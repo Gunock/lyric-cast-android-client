@@ -1,0 +1,23 @@
+<!--
+  ~ Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+  ~ Copyright (c) 2020 . All rights reserved.
+  ~  Last modified 10/11/20 11:08 PM
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.gunock.lyriccast.MainActivity">
+    <item
+        android:id="@+id/menu_cast"
+        android:title="@string/button_cast"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always"
+        tools:icon="@drawable/mr_button_light" />
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/settings" />
+    <item
+        android:id="@+id/menu_import_songs"
+        android:title="@string/import_songs_title" />
+</menu>
