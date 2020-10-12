@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+  ~ Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~  Last modified 10/11/20 11:21 PM
+  ~ Last modified 10/12/20 10:11 PM
   -->
 
 <resources>
@@ -11,22 +11,26 @@
     <string name="settings">Settings</string>
 
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="song_list_fragment_label">Songs</string>
+    <string name="controls_fragment_label">Controls</string>
     <string name="button_cast">Cast</string>
     <string name="button_blank">Blank</string>
-    <string name="button_test">Test</string>
     <string name="button_previous">Previous</string>
     <string name="button_next">Next</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!--  Strings used for inputs  -->
+    <string name="song_filter_hint">Song title</string>
 
-    <!-- String used in application logic -->
+    <!-- Strings used in application logic -->
     <string name="chromecast_app_id">67E9729E</string>
     <string name="content_namespace">urn:x-cast:lyric.cast.content</string>
     <string name="control_namespace">urn:x-cast:lyric.cast.control</string>
     <string name="content_message_template">{\"text\":\"%1$s\"}</string>
     <string name="control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
     <string name="import_songs_title">Import songs</string>
+
+    <!--  Strings used as placeholders -->
+    <string name="placeholder_title">Title</string>
+    <string name="placeholder_author">Author</string>
+    <string name="placeholder_tag">Tag</string>
 </resources>

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 6:51 PM
+ * Last modified 10/12/20 9:35 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -29,6 +29,11 @@ object MessageHelper {
         Log.d(tag, "Sending content message")
         Log.d(tag, "Namespace: $CONTENT_NAMESPACE")
         Log.d(tag, "Content: $messageContent")
+        if (castSession == null) {
+            Log.d(tag, "Message not sent (no session)")
+            return null
+        }
+
         castSession.sendMessage(CONTENT_NAMESPACE, messageContent)
         return null
     }
@@ -44,6 +49,11 @@ object MessageHelper {
         Log.d(tag, "Sending control message")
         Log.d(tag, "Namespace: $CONTROL_NAMESPACE")
         Log.d(tag, "Content: $messageContent")
+        if (castSession == null) {
+            Log.d(tag, "Message not sent (no session)")
+            return null
+        }
+
         castSession.sendMessage(CONTROL_NAMESPACE, messageContent)
         return null
     }

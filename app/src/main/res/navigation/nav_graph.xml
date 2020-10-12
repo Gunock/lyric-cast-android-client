@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+  ~ Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~  Last modified 10/11/20 7:38 PM
+  ~ Last modified 10/12/20 6:57 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/SongListFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/SongListFragment"
         android:name="pl.gunock.lyriccast.SongListFragment"
-        android:label="@string/first_fragment_label"
+        android:label="@string/song_list_fragment_label"
         tools:layout="@layout/fragment_song_list">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_SongListFragment_to_ControlsFragment"
+            app:destination="@id/ControlsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="pl.gunock.lyriccast.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/ControlsFragment"
+        android:name="pl.gunock.lyriccast.ControlsFragment"
+        android:label="@string/controls_fragment_label"
+        tools:layout="@layout/fragment_controls">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_ControlsFragment_to_SongListFragment"
+            app:destination="@id/SongListFragment" />
     </fragment>
 </navigation>

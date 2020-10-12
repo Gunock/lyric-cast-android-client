@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 11:06 PM
+ * Last modified 10/12/20 8:57 PM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.listeners
 
 import android.content.Context
 import android.view.GestureDetector
@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 
 class RecyclerItemClickListener(
     context: Context?,
-    private val mListener: (View?, position: Int) -> Unit
+    private val mListener: (view: View?, position: Int) -> Unit
 ) :
     OnItemTouchListener {
 

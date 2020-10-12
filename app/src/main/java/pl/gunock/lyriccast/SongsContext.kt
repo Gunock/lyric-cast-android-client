@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 10:18 PM
+ * Last modified 10/12/20 9:01 PM
  */
 
 package pl.gunock.lyriccast
 
 import android.util.Log
 import org.json.JSONObject
+import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
 import java.io.FilenameFilter
@@ -19,6 +20,10 @@ object SongsContext {
 
     var songsList: MutableList<SongMetadataModel> = mutableListOf()
     var songsListAdapter: SongListAdapter? = null
+
+    private var presentationIndex: Int = 0
+    private var currentSongMetadata: SongMetadataModel? = null
+    private var currentSongLyrics: SongLyricsModel? = null
 
     private val songsMap: MutableMap<String, SongMetadataModel> = mutableMapOf()
 
@@ -35,6 +40,35 @@ object SongsContext {
         fillSongsList(loadedSongsMeta)
     }
 
+    fun pickSong(position: Int) {
+        currentSongMetadata = songsList[position]
+        currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
+        presentationIndex = 0
+    }
+
+    fun nextSlide() {
+        if (++presentationIndex >= currentSongMetadata!!.presentation.size) {
+            presentationIndex = currentSongMetadata!!.presentation.size - 1
+        }
+    }
+
+    fun previousSlide() {
+        if (--presentationIndex < 0) {
+            presentationIndex = 0
+        }
+    }
+
+    fun getCurrentSlide(): String {
+        val slideTag: String = currentSongMetadata!!.presentation[presentationIndex]
+        return currentSongLyrics!!.lyrics[slideTag] ?: error("Lyrics not found")
+    }
+
+    fun filterSongs(text: String) {
+        songsListAdapter!!.songs = songsList.filter { song -> song.title.contains(text) }
+            .toMutableList()
+        songsListAdapter!!.notifyDataSetChanged()
+    }
+
     private fun fillSongsList(songs: MutableList<SongMetadataModel>): Void? {
         songsMap.clear()
         songsList = songs
@@ -47,4 +81,5 @@ object SongsContext {
         songsListAdapter!!.notifyDataSetChanged()
         return null
     }
+
 }
