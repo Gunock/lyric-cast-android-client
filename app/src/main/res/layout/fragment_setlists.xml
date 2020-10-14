@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 11:43 PM
+  ~ Last modified 10/14/20 11:44 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,10 +9,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.SongListFragment">
+    tools:context=".fragments.SetlistsFragment">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_view_filter_songs"
+        android:id="@+id/text_view_filter_setlists"
         android:layout_width="0dp"
         android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,18 +22,18 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/song_filter_hint"
+            android:hint="@string/setlist_filter_hint"
             android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
-        android:id="@+id/spinner_category"
+        android:id="@+id/spinner_setlist_category"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_filter_songs" />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_filter_setlists" />
 
     <View
         android:id="@+id/HorizontalDivider"
@@ -43,10 +42,10 @@
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_category" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner_setlist_category" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_songs"
+        android:id="@+id/recycler_view_setlists"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fadeScrollbars="false"
@@ -54,11 +53,12 @@
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_category">
+        app:layout_constraintTop_toBottomOf="@+id/spinner_setlist_category">
 
     </androidx.recyclerview.widget.RecyclerView>
 

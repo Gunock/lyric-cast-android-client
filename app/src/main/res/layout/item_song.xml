@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
+  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/12/20 10:37 PM
+  ~ Last modified 10/14/20 10:47 PM
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,8 +15,7 @@
     android:focusable="true"
     android:longClickable="false"
     android:orientation="vertical"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingTop="10dp">
 
     <TextView
         android:id="@+id/song_title"
@@ -48,12 +47,12 @@
             android:text="@string/placeholder_author"
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/cardView"
+            app:layout_constraintEnd_toStartOf="@+id/card_song_category"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+            android:id="@+id/card_song_category"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
             app:cardCornerRadius="@dimen/cast_intro_overlay_focus_radius"
@@ -62,7 +61,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/song_tag"
+                android:id="@+id/song_category"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -70,11 +69,19 @@
                 android:maxLines="1"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:text="@string/placeholder_tag"
+                android:text="@string/placeholder_category"
                 android:textAlignment="viewStart"
                 android:textColor="@color/common_google_signin_btn_text_dark_default" />
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:background="?android:attr/listDivider" />
 
 </LinearLayout>

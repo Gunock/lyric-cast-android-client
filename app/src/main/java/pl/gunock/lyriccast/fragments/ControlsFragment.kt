@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
+ * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/12/20 10:37 PM
+ * Last modified 10/13/20 8:55 PM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.gms.cast.framework.CastContext
+import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.utils.ControlAction
 import pl.gunock.lyriccast.utils.MessageHelper

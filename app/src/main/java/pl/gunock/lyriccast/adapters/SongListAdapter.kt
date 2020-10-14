@@ -1,16 +1,17 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
+ * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/12/20 10:11 PM
+ * Last modified 10/13/20 9:12 PM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.models.SongMetadataModel
 
 class SongListAdapter(var songs: MutableList<SongMetadataModel>) :
@@ -19,7 +20,7 @@ class SongListAdapter(var songs: MutableList<SongMetadataModel>) :
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.song_title)
         val authorTextView: TextView = itemView.findViewById(R.id.song_author)
-        val tagTextView: TextView = itemView.findViewById(R.id.song_tag)
+        val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -31,11 +32,7 @@ class SongListAdapter(var songs: MutableList<SongMetadataModel>) :
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         holder.titleTextView.text = songs[position].title
         holder.authorTextView.text = songs[position].author
-        if (songs[position].tags.isNotEmpty()) {
-            holder.tagTextView.text = songs[position].tags[0]
-        } else {
-            holder.tagTextView.text = ""
-        }
+        holder.categoryTextView.text = songs[position].category
     }
 
     override fun getItemCount() = songs.size

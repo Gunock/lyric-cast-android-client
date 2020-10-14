@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 8:12 PM
+ * Last modified 10/14/20 11:44 PM
  */
 
 package pl.gunock.lyriccast
@@ -15,22 +15,28 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
+import pl.gunock.lyriccast.listeners.TabItemSelectedListener
 import pl.gunock.lyriccast.utils.FileHelper
 import pl.gunock.lyriccast.utils.ResourceHelper
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private val tag = "MainActivity"
-    private val selectFolderResultCode = 1
 
+    private val selectFolderResultCode = 1
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ResourceHelper.initialize(applicationContext)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
@@ -41,12 +47,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(turnWifiOn)
         }
 
+        setupListeners()
+
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
         castContext = CastContext.getSharedInstance(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         CastButtonFactory.setUpMediaRouteButton(
             applicationContext,
@@ -57,9 +64,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.menu_import_songs -> importFiles()
             R.id.menu_settings -> goToSettings()
@@ -85,6 +89,33 @@ class MainActivity : AppCompatActivity() {
             )
 
             SongsContext.loadSongsMetadata()
+        }
+    }
+
+    private fun setupListeners() {
+        findViewById<TabLayout>(R.id.tab_layout_songs_setlists).addOnTabSelectedListener(
+            TabItemSelectedListener {
+                val navHostFragment =
+                    supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment) as NavHostFragment
+                val navController = navHostFragment.navController
+
+                if (it!!.text == getString(R.string.song_list_fragment_label)) {
+                    Log.d(tag, "Switching to song list")
+                    navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
+                } else if (it.text == getString(R.string.setlists_fragment_label)) {
+                    Log.d(tag, "Switching to setlists")
+                    navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
+                }
+            })
+
+        findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
+            if (findViewById<LinearLayout>(R.id.fab_view_add_song).isVisible) {
+                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.INVISIBLE
+                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.INVISIBLE
+            } else {
+                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.VISIBLE
+                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.VISIBLE
+            }
         }
     }
 

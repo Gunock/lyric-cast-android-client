@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 10:13 PM
+ * Last modified 10/14/20 8:51 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -11,13 +11,24 @@ import pl.gunock.lyriccast.utils.JsonHelper.arrayToStringList
 import java.io.File
 import java.util.*
 
-class SongMetadataModel(json: JSONObject) {
-    var lyricsFilename: String = json.getString("lyricsFilename")
-    var title: String = json.getString("title")
-    var author: String = json.getString("author")
-    var copyright: String = json.getString("copyright")
-    var tags: List<String> = arrayToStringList(json.getJSONArray("tags"))
-    var presentation: List<String> = arrayToStringList(json.getJSONArray("presentation"))
+class SongMetadataModel() {
+    var lyricsFilename: String = ""
+    var title: String = ""
+    var author: String = ""
+    var copyright: String = ""
+    var category: String = ""
+    var tags: List<String> = listOf()
+    var presentation: List<String> = listOf()
+
+    constructor(json: JSONObject) : this() {
+        lyricsFilename = json.getString("lyricsFilename")
+        title = json.getString("title")
+        author = json.getString("author")
+        copyright = json.getString("copyright")
+        category = json.getString("category")
+        tags = arrayToStringList(json.getJSONArray("tags"))
+        presentation = arrayToStringList(json.getJSONArray("presentation"))
+    }
 
     init {
         author = if (author.toLowerCase(Locale.ROOT) != "null") author else "Unknown"
@@ -28,9 +39,7 @@ class SongMetadataModel(json: JSONObject) {
         val builder: StringBuilder = StringBuilder()
 
         builder.append("(title: $title, ")
-        builder.append("author: $author, ")
-        builder.append("copyright: $copyright, ")
-        builder.append("tags: $tags)")
+        builder.append("author: $author)")
 
         return builder.toString()
     }
