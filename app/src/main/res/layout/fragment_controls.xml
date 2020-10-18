@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 10:45 PM
+  ~ Last modified 10/19/20 12:24 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
-        android:text="@string/button_next"
+        android:text="@string/next"
         app:layout_constraintStart_toEndOf="@+id/button_control_blank"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/button_blank"
+        android:text="@string/blank"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:text="@string/button_previous"
+        android:text="@string/previous"
         app:layout_constraintEnd_toStartOf="@+id/button_control_blank"
         app:layout_constraintTop_toTopOf="parent" />
 

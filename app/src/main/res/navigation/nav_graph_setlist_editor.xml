@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+  ~ Copyright (c) 2020 . All rights reserved.
+  ~ Last modified 10/19/20 12:24 AM
+  -->
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_setlist_editor"
+    app:startDestination="@id/SetlistEditorFragment">
+
+    <fragment
+        android:id="@+id/SetlistEditorSongListFragment"
+        android:name="pl.gunock.lyriccast.fragments.SetlistEditorSongListFragment"
+        android:label="@string/songs"
+        tools:layout="@layout/fragment_song_list">
+
+        <action
+            android:id="@+id/action_SetlistEditorSongListFragment_to_SetlistEditorFragment"
+            app:destination="@id/SetlistEditorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SetlistEditorFragment"
+        android:name="pl.gunock.lyriccast.fragments.SetlistEditorFragment"
+        android:label="@string/songs"
+        tools:layout="@layout/fragment_setlist_editor">
+
+        <action
+            android:id="@+id/action_SetlistEditorFragment_to_SetlistEditorSongListFragment"
+            app:destination="@id/SetlistEditorSongListFragment" />
+    </fragment>
+</navigation>

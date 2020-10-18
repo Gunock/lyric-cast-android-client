@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 11:50 PM
+  ~ Last modified 10/19/20 12:26 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,7 +12,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/main_nav_host_fragment"
+        android:id="@+id/main_nav_host"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -23,7 +23,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:navGraph="@navigation/nav_graph">
+        app:navGraph="@navigation/nav_graph_main">
 
     </androidx.fragment.app.FragmentContainerView>
 
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="2dp"
                 android:layout_weight="1"
-                android:text="@string/fab_add_setlist" />
+                android:text="@string/add_setlist" />
         </androidx.cardview.widget.CardView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,6 +68,7 @@
             android:clickable="false"
             android:visibility="visible"
             app:fabCustomSize="40dp"
+            android:contentDescription="@string/add_setlist"
             app:srcCompat="@drawable/ic_action_setlist" />
 
     </LinearLayout>
@@ -100,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="2dp"
-                android:text="@string/fab_add_song" />
+                android:text="@string/add_song" />
         </androidx.cardview.widget.CardView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -113,6 +114,7 @@
             android:visibility="visible"
             app:fabCustomSize="40dp"
             app:srcCompat="@drawable/ic_action_song"
+            android:contentDescription="@string/add_song"
             app:useCompatPadding="false" />
     </LinearLayout>
 
@@ -128,6 +130,7 @@
         app:backgroundTint="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_songs_setlists"
         app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/add_song"
         app:srcCompat="@drawable/ic_action_add" />
 
     <View
@@ -152,13 +155,13 @@
             android:id="@+id/tab_songs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/song_list_fragment_label" />
+            android:text="@string/songs" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_setlists"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/setlists_fragment_label" />
+            android:text="@string/setlists" />
 
     </com.google.android.material.tabs.TabLayout>
 

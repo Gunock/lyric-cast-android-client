@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 11:50 PM
+  ~ Last modified 10/19/20 12:24 AM
   -->
 
 <resources>
@@ -11,19 +11,25 @@
     <string name="settings">Settings</string>
 
     <!-- Strings used for fragments for navigation -->
-    <string name="song_list_fragment_label">Songs</string>
-    <string name="setlists_fragment_label">Setlists</string>
-    <string name="controls_fragment_label">Controls</string>
-    <string name="button_cast">Cast</string>
-    <string name="button_blank">Blank</string>
-    <string name="button_previous">Previous</string>
-    <string name="button_next">Next</string>
-    <string name="fab_add_song">Add song</string>
-    <string name="fab_add_setlist">Add setlist</string>
+    <string name="import_songs">Import songs</string>
+    <string name="songs">Songs</string>
+    <string name="setlists">Setlists</string>
+    <string name="controls">Controls</string>
+    <string name="cast">Cast</string>
+    <string name="blank">Blank</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="add">Add</string>
+    <string name="add_song">Add song</string>
+    <string name="add_setlist">Add setlist</string>
 
     <!--  Strings used for inputs  -->
-    <string name="song_filter_hint">Song title</string>
-    <string name="setlist_filter_hint">Setlist name</string>
+    <string name="song_title">Song title</string>
+    <string name="setlist_name">Setlist name</string>
+
+    <!--  Strings used for buttons  -->
+    <string name="save">Save</string>
+    <string name="pick_songs">Pick songs</string>
 
     <!-- Strings used in application logic -->
     <string name="chromecast_app_id">67E9729E</string>
@@ -31,7 +37,6 @@
     <string name="control_namespace">urn:x-cast:lyric.cast.control</string>
     <string name="content_message_template">{\"text\":\"%1$s\"}</string>
     <string name="control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
-    <string name="import_songs_title">Import songs</string>
 
     <!--  Strings used as placeholders -->
     <string name="placeholder_title">Title</string>

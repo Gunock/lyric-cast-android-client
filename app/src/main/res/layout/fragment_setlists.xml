@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 11:44 PM
+  ~ Last modified 10/19/20 12:24 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,14 +22,14 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/setlist_filter_hint"
+            android:hint="@string/setlist_name"
             android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
         android:id="@+id/spinner_setlist_category"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/14/20 11:43 PM
+  ~ Last modified 10/19/20 12:24 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,18 +23,27 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/song_filter_hint"
+            android:hint="@string/song_title"
             android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
         android:id="@+id/spinner_category"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/switch_selected_songs"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_filter_songs" />
+
+    <Switch
+        android:id="@+id/switch_selected_songs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selected"
+        app:layout_constraintBottom_toBottomOf="@+id/spinner_category"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/spinner_category" />
 
     <View
         android:id="@+id/HorizontalDivider"

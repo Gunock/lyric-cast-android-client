@@ -1,14 +1,15 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 7:43 PM
+ * Last modified 10/17/20 12:30 PM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.cast.framework.CastContext
+import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.utils.ResourceHelper
 
 class SettingsActivity : AppCompatActivity() {

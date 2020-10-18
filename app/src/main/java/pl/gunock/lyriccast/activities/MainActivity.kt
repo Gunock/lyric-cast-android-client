@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 11:44 PM
+ * Last modified 10/19/20 12:24 AM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.activities
 
 import android.app.Activity
 import android.content.Context
@@ -24,6 +24,8 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.TabItemSelectedListener
 import pl.gunock.lyriccast.utils.FileHelper
 import pl.gunock.lyriccast.utils.ResourceHelper
@@ -47,9 +49,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(turnWifiOn)
         }
 
-        setupListeners()
+        setUpListeners()
 
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
+        SongsContext.setlistsDirectory = "${filesDir.path}/setlists/"
+        SongsContext.loadSetlists()
+
         castContext = CastContext.getSharedInstance(this)
     }
 
@@ -92,17 +97,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupListeners() {
+    private fun setUpListeners() {
         findViewById<TabLayout>(R.id.tab_layout_songs_setlists).addOnTabSelectedListener(
             TabItemSelectedListener {
                 val navHostFragment =
-                    supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment) as NavHostFragment
+                    supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
                 val navController = navHostFragment.navController
 
-                if (it!!.text == getString(R.string.song_list_fragment_label)) {
+                if (it!!.text == getString(R.string.songs)) {
                     Log.d(tag, "Switching to song list")
                     navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
-                } else if (it.text == getString(R.string.setlists_fragment_label)) {
+                } else if (it.text == getString(R.string.setlists)) {
                     Log.d(tag, "Switching to setlists")
                     navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
                 }
@@ -110,12 +115,17 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
             if (findViewById<LinearLayout>(R.id.fab_view_add_song).isVisible) {
-                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.INVISIBLE
-                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.INVISIBLE
+                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
+                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
             } else {
                 findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.VISIBLE
                 findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.VISIBLE
             }
+        }
+
+        findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
+            val intent = Intent(this, SetlistEditorActivity::class.java)
+            startActivity(intent)
         }
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 8:51 PM
+ * Last modified 10/17/20 12:18 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -28,9 +28,7 @@ class SongMetadataModel() {
         category = json.getString("category")
         tags = arrayToStringList(json.getJSONArray("tags"))
         presentation = arrayToStringList(json.getJSONArray("presentation"))
-    }
 
-    init {
         author = if (author.toLowerCase(Locale.ROOT) != "null") author else "Unknown"
         copyright = if (copyright.toLowerCase(Locale.ROOT) != "null") copyright else ""
     }

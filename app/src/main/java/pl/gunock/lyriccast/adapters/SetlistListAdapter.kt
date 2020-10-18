@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 11:41 PM
+ * Last modified 10/17/20 12:05 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,7 @@ class SetlistListAdapter(var setlists: MutableList<SetlistModel>) :
         val titleTextView: TextView = itemView.findViewById(R.id.song_title)
         val authorTextView: TextView = itemView.findViewById(R.id.song_author)
         val categoryCardView: CardView = itemView.findViewById(R.id.card_song_category)
+        val checkBox: CheckBox = itemView.findViewById(R.id.song_checkbox)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -34,7 +36,8 @@ class SetlistListAdapter(var setlists: MutableList<SetlistModel>) :
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         holder.titleTextView.text = setlists[position].name
         holder.authorTextView.text = ""
-        holder.categoryCardView.visibility = View.INVISIBLE
+        holder.categoryCardView.visibility = View.GONE
+        holder.checkBox.visibility = View.GONE
     }
 
     override fun getItemCount() = setlists.size

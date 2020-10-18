@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 8:33 PM
+ * Last modified 10/19/20 12:15 AM
  */
 
 package pl.gunock.lyriccast.utils
@@ -27,7 +27,7 @@ object JsonHelper {
     fun objectToMap(json: JSONObject): Map<String, String> {
         val result: HashMap<String, String> = HashMap()
 
-        json.keys().forEach { key ->
+        for (key in json.keys()) {
             result[key] = json[key] as String
         }
 

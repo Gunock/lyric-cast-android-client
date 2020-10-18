@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 11:45 PM
+ * Last modified 10/19/20 12:17 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Switch
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,6 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.RecyclerItemClickListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
@@ -40,7 +40,6 @@ class SongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_song_list, container, false)
     }
 
@@ -52,7 +51,9 @@ class SongListFragment : Fragment() {
         searchView = view.findViewById(R.id.text_view_filter_songs)
         categorySpinner = view.findViewById(R.id.spinner_category)
 
-        SongsContext.songsListAdapter = SongListAdapter(SongsContext.songsList)
+        SongsContext.setupSongListAdapter()
+
+        view.findViewById<Switch>(R.id.switch_selected_songs).visibility = View.GONE
 
         view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
@@ -62,7 +63,7 @@ class SongListFragment : Fragment() {
 
         setupListeners(view)
 
-        if (SongsContext.songsList.isEmpty()) {
+        if (SongsContext.songList.isEmpty()) {
             SongsContext.loadSongsMetadata()
         }
 

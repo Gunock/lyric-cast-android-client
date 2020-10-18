@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/12/20 10:37 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/12/20 9:35 PM
+ * Last modified 10/16/20 9:45 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -20,7 +20,7 @@ object MessageHelper {
     private val CONTENT_MESSAGE_TEMPLATE: String = getString(R.string.content_message_template)
     private val CONTROL_MESSAGE_TEMPLATE: String = getString(R.string.control_message_template)
 
-    fun sendContentMessage(context: CastContext, message: String): Void? {
+    fun sendContentMessage(context: CastContext, message: String) {
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTENT_MESSAGE_TEMPLATE.format(message)
             .replace("\n", "<br>")
@@ -31,18 +31,17 @@ object MessageHelper {
         Log.d(tag, "Content: $messageContent")
         if (castSession == null) {
             Log.d(tag, "Message not sent (no session)")
-            return null
+            return
         }
 
         castSession.sendMessage(CONTENT_NAMESPACE, messageContent)
-        return null
     }
 
-    fun sendControlMessage(context: CastContext, action: ControlAction): Void? {
+    fun sendControlMessage(context: CastContext, action: ControlAction) {
         return sendControlMessage(context, action, null)
     }
 
-    fun sendControlMessage(context: CastContext, action: ControlAction, value: String?): Void? {
+    fun sendControlMessage(context: CastContext, action: ControlAction, value: String?) {
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), value)
 
@@ -51,10 +50,9 @@ object MessageHelper {
         Log.d(tag, "Content: $messageContent")
         if (castSession == null) {
             Log.d(tag, "Message not sent (no session)")
-            return null
+            return
         }
 
         castSession.sendMessage(CONTROL_NAMESPACE, messageContent)
-        return null
     }
 }

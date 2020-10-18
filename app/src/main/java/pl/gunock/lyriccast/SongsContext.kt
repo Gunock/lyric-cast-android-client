@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 11:45 PM
+ * Last modified 10/19/20 12:00 AM
  */
 
 package pl.gunock.lyriccast
@@ -11,6 +11,7 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.adapters.SetlistListAdapter
 import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.models.SetlistModel
+import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
@@ -20,27 +21,33 @@ import java.util.*
 object SongsContext {
     private const val tag = "SongsContext"
 
-    var songsDirectory = ""
-    var songsList: MutableList<SongMetadataModel> = mutableListOf()
+    var songsDirectory: String = ""
+    var setlistsDirectory: String = ""
+    var songList: MutableList<SongMetadataModel> = mutableListOf()
+    val songItemList: MutableList<SongItemModel> = mutableListOf()
     var songsListAdapter: SongListAdapter? = null
+
     var setlistList: MutableList<SetlistModel> = mutableListOf()
     var setlistListAdapter: SetlistListAdapter? = null
     var categories: MutableSet<String> = mutableSetOf()
 
-    private var presentationIndex: Int = 0
+    private var presentationIterator: ListIterator<String>? = null
+    private var presentationCurrentTag: String = ""
     private var currentSongMetadata: SongMetadataModel? = null
     private var currentSongLyrics: SongLyricsModel? = null
 
-    private val songsMap: MutableMap<String, SongMetadataModel> = mutableMapOf()
-
     fun loadSongsMetadata() {
         val loadedSongsMeta: MutableList<SongMetadataModel> = mutableListOf()
-        val metadataFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
+        val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
         categories.clear()
         categories.add("All")
-        val fileList = File(songsDirectory).listFiles(metadataFilter)
+        val fileList = File(songsDirectory).listFiles(fileFilter)
 
-        fileList!!.forEach { file ->
+        if (fileList == null || fileList.isEmpty()) {
+            return
+        }
+
+        for (file in fileList) {
             Log.d(tag, "Reading file: ${file.name}")
             val json = JSONObject(file.readText(Charsets.UTF_8))
             val songMetadata = SongMetadataModel(json)
@@ -52,46 +59,83 @@ object SongsContext {
         fillSongsList(loadedSongsMeta)
     }
 
+    fun loadSetlists() {
+        val loadedSetlists: MutableList<SetlistModel> = mutableListOf()
+        val fileFilter = FilenameFilter { _, name -> name.endsWith(".json") }
+        val fileList = File(setlistsDirectory).listFiles(fileFilter)
+
+        if (fileList == null || fileList.isEmpty()) {
+            return
+        }
+
+        for (file in fileList) {
+            if (file.isDirectory) {
+                file.deleteRecursively()
+            }
+
+            Log.d(tag, "Reading file: ${file.name}")
+            val json = JSONObject(file.readText(Charsets.UTF_8))
+            val songSetlist = SetlistModel(json)
+            loadedSetlists.add(songSetlist)
+        }
+        Log.d(tag, "Parsed metadata files: $loadedSetlists")
+
+        setlistList = loadedSetlists
+    }
+
     fun pickSong(position: Int) {
-        currentSongMetadata = songsListAdapter!!.songs[position]
+        currentSongMetadata = songList[songsListAdapter!!.songs[position].originalPosition]
         currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
-        presentationIndex = 0
+        presentationIterator = currentSongMetadata!!.presentation.listIterator()
+        presentationCurrentTag = presentationIterator!!.next()
     }
 
     fun nextSlide() {
-        if (++presentationIndex >= currentSongMetadata!!.presentation.size) {
-            presentationIndex = currentSongMetadata!!.presentation.size - 1
+        if (presentationIterator!!.hasNext()) {
+            presentationCurrentTag = presentationIterator!!.next()
         }
     }
 
     fun previousSlide() {
-        if (--presentationIndex < 0) {
-            presentationIndex = 0
+        if (presentationIterator!!.hasPrevious()) {
+            presentationCurrentTag = presentationIterator!!.previous()
         }
     }
 
     fun getCurrentSlide(): String {
-        val slideTag: String = currentSongMetadata!!.presentation[presentationIndex]
-        return currentSongLyrics!!.lyrics[slideTag] ?: error("Lyrics not found")
+        return currentSongLyrics!!.lyrics[presentationCurrentTag] ?: error("Lyrics not found")
+    }
+
+    fun saveSetlist(setlist: SetlistModel) {
+        val json = setlist.toJson()
+        val setlistFile = File("$setlistsDirectory/${setlist.name}.json")
+        File(setlistsDirectory).mkdirs()
+        setlistFile.writeText(json.toString())
+    }
+
+    fun setupSongListAdapter(showCheckBox: Boolean = false) {
+        for (i in 0 until songList.size) {
+            songItemList.add(SongItemModel(i, songList[i]))
+        }
+        songsListAdapter = SongListAdapter(songItemList, showCheckBox)
     }
 
     fun filterSongs(title: String, category: String = "All") {
-        songsListAdapter!!.songs = songsList.filter { song ->
+        songsListAdapter!!.songs = songItemList.filter { song ->
             song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
                     && (category == "All" || song.category == category)
         }.toMutableList()
         songsListAdapter!!.notifyDataSetChanged()
     }
 
-    private fun fillSongsList(songs: MutableList<SongMetadataModel>): Void? {
-        songsMap.clear()
-        songsList = songs
-        songs.forEach { song ->
-            songsMap[song.title] = song
+    private fun fillSongsList(songs: MutableList<SongMetadataModel>) {
+        songList = songs
+        songItemList.clear()
+        for (i in 0 until songList.size) {
+            songItemList.add(SongItemModel(i, songList[i]))
         }
-        songsListAdapter!!.songs = songs
+        songsListAdapter!!.songs = songItemList
         songsListAdapter!!.notifyDataSetChanged()
-        return null
     }
 
 }
