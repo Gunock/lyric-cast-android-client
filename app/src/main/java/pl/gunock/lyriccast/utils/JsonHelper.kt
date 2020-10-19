@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 12:15 AM
+ * Last modified 10/19/20 4:22 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -16,13 +16,6 @@ object JsonHelper {
             jsonArray.getString(it)
         }
     }
-
-    fun arrayToJsonList(jsonArray: JSONArray): List<JSONObject> {
-        return List<JSONObject>(jsonArray.length()) {
-            jsonArray.getJSONObject(it)
-        }
-    }
-
 
     fun objectToMap(json: JSONObject): Map<String, String> {
         val result: HashMap<String, String> = HashMap()

@@ -1,16 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 12:00 AM
+ * Last modified 10/19/20 4:35 PM
  */
 
 package pl.gunock.lyriccast
 
 import android.util.Log
 import org.json.JSONObject
-import pl.gunock.lyriccast.adapters.SetlistListAdapter
 import pl.gunock.lyriccast.adapters.SongListAdapter
-import pl.gunock.lyriccast.models.SetlistModel
 import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
@@ -22,13 +20,10 @@ object SongsContext {
     private const val tag = "SongsContext"
 
     var songsDirectory: String = ""
-    var setlistsDirectory: String = ""
     var songList: MutableList<SongMetadataModel> = mutableListOf()
     val songItemList: MutableList<SongItemModel> = mutableListOf()
     var songsListAdapter: SongListAdapter? = null
 
-    var setlistList: MutableList<SetlistModel> = mutableListOf()
-    var setlistListAdapter: SetlistListAdapter? = null
     var categories: MutableSet<String> = mutableSetOf()
 
     private var presentationIterator: ListIterator<String>? = null
@@ -59,30 +54,6 @@ object SongsContext {
         fillSongsList(loadedSongsMeta)
     }
 
-    fun loadSetlists() {
-        val loadedSetlists: MutableList<SetlistModel> = mutableListOf()
-        val fileFilter = FilenameFilter { _, name -> name.endsWith(".json") }
-        val fileList = File(setlistsDirectory).listFiles(fileFilter)
-
-        if (fileList == null || fileList.isEmpty()) {
-            return
-        }
-
-        for (file in fileList) {
-            if (file.isDirectory) {
-                file.deleteRecursively()
-            }
-
-            Log.d(tag, "Reading file: ${file.name}")
-            val json = JSONObject(file.readText(Charsets.UTF_8))
-            val songSetlist = SetlistModel(json)
-            loadedSetlists.add(songSetlist)
-        }
-        Log.d(tag, "Parsed metadata files: $loadedSetlists")
-
-        setlistList = loadedSetlists
-    }
-
     fun pickSong(position: Int) {
         currentSongMetadata = songList[songsListAdapter!!.songs[position].originalPosition]
         currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
@@ -106,13 +77,6 @@ object SongsContext {
         return currentSongLyrics!!.lyrics[presentationCurrentTag] ?: error("Lyrics not found")
     }
 
-    fun saveSetlist(setlist: SetlistModel) {
-        val json = setlist.toJson()
-        val setlistFile = File("$setlistsDirectory/${setlist.name}.json")
-        File(setlistsDirectory).mkdirs()
-        setlistFile.writeText(json.toString())
-    }
-
     fun setupSongListAdapter(showCheckBox: Boolean = false) {
         for (i in 0 until songList.size) {
             songItemList.add(SongItemModel(i, songList[i]))
@@ -120,7 +84,7 @@ object SongsContext {
         songsListAdapter = SongListAdapter(songItemList, showCheckBox)
     }
 
-    fun filterSongs(title: String, category: String = "All") {
+    fun filter(title: String, category: String = "All") {
         songsListAdapter!!.songs = songItemList.filter { song ->
             song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
                     && (category == "All" || song.category == category)

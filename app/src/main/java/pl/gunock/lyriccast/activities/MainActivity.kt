@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 12:24 AM
+ * Last modified 10/19/20 4:22 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -25,6 +25,7 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.TabItemSelectedListener
 import pl.gunock.lyriccast.utils.FileHelper
@@ -52,8 +53,8 @@ class MainActivity : AppCompatActivity() {
         setUpListeners()
 
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
-        SongsContext.setlistsDirectory = "${filesDir.path}/setlists/"
-        SongsContext.loadSetlists()
+        SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
+        SetlistsContext.loadSetlists()
 
         castContext = CastContext.getSharedInstance(this)
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 12:17 AM
+ * Last modified 10/19/20 4:40 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,13 +10,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SetlistListAdapter
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
@@ -42,30 +43,45 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        SongsContext.setlistListAdapter = SetlistListAdapter(SongsContext.setlistList)
+        searchView = view.findViewById(R.id.text_view_filter_setlists)
+        categorySpinner = view.findViewById(R.id.spinner_setlist_category)
+
+        SetlistsContext.setlistListAdapter = SetlistListAdapter(SetlistsContext.setlistList)
         view.findViewById<RecyclerView>(R.id.recycler_view_setlists).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = SongsContext.setlistListAdapter
+            adapter = SetlistsContext.setlistListAdapter
         }
+
         setupListeners(view)
+
+        val categorySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            SongsContext.categories.toList()
+        )
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        categorySpinner!!.apply {
+            adapter = categorySpinnerAdapter
+        }
     }
 
-    // TODO: Adapt for setlists
     private fun setupListeners(view: View) {
-        view.findViewById<RecyclerView>(R.id.recycler_view_songs).addOnItemTouchListener(
+        // TODO: Adapt for setlists
+        view.findViewById<RecyclerView>(R.id.recycler_view_setlists).addOnItemTouchListener(
             RecyclerItemClickListener(context) { _, position ->
-                SongsContext.pickSong(position)
-                findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
+//                SongsContext.pickSong(position)
+//                findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
             })
 
         searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
+            SetlistsContext.filter(it, categorySpinner!!.selectedItem.toString())
         })
 
         categorySpinner!!.onItemSelectedListener =
             SpinnerItemSelectedListener { _, _ ->
-                SongsContext.filterSongs(
+                SetlistsContext.filter(
                     searchView!!.editText!!.editableText.toString(),
                     categorySpinner!!.selectedItem.toString()
                 )

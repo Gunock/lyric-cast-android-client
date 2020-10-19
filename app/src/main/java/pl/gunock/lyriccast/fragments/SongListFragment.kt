@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 12:17 AM
+ * Last modified 10/19/20 4:35 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -87,12 +87,12 @@ class SongListFragment : Fragment() {
             })
 
         searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
+            SongsContext.filter(it, categorySpinner!!.selectedItem.toString())
         })
 
         categorySpinner!!.onItemSelectedListener =
             SpinnerItemSelectedListener { _, _ ->
-                SongsContext.filterSongs(
+                SongsContext.filter(
                     searchView!!.editText!!.editableText.toString(),
                     categorySpinner!!.selectedItem.toString()
                 )
