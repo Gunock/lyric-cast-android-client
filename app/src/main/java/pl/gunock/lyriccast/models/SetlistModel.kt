@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:35 PM
+ * Last modified 10/20/20 10:54 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -10,10 +10,16 @@ import org.json.JSONArray
 import org.json.JSONObject
 import pl.gunock.lyriccast.utils.JsonHelper
 
-class SetlistModel() {
+open class SetlistModel() {
     var name: String = ""
     var songTitles: List<String> = listOf()
     var category: String = ""
+
+    constructor(setlist: SetlistModel) : this() {
+        name = setlist.name
+        songTitles = setlist.songTitles
+        category = setlist.category
+    }
 
     constructor(json: JSONObject) : this() {
         name = json.getString("name")

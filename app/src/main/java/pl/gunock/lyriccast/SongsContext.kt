@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:35 PM
+ * Last modified 10/20/20 10:00 PM
  */
 
 package pl.gunock.lyriccast
@@ -20,7 +20,7 @@ object SongsContext {
     private const val tag = "SongsContext"
 
     var songsDirectory: String = ""
-    var songList: MutableList<SongMetadataModel> = mutableListOf()
+    var songList: Map<String, SongMetadataModel> = mapOf()
     val songItemList: MutableList<SongItemModel> = mutableListOf()
     var songsListAdapter: SongListAdapter? = null
 
@@ -31,46 +31,50 @@ object SongsContext {
     private var currentSongMetadata: SongMetadataModel? = null
     private var currentSongLyrics: SongLyricsModel? = null
 
-    fun loadSongsMetadata() {
-        val loadedSongsMeta: MutableList<SongMetadataModel> = mutableListOf()
+    fun loadSongsMetadata(): List<SongMetadataModel> {
+        val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
         categories.clear()
         categories.add("All")
         val fileList = File(songsDirectory).listFiles(fileFilter)
 
         if (fileList == null || fileList.isEmpty()) {
-            return
+            return listOf()
         }
 
         for (file in fileList) {
             Log.d(tag, "Reading file: ${file.name}")
             val json = JSONObject(file.readText(Charsets.UTF_8))
             val songMetadata = SongMetadataModel(json)
-            loadedSongsMeta.add(songMetadata)
+            loadedSongsMetadata.add(songMetadata)
             categories.add(songMetadata.category)
         }
-        Log.d(tag, "Parsed metadata files: $loadedSongsMeta")
+        Log.d(tag, "Parsed metadata files: $loadedSongsMetadata")
 
-        fillSongsList(loadedSongsMeta)
+        return loadedSongsMetadata
     }
 
-    fun pickSong(position: Int) {
-        currentSongMetadata = songList[songsListAdapter!!.songs[position].originalPosition]
+    fun pickSong(title: String) {
+        currentSongMetadata = songList[title]
         currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
         presentationIterator = currentSongMetadata!!.presentation.listIterator()
         presentationCurrentTag = presentationIterator!!.next()
     }
 
-    fun nextSlide() {
+    fun nextSlide(): Boolean {
         if (presentationIterator!!.hasNext()) {
             presentationCurrentTag = presentationIterator!!.next()
+            return true
         }
+        return false
     }
 
-    fun previousSlide() {
+    fun previousSlide(): Boolean {
         if (presentationIterator!!.hasPrevious()) {
             presentationCurrentTag = presentationIterator!!.previous()
+            return true
         }
+        return false
     }
 
     fun getCurrentSlide(): String {
@@ -78,13 +82,13 @@ object SongsContext {
     }
 
     fun setupSongListAdapter(showCheckBox: Boolean = false) {
-        for (i in 0 until songList.size) {
-            songItemList.add(SongItemModel(i, songList[i]))
+        for (i in songList.values.indices) {
+            songItemList.add(SongItemModel(i, songList.values.elementAt(i)))
         }
         songsListAdapter = SongListAdapter(songItemList, showCheckBox)
     }
 
-    fun filter(title: String, category: String = "All") {
+    fun filterSongs(title: String, category: String = "All") {
         songsListAdapter!!.songs = songItemList.filter { song ->
             song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
                     && (category == "All" || song.category == category)
@@ -92,13 +96,13 @@ object SongsContext {
         songsListAdapter!!.notifyDataSetChanged()
     }
 
-    private fun fillSongsList(songs: MutableList<SongMetadataModel>) {
-        songList = songs
+    fun fillSongsList(songs: List<SongMetadataModel>) {
+        songList = songs.map { it.title to it }.toMap()
         songItemList.clear()
-        for (i in 0 until songList.size) {
-            songItemList.add(SongItemModel(i, songList[i]))
-        }
         songsListAdapter!!.songs = songItemList
+        for (i in songList.values.indices) {
+            songItemList.add(SongItemModel(i, songList.values.elementAt(i)))
+        }
         songsListAdapter!!.notifyDataSetChanged()
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/17/20 12:05 PM
+ * Last modified 10/20/20 10:00 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -14,9 +14,9 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.models.SetlistModel
+import pl.gunock.lyriccast.models.SetlistItemModel
 
-class SetlistListAdapter(var setlists: MutableList<SetlistModel>) :
+class SetlistListAdapter(var setlists: MutableList<SetlistItemModel>) :
     RecyclerView.Adapter<SetlistListAdapter.SongViewHolder>() {
 
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:35 PM
+ * Last modified 10/20/20 10:00 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -14,21 +14,22 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Switch
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.RecyclerItemClickListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
+import pl.gunock.lyriccast.models.SongMetadataModel
 
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class SongListFragment : Fragment() {
 
     private var castContext: CastContext? = null
@@ -64,16 +65,26 @@ class SongListFragment : Fragment() {
         setupListeners(view)
 
         if (SongsContext.songList.isEmpty()) {
-            SongsContext.loadSongsMetadata()
+            lifecycleScope.launch(Dispatchers.IO) {
+                val songList: List<SongMetadataModel> = SongsContext.loadSongsMetadata()
+                lifecycleScope.launch(Dispatchers.Main) {
+                    SongsContext.fillSongsList(songList)
+                    setupCategorySpinner()
+                }
+            }
         }
+        if (SongsContext.categories.toList().isNotEmpty()) {
+            setupCategorySpinner()
+        }
+    }
 
+    private fun setupCategorySpinner() {
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
             SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
         categorySpinner!!.apply {
             adapter = categorySpinnerAdapter
         }
@@ -82,20 +93,20 @@ class SongListFragment : Fragment() {
     private fun setupListeners(view: View) {
         view.findViewById<RecyclerView>(R.id.recycler_view_songs).addOnItemTouchListener(
             RecyclerItemClickListener(context) { _, position ->
-                SongsContext.pickSong(position)
+                val songItem = SongsContext.songItemList[position]
+                SongsContext.pickSong(songItem.title)
                 findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
             })
 
         searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filter(it, categorySpinner!!.selectedItem.toString())
+            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
         })
 
-        categorySpinner!!.onItemSelectedListener =
-            SpinnerItemSelectedListener { _, _ ->
-                SongsContext.filter(
-                    searchView!!.editText!!.editableText.toString(),
-                    categorySpinner!!.selectedItem.toString()
-                )
-            }
+        categorySpinner!!.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+            SongsContext.filterSongs(
+                searchView!!.editText!!.editableText.toString(),
+                categorySpinner!!.selectedItem.toString()
+            )
+        }
     }
 }

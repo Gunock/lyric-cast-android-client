@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:40 PM
+ * Last modified 10/20/20 10:00 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,10 +10,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +22,7 @@ import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.models.SetlistModel
 import pl.gunock.lyriccast.models.SongItemModel
+import pl.gunock.lyriccast.utils.KeyboardHelper
 
 
 /**
@@ -51,11 +50,10 @@ class SetlistEditorFragment : Fragment() {
 
     private fun setupListeners(view: View) {
         view.findViewById<Button>(R.id.button_pick_setlist_songs).setOnClickListener {
-            val inputMethodManager: InputMethodManager? =
-                getSystemService(requireContext(), InputMethodManager::class.java)
-            inputMethodManager?.hideSoftInputFromWindow(view.applicationWindowToken, 0)
+            KeyboardHelper.hideKeyboard(view)
             findNavController().navigate(R.id.action_SetlistEditorFragment_to_SetlistEditorSongListFragment)
         }
+
         view.findViewById<Button>(R.id.button_save_setlist).setOnClickListener {
             val setlist = SetlistModel()
             setlist.name = view.findViewById<TextView>(R.id.text_input_setlist_name).text.toString()

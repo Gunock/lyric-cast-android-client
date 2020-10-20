@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:22 PM
+ * Last modified 10/20/20 9:18 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
-        SetlistsContext.loadSetlists()
 
         castContext = CastContext.getSharedInstance(this)
     }

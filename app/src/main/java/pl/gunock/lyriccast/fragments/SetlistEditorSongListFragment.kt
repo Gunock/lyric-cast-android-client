@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
+ * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:35 PM
+ * Last modified 10/19/20 4:53 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -64,12 +64,12 @@ class SetlistEditorSongListFragment : Fragment() {
 
     private fun setupListeners() {
         searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filter(it, categorySpinner!!.selectedItem.toString())
+            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
         })
 
         categorySpinner!!.onItemSelectedListener =
             SpinnerItemSelectedListener { _, _ ->
-                SongsContext.filter(
+                SongsContext.filterSongs(
                     searchView!!.editText!!.editableText.toString(),
                     categorySpinner!!.selectedItem.toString()
                 )
