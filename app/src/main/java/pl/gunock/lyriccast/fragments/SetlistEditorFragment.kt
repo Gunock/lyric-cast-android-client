@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:00 PM
+ * Last modified 10/23/20 8:21 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -42,7 +42,8 @@ class SetlistEditorFragment : Fragment() {
         view.findViewById<RecyclerView>(R.id.recycler_view_setlist_editor).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = SongListAdapter(SongsContext.songItemList.filter { it.isSelected })
+            adapter =
+                SongListAdapter(SongsContext.songItemList.filter { it.selected }.toMutableList())
         }
 
         setupListeners(view)
@@ -59,7 +60,7 @@ class SetlistEditorFragment : Fragment() {
             setlist.name = view.findViewById<TextView>(R.id.text_input_setlist_name).text.toString()
 
             val selectedSongs: List<SongItemModel> =
-                SongsContext.songItemList.filter { it.isSelected }
+                SongsContext.songItemList.filter { it.selected }
             setlist.songTitles = List(selectedSongs.size) {
                 selectedSongs[it].title
             }

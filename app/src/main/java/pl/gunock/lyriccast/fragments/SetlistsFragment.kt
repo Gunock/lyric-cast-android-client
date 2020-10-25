@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:09 PM
+ * Last modified 10/23/20 8:01 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,7 +24,6 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
-import pl.gunock.lyriccast.adapters.SetlistListAdapter
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.RecyclerItemClickListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
@@ -54,7 +53,6 @@ class SetlistsFragment : Fragment() {
 
         SetlistsContext.setupSetlistListAdapter()
 
-        SetlistsContext.setlistListAdapter = SetlistListAdapter(SetlistsContext.setlistItemList)
         view.findViewById<RecyclerView>(R.id.recycler_view_setlists).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
@@ -90,7 +88,6 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupListeners(view: View) {
-        // TODO: Adapt for setlists
         view.findViewById<RecyclerView>(R.id.recycler_view_setlists).addOnItemTouchListener(
             RecyclerItemClickListener(context) { _, position ->
                 SetlistsContext.pickSetlist(position)

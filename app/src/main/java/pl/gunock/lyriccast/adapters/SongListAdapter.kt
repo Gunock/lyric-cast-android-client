@@ -1,26 +1,30 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/18/20 11:08 PM
+ * Last modified 10/25/20 9:42 PM
  */
 
 package pl.gunock.lyriccast.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.models.SongItemModel
 
 class SongListAdapter(
-    var songs: List<SongItemModel>,
-    val showCheckBox: Boolean = false
+    var songs: MutableList<SongItemModel>,
+    val showCheckBox: Boolean = false,
+    val showRowNumber: Boolean = false
 ) : RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {
 
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
         val titleTextView: TextView = itemView.findViewById(R.id.song_title)
         val authorTextView: TextView = itemView.findViewById(R.id.song_author)
         val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
@@ -34,7 +38,13 @@ class SongListAdapter(
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        holder.titleTextView.text = songs[position].title
+        if (!showRowNumber) {
+            holder.titleTextView.text = songs[position].title
+        } else {
+
+            holder.titleTextView.text = holder.itemView.resources
+                .getString(R.string.song_item_title_template, position + 1, songs[position].title)
+        }
         holder.authorTextView.text = songs[position].author
         holder.categoryTextView.text = songs[position].category
         if (!showCheckBox) {
@@ -48,10 +58,20 @@ class SongListAdapter(
             )
 
             holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-                songs[position].isSelected = isChecked
+                songs[position].selected = isChecked
             }
 
-            holder.checkBox.isChecked = songs[position].isSelected
+            holder.checkBox.isChecked = songs[position].selected
+        }
+        if (songs[position].highlight) {
+            holder.itemLayout.setBackgroundColor(
+                holder.itemView.resources.getColor(
+                    R.color.colorAccent,
+                    null
+                )
+            )
+        } else {
+            holder.itemLayout.setBackgroundColor(Color.TRANSPARENT)
         }
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 12:18 PM
+ * Last modified 10/25/20 9:36 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -11,37 +11,56 @@ import android.util.Log
 import androidx.core.net.toUri
 import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 object FileHelper {
     private const val tag = "FileHelper"
-
 
     fun unzip(resolver: ContentResolver, inputStream: InputStream, targetLocation: String) {
         Log.d(tag, "Unzipping stream to '$targetLocation'")
         createDirIfNotExists(targetLocation)
 
-        val zin = ZipInputStream(inputStream)
-        var ze: ZipEntry?
+        val zipIn = ZipInputStream(inputStream)
+        var zipEntry: ZipEntry?
 
-        while (zin.nextEntry.also { ze = it } != null) {
-            if (ze!!.isDirectory) {
+        while (zipIn.nextEntry.also { zipEntry = it } != null) {
+            if (zipEntry!!.isDirectory) {
                 continue
             }
 
-            Log.d(tag, "Extracting file: ${ze!!.name}")
+            Log.d(tag, "Extracting file: ${zipEntry!!.name}")
 
-            val filename: String = ze!!.name.split("/").last()
+            val filename: String = zipEntry!!.name.split("/").last()
             Log.d(tag, "Extracting file to: ${targetLocation + filename}")
 
             resolver.openOutputStream(File(targetLocation + filename).toUri()).use {
-                it!!.write(zin.readBytes())
-                zin.closeEntry()
+                it!!.write(zipIn.readBytes())
+                zipIn.closeEntry()
             }
             Log.d(tag, "File extracted to: ${targetLocation + filename}")
         }
-        zin.close()
+        zipIn.close()
+    }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun zip(outputStream: OutputStream, sourceLocation: String) {
+        Log.d(tag, "Zipping files from '$sourceLocation'")
+        createDirIfNotExists(sourceLocation)
+
+        ZipOutputStream(outputStream).use { zipOut ->
+            for (file in File(sourceLocation).listFiles()) {
+                if (file.isDirectory) {
+                    continue
+                }
+
+                zipOut.putNextEntry(ZipEntry(file.name))
+                zipOut.write(file.readBytes())
+                zipOut.closeEntry()
+            }
+        }
     }
 
     private fun createDirIfNotExists(path: String) {

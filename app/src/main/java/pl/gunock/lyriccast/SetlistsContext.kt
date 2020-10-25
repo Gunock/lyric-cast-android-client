@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:46 PM
+ * Last modified 10/23/20 10:13 PM
  */
 
 package pl.gunock.lyriccast
@@ -24,9 +24,10 @@ object SetlistsContext {
     val setlistItemList: MutableList<SetlistItemModel> = mutableListOf()
     var setlistListAdapter: SetlistListAdapter? = null
 
-    private var presentationIterator: ListIterator<String>? = null
     var currentSetlist: SetlistModel? = null
+    private var presentationIterator: ListIterator<String>? = null
     private var currentSongTitle: String = ""
+    private var presentationGap: Boolean = false
 
     fun loadSetlists(): List<SetlistModel> {
         val loadedSetlists: MutableList<SetlistModel> = mutableListOf()
@@ -38,16 +39,12 @@ object SetlistsContext {
         }
 
         for (file in fileList) {
-            if (file.isDirectory) {
-                file.deleteRecursively()
-            }
-
             Log.d(tag, "Reading file: ${file.name}")
             val json = JSONObject(file.readText(Charsets.UTF_8))
             val setlist = SetlistModel(json)
             loadedSetlists.add(setlist)
         }
-        Log.d(tag, "Parsed metadata files: $loadedSetlists")
+        Log.d(tag, "Parsed setlist files: $loadedSetlists")
 
         return loadedSetlists
     }
@@ -60,6 +57,7 @@ object SetlistsContext {
     }
 
     fun setupSetlistListAdapter() {
+        setlistItemList.clear()
         for (i in setlistList.indices) {
             setlistItemList.add(SetlistItemModel(i, setlistList[i]))
         }
@@ -78,9 +76,16 @@ object SetlistsContext {
             if (!presentationIterator!!.hasNext()) {
                 return false
             }
-            currentSongTitle = presentationIterator!!.next()
-            SongsContext.pickSong(currentSongTitle)
+            if (presentationGap) {
+                currentSongTitle = presentationIterator!!.next()
+                SongsContext.pickSong(currentSongTitle)
+            } else {
+                currentSongTitle = ""
+                presentationGap = true
+            }
             return true
+        } else {
+            presentationGap = false
         }
         return false
     }
@@ -90,9 +95,17 @@ object SetlistsContext {
             if (!presentationIterator!!.hasPrevious()) {
                 return false
             }
-            currentSongTitle = presentationIterator!!.previous()
-            SongsContext.pickSong(currentSongTitle)
+            if (presentationGap) {
+                currentSongTitle = presentationIterator!!.previous()
+                SongsContext.pickSong(currentSongTitle)
+                presentationGap = false
+            } else {
+                currentSongTitle = ""
+                presentationGap = true
+            }
             return true
+        } else {
+            presentationGap = false
         }
         return false
     }
@@ -103,16 +116,20 @@ object SetlistsContext {
     }
 
     fun getCurrentSlide(): String {
+        if (currentSongTitle.isEmpty()) {
+            return ""
+        }
+
         return SongsContext.getCurrentSlide()
     }
 
     fun fillSetlistList(setlists: List<SetlistModel>) {
         setlistList = setlists.toMutableList()
         setlistItemList.clear()
-        setlistListAdapter!!.setlists = setlistItemList
         for (i in setlists.indices) {
-            setlistList.add(SetlistItemModel(i, setlists[i]))
+            setlistItemList.add(SetlistItemModel(i, setlists[i]))
         }
+        setlistListAdapter!!.setlists = setlistItemList
         setlistListAdapter!!.notifyDataSetChanged()
     }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:26 AM
+  ~ Last modified 10/25/20 8:36 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -128,7 +128,7 @@
         android:focusable="true"
         android:tint="@color/design_default_color_on_primary"
         app:backgroundTint="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toTopOf="@+id/tab_layout_songs_setlists"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/add_song"
         app:srcCompat="@drawable/ic_action_add" />
@@ -138,12 +138,12 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/tab_layout_songs_setlists"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_songs_setlists"
+        android:id="@+id/tab_layout_song_section"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -152,7 +152,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_songs"
+            android:id="@+id/tab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/songs" />

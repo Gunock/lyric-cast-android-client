@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:00 PM
+ * Last modified 10/25/20 9:39 PM
  */
 
 package pl.gunock.lyriccast
@@ -82,8 +82,9 @@ object SongsContext {
     }
 
     fun setupSongListAdapter(showCheckBox: Boolean = false) {
+        songItemList.clear()
         for (i in songList.values.indices) {
-            songItemList.add(SongItemModel(i, songList.values.elementAt(i)))
+            songItemList.add(SongItemModel(songList.values.elementAt(i)))
         }
         songsListAdapter = SongListAdapter(songItemList, showCheckBox)
     }
@@ -99,10 +100,10 @@ object SongsContext {
     fun fillSongsList(songs: List<SongMetadataModel>) {
         songList = songs.map { it.title to it }.toMap()
         songItemList.clear()
-        songsListAdapter!!.songs = songItemList
         for (i in songList.values.indices) {
-            songItemList.add(SongItemModel(i, songList.values.elementAt(i)))
+            songItemList.add(SongItemModel(songList.values.elementAt(i)))
         }
+        songsListAdapter!!.songs = songItemList
         songsListAdapter!!.notifyDataSetChanged()
     }
 

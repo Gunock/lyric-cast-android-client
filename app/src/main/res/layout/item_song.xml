@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:15 AM
+  ~ Last modified 10/23/20 8:01 PM
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,6 +11,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:drawable/list_selector_background"
+    android:backgroundTintMode="add"
     android:clickable="true"
     android:focusable="true"
     android:longClickable="false"
@@ -51,7 +52,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
         <TextView
@@ -63,6 +64,7 @@
             android:paddingStart="?android:attr/listPreferredItemPaddingStart"
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
             android:text="@string/placeholder_author"
+            android:textAlignment="textStart"
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/card_song_category"
@@ -73,6 +75,9 @@
             android:id="@+id/card_song_category"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@color/colorPrimaryDark"
+            app:cardBackgroundColor="@color/colorPrimaryDark"
             app:cardCornerRadius="@dimen/cast_intro_overlay_focus_radius"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                android:background="@color/colorPrimaryDark"
                 android:maxLines="1"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
@@ -98,7 +102,7 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:layout_weight="1"
         android:background="?android:attr/listDivider" />
 

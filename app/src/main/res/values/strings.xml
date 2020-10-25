@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:24 AM
+  ~ Last modified 10/25/20 10:01 PM
   -->
 
 <resources>
@@ -12,6 +12,8 @@
 
     <!-- Strings used for fragments for navigation -->
     <string name="import_songs">Import songs</string>
+    <string name="export_songs">Export songs</string>
+    <string name="export_setlists">Export setlists</string>
     <string name="songs">Songs</string>
     <string name="setlists">Setlists</string>
     <string name="controls">Controls</string>
@@ -22,10 +24,16 @@
     <string name="add">Add</string>
     <string name="add_song">Add song</string>
     <string name="add_setlist">Add setlist</string>
+    <string name="chorus">Chorus</string>
+    <string name="song_item_title_template">%d. %s</string>
 
     <!--  Strings used for inputs  -->
     <string name="song_title">Song title</string>
     <string name="setlist_name">Setlist name</string>
+    <string name="selected">Selected</string>
+    <string name="section_name">Section name</string>
+    <string name="new_section">New section</string>
+    <string name="hint_enter_lyrics">Enter lyrics</string>
 
     <!--  Strings used for buttons  -->
     <string name="save">Save</string>

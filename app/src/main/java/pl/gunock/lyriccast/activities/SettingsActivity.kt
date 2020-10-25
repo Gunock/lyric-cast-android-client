@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/17/20 12:30 PM
+ * Last modified 10/25/20 9:58 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -10,7 +10,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.cast.framework.CastContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.utils.ResourceHelper
 
 class SettingsActivity : AppCompatActivity() {
     private val tag = "SettingsActivity"
@@ -18,8 +17,6 @@ class SettingsActivity : AppCompatActivity() {
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ResourceHelper.initialize(applicationContext)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         setSupportActionBar(findViewById(R.id.toolbar_settings))

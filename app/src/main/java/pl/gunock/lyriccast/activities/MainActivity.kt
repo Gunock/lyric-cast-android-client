@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 9:18 PM
+ * Last modified 10/25/20 9:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -29,17 +29,19 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.TabItemSelectedListener
 import pl.gunock.lyriccast.utils.FileHelper
-import pl.gunock.lyriccast.utils.ResourceHelper
+import pl.gunock.lyriccast.utils.MessageHelper
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private val tag = "MainActivity"
 
-    private val selectFolderResultCode = 1
+    private val exportSongsResultCode = 1
+    private val exportSetlistsResultCode = 2
+    private val selectFileResultCode = 3
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ResourceHelper.initialize(applicationContext)
+        MessageHelper.initialize(applicationContext)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
@@ -70,8 +72,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_import_songs -> importFiles()
             R.id.menu_settings -> goToSettings()
+            R.id.menu_import_songs -> importSongs()
+            R.id.menu_export_songs -> exportFiles(exportSongsResultCode)
+            R.id.menu_export_setlists -> exportFiles(exportSetlistsResultCode)
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -79,26 +83,48 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == selectFolderResultCode && resultCode == Activity.RESULT_OK) {
-            val uri = data?.data!!
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
 
-            Log.d(tag, "Selected file URI: $uri")
-            Log.d(tag, "Target path: ${SongsContext.songsDirectory}")
+        when (requestCode) {
+            selectFileResultCode -> {
+                val uri = data?.data!!
 
-            File(SongsContext.songsDirectory).deleteRecursively()
+                Log.d(tag, "Selected file URI: $uri")
+                Log.d(tag, "Target path: ${SongsContext.songsDirectory}")
 
-            FileHelper.unzip(
-                contentResolver,
-                contentResolver.openInputStream(uri)!!,
-                SongsContext.songsDirectory
-            )
+                File(SongsContext.songsDirectory).deleteRecursively()
 
-            SongsContext.loadSongsMetadata()
+                FileHelper.unzip(
+                    contentResolver,
+                    contentResolver.openInputStream(uri)!!,
+                    SongsContext.songsDirectory
+                )
+
+                SongsContext.loadSongsMetadata()
+            }
+            exportSongsResultCode -> {
+                val uri = data?.data!!
+
+                FileHelper.zip(
+                    contentResolver.openOutputStream(uri)!!,
+                    SongsContext.songsDirectory
+                )
+            }
+            exportSetlistsResultCode -> {
+                val uri = data?.data!!
+
+                FileHelper.zip(
+                    contentResolver.openOutputStream(uri)!!,
+                    SetlistsContext.setlistsDirectory
+                )
+            }
         }
     }
 
     private fun setUpListeners() {
-        findViewById<TabLayout>(R.id.tab_layout_songs_setlists).addOnTabSelectedListener(
+        findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
             TabItemSelectedListener {
                 val navHostFragment =
                     supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
@@ -127,20 +153,35 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SetlistEditorActivity::class.java)
             startActivity(intent)
         }
+
+        findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
+            val intent = Intent(this, SongEditorActivity::class.java)
+            startActivity(intent)
+        }
     }
 
-    private fun importFiles(): Boolean {
+    private fun exportFiles(resultCode: Int): Boolean {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.type = "application/zip"
+
+        val chooserIntent = Intent.createChooser(intent, "Choose a directory")
+        startActivityForResult(chooserIntent, resultCode)
+        return true
+    }
+
+    private fun importSongs(): Boolean {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, selectFolderResultCode)
+        startActivityForResult(chooserIntent, selectFileResultCode)
         return true
     }
 
     private fun goToSettings(): Boolean {
         val intent = Intent(this, SettingsActivity::class.java)
+
         startActivity(intent)
         return true
     }

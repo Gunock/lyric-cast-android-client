@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:54 PM
+ * Last modified 10/25/20 9:39 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -23,6 +23,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private var slidePreview: TextView? = null
     private var songTitle: TextView? = null
+    private var songListAdapter: SongListAdapter? = null
 //    private var sessionCreatedListener: SessionCreatedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +33,6 @@ class SetlistControlsActivity : AppCompatActivity() {
         slidePreview = findViewById(R.id.text_view_slide_preview2)
         songTitle = findViewById(R.id.current_song_title)
 
-
-
         findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
@@ -41,10 +40,20 @@ class SetlistControlsActivity : AppCompatActivity() {
             val songTitles = SetlistsContext.currentSetlist!!.songTitles
             val songItemList: MutableList<SongItemModel> = mutableListOf()
             for (i in songTitles.indices) {
-                songItemList.add(SongItemModel(i, SongsContext.songList.getValue(songTitles[i])))
+                songItemList.add(SongItemModel(SongsContext.songList.getValue(songTitles[i])))
             }
 
-            adapter = SongListAdapter(songItemList)
+            val iterator = songItemList.listIterator()
+            while (iterator.hasNext()) {
+                val oldValue = iterator.next()
+                if (oldValue.title == songTitles[0]) {
+                    oldValue.highlight = true
+                    iterator.set(oldValue)
+                }
+            }
+
+            songListAdapter = SongListAdapter(songItemList, showRowNumber = true)
+            adapter = songListAdapter
         }
 
         setUpListeners()
@@ -79,6 +88,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
             if (SetlistsContext.previousSlide()) {
                 songTitle!!.text = SetlistsContext.getCurrentSongTitle()
+                highlightCurrentSong()
             }
             sendSlide()
         }
@@ -86,9 +96,20 @@ class SetlistControlsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
             if (SetlistsContext.nextSlide()) {
                 songTitle!!.text = SetlistsContext.getCurrentSongTitle()
+                highlightCurrentSong()
             }
             sendSlide()
         }
+    }
+
+    private fun highlightCurrentSong() {
+        val iterator = songListAdapter!!.songs.listIterator()
+        while (iterator.hasNext()) {
+            val oldValue = iterator.next()
+            oldValue.highlight = oldValue.title == SetlistsContext.getCurrentSongTitle()
+            iterator.set(oldValue)
+        }
+        songListAdapter!!.notifyDataSetChanged()
     }
 
     private fun sendSlide() {

@@ -1,24 +1,31 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
+ * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/16/20 9:45 PM
+ * Last modified 10/25/20 9:51 PM
  */
 
 package pl.gunock.lyriccast.utils
 
+import android.content.Context
 import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.utils.ResourceHelper.getString
 
 object MessageHelper {
 
     private const val tag = "MessageHelper"
 
-    private val CONTENT_NAMESPACE: String = getString(R.string.content_namespace)
-    private val CONTROL_NAMESPACE: String = getString(R.string.control_namespace)
-    private val CONTENT_MESSAGE_TEMPLATE: String = getString(R.string.content_message_template)
-    private val CONTROL_MESSAGE_TEMPLATE: String = getString(R.string.control_message_template)
+    private var CONTENT_NAMESPACE: String = ""
+    private var CONTROL_NAMESPACE: String = ""
+    private var CONTENT_MESSAGE_TEMPLATE: String = ""
+    private var CONTROL_MESSAGE_TEMPLATE: String = ""
+
+    fun initialize(context: Context) {
+        CONTENT_NAMESPACE = context.getString(R.string.content_namespace)
+        CONTROL_NAMESPACE = context.getString(R.string.control_namespace)
+        CONTENT_MESSAGE_TEMPLATE = context.getString(R.string.content_message_template)
+        CONTROL_MESSAGE_TEMPLATE = context.getString(R.string.control_message_template)
+    }
 
     fun sendContentMessage(context: CastContext, message: String) {
         val castSession = context.sessionManager.currentCastSession
