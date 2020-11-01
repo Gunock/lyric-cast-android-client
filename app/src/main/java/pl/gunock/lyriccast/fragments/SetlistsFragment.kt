@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/23/20 8:01 PM
+ * Last modified 11/1/20 12:01 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -73,6 +73,17 @@ class SetlistsFragment : Fragment() {
         if (SongsContext.categories.toList().isNotEmpty()) {
             setupCategorySpinner()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        searchView!!.editText!!.setText("")
+        categorySpinner!!.setSelection(0)
+
+        SetlistsContext.setupSetlistListAdapter()
+        view?.findViewById<RecyclerView>(R.id.recycler_view_setlists)?.adapter =
+            SetlistsContext.setlistListAdapter
     }
 
     private fun setupCategorySpinner() {

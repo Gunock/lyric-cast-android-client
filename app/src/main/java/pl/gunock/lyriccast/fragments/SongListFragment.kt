@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:00 PM
+ * Last modified 11/1/20 3:43 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -63,8 +63,42 @@ class SongListFragment : Fragment() {
         }
 
         setupListeners(view)
+        loadSongs()
+    }
 
-        if (SongsContext.songList.isEmpty()) {
+    private fun setupListeners(view: View) {
+        view.findViewById<RecyclerView>(R.id.recycler_view_songs).addOnItemTouchListener(
+            RecyclerItemClickListener(context) { _, position ->
+                val songItem = SongsContext.songItemList[position]
+                SongsContext.pickSong(songItem.title)
+                findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
+            })
+
+        searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
+            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
+        })
+
+        categorySpinner!!.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+            SongsContext.filterSongs(
+                searchView!!.editText!!.editableText.toString(),
+                categorySpinner!!.selectedItem.toString()
+            )
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        searchView!!.editText!!.setText("")
+        categorySpinner!!.setSelection(0)
+
+        SongsContext.setupSongListAdapter()
+        view?.findViewById<RecyclerView>(R.id.recycler_view_songs)?.adapter =
+            SongsContext.songsListAdapter
+    }
+
+    private fun loadSongs() {
+        if (SongsContext.songMap.isEmpty()) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val songList: List<SongMetadataModel> = SongsContext.loadSongsMetadata()
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -87,26 +121,6 @@ class SongListFragment : Fragment() {
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner!!.apply {
             adapter = categorySpinnerAdapter
-        }
-    }
-
-    private fun setupListeners(view: View) {
-        view.findViewById<RecyclerView>(R.id.recycler_view_songs).addOnItemTouchListener(
-            RecyclerItemClickListener(context) { _, position ->
-                val songItem = SongsContext.songItemList[position]
-                SongsContext.pickSong(songItem.title)
-                findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
-            })
-
-        searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
-        })
-
-        categorySpinner!!.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
-            SongsContext.filterSongs(
-                searchView!!.editText!!.editableText.toString(),
-                categorySpinner!!.selectedItem.toString()
-            )
         }
     }
 }

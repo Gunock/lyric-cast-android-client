@@ -1,13 +1,13 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- *  Last modified 10/11/20 11:06 PM
+ * Last modified 10/31/20 9:00 PM
  */
 
 package pl.gunock.lyriccast
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 /**
  * Example local unit test, which will execute on the development machine (host).

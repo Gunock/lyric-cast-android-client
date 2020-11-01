@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:39 PM
+ * Last modified 11/1/20 2:06 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -40,7 +40,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             val songTitles = SetlistsContext.currentSetlist!!.songTitles
             val songItemList: MutableList<SongItemModel> = mutableListOf()
             for (i in songTitles.indices) {
-                songItemList.add(SongItemModel(SongsContext.songList.getValue(songTitles[i])))
+                songItemList.add(SongItemModel(SongsContext.songMap.getValue(songTitles[i])))
             }
 
             val iterator = songItemList.listIterator()

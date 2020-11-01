@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/23/20 8:21 PM
+ * Last modified 11/1/20 11:40 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -39,7 +39,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<RecyclerView>(R.id.recycler_view_setlist_editor).apply {
+        view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter =

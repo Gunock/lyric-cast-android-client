@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 8:48 PM
+ * Last modified 10/31/20 8:37 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -14,5 +14,11 @@ class SongLyricsModel() {
 
     constructor(json: JSONObject) : this() {
         lyrics = objectToMap(json.getJSONObject("lyrics"))
+    }
+
+    fun toJSON(): JSONObject {
+        val json = JSONObject()
+        json.put("lyrics", JSONObject(lyrics))
+        return json
     }
 }

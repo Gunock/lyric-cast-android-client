@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:51 PM
+ * Last modified 10/31/20 11:08 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         MessageHelper.initialize(applicationContext)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
@@ -58,6 +59,13 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

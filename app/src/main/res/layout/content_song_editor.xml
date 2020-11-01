@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/25/20 10:02 PM
+  ~ Last modified 10/31/20 10:35 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,7 +11,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_view_filter_songs"
+        android:id="@+id/text_view_song_title"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
@@ -20,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/text_input_song_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/song_title"
@@ -34,7 +35,7 @@
         android:layout_marginTop="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_filter_songs" />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_song_title" />
 
     <View
         android:id="@+id/divider5"
@@ -55,6 +56,7 @@
         app:layout_constraintTop_toBottomOf="@+id/spinner_song_editor_category">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/text_input_section_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/section_name"

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/23/20 10:13 PM
+ * Last modified 11/1/20 2:04 PM
  */
 
 package pl.gunock.lyriccast
@@ -21,6 +21,8 @@ object SetlistsContext {
     var setlistsDirectory: String = ""
 
     var setlistList: MutableList<SetlistModel> = mutableListOf()
+
+    // TODO: Try to move adapters to activities/fragments
     val setlistItemList: MutableList<SetlistItemModel> = mutableListOf()
     var setlistListAdapter: SetlistListAdapter? = null
 

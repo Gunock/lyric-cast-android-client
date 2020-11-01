@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/25/20 10:01 PM
+  ~ Last modified 10/31/20 7:25 PM
   -->
 
 <resources>
@@ -9,6 +9,8 @@
 
     <!--  Strings used for toolbars -->
     <string name="settings">Settings</string>
+    <string name="song_editor">Song editor</string>
+    <string name="setlist_editor">Setlist editor</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="import_songs">Import songs</string>

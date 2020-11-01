@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
   ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/25/20 9:36 PM
+  ~ Last modified 11/1/20 11:22 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,6 +22,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/text_input_song_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/song_title"

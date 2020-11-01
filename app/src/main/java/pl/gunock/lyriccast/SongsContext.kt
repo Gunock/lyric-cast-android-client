@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:39 PM
+ * Last modified 11/1/20 2:06 PM
  */
 
 package pl.gunock.lyriccast
@@ -20,7 +20,9 @@ object SongsContext {
     private const val tag = "SongsContext"
 
     var songsDirectory: String = ""
-    var songList: Map<String, SongMetadataModel> = mapOf()
+    var songMap: MutableMap<String, SongMetadataModel> = mutableMapOf()
+
+    // TODO: Try to move adapters to activities/fragments
     val songItemList: MutableList<SongItemModel> = mutableListOf()
     var songsListAdapter: SongListAdapter? = null
 
@@ -54,8 +56,41 @@ object SongsContext {
         return loadedSongsMetadata
     }
 
+    fun setupSongListAdapter(showCheckBox: Boolean = false) {
+        Log.d(tag, "setupSongListAdapter invoked")
+        songItemList.clear()
+        for (i in songMap.values.indices) {
+            songItemList.add(SongItemModel(songMap.values.elementAt(i)))
+        }
+        songsListAdapter = SongListAdapter(songItemList, showCheckBox)
+    }
+
+    fun filterSongs(title: String, category: String = "All") {
+        Log.d(tag, "filterSongs invoked")
+        songsListAdapter!!.songs = songItemList.filter { song ->
+            song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
+                    && (category == "All" || song.category == category)
+        }.toMutableList()
+        songsListAdapter!!.notifyDataSetChanged()
+    }
+
+    fun fillSongsList(songs: List<SongMetadataModel>) {
+        songItemList.clear()
+        for (song in songs) {
+            addSong(song)
+        }
+        songsListAdapter!!.songs = songItemList
+        songsListAdapter!!.notifyDataSetChanged()
+    }
+
+    fun addSong(song: SongMetadataModel) {
+        songMap[song.title] = song
+        songItemList.add(SongItemModel(song))
+        songsListAdapter?.notifyDataSetChanged()
+    }
+
     fun pickSong(title: String) {
-        currentSongMetadata = songList[title]
+        currentSongMetadata = songMap[title]
         currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
         presentationIterator = currentSongMetadata!!.presentation.listIterator()
         presentationCurrentTag = presentationIterator!!.next()
@@ -80,31 +115,4 @@ object SongsContext {
     fun getCurrentSlide(): String {
         return currentSongLyrics!!.lyrics[presentationCurrentTag] ?: error("Lyrics not found")
     }
-
-    fun setupSongListAdapter(showCheckBox: Boolean = false) {
-        songItemList.clear()
-        for (i in songList.values.indices) {
-            songItemList.add(SongItemModel(songList.values.elementAt(i)))
-        }
-        songsListAdapter = SongListAdapter(songItemList, showCheckBox)
-    }
-
-    fun filterSongs(title: String, category: String = "All") {
-        songsListAdapter!!.songs = songItemList.filter { song ->
-            song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
-                    && (category == "All" || song.category == category)
-        }.toMutableList()
-        songsListAdapter!!.notifyDataSetChanged()
-    }
-
-    fun fillSongsList(songs: List<SongMetadataModel>) {
-        songList = songs.map { it.title to it }.toMap()
-        songItemList.clear()
-        for (i in songList.values.indices) {
-            songItemList.add(SongItemModel(songList.values.elementAt(i)))
-        }
-        songsListAdapter!!.songs = songItemList
-        songsListAdapter!!.notifyDataSetChanged()
-    }
-
 }
