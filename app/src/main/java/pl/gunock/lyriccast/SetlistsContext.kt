@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
+ * Created by Tomasz Kiljańczyk on 11/1/20 9:57 PM
  * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:04 PM
+ * Last modified 11/1/20 9:57 PM
  */
 
 package pl.gunock.lyriccast
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast
 import android.util.Log
 import org.json.JSONObject
 import pl.gunock.lyriccast.adapters.SetlistListAdapter
-import pl.gunock.lyriccast.models.SetlistItemModel
 import pl.gunock.lyriccast.models.SetlistModel
 import java.io.File
 import java.io.FilenameFilter
@@ -23,7 +22,7 @@ object SetlistsContext {
     var setlistList: MutableList<SetlistModel> = mutableListOf()
 
     // TODO: Try to move adapters to activities/fragments
-    val setlistItemList: MutableList<SetlistItemModel> = mutableListOf()
+    val setlistItemList: MutableList<SetlistModel> = mutableListOf()
     var setlistListAdapter: SetlistListAdapter? = null
 
     var currentSetlist: SetlistModel? = null
@@ -61,7 +60,7 @@ object SetlistsContext {
     fun setupSetlistListAdapter() {
         setlistItemList.clear()
         for (i in setlistList.indices) {
-            setlistItemList.add(SetlistItemModel(i, setlistList[i]))
+            setlistItemList.add(setlistList[i])
         }
         setlistListAdapter = SetlistListAdapter(setlistItemList)
     }
@@ -129,7 +128,7 @@ object SetlistsContext {
         setlistList = setlists.toMutableList()
         setlistItemList.clear()
         for (i in setlists.indices) {
-            setlistItemList.add(SetlistItemModel(i, setlists[i]))
+            setlistItemList.add(setlists[i])
         }
         setlistListAdapter!!.setlists = setlistItemList
         setlistListAdapter!!.notifyDataSetChanged()
