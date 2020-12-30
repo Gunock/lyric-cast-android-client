@@ -1,0 +1,17 @@
+<resources>
+    <!-- Color Preference -->
+    <string-array name="color_entries">
+        <item>Black</item>
+        <item>White</item>
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Deep Pink</item>
+    </string-array>
+    <string-array name="color_values">
+        <item>Black</item>
+        <item>White</item>
+        <item>Blue</item>
+        <item>Red</item>
+        <item>DeepPink</item>
+    </string-array>
+</resources>

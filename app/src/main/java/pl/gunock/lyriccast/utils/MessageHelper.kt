@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.utils
 import android.content.Context
 import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
+import org.json.JSONObject
 import pl.gunock.lyriccast.R
 
 object MessageHelper {
@@ -61,5 +62,22 @@ object MessageHelper {
         }
 
         castSession.sendMessage(CONTROL_NAMESPACE, messageContent)
+    }
+
+    fun sendControlMessage(context: CastContext, action: ControlAction, json: JSONObject) {
+        val castSession = context.sessionManager.currentCastSession
+        val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), null)
+        val messageJson = JSONObject(messageContent)
+        messageJson.put("value", json)
+
+        Log.d(tag, "Sending control message")
+        Log.d(tag, "Namespace: $CONTROL_NAMESPACE")
+        Log.d(tag, "Content: $messageJson")
+        if (castSession == null) {
+            Log.d(tag, "Message not sent (no session)")
+            return
+        }
+
+        castSession.sendMessage(CONTROL_NAMESPACE, messageJson.toString())
     }
 }

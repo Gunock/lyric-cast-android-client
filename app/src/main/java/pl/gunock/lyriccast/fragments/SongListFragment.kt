@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
@@ -62,7 +63,6 @@ class SongListFragment : Fragment() {
             adapter = SongsContext.songsListAdapter
         }
 
-        setupListeners(view)
         loadSongs()
     }
 
@@ -92,24 +92,33 @@ class SongListFragment : Fragment() {
         searchView!!.editText!!.setText("")
         categorySpinner!!.setSelection(0)
 
-        SongsContext.setupSongListAdapter()
-        view?.findViewById<RecyclerView>(R.id.recycler_view_songs)?.adapter =
-            SongsContext.songsListAdapter
+        setupSongList()
     }
 
     private fun loadSongs() {
         if (SongsContext.songMap.isEmpty()) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val songList: List<SongMetadataModel> = SongsContext.loadSongsMetadata()
-                lifecycleScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch {
                     SongsContext.fillSongsList(songList)
                     setupCategorySpinner()
+                    setupSongList()
+                    setupListeners(requireView())
                 }
             }
         }
         if (SongsContext.categories.toList().isNotEmpty()) {
-            setupCategorySpinner()
+            CoroutineScope(Dispatchers.Main).launch {
+                setupCategorySpinner()
+                setupListeners(requireView())
+            }
         }
+    }
+
+    private fun setupSongList(){
+        SongsContext.setupSongListAdapter()
+        view?.findViewById<RecyclerView>(R.id.recycler_view_songs)?.adapter =
+            SongsContext.songsListAdapter
     }
 
     private fun setupCategorySpinner() {

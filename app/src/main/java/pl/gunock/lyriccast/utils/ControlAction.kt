@@ -7,5 +7,6 @@
 package pl.gunock.lyriccast.utils
 
 enum class ControlAction {
-    BLANK
+    BLANK,
+    CONFIGURE
 }

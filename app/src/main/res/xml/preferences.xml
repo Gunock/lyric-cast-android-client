@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Tomasz Kiljańczyk on 12/30/20 4:48 PM
+  ~ Copyright (c) 2020 . All rights reserved.
+  ~ Last modified 12/26/20 10:54 PM
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Chromecast">
+
+        <ListPreference
+            android:id="@+id/backgroundColor"
+            app:defaultValue="Black"
+            app:entries="@array/color_entries"
+            app:entryValues="@array/color_values"
+            app:key="backgroundColor"
+            app:title="Background color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:id="@+id/fontColor"
+            app:defaultValue="White"
+            app:entries="@array/color_entries"
+            app:entryValues="@array/color_values"
+            app:key="fontColor"
+            app:title="Font color"
+            app:useSimpleSummaryProvider="true" />
+
+
+        <EditTextPreference
+            android:id="@+id/modelCategory"
+            app:defaultValue="20"
+            app:key="fontSize"
+            app:title="Font size"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

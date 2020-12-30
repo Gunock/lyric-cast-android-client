@@ -13,7 +13,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastContext
+import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
@@ -63,11 +65,32 @@ class ControlsFragment : Fragment() {
         sendSlide()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireView().context)
+        val fontSize = prefs.getString("fontSize", "40")
+        val backgroundColor = prefs.getString("backgroundColor", "Black")
+        val fontColor = prefs.getString("fontColor", "White")
+        val configurationJson = JSONObject()
+        configurationJson.run {
+            put("fontSize", "${fontSize}px")
+            put("backgroundColor", backgroundColor)
+            put("fontColor", fontColor)
+        }
+
+        MessageHelper.sendControlMessage(
+            castContext!!,
+            ControlAction.CONFIGURE,
+            configurationJson
+        )
+    }
+
     override fun onStop() {
         super.onStop()
-        if (castContext!!.sessionManager!!.currentSession != null) {
-            castContext!!.sessionManager!!.endCurrentSession(true)
-        }
+//        if (castContext!!.sessionManager!!.currentSession != null) {
+//            castContext!!.sessionManager!!.endCurrentSession(true)
+//        }
         castContext!!.sessionManager!!.removeSessionManagerListener(sessionCreatedListener)
     }
 

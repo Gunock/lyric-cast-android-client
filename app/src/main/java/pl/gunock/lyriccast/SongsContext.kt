@@ -45,8 +45,12 @@ object SongsContext {
         }
 
         for (file in fileList) {
-            Log.d(tag, "Reading file: ${file.name}")
-            val json = JSONObject(file.readText(Charsets.UTF_8))
+            Log.d(tag, "Reading file : ${file.name}")
+            val fileText = file.readText(Charsets.UTF_8)
+            Log.d(tag, "File content : ${fileText.replace("\n", "")}")
+            val json = JSONObject(fileText)
+            Log.d(tag, "Parsed JSON : $json")
+
             val songMetadata = SongMetadataModel(json)
             loadedSongsMetadata.add(songMetadata)
             categories.add(songMetadata.category)
