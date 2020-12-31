@@ -54,7 +54,7 @@
 
         <activity
             android:name=".activities.SetlistControlsActivity"
-            android:label="@string/settings"
+            android:label=""
             android:parentActivityName="pl.gunock.lyriccast.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />

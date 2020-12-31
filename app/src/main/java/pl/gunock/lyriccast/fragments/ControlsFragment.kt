@@ -28,7 +28,7 @@ import pl.gunock.lyriccast.utils.MessageHelper
 class ControlsFragment : Fragment() {
 
     private var castContext: CastContext? = null
-    private var slidePreview: TextView? = null
+    private lateinit var slidePreview: TextView
     private var sessionCreatedListener: SessionCreatedListener? = null
 
     override fun onCreateView(
@@ -97,7 +97,7 @@ class ControlsFragment : Fragment() {
     }
 
     private fun sendSlide() {
-        slidePreview!!.text = SongsContext.getCurrentSlide()
+        slidePreview.text = SongsContext.getCurrentSlide()
         MessageHelper.sendContentMessage(
             castContext!!,
             SongsContext.getCurrentSlide()

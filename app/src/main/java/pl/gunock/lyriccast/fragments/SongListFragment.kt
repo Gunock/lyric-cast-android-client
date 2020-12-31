@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.Switch
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -36,8 +36,8 @@ class SongListFragment : Fragment() {
 
     private var castContext: CastContext? = null
 
-    private var searchView: TextInputLayout? = null
-    private var categorySpinner: Spinner? = null
+    private lateinit var searchView: TextInputLayout
+    private lateinit var categorySpinner: Spinner
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +54,7 @@ class SongListFragment : Fragment() {
         searchView = view.findViewById(R.id.text_view_filter_songs)
         categorySpinner = view.findViewById(R.id.spinner_category)
 
-        view.findViewById<Switch>(R.id.switch_selected_songs).visibility = View.GONE
+        view.findViewById<SwitchCompat>(R.id.switch_selected_songs).visibility = View.GONE
 
         view.findViewById<RecyclerView>(R.id.recycler_view_songs).run {
             setHasFixedSize(true)
@@ -73,14 +73,14 @@ class SongListFragment : Fragment() {
                 findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
             })
 
-        searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
+        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
+            SongsContext.filterSongs(it, categorySpinner.selectedItem.toString())
         })
 
-        categorySpinner!!.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
             SongsContext.filterSongs(
-                searchView!!.editText!!.editableText.toString(),
-                categorySpinner!!.selectedItem.toString()
+                searchView.editText!!.editableText.toString(),
+                categorySpinner.selectedItem.toString()
             )
         }
     }
@@ -88,8 +88,8 @@ class SongListFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        searchView!!.editText!!.setText("")
-        categorySpinner!!.setSelection(0)
+        searchView.editText!!.setText("")
+        categorySpinner.setSelection(0)
 
         setupSongList()
     }
@@ -130,7 +130,7 @@ class SongListFragment : Fragment() {
             SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner!!.apply {
+        categorySpinner.apply {
             adapter = categorySpinnerAdapter
         }
     }

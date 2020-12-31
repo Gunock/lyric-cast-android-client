@@ -75,15 +75,31 @@ object SongsContext {
         )
     }
 
-    fun filterSongs(title: String, category: String = "All") {
+    fun filterSongs(title: String, category: String = "All", isSelected: Boolean? = null) {
         Log.d(tag, "filterSongs invoked")
 
-        val duration = measureTimeMillis {
-            songsListAdapter!!.songs = songItemList.filter { song ->
-                song.title.toLowerCase(Locale.ROOT).normalize()
+        val predicate = if (isSelected == null) { song: SongItemModel ->
+            val titleCondition = song.title.toLowerCase(Locale.ROOT)
+                .normalize()
+                .contains(title.toLowerCase(Locale.ROOT).normalize())
+            val categoryCondition = (category == "All" || song.category == category)
+
+            titleCondition && categoryCondition
+        } else { song: SongItemModel ->
+            if (song.selected != isSelected) {
+                false
+            } else {
+                val titleCondition = song.title.toLowerCase(Locale.ROOT)
+                    .normalize()
                     .contains(title.toLowerCase(Locale.ROOT).normalize())
-                        && (category == "All" || song.category == category)
-            }.toMutableList()
+                val categoryCondition = (category == "All" || song.category == category)
+
+                titleCondition && categoryCondition
+            }
+        }
+
+        val duration = measureTimeMillis {
+            songsListAdapter!!.songs = songItemList.filter(predicate).toMutableList()
         }
         Log.d(tag, "Filtering took : ${duration}ms")
 

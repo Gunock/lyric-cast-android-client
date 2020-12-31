@@ -29,7 +29,7 @@ import java.io.File
 class SongEditorActivity : AppCompatActivity() {
     private val tag = "SongEditorActivity"
 
-    private var sectionNameInput: TextInputLayout? = null
+    private lateinit var sectionNameInput: TextInputLayout
     private var selectedTab: TabLayout.Tab? = null
 
     private val sectionLyrics: MutableMap<TabLayout.Tab, String> = mutableMapOf()
@@ -64,7 +64,7 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        sectionNameInput!!.editText!!.addTextChangedListener(InputTextChangeListener {
+        sectionNameInput.editText!!.addTextChangedListener(InputTextChangeListener {
             selectedTab!!.text = it
         })
 
@@ -83,7 +83,7 @@ class SongEditorActivity : AppCompatActivity() {
                 selectedTab = it
 
                 if (it!!.text == getString(R.string.add)) {
-                    sectionNameInput!!.editText!!.setText(getString(R.string.new_section))
+                    sectionNameInput.editText!!.setText(getString(R.string.new_section))
 
                     sectionLyrics[it] = ""
                     findViewById<EditText>(R.id.text_input_section_lyrics).setText("")
@@ -92,7 +92,7 @@ class SongEditorActivity : AppCompatActivity() {
                     newAddTab.text = getString(R.string.add)
                     it.parent!!.addTab(newAddTab)
                 } else {
-                    sectionNameInput!!.editText!!.setText(it.text)
+                    sectionNameInput.editText!!.setText(it.text)
                     findViewById<EditText>(R.id.text_input_section_lyrics).setText(sectionLyrics[it])
                 }
             })

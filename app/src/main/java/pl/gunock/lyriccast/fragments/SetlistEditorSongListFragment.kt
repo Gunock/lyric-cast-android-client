@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +25,9 @@ import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
 
 class SetlistEditorSongListFragment : Fragment() {
 
-    private var searchView: TextInputLayout? = null
-    private var categorySpinner: Spinner? = null
+    private lateinit var searchView: TextInputLayout
+    private lateinit var categorySpinner: Spinner
+    private lateinit var selectedSongsSwitch: SwitchCompat
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +41,7 @@ class SetlistEditorSongListFragment : Fragment() {
 
         searchView = view.findViewById(R.id.text_view_filter_songs)
         categorySpinner = view.findViewById(R.id.spinner_category)
+        selectedSongsSwitch = view.findViewById(R.id.switch_selected_songs)
 
         SongsContext.setupSongListAdapter(showCheckBox = true)
 
@@ -57,22 +60,30 @@ class SetlistEditorSongListFragment : Fragment() {
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        categorySpinner!!.apply {
+        categorySpinner.apply {
             adapter = categorySpinnerAdapter
         }
     }
 
     private fun setupListeners() {
-        searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner!!.selectedItem.toString())
+        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
+            SongsContext.filterSongs(it, categorySpinner.selectedItem.toString())
         })
 
-        categorySpinner!!.onItemSelectedListener =
+        categorySpinner.onItemSelectedListener =
             SpinnerItemSelectedListener { _, _ ->
                 SongsContext.filterSongs(
-                    searchView!!.editText!!.editableText.toString(),
-                    categorySpinner!!.selectedItem.toString()
+                    searchView.editText!!.editableText.toString(),
+                    categorySpinner.selectedItem.toString()
                 )
             }
+
+        selectedSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            SongsContext.filterSongs(
+                searchView.editText!!.editableText.toString(),
+                categorySpinner.selectedItem.toString(),
+                isSelected = if (isChecked) true else null
+            )
+        }
     }
 }

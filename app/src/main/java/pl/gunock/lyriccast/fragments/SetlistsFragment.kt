@@ -36,8 +36,8 @@ import java.util.*
  */
 class SetlistsFragment : Fragment() {
 
-    private var searchView: TextInputLayout? = null
-    private var categorySpinner: Spinner? = null
+    private lateinit var searchView: TextInputLayout
+    private lateinit var categorySpinner: Spinner
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,8 +79,8 @@ class SetlistsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        searchView!!.editText!!.setText("")
-        categorySpinner!!.setSelection(0)
+        searchView.editText!!.setText("")
+        categorySpinner.setSelection(0)
 
         SetlistsContext.setupSetlistListAdapter()
         view?.findViewById<RecyclerView>(R.id.recycler_view_setlists)?.adapter =
@@ -94,7 +94,7 @@ class SetlistsFragment : Fragment() {
             SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner!!.apply {
+        categorySpinner.apply {
             adapter = categorySpinnerAdapter
         }
     }
@@ -107,14 +107,14 @@ class SetlistsFragment : Fragment() {
                 startActivity(intent)
             })
 
-        searchView!!.editText!!.addTextChangedListener(InputTextChangeListener {
-            SetlistsContext.filterSetlists(it, categorySpinner!!.selectedItem.toString())
+        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
+            SetlistsContext.filterSetlists(it, categorySpinner.selectedItem.toString())
         })
 
-        categorySpinner!!.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
             SetlistsContext.filterSetlists(
-                searchView!!.editText!!.editableText.toString(),
-                categorySpinner!!.selectedItem.toString()
+                searchView.editText!!.editableText.toString(),
+                categorySpinner.selectedItem.toString()
             )
         }
     }

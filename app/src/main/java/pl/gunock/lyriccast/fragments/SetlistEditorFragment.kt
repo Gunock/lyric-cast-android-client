@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,6 +62,15 @@ class SetlistEditorFragment : Fragment() {
 
             val selectedSongs: List<SongItemModel> =
                 SongsContext.songItemList.filter { it.selected }
+
+            if (selectedSongs.isEmpty()) {
+                val toast = Toast.makeText(requireContext(),
+                    "Empty setlists are not allowed!",
+                    Toast.LENGTH_SHORT)
+                toast.show()
+                return@setOnClickListener
+            }
+
             setlist.songTitles = List(selectedSongs.size) {
                 selectedSongs[it].title
             }

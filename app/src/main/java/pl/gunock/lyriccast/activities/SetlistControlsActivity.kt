@@ -28,14 +28,17 @@ class SetlistControlsActivity : AppCompatActivity() {
     private val tag = "SetlistControlsActivity"
 
     private var castContext: CastContext? = null
-    private var slidePreview: TextView? = null
-    private var songTitle: TextView? = null
+    private lateinit var slidePreview: TextView
+    private lateinit var songTitle: TextView
     private var songListAdapter: SongListAdapter? = null
     private var sessionCreatedListener: SessionCreatedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_setlist_controls)
+        setSupportActionBar(findViewById(R.id.toolbar_main))
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {
@@ -71,7 +74,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         setUpListeners()
 
-        songTitle!!.text = SetlistsContext.getCurrentSongTitle()
+        songTitle.text = SetlistsContext.getCurrentSongTitle()
         sendSlide()
     }
 
@@ -121,7 +124,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
             if (SetlistsContext.previousSlide()) {
-                songTitle!!.text = SetlistsContext.getCurrentSongTitle()
+                songTitle.text = SetlistsContext.getCurrentSongTitle()
                 highlightCurrentSong()
             }
             sendSlide()
@@ -129,7 +132,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
             if (SetlistsContext.nextSlide()) {
-                songTitle!!.text = SetlistsContext.getCurrentSongTitle()
+                songTitle.text = SetlistsContext.getCurrentSongTitle()
                 highlightCurrentSong()
             }
             sendSlide()
@@ -147,7 +150,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun sendSlide() {
-        slidePreview!!.text = SetlistsContext.getCurrentSlide()
+        slidePreview.text = SetlistsContext.getCurrentSlide()
         MessageHelper.sendContentMessage(
             castContext!!,
             SetlistsContext.getCurrentSlide()
