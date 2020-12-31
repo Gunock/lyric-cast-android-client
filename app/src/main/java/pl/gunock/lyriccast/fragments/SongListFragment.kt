@@ -16,6 +16,7 @@ import android.widget.Switch
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
@@ -53,14 +54,12 @@ class SongListFragment : Fragment() {
         searchView = view.findViewById(R.id.text_view_filter_songs)
         categorySpinner = view.findViewById(R.id.spinner_category)
 
-        SongsContext.setupSongListAdapter()
-
         view.findViewById<Switch>(R.id.switch_selected_songs).visibility = View.GONE
 
-        view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
+        view.findViewById<RecyclerView>(R.id.recycler_view_songs).run {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = SongsContext.songsListAdapter
+            adapter = null
         }
 
         loadSongs()
@@ -69,7 +68,7 @@ class SongListFragment : Fragment() {
     private fun setupListeners(view: View) {
         view.findViewById<RecyclerView>(R.id.recycler_view_songs).addOnItemTouchListener(
             RecyclerItemClickListener(context) { _, position ->
-                val songItem = SongsContext.songItemList[position]
+                val songItem = SongsContext.songsListAdapter!!.songs[position]
                 SongsContext.pickSong(songItem.title)
                 findNavController().navigate(R.id.action_SongListFragment_to_ControlsFragment)
             })
@@ -107,7 +106,7 @@ class SongListFragment : Fragment() {
                 }
             }
         }
-        if (SongsContext.categories.toList().isNotEmpty()) {
+        else if (SongsContext.categories.toList().isNotEmpty()) {
             CoroutineScope(Dispatchers.Main).launch {
                 setupCategorySpinner()
                 setupListeners(requireView())
@@ -116,7 +115,10 @@ class SongListFragment : Fragment() {
     }
 
     private fun setupSongList(){
-        SongsContext.setupSongListAdapter()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val showAuthor = prefs.getBoolean("showAuthor", true)
+
+        SongsContext.setupSongListAdapter(showAuthor = showAuthor)
         view?.findViewById<RecyclerView>(R.id.recycler_view_songs)?.adapter =
             SongsContext.songsListAdapter
     }

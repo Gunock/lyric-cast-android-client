@@ -10,25 +10,38 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.cast.framework.CastContext
+import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.models.SongItemModel
+import pl.gunock.lyriccast.utils.ControlAction
+import pl.gunock.lyriccast.utils.MessageHelper
 
 class SetlistControlsActivity : AppCompatActivity() {
     private val tag = "SetlistControlsActivity"
 
+    private var castContext: CastContext? = null
     private var slidePreview: TextView? = null
     private var songTitle: TextView? = null
     private var songListAdapter: SongListAdapter? = null
-//    private var sessionCreatedListener: SessionCreatedListener? = null
+    private var sessionCreatedListener: SessionCreatedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setlist_controls)
+
+        castContext = CastContext.getSharedInstance()
+        sessionCreatedListener = SessionCreatedListener {
+            sendSlide()
+        }
+        castContext!!.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
 
         slidePreview = findViewById(R.id.text_view_slide_preview2)
         songTitle = findViewById(R.id.current_song_title)
@@ -80,10 +93,31 @@ class SetlistControlsActivity : AppCompatActivity() {
 //        }
 //    }
 
+    override fun onResume() {
+        super.onResume()
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val fontSize = prefs.getString("fontSize", "40")
+        val backgroundColor = prefs.getString("backgroundColor", "Black")
+        val fontColor = prefs.getString("fontColor", "White")
+        val configurationJson = JSONObject()
+        configurationJson.run {
+            put("fontSize", "${fontSize}px")
+            put("backgroundColor", backgroundColor)
+            put("fontColor", fontColor)
+        }
+
+        MessageHelper.sendControlMessage(
+            castContext!!,
+            ControlAction.CONFIGURE,
+            configurationJson
+        )
+    }
+
     private fun setUpListeners() {
-//        findViewById<Button>(R.id.button_control_blank).setOnClickListener {
-//            MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
-//        }
+        findViewById<Button>(R.id.button_control_blank2).setOnClickListener {
+            MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
+        }
 
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
             if (SetlistsContext.previousSlide()) {
@@ -114,10 +148,10 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun sendSlide() {
         slidePreview!!.text = SetlistsContext.getCurrentSlide()
-//        MessageHelper.sendContentMessage(
-//            castContext!!,
-//            SongsContext.getCurrentSlide()
-//        )
+        MessageHelper.sendContentMessage(
+            castContext!!,
+            SetlistsContext.getCurrentSlide()
+        )
     }
 
 }

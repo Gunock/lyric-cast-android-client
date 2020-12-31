@@ -19,7 +19,7 @@ object SetlistsContext {
 
     var setlistsDirectory: String = ""
 
-    var setlistList: MutableList<SetlistModel> = mutableListOf()
+    var setlistList: SortedSet<SetlistModel> = sortedSetOf()
 
     // TODO: Try to move adapters to activities/fragments
     val setlistItemList: MutableList<SetlistModel> = mutableListOf()
@@ -30,13 +30,13 @@ object SetlistsContext {
     private var currentSongTitle: String = ""
     private var presentationGap: Boolean = false
 
-    fun loadSetlists(): List<SetlistModel> {
-        val loadedSetlists: MutableList<SetlistModel> = mutableListOf()
+    fun loadSetlists(): SortedSet<SetlistModel> {
+        val loadedSetlists: SortedSet<SetlistModel> = sortedSetOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".json") }
         val fileList = File(setlistsDirectory).listFiles(fileFilter)
 
         if (fileList == null || fileList.isEmpty()) {
-            return listOf()
+            return sortedSetOf()
         }
 
         for (file in fileList) {
@@ -60,13 +60,13 @@ object SetlistsContext {
     fun setupSetlistListAdapter() {
         setlistItemList.clear()
         for (i in setlistList.indices) {
-            setlistItemList.add(setlistList[i])
+            setlistItemList.add(setlistList.elementAt(i))
         }
         setlistListAdapter = SetlistListAdapter(setlistItemList)
     }
 
     fun pickSetlist(position: Int) {
-        currentSetlist = setlistItemList[position]
+        currentSetlist = setlistListAdapter!!.setlists[position]
         presentationIterator = currentSetlist!!.songTitles.listIterator()
         currentSongTitle = presentationIterator!!.next()
         SongsContext.pickSong(currentSongTitle)
@@ -124,11 +124,11 @@ object SetlistsContext {
         return SongsContext.getCurrentSlide()
     }
 
-    fun fillSetlistList(setlists: List<SetlistModel>) {
-        setlistList = setlists.toMutableList()
+    fun fillSetlistList(setlists: SortedSet<SetlistModel>) {
+        setlistList = setlists
         setlistItemList.clear()
         for (i in setlists.indices) {
-            setlistItemList.add(setlists[i])
+            setlistItemList.add(setlists.elementAt(i))
         }
         setlistListAdapter!!.setlists = setlistItemList
         setlistListAdapter!!.notifyDataSetChanged()

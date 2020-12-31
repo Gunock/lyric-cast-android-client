@@ -46,6 +46,7 @@ class ControlsFragment : Fragment() {
             sendSlide()
         }
         castContext!!.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
+
         slidePreview = view.findViewById(R.id.text_view_slide_preview)
 
         view.findViewById<Button>(R.id.button_control_blank).setOnClickListener {
@@ -68,7 +69,7 @@ class ControlsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(requireView().context)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val fontSize = prefs.getString("fontSize", "40")
         val backgroundColor = prefs.getString("backgroundColor", "Black")
         val fontColor = prefs.getString("fontColor", "White")
@@ -88,6 +89,7 @@ class ControlsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        // TODO: Remove unused code
 //        if (castContext!!.sessionManager!!.currentSession != null) {
 //            castContext!!.sessionManager!!.endCurrentSession(true)
 //        }

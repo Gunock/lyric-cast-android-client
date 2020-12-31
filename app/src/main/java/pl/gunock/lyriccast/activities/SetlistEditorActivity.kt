@@ -7,6 +7,7 @@
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
 
@@ -21,6 +22,16 @@ class SetlistEditorActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         setupListeners()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true // Ignores default behaviour
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 

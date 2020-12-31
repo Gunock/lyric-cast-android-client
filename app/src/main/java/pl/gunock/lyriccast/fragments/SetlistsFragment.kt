@@ -28,6 +28,7 @@ import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.RecyclerItemClickListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
 import pl.gunock.lyriccast.models.SetlistModel
+import java.util.*
 
 
 /**
@@ -63,7 +64,7 @@ class SetlistsFragment : Fragment() {
 
         if (SetlistsContext.setlistList.isEmpty()) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val setlistList: List<SetlistModel> = SetlistsContext.loadSetlists()
+                val setlistList: SortedSet<SetlistModel> = SetlistsContext.loadSetlists()
                 lifecycleScope.launch(Dispatchers.Main) {
                     SetlistsContext.fillSetlistList(setlistList)
                     setupCategorySpinner()

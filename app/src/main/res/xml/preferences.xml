@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Created by Tomasz Kiljańczyk on 12/30/20 4:48 PM
   ~ Copyright (c) 2020 . All rights reserved.
   ~ Last modified 12/26/20 10:54 PM
@@ -9,7 +8,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="Chromecast">
-
         <ListPreference
             android:id="@+id/backgroundColor"
             app:defaultValue="Black"
@@ -34,6 +32,15 @@
             app:defaultValue="20"
             app:key="fontSize"
             app:title="Font size"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Application">
+        <CheckBoxPreference
+            android:id="@+id/showAuthor"
+            app:defaultValue="true"
+            app:key="showAuthor"
+            app:title="Show author"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

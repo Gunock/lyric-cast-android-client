@@ -20,7 +20,8 @@ import pl.gunock.lyriccast.models.SongItemModel
 class SongListAdapter(
     var songs: MutableList<SongItemModel>,
     val showCheckBox: Boolean = false,
-    val showRowNumber: Boolean = false
+    val showRowNumber: Boolean = false,
+    val showAuthor: Boolean = true
 ) : RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {
 
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -47,6 +48,11 @@ class SongListAdapter(
         }
         holder.authorTextView.text = songs[position].author
         holder.categoryTextView.text = songs[position].category
+
+        if (!showAuthor) {
+            holder.authorTextView.visibility = View.GONE
+        }
+
         if (!showCheckBox) {
             holder.checkBox.visibility = View.GONE
         } else {
@@ -63,6 +69,7 @@ class SongListAdapter(
 
             holder.checkBox.isChecked = songs[position].selected
         }
+
         if (songs[position].highlight) {
             holder.itemLayout.setBackgroundColor(
                 holder.itemView.resources.getColor(

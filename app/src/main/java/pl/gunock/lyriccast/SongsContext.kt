@@ -9,18 +9,20 @@ package pl.gunock.lyriccast
 import android.util.Log
 import org.json.JSONObject
 import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
 import java.io.FilenameFilter
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 object SongsContext {
     private const val tag = "SongsContext"
 
     var songsDirectory: String = ""
-    var songMap: MutableMap<String, SongMetadataModel> = mutableMapOf()
+    var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
 
     // TODO: Try to move adapters to activities/fragments
     val songItemList: MutableList<SongItemModel> = mutableListOf()
@@ -60,21 +62,31 @@ object SongsContext {
         return loadedSongsMetadata
     }
 
-    fun setupSongListAdapter(showCheckBox: Boolean = false) {
+    fun setupSongListAdapter(showCheckBox: Boolean = false, showAuthor: Boolean = true) {
         Log.d(tag, "setupSongListAdapter invoked")
         songItemList.clear()
         for (i in songMap.values.indices) {
             songItemList.add(SongItemModel(songMap.values.elementAt(i)))
         }
-        songsListAdapter = SongListAdapter(songItemList, showCheckBox)
+        songsListAdapter = SongListAdapter(
+            songItemList,
+            showCheckBox = showCheckBox,
+            showAuthor = showAuthor
+        )
     }
 
     fun filterSongs(title: String, category: String = "All") {
         Log.d(tag, "filterSongs invoked")
-        songsListAdapter!!.songs = songItemList.filter { song ->
-            song.title.toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))
-                    && (category == "All" || song.category == category)
-        }.toMutableList()
+
+        val duration = measureTimeMillis {
+            songsListAdapter!!.songs = songItemList.filter { song ->
+                song.title.toLowerCase(Locale.ROOT).normalize()
+                    .contains(title.toLowerCase(Locale.ROOT).normalize())
+                        && (category == "All" || song.category == category)
+            }.toMutableList()
+        }
+        Log.d(tag, "Filtering took : ${duration}ms")
+
         songsListAdapter!!.notifyDataSetChanged()
     }
 

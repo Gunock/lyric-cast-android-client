@@ -10,7 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import pl.gunock.lyriccast.utils.JsonHelper
 
-open class SetlistModel() {
+open class SetlistModel() : Comparable<SetlistModel> {
     var name: String = ""
     var songTitles: List<String> = listOf()
     var category: String = ""
@@ -34,5 +34,9 @@ open class SetlistModel() {
         result.put("name", name)
         result.put("songTitles", JSONArray(songTitles))
         return result
+    }
+
+    override fun compareTo(other: SetlistModel): Int {
+        return name.compareTo(other.name)
     }
 }
