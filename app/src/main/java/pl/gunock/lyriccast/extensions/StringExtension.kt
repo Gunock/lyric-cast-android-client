@@ -13,7 +13,7 @@ private val specialCharacters: Map<Char, Char> = mapOf(
     'Ł' to 'L',
 )
 
-val nonSpacingMarkRegex = "\\p{Mn}+".toRegex()
+//val nonSpacingMarkRegex = "\\p{Mn}+".toRegex()
 
 fun String.normalize(): String {
     var result: String = Normalizer.normalize(this, Normalizer.Form.NFD)

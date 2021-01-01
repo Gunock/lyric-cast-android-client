@@ -121,6 +121,10 @@ object SongsContext {
         songsListAdapter?.notifyDataSetChanged()
     }
 
+    fun getSongLyrics(title: String): SongLyricsModel{
+        return songMap[title]!!.loadLyrics(songsDirectory)
+    }
+
     fun pickSong(title: String) {
         currentSongMetadata = songMap[title]
         currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)

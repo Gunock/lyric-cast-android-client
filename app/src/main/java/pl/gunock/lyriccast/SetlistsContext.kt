@@ -26,9 +26,7 @@ object SetlistsContext {
     var setlistListAdapter: SetlistListAdapter? = null
 
     var currentSetlist: SetlistModel? = null
-    private var presentationIterator: ListIterator<String>? = null
-    private var currentSongTitle: String = ""
-    private var presentationGap: Boolean = false
+    private var presentationIterator: ListIterator<Pair<String, String>>? = null
 
     fun loadSetlists(): SortedSet<SetlistModel> {
         val loadedSetlists: SortedSet<SetlistModel> = sortedSetOf()
@@ -65,63 +63,40 @@ object SetlistsContext {
         setlistListAdapter = SetlistListAdapter(setlistItemList)
     }
 
+
+    var slideList: MutableList<Pair<String, String>> = mutableListOf()
+
     fun pickSetlist(position: Int) {
         currentSetlist = setlistListAdapter!!.setlists[position]
-        presentationIterator = currentSetlist!!.songTitles.listIterator()
-        currentSongTitle = presentationIterator!!.next()
-        SongsContext.pickSong(currentSongTitle)
-    }
 
-    fun nextSlide(): Boolean {
-        if (!SongsContext.nextSlide()) {
-            if (!presentationIterator!!.hasNext()) {
-                return false
+        slideList.clear()
+        for (songTitle in currentSetlist!!.songTitles) {
+            slideList.add(Pair(songTitle, ""))
+
+            val songMetadata = SongsContext.songMap[songTitle]!!
+            val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
+
+            for (section in songMetadata.presentation) {
+                val lyrics = songLyrics[section] ?: error("ERROR")
+                slideList.add(Pair(songTitle, lyrics))
             }
-            if (presentationGap) {
-                currentSongTitle = presentationIterator!!.next()
-                SongsContext.pickSong(currentSongTitle)
-            } else {
-                currentSongTitle = ""
-                presentationGap = true
-            }
-            return true
-        } else {
-            presentationGap = false
-        }
-        return false
-    }
-
-    fun previousSlide(): Boolean {
-        if (!SongsContext.previousSlide()) {
-            if (!presentationIterator!!.hasPrevious()) {
-                return false
-            }
-            if (presentationGap) {
-                currentSongTitle = presentationIterator!!.previous()
-                SongsContext.pickSong(currentSongTitle)
-                presentationGap = false
-            } else {
-                currentSongTitle = ""
-                presentationGap = true
-            }
-            return true
-        } else {
-            presentationGap = false
-        }
-        return false
-    }
-
-
-    fun getCurrentSongTitle(): String {
-        return currentSongTitle
-    }
-
-    fun getCurrentSlide(): String {
-        if (currentSongTitle.isEmpty()) {
-            return ""
         }
 
-        return SongsContext.getCurrentSlide()
+        presentationIterator = slideList.listIterator()
+    }
+
+    fun nextSlide(): Pair<String, String>? {
+        if (presentationIterator!!.hasNext()) {
+            return presentationIterator!!.next()
+        }
+        return null
+    }
+
+    fun previousSlide(): Pair<String, String>? {
+        if (presentationIterator!!.hasPrevious()) {
+            return presentationIterator!!.previous()
+        }
+        return null
     }
 
     fun fillSetlistList(setlists: SortedSet<SetlistModel>) {

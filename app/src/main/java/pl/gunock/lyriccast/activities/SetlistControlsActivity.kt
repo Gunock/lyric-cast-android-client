@@ -30,8 +30,10 @@ class SetlistControlsActivity : AppCompatActivity() {
     private var castContext: CastContext? = null
     private lateinit var slidePreview: TextView
     private lateinit var songTitle: TextView
-    private var songListAdapter: SongListAdapter? = null
+    private lateinit var songListAdapter: SongListAdapter
     private var sessionCreatedListener: SessionCreatedListener? = null
+
+    var currentSlide: Pair<String, String> = Pair("", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +76,10 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         setUpListeners()
 
-        songTitle.text = SetlistsContext.getCurrentSongTitle()
+        // Gets first slide
+        SetlistsContext.nextSlide()!!
+        currentSlide = SetlistsContext.previousSlide()!!
+        songTitle.text = currentSlide.first
         sendSlide()
     }
 
@@ -117,43 +122,59 @@ class SetlistControlsActivity : AppCompatActivity() {
         )
     }
 
+
     private fun setUpListeners() {
         findViewById<Button>(R.id.button_control_blank2).setOnClickListener {
             MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
         }
 
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
-            if (SetlistsContext.previousSlide()) {
-                songTitle.text = SetlistsContext.getCurrentSongTitle()
+            var previousSlide = SetlistsContext.previousSlide() ?: return@setOnClickListener
+
+            if (previousSlide == currentSlide) {
+                previousSlide = SetlistsContext.previousSlide()!!
+            }
+
+            if (previousSlide.first != currentSlide.first) {
+                previousSlide = SetlistsContext.previousSlide()!!
+                songTitle.text = previousSlide.first
                 highlightCurrentSong()
             }
+
+            currentSlide = previousSlide
             sendSlide()
         }
 
         findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
-            if (SetlistsContext.nextSlide()) {
-                songTitle.text = SetlistsContext.getCurrentSongTitle()
+            var nextSlide = SetlistsContext.nextSlide() ?: return@setOnClickListener
+
+            if (nextSlide == currentSlide) {
+                nextSlide = SetlistsContext.nextSlide()!!
+            }
+
+            if (nextSlide.first != currentSlide.first) {
+                songTitle.text = nextSlide.first
                 highlightCurrentSong()
             }
+
+            currentSlide = nextSlide
             sendSlide()
         }
     }
 
     private fun highlightCurrentSong() {
-        val iterator = songListAdapter!!.songs.listIterator()
-        while (iterator.hasNext()) {
-            val oldValue = iterator.next()
-            oldValue.highlight = oldValue.title == SetlistsContext.getCurrentSongTitle()
-            iterator.set(oldValue)
-        }
-        songListAdapter!!.notifyDataSetChanged()
+        songListAdapter.songs.forEach { it.highlight = it.title == songTitle.text }
+        songListAdapter.notifyDataSetChanged()
+
+        val songItemPosition = songListAdapter.songs.indexOfFirst { it.title == songTitle.text }
+        findViewById<RecyclerView>(R.id.recycler_view_songs).scrollToPosition(songItemPosition)
     }
 
     private fun sendSlide() {
-        slidePreview.text = SetlistsContext.getCurrentSlide()
+        slidePreview.text = currentSlide.second
         MessageHelper.sendContentMessage(
             castContext!!,
-            SetlistsContext.getCurrentSlide()
+            currentSlide.second
         )
     }
 
