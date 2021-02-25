@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/31/20 7:25 PM
+  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/25/21 9:53 PM
   -->
 
 <resources>
@@ -24,6 +24,8 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string name="add_song">Add song</string>
     <string name="add_setlist">Add setlist</string>
     <string name="chorus">Chorus</string>

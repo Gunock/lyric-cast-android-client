@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 3:43 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:46 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -42,12 +42,17 @@ class SongEditorActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         sectionNameInput = findViewById(R.id.text_view_section_name)
-        val songSectionTabLayout: TabLayout = findViewById(R.id.tab_layout_song_section)
-        selectedTab = songSectionTabLayout.getTabAt(songSectionTabLayout.selectedTabPosition)
-        sectionLyrics[selectedTab!!] = ""
+
+        val songTitle = intent.getStringExtra("songTitle")
+        if (songTitle != null) {
+            loadSongData(songTitle)
+        } else {
+            val songSectionTabLayout: TabLayout = findViewById(R.id.tab_layout_song_section)
+            selectedTab = songSectionTabLayout.getTabAt(0)
+            sectionLyrics[selectedTab!!] = ""
+        }
 
         setupCategorySpinner()
-
         setupListeners()
     }
 
@@ -95,7 +100,8 @@ class SongEditorActivity : AppCompatActivity() {
                     sectionNameInput.editText!!.setText(it.text)
                     findViewById<EditText>(R.id.text_input_section_lyrics).setText(sectionLyrics[it])
                 }
-            })
+            }
+        )
     }
 
     private fun saveSong() {
@@ -128,4 +134,32 @@ class SongEditorActivity : AppCompatActivity() {
         SongsContext.addSong(song)
     }
 
+    private fun loadSongData(songTitle: String) {
+        val songTitleInput: TextInputLayout = findViewById(R.id.text_view_song_title)
+        songTitleInput.editText!!.setText(songTitle)
+
+        val songMetadata = SongsContext.getSongMetadata(songTitle)
+        val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
+
+        val songSectionTabLayout: TabLayout = findViewById(R.id.tab_layout_song_section)
+        songSectionTabLayout.removeAllTabs()
+
+        for (sectionName in songMetadata.presentation) {
+            val newTab = songSectionTabLayout.newTab()
+            songSectionTabLayout.addTab(newTab)
+
+            sectionNameInput.editText!!.setText(sectionName)
+
+            sectionLyrics[newTab] = songLyrics[sectionName]!!
+
+            newTab.text = sectionName
+        }
+
+        val newAddTab = songSectionTabLayout.newTab()
+        songSectionTabLayout.addTab(newAddTab)
+        newAddTab.text = getString(R.string.add)
+
+        val sectionLyricsInput = findViewById<EditText>(R.id.text_input_section_lyrics)
+        sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
+    }
 }

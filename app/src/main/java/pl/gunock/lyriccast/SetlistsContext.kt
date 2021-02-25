@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 9:57 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 9:57 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/22/21 8:16 PM
  */
 
 package pl.gunock.lyriccast
@@ -22,7 +22,7 @@ object SetlistsContext {
     var setlistList: SortedSet<SetlistModel> = sortedSetOf()
 
     // TODO: Try to move adapters to activities/fragments
-    val setlistItemList: MutableList<SetlistModel> = mutableListOf()
+    private val setlistItemList: MutableList<SetlistModel> = mutableListOf()
     var setlistListAdapter: SetlistListAdapter? = null
 
     var currentSetlist: SetlistModel? = null
@@ -71,7 +71,7 @@ object SetlistsContext {
 
         slideList.clear()
         for (songTitle in currentSetlist!!.songTitles) {
-            slideList.add(Pair(songTitle, ""))
+//            slideList.add(Pair(songTitle, ""))
 
             val songMetadata = SongsContext.songMap[songTitle]!!
             val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
@@ -83,20 +83,6 @@ object SetlistsContext {
         }
 
         presentationIterator = slideList.listIterator()
-    }
-
-    fun nextSlide(): Pair<String, String>? {
-        if (presentationIterator!!.hasNext()) {
-            return presentationIterator!!.next()
-        }
-        return null
-    }
-
-    fun previousSlide(): Pair<String, String>? {
-        if (presentationIterator!!.hasPrevious()) {
-            return presentationIterator!!.previous()
-        }
-        return null
     }
 
     fun fillSetlistList(setlists: SortedSet<SetlistModel>) {

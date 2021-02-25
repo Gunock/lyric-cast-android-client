@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/14/20 11:53 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/22/21 9:17 PM
  */
 
 package pl.gunock.lyriccast.listeners
@@ -24,7 +24,7 @@ class RecyclerItemClickListener(
     private var mGestureDetector: GestureDetector =
         GestureDetector(context, object : SimpleOnGestureListener() {
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                return true
+                return false
             }
         })
 

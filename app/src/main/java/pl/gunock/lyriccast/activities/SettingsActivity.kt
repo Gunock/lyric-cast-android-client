@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:58 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:59 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -13,7 +13,9 @@ import com.google.android.gms.cast.framework.CastContext
 import pl.gunock.lyriccast.R
 
 class SettingsActivity : AppCompatActivity() {
-    private val tag = "SettingsActivity"
+    private companion object {
+        private const val TAG = "SettingsActivity"
+    }
 
     private var castContext: CastContext? = null
 

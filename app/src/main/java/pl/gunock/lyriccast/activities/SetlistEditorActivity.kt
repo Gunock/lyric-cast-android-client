@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/23/20 10:04 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:57 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -12,7 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
 
 class SetlistEditorActivity : AppCompatActivity() {
-    private val tag = "SetlistEditorActivity"
+    private companion object {
+        private const val TAG = "SetlistEditorActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

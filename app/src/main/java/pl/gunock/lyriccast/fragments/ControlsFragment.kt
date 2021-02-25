@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/14/20 11:51 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/13/20 8:55 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:55 PM
  */
 
 package pl.gunock.lyriccast.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,11 +14,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.utils.ControlAction
 import pl.gunock.lyriccast.utils.MessageHelper
@@ -28,7 +29,15 @@ import pl.gunock.lyriccast.utils.MessageHelper
 class ControlsFragment : Fragment() {
 
     private var castContext: CastContext? = null
-    private lateinit var slidePreview: TextView
+
+    private lateinit var songTitleView: TextView
+    private lateinit var slideNumberView: TextView
+    private lateinit var slidePreviewView: TextView
+
+    private val args: ControlsFragmentArgs by navArgs()
+
+    private var currentSlide = 0
+
     private var sessionCreatedListener: SessionCreatedListener? = null
 
     override fun onCreateView(
@@ -45,23 +54,15 @@ class ControlsFragment : Fragment() {
         sessionCreatedListener = SessionCreatedListener {
             sendSlide()
         }
-        castContext!!.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
+        castContext?.sessionManager?.addSessionManagerListener(sessionCreatedListener)
 
-        slidePreview = view.findViewById(R.id.text_view_slide_preview)
+        songTitleView = view.findViewById(R.id.text_view_controls_song_title)
+        slideNumberView = view.findViewById(R.id.text_view_slide_number)
+        slidePreviewView = view.findViewById(R.id.text_view_slide_preview)
 
-        view.findViewById<Button>(R.id.button_control_blank).setOnClickListener {
-            MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
-        }
+        songTitleView.text = args.songTitle
 
-        view.findViewById<Button>(R.id.button_prev).setOnClickListener {
-            SongsContext.previousSlide()
-            sendSlide()
-        }
-
-        view.findViewById<Button>(R.id.button_next).setOnClickListener {
-            SongsContext.nextSlide()
-            sendSlide()
-        }
+        setViewListeners(view)
 
         sendSlide()
     }
@@ -73,8 +74,8 @@ class ControlsFragment : Fragment() {
         val fontSize = prefs.getString("fontSize", "40")
         val backgroundColor = prefs.getString("backgroundColor", "Black")
         val fontColor = prefs.getString("fontColor", "White")
-        val configurationJson = JSONObject()
-        configurationJson.run {
+
+        val configurationJson = JSONObject().apply {
             put("fontSize", "${fontSize}px")
             put("backgroundColor", backgroundColor)
             put("fontColor", fontColor)
@@ -93,14 +94,51 @@ class ControlsFragment : Fragment() {
 //        if (castContext!!.sessionManager!!.currentSession != null) {
 //            castContext!!.sessionManager!!.endCurrentSession(true)
 //        }
-        castContext!!.sessionManager!!.removeSessionManagerListener(sessionCreatedListener)
+        castContext?.sessionManager?.removeSessionManagerListener(sessionCreatedListener)
     }
 
+    private fun setViewListeners(view: View) {
+        view.findViewById<Button>(R.id.button_control_blank).setOnClickListener {
+            sendBlank()
+        }
+
+        view.findViewById<Button>(R.id.button_prev).setOnClickListener {
+            if (currentSlide <= 0) {
+                return@setOnClickListener
+            }
+            currentSlide--
+            sendSlide()
+        }
+
+        view.findViewById<Button>(R.id.button_next).setOnClickListener {
+            if (currentSlide >= args.lyrics.size - 1) {
+                return@setOnClickListener
+            }
+            currentSlide++
+            sendSlide()
+        }
+    }
+
+    private fun sendBlank() {
+        if (castContext == null) {
+            return
+        }
+
+        MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
+    }
+
+    @SuppressLint("SetTextI18n")
     private fun sendSlide() {
-        slidePreview.text = SongsContext.getCurrentSlide()
+        slideNumberView.text = "${currentSlide + 1}/${args.lyrics.size}"
+        slidePreviewView.text = args.lyrics[currentSlide]
+
+        if (castContext == null) {
+            return
+        }
+
         MessageHelper.sendContentMessage(
             castContext!!,
-            SongsContext.getCurrentSlide()
+            args.lyrics[currentSlide]
         )
     }
 }

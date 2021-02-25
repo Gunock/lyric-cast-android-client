@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/25/20 8:36 PM
+  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/25/21 6:08 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -66,10 +66,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
+            android:contentDescription="@string/add_setlist"
             android:visibility="visible"
             app:fabCustomSize="40dp"
-            android:contentDescription="@string/add_setlist"
-            app:srcCompat="@drawable/ic_action_setlist" />
+            app:maxImageSize="24dp"
+            app:srcCompat="@drawable/baseline_playlist_add_black_24dp" />
 
     </LinearLayout>
 
@@ -109,12 +110,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
+            android:contentDescription="@string/add_song"
             android:cropToPadding="false"
             android:scaleType="center"
             android:visibility="visible"
             app:fabCustomSize="40dp"
-            app:srcCompat="@drawable/ic_action_song"
-            android:contentDescription="@string/add_song"
+            app:srcCompat="@drawable/baseline_music_note_black_24dp"
             app:useCompatPadding="false" />
     </LinearLayout>
 
@@ -125,13 +126,15 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
+        android:contentDescription="@string/add_song"
         android:focusable="true"
+        android:scaleType="center"
         android:tint="@color/design_default_color_on_primary"
         app:backgroundTint="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/add_song"
-        app:srcCompat="@drawable/ic_action_add" />
+        app:maxImageSize="48dp"
+        app:srcCompat="@drawable/baseline_add_black_24dp" />
 
     <View
         android:id="@+id/tabDivider"

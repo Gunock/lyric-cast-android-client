@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:06 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:58 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -25,15 +25,21 @@ import pl.gunock.lyriccast.utils.ControlAction
 import pl.gunock.lyriccast.utils.MessageHelper
 
 class SetlistControlsActivity : AppCompatActivity() {
-    private val tag = "SetlistControlsActivity"
+    private companion object {
+        private const val TAG = "SetlistControlsActivity"
+    }
+
+    private lateinit var slidePreviewView: TextView
+    private lateinit var songTitleView: TextView
 
     private var castContext: CastContext? = null
-    private lateinit var slidePreview: TextView
-    private lateinit var songTitle: TextView
-    private lateinit var songListAdapter: SongListAdapter
     private var sessionCreatedListener: SessionCreatedListener? = null
+    private lateinit var songListAdapter: SongListAdapter
 
-    var currentSlide: Pair<String, String> = Pair("", "")
+    private lateinit var setlistLyrics: List<String>
+    private var songTitles: MutableMap<Int, String> = mutableMapOf()
+    private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
+    private var currentLyricsIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +54,23 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
         castContext!!.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
 
-        slidePreview = findViewById(R.id.text_view_slide_preview2)
-        songTitle = findViewById(R.id.current_song_title)
+        slidePreviewView = findViewById(R.id.text_view_slide_preview2)
+        songTitleView = findViewById(R.id.current_song_title)
+
+        val songsMetadata = SongsContext.songMap
+        var setlistLyricsIndex = 0
+        setlistLyrics = SetlistsContext.currentSetlist!!.songTitles.flatMap { songTitle ->
+            val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
+            val lyrics = songsMetadata[songTitle]!!.presentation.map { songLyrics[it]!! }
+
+            songTitles[setlistLyricsIndex] = songTitle
+            songTitles[setlistLyricsIndex + lyrics.size - 1] = songTitle
+            songStartPoints[songTitle] = setlistLyricsIndex
+
+            setlistLyricsIndex += lyrics.size
+
+            lyrics
+        }
 
         findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
@@ -75,31 +96,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
 
         setUpListeners()
-
-        // Gets first slide
-        SetlistsContext.nextSlide()!!
-        currentSlide = SetlistsContext.previousSlide()!!
-        songTitle.text = currentSlide.first
-        sendSlide()
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        CastButtonFactory.setUpMediaRouteButton(
-//            applicationContext,
-//            menu,
-//            R.id.menu_cast
-//        )
-//        return true
-//    }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.menu_import_songs -> importFiles()
-//            R.id.menu_settings -> goToSettings()
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -120,8 +117,8 @@ class SetlistControlsActivity : AppCompatActivity() {
             ControlAction.CONFIGURE,
             configurationJson
         )
+        sendSlide()
     }
-
 
     private fun setUpListeners() {
         findViewById<Button>(R.id.button_control_blank2).setOnClickListener {
@@ -129,52 +126,45 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
-            var previousSlide = SetlistsContext.previousSlide() ?: return@setOnClickListener
-
-            if (previousSlide == currentSlide) {
-                previousSlide = SetlistsContext.previousSlide()!!
+            if (currentLyricsIndex <= 0) {
+                return@setOnClickListener
             }
-
-            if (previousSlide.first != currentSlide.first) {
-                previousSlide = SetlistsContext.previousSlide()!!
-                songTitle.text = previousSlide.first
-                highlightCurrentSong()
-            }
-
-            currentSlide = previousSlide
+            currentLyricsIndex--
             sendSlide()
         }
 
         findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
-            var nextSlide = SetlistsContext.nextSlide() ?: return@setOnClickListener
-
-            if (nextSlide == currentSlide) {
-                nextSlide = SetlistsContext.nextSlide()!!
+            if (currentLyricsIndex >= setlistLyrics.size - 1) {
+                return@setOnClickListener
             }
-
-            if (nextSlide.first != currentSlide.first) {
-                songTitle.text = nextSlide.first
-                highlightCurrentSong()
-            }
-
-            currentSlide = nextSlide
+            currentLyricsIndex++
             sendSlide()
         }
     }
 
-    private fun highlightCurrentSong() {
-        songListAdapter.songs.forEach { it.highlight = it.title == songTitle.text }
-        songListAdapter.notifyDataSetChanged()
-
-        val songItemPosition = songListAdapter.songs.indexOfFirst { it.title == songTitle.text }
-        findViewById<RecyclerView>(R.id.recycler_view_songs).scrollToPosition(songItemPosition)
-    }
+    // TODO: Find a workaround for programmatic item highlight
+//    private fun highlightSong(title: String) {
+//        val songItemPosition: Int = songListAdapter.songs.indexOfFirst { it.title == title }
+//        songListAdapter.songs.forEach { it.highlight = it.title == title }
+//
+//        findViewById<RecyclerView>(R.id.recycler_view_songs).run {
+//            scrollToPosition(songItemPosition)
+//            postInvalidate()
+//        }
+//
+//    }
 
     private fun sendSlide() {
-        slidePreview.text = currentSlide.second
+        if (songTitles.containsKey(currentLyricsIndex)) {
+            val songTitle = songTitles[currentLyricsIndex]!!
+            songTitleView.text = songTitle
+//            highlightSong(songTitle)
+        }
+
+        slidePreviewView.text = setlistLyrics[currentLyricsIndex]
         MessageHelper.sendContentMessage(
             castContext!!,
-            currentSlide.second
+            setlistLyrics[currentLyricsIndex]
         )
     }
 

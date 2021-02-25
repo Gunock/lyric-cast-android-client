@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/31/20 11:08 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:31 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -33,11 +33,13 @@ import pl.gunock.lyriccast.utils.MessageHelper
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    private val tag = "MainActivity"
+    private companion object {
+        const val TAG = "MainActivity"
+        const val EXPORT_SONGS_RESULT_CODE = 1
+        const val EXPORT_SETLISTS_RESULT_CODE = 2
+        const val SELECT_FILE_RESULT_CODE = 3
+    }
 
-    private val exportSongsResultCode = 1
-    private val exportSetlistsResultCode = 2
-    private val selectFileResultCode = 3
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
-        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
             val turnWifiOn = Intent(Settings.ACTION_WIFI_SETTINGS)
             startActivity(turnWifiOn)
@@ -70,11 +72,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+
         CastButtonFactory.setUpMediaRouteButton(
-            applicationContext,
+            baseContext,
             menu,
             R.id.menu_cast
         )
+
         return true
     }
 
@@ -82,8 +86,8 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> importSongs()
-            R.id.menu_export_songs -> exportFiles(exportSongsResultCode)
-            R.id.menu_export_setlists -> exportFiles(exportSetlistsResultCode)
+            R.id.menu_export_songs -> exportFiles(EXPORT_SONGS_RESULT_CODE)
+            R.id.menu_export_setlists -> exportFiles(EXPORT_SETLISTS_RESULT_CODE)
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -96,11 +100,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         when (requestCode) {
-            selectFileResultCode -> {
+            SELECT_FILE_RESULT_CODE -> {
                 val uri = data?.data!!
 
-                Log.d(tag, "Selected file URI: $uri")
-                Log.d(tag, "Target path: ${SongsContext.songsDirectory}")
+                Log.d(TAG, "Selected file URI: $uri")
+                Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
 
                 File(SongsContext.songsDirectory).deleteRecursively()
 
@@ -112,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
                 SongsContext.loadSongsMetadata()
             }
-            exportSongsResultCode -> {
+            EXPORT_SONGS_RESULT_CODE -> {
                 val uri = data?.data!!
 
                 FileHelper.zip(
@@ -120,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                     SongsContext.songsDirectory
                 )
             }
-            exportSetlistsResultCode -> {
+            EXPORT_SETLISTS_RESULT_CODE -> {
                 val uri = data?.data!!
 
                 FileHelper.zip(
@@ -139,10 +143,10 @@ class MainActivity : AppCompatActivity() {
                 val navController = navHostFragment.navController
 
                 if (it!!.text == getString(R.string.songs)) {
-                    Log.d(tag, "Switching to song list")
+                    Log.d(TAG, "Switching to song list")
                     navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
                 } else if (it.text == getString(R.string.setlists)) {
-                    Log.d(tag, "Switching to setlists")
+                    Log.d(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
                 }
             })
@@ -158,12 +162,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
-            val intent = Intent(this, SetlistEditorActivity::class.java)
+            val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
-            val intent = Intent(this, SongEditorActivity::class.java)
+            val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
         }
     }
@@ -183,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, selectFileResultCode)
+        startActivityForResult(chooserIntent, SELECT_FILE_RESULT_CODE)
         return true
     }
 

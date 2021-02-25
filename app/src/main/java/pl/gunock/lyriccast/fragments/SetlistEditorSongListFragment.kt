@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:53 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 1:27 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -48,7 +48,7 @@ class SetlistEditorSongListFragment : Fragment() {
         view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = SongsContext.songsListAdapter
+            adapter = SongsContext.songListAdapter
         }
 
         setupListeners()

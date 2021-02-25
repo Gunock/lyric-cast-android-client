@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:39 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 9:53 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -12,7 +12,7 @@ class SongItemModel(songMetadataModel: SongMetadataModel) {
     val category: String = songMetadataModel.category
 
     var highlight: Boolean = false
-    var selected: Boolean = false
+    var isSelected: Boolean = false
 
     override fun toString(): String {
         val builder: StringBuilder = StringBuilder()
@@ -22,5 +22,4 @@ class SongItemModel(songMetadataModel: SongMetadataModel) {
 
         return builder.toString()
     }
-
 }

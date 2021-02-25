@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:06 PM
+ * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/25/21 8:57 PM
  */
 
 package pl.gunock.lyriccast
@@ -26,14 +26,9 @@ object SongsContext {
 
     // TODO: Try to move adapters to activities/fragments
     val songItemList: MutableList<SongItemModel> = mutableListOf()
-    var songsListAdapter: SongListAdapter? = null
+    var songListAdapter: SongListAdapter? = null
 
     var categories: MutableSet<String> = mutableSetOf()
-
-    private var presentationIterator: ListIterator<String>? = null
-    private var presentationCurrentTag: String = ""
-    private var currentSongMetadata: SongMetadataModel? = null
-    private var currentSongLyrics: SongLyricsModel? = null
 
     fun loadSongsMetadata(): List<SongMetadataModel> {
         val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
@@ -62,13 +57,23 @@ object SongsContext {
         return loadedSongsMetadata
     }
 
+    fun deleteSongs(songTitles: List<String>) {
+        for (songTitle in songTitles) {
+            val songTitleNormalized = songTitle.normalize()
+
+            File("$songsDirectory$songTitleNormalized.json").delete()
+            File("$songsDirectory$songTitleNormalized.metadata.json").delete()
+            songMap.remove(songTitle)
+        }
+    }
+
     fun setupSongListAdapter(showCheckBox: Boolean = false, showAuthor: Boolean = true) {
         Log.d(tag, "setupSongListAdapter invoked")
         songItemList.clear()
         for (i in songMap.values.indices) {
             songItemList.add(SongItemModel(songMap.values.elementAt(i)))
         }
-        songsListAdapter = SongListAdapter(
+        songListAdapter = SongListAdapter(
             songItemList,
             showCheckBox = showCheckBox,
             showAuthor = showAuthor
@@ -86,7 +91,7 @@ object SongsContext {
 
             titleCondition && categoryCondition
         } else { song: SongItemModel ->
-            if (song.selected != isSelected) {
+            if (song.isSelected != isSelected) {
                 false
             } else {
                 val titleCondition = song.title.toLowerCase(Locale.ROOT)
@@ -99,11 +104,11 @@ object SongsContext {
         }
 
         val duration = measureTimeMillis {
-            songsListAdapter!!.songs = songItemList.filter(predicate).toMutableList()
+            songListAdapter!!.songs = songItemList.filter(predicate).toMutableList()
         }
         Log.d(tag, "Filtering took : ${duration}ms")
 
-        songsListAdapter!!.notifyDataSetChanged()
+        songListAdapter!!.notifyDataSetChanged()
     }
 
     fun fillSongsList(songs: List<SongMetadataModel>) {
@@ -111,44 +116,21 @@ object SongsContext {
         for (song in songs) {
             addSong(song)
         }
-        songsListAdapter!!.songs = songItemList
-        songsListAdapter!!.notifyDataSetChanged()
+        songListAdapter!!.songs = songItemList
+        songListAdapter!!.notifyDataSetChanged()
     }
 
     fun addSong(song: SongMetadataModel) {
         songMap[song.title] = song
         songItemList.add(SongItemModel(song))
-        songsListAdapter?.notifyDataSetChanged()
+        songListAdapter?.notifyDataSetChanged()
     }
 
-    fun getSongLyrics(title: String): SongLyricsModel{
+    fun getSongLyrics(title: String): SongLyricsModel {
         return songMap[title]!!.loadLyrics(songsDirectory)
     }
 
-    fun pickSong(title: String) {
-        currentSongMetadata = songMap[title]
-        currentSongLyrics = currentSongMetadata!!.loadLyrics(songsDirectory)
-        presentationIterator = currentSongMetadata!!.presentation.listIterator()
-        presentationCurrentTag = presentationIterator!!.next()
-    }
-
-    fun nextSlide(): Boolean {
-        if (presentationIterator!!.hasNext()) {
-            presentationCurrentTag = presentationIterator!!.next()
-            return true
-        }
-        return false
-    }
-
-    fun previousSlide(): Boolean {
-        if (presentationIterator!!.hasPrevious()) {
-            presentationCurrentTag = presentationIterator!!.previous()
-            return true
-        }
-        return false
-    }
-
-    fun getCurrentSlide(): String {
-        return currentSongLyrics!!.lyrics[presentationCurrentTag] ?: error("Lyrics not found")
+    fun getSongMetadata(title: String): SongMetadataModel {
+        return songMap[title]!!
     }
 }
