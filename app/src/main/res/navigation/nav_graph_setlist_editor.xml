@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:24 AM
+  ~ Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/26/21 9:36 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,6 +19,12 @@
         <action
             android:id="@+id/action_SetlistEditorSongListFragment_to_SetlistEditorFragment"
             app:destination="@id/SetlistEditorFragment" />
+        <argument
+            android:name="selectedSongs"
+            app:argType="string[]" />
+        <argument
+            android:name="setlistName"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/SetlistEditorFragment"
@@ -29,5 +35,15 @@
         <action
             android:id="@+id/action_SetlistEditorFragment_to_SetlistEditorSongListFragment"
             app:destination="@id/SetlistEditorSongListFragment" />
+        <argument
+            android:name="selectedSongs"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="setlistName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

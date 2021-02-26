@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 8:53 PM
+ * Last modified 2/26/21 7:40 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -28,14 +28,8 @@ class SongListAdapter(
     val onLongClickListener: LongClickAdapterListener<SongViewHolder>? = null,
     val onClickListener: ClickAdapterListener<SongViewHolder>? = null
 ) : RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {
-
     private companion object {
         const val TAG = "SongListAdapter"
-    }
-
-    // Selector
-    init {
-        setHasStableIds(true)
     }
 
     inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,7 +43,6 @@ class SongListAdapter(
             if (!showRowNumber) {
                 titleTextView.text = item.title
             } else {
-
                 titleTextView.text = itemView.resources
                     .getString(R.string.song_item_title_template, layoutPosition + 1, item.title)
             }
@@ -78,10 +71,7 @@ class SongListAdapter(
 
             if (isSelected) {
                 itemLayout.setBackgroundColor(
-                    itemView.resources.getColor(
-                        R.color.colorAccent,
-                        null
-                    )
+                    itemView.resources.getColor(R.color.colorAccent, null)
                 )
             } else {
                 itemLayout.setBackgroundColor(Color.TRANSPARENT)

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:58 PM
+ * Last modified 2/26/21 7:24 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,6 +20,7 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
+import pl.gunock.lyriccast.models.SetlistModel
 import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.utils.ControlAction
 import pl.gunock.lyriccast.utils.MessageHelper
@@ -41,8 +42,13 @@ class SetlistControlsActivity : AppCompatActivity() {
     private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
     private var currentLyricsIndex: Int = 0
 
+    private lateinit var setlist: SetlistModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val setlistName = intent.getStringExtra("setlistName")!!
+        setlist = SetlistsContext.getSetlist(setlistName)!!
 
         setContentView(R.layout.activity_setlist_controls)
         setSupportActionBar(findViewById(R.id.toolbar_main))
@@ -59,7 +65,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val songsMetadata = SongsContext.songMap
         var setlistLyricsIndex = 0
-        setlistLyrics = SetlistsContext.currentSetlist!!.songTitles.flatMap { songTitle ->
+        setlistLyrics = setlist.songTitles.flatMap { songTitle ->
             val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
             val lyrics = songsMetadata[songTitle]!!.presentation.map { songLyrics[it]!! }
 
@@ -76,7 +82,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
 
-            val songTitles = SetlistsContext.currentSetlist!!.songTitles
+            val songTitles = setlist.songTitles
             val songItemList: MutableList<SongItemModel> = mutableListOf()
             for (i in songTitles.indices) {
                 songItemList.add(SongItemModel(SongsContext.songMap.getValue(songTitles[i])))

@@ -1,32 +1,28 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/22/21 8:16 PM
+ * Last modified 2/26/21 9:36 PM
  */
 
 package pl.gunock.lyriccast
 
 import android.util.Log
 import org.json.JSONObject
-import pl.gunock.lyriccast.adapters.SetlistListAdapter
+import pl.gunock.lyriccast.models.SetlistItemModel
 import pl.gunock.lyriccast.models.SetlistModel
 import java.io.File
 import java.io.FilenameFilter
 import java.util.*
 
 object SetlistsContext {
-    private const val tag = "SongsContext"
+    private const val TAG = "SongsContext"
 
     var setlistsDirectory: String = ""
 
     var setlistList: SortedSet<SetlistModel> = sortedSetOf()
 
     // TODO: Try to move adapters to activities/fragments
-    private val setlistItemList: MutableList<SetlistModel> = mutableListOf()
-    var setlistListAdapter: SetlistListAdapter? = null
-
-    var currentSetlist: SetlistModel? = null
-    private var presentationIterator: ListIterator<Pair<String, String>>? = null
+    var setlistItemList: MutableList<SetlistItemModel> = mutableListOf()
 
     fun loadSetlists(): SortedSet<SetlistModel> {
         val loadedSetlists: SortedSet<SetlistModel> = sortedSetOf()
@@ -38,12 +34,12 @@ object SetlistsContext {
         }
 
         for (file in fileList) {
-            Log.d(tag, "Reading file: ${file.name}")
+            Log.d(TAG, "Reading file: ${file.name}")
             val json = JSONObject(file.readText(Charsets.UTF_8))
             val setlist = SetlistModel(json)
             loadedSetlists.add(setlist)
         }
-        Log.d(tag, "Parsed setlist files: $loadedSetlists")
+        Log.d(TAG, "Parsed setlist files: $loadedSetlists")
 
         return loadedSetlists
     }
@@ -55,52 +51,16 @@ object SetlistsContext {
         setlistFile.writeText(json.toString())
     }
 
-    fun setupSetlistListAdapter() {
-        setlistItemList.clear()
-        for (i in setlistList.indices) {
-            setlistItemList.add(setlistList.elementAt(i))
+    fun deleteSetlists(setlistNames: List<String>) {
+        for (setlistName in setlistNames) {
+            val setlistFile = File("$setlistsDirectory/${setlistName}.json")
+            setlistFile.delete()
         }
-        setlistListAdapter = SetlistListAdapter(setlistItemList)
+        setlistList = setlistList.filter { !setlistNames.contains(it.name) }.toSortedSet()
     }
 
-
-    var slideList: MutableList<Pair<String, String>> = mutableListOf()
-
-    fun pickSetlist(position: Int) {
-        currentSetlist = setlistListAdapter!!.setlists[position]
-
-        slideList.clear()
-        for (songTitle in currentSetlist!!.songTitles) {
-//            slideList.add(Pair(songTitle, ""))
-
-            val songMetadata = SongsContext.songMap[songTitle]!!
-            val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
-
-            for (section in songMetadata.presentation) {
-                val lyrics = songLyrics[section] ?: error("ERROR")
-                slideList.add(Pair(songTitle, lyrics))
-            }
-        }
-
-        presentationIterator = slideList.listIterator()
-    }
-
-    fun fillSetlistList(setlists: SortedSet<SetlistModel>) {
-        setlistList = setlists
-        setlistItemList.clear()
-        for (i in setlists.indices) {
-            setlistItemList.add(setlists.elementAt(i))
-        }
-        setlistListAdapter!!.setlists = setlistItemList
-        setlistListAdapter!!.notifyDataSetChanged()
-    }
-
-    fun filterSetlists(name: String, category: String = "All") {
-        setlistListAdapter!!.setlists = setlistItemList.filter { setlist ->
-            setlist.name.toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT))
-                    && (category == "All" || setlist.category == category)
-        }.toMutableList()
-        setlistListAdapter!!.notifyDataSetChanged()
+    fun getSetlist(setlistName: String): SetlistModel? {
+        return setlistList.first { it.name == setlistName }
     }
 
 }

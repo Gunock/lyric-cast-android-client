@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:51 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/26/21 7:08 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -13,8 +13,7 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 
 object MessageHelper {
-
-    private const val tag = "MessageHelper"
+    private const val TAG = "MessageHelper"
 
     private var CONTENT_NAMESPACE: String = ""
     private var CONTROL_NAMESPACE: String = ""
@@ -34,11 +33,11 @@ object MessageHelper {
             .replace("\n", "<br>")
             .replace("\r", "")
 
-        Log.d(tag, "Sending content message")
-        Log.d(tag, "Namespace: $CONTENT_NAMESPACE")
-        Log.d(tag, "Content: $messageContent")
+        Log.d(TAG, "Sending content message")
+        Log.d(TAG, "Namespace: $CONTENT_NAMESPACE")
+        Log.d(TAG, "Content: $messageContent")
         if (castSession == null) {
-            Log.d(tag, "Message not sent (no session)")
+            Log.d(TAG, "Message not sent (no session)")
             return
         }
 
@@ -53,11 +52,11 @@ object MessageHelper {
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), value)
 
-        Log.d(tag, "Sending control message")
-        Log.d(tag, "Namespace: $CONTROL_NAMESPACE")
-        Log.d(tag, "Content: $messageContent")
+        Log.d(TAG, "Sending control message")
+        Log.d(TAG, "Namespace: $CONTROL_NAMESPACE")
+        Log.d(TAG, "Content: $messageContent")
         if (castSession == null) {
-            Log.d(tag, "Message not sent (no session)")
+            Log.d(TAG, "Message not sent (no session)")
             return
         }
 
@@ -70,11 +69,11 @@ object MessageHelper {
         val messageJson = JSONObject(messageContent)
         messageJson.put("value", json)
 
-        Log.d(tag, "Sending control message")
-        Log.d(tag, "Namespace: $CONTROL_NAMESPACE")
-        Log.d(tag, "Content: $messageJson")
+        Log.d(TAG, "Sending control message")
+        Log.d(TAG, "Namespace: $CONTROL_NAMESPACE")
+        Log.d(TAG, "Content: $messageJson")
         if (castSession == null) {
-            Log.d(tag, "Message not sent (no session)")
+            Log.d(TAG, "Message not sent (no session)")
             return
         }
 

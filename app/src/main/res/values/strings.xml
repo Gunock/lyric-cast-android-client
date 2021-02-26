@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/25/21 9:53 PM
+  ~ Last modified 2/26/21 7:20 PM
   -->
 
 <resources>
@@ -52,6 +52,7 @@
 
     <!--  Strings used as placeholders -->
     <string name="placeholder_title">Title</string>
+    <string name="placeholder_name">Name</string>
     <string name="placeholder_author">Author</string>
     <string name="placeholder_category">Category</string>
 </resources>

@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:57 PM
+ * Last modified 2/26/21 7:08 PM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Spinner
@@ -29,10 +30,12 @@ import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
 import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
+import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
 import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.models.SongMetadataModel
+import kotlin.system.measureTimeMillis
 
 
 class SongListFragment : Fragment() {
@@ -101,19 +104,6 @@ class SongListFragment : Fragment() {
         loadSongs()
     }
 
-    private fun setupListeners() {
-        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
-            SongsContext.filterSongs(it, categorySpinner.selectedItem.toString())
-        })
-
-        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
-            SongsContext.filterSongs(
-                searchView.editText!!.editableText.toString(),
-                categorySpinner.selectedItem.toString()
-            )
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -121,6 +111,48 @@ class SongListFragment : Fragment() {
         categorySpinner.setSelection(0)
 
         setupSongList()
+    }
+
+    private fun setupListeners() {
+        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
+            filterSongs(it, categorySpinner.selectedItem.toString())
+        })
+
+        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+            filterSongs(
+                searchView.editText!!.editableText.toString(),
+                categorySpinner.selectedItem.toString()
+            )
+        }
+    }
+
+    private fun filterSongs(title: String, category: String = "All", isSelected: Boolean? = null) {
+        Log.d(TAG, "filterSongs invoked")
+
+        val predicate = if (isSelected == null) { song: SongItemModel ->
+            val titleCondition = song.title.normalize()
+                .contains(title.normalize(), ignoreCase = true)
+            val categoryCondition = (category == "All" || song.category == category)
+
+            titleCondition && categoryCondition
+        } else { song: SongItemModel ->
+            if (song.isSelected != isSelected) {
+                false
+            } else {
+                val titleCondition = song.title.normalize()
+                    .contains(title.normalize(), ignoreCase = true)
+                val categoryCondition = (category == "All" || song.category == category)
+
+                titleCondition && categoryCondition
+            }
+        }
+
+        val duration = measureTimeMillis {
+            songListAdapter.songs = SongsContext.songItemList.filter(predicate).toMutableList()
+        }
+        Log.d(TAG, "Filtering took : ${duration}ms")
+
+        songListAdapter.notifyDataSetChanged()
     }
 
     private fun loadSongs() {
@@ -176,9 +208,7 @@ class SongListFragment : Fragment() {
             onClickListener = onClickListener
         )
 
-        requireView().findViewById<RecyclerView>(R.id.recycler_view_songs)
-            ?.adapter = songListAdapter
-        SongsContext.songListAdapter = songListAdapter
+        songListRecyclerView.adapter = songListAdapter
     }
 
     private fun pickSong(item: SongItemModel) {
@@ -256,8 +286,7 @@ class SongListFragment : Fragment() {
     }
 
     private fun editSelectedSong(): Boolean {
-        val selectedSong = songListAdapter.songs
-            .first { it.isSelected }
+        val selectedSong = songListAdapter.songs.first { it.isSelected }
 
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("songTitle", selectedSong.title)

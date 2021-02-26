@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:57 PM
+ * Last modified 2/26/21 9:36 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
 
@@ -26,15 +25,15 @@ class SetlistEditorActivity : AppCompatActivity() {
         setupListeners()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true // Ignores default behaviour
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            android.R.id.home -> {
+//                onBackPressed()
+//                return true // Ignores default behaviour
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
 
 
     private fun setupListeners() {

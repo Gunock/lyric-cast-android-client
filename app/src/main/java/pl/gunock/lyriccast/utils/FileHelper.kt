@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/25/20 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/26/21 7:08 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -17,10 +17,10 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 object FileHelper {
-    private const val tag = "FileHelper"
+    private const val TAG = "FileHelper"
 
     fun unzip(resolver: ContentResolver, inputStream: InputStream, targetLocation: String) {
-        Log.d(tag, "Unzipping stream to '$targetLocation'")
+        Log.d(TAG, "Unzipping stream to '$targetLocation'")
         createDirIfNotExists(targetLocation)
 
         val zipIn = ZipInputStream(inputStream)
@@ -31,23 +31,23 @@ object FileHelper {
                 continue
             }
 
-            Log.d(tag, "Extracting file: ${zipEntry!!.name}")
+            Log.d(TAG, "Extracting file: ${zipEntry!!.name}")
 
             val filename: String = zipEntry!!.name.split("/").last()
-            Log.d(tag, "Extracting file to: ${targetLocation + filename}")
+            Log.d(TAG, "Extracting file to: ${targetLocation + filename}")
 
             resolver.openOutputStream(File(targetLocation + filename).toUri()).use {
                 it!!.write(zipIn.readBytes())
                 zipIn.closeEntry()
             }
-            Log.d(tag, "File extracted to: ${targetLocation + filename}")
+            Log.d(TAG, "File extracted to: ${targetLocation + filename}")
         }
         zipIn.close()
     }
 
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun zip(outputStream: OutputStream, sourceLocation: String) {
-        Log.d(tag, "Zipping files from '$sourceLocation'")
+        Log.d(TAG, "Zipping files from '$sourceLocation'")
         createDirIfNotExists(sourceLocation)
 
         ZipOutputStream(outputStream).use { zipOut ->
@@ -66,11 +66,11 @@ object FileHelper {
     private fun createDirIfNotExists(path: String) {
         val file = File(path)
         if (!file.exists()) {
-            Log.d(tag, "'$path' does not exists")
+            Log.d(TAG, "'$path' does not exists")
             if (File(path).mkdirs()) {
-                Log.d(tag, "'$path' directory creation succeeded")
+                Log.d(TAG, "'$path' directory creation succeeded")
             } else {
-                Log.d(tag, "'$path' directory creation failed")
+                Log.d(TAG, "'$path' directory creation failed")
             }
         }
     }

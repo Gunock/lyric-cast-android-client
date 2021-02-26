@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:39 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 8:41 PM
+ * Last modified 2/26/21 9:38 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
@@ -30,55 +31,94 @@ import pl.gunock.lyriccast.utils.KeyboardHelper
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class SetlistEditorFragment : Fragment() {
+
+    private val args: SetlistEditorFragmentArgs by navArgs()
+
+    private lateinit var selectedSongs: List<SongItemModel>
+    private lateinit var songsRecyclerView: RecyclerView
+    private lateinit var setlistNameInput: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_setlist_editor, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
+        val setlistName = requireActivity().intent.getStringExtra("setlistName")
+
+        setlistNameInput = view.findViewById(R.id.text_input_setlist_name)
+
+        if (!args.selectedSongs.isNullOrEmpty()) {
+            SongsContext.songItemList.forEach {
+                it.isSelected = args.selectedSongs!!.contains(it.title)
+            }
+            setlistNameInput.text = args.setlistName
+        } else if (setlistName != null) {
+            setlistNameInput.text = setlistName
+
+            val setlist = SetlistsContext.getSetlist(setlistName)!!
+
+            SongsContext.songItemList.forEach {
+                it.isSelected = setlist.songTitles.contains(it.title)
+            }
+        }
+
+        songsRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter =
-                SongListAdapter(SongsContext.songItemList.filter { it.isSelected }.toMutableList())
         }
 
         setupListeners(view)
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        selectedSongs = SongsContext.songItemList.filter { it.isSelected }
+        songsRecyclerView.adapter = SongListAdapter(selectedSongs.toMutableList())
+    }
+
     private fun setupListeners(view: View) {
         view.findViewById<Button>(R.id.button_pick_setlist_songs).setOnClickListener {
             KeyboardHelper.hideKeyboard(view)
-            findNavController().navigate(R.id.action_SetlistEditorFragment_to_SetlistEditorSongListFragment)
+
+            val action = SetlistEditorFragmentDirections
+                .actionSetlistEditorFragmentToSetlistEditorSongListFragment(
+                    selectedSongs = selectedSongs.map { it.title }.toTypedArray(),
+                    setlistName = setlistNameInput.text.toString()
+                )
+
+            findNavController().navigate(action)
         }
 
         view.findViewById<Button>(R.id.button_save_setlist).setOnClickListener {
             val setlist = SetlistModel()
-            setlist.name = view.findViewById<TextView>(R.id.text_input_setlist_name).text.toString()
+            setlist.name = setlistNameInput.text.toString()
 
             val selectedSongs: List<SongItemModel> =
                 SongsContext.songItemList.filter { it.isSelected }
 
             if (selectedSongs.isEmpty()) {
-                val toast = Toast.makeText(requireContext(),
+                val toast = Toast.makeText(
+                    requireContext(),
                     "Empty setlists are not allowed!",
-                    Toast.LENGTH_SHORT)
+                    Toast.LENGTH_SHORT
+                )
                 toast.show()
                 return@setOnClickListener
             }
 
-            setlist.songTitles = List(selectedSongs.size) {
-                selectedSongs[it].title
-            }
+            setlist.songTitles = selectedSongs.map { it.title }
 
             SetlistsContext.setlistList.add(setlist)
             SetlistsContext.saveSetlist(setlist)
 
-            activity?.finish()
+            requireActivity().finish()
         }
     }
 }

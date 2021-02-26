@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:55 PM
+ * Last modified 2/26/21 8:22 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -28,13 +28,13 @@ import pl.gunock.lyriccast.utils.MessageHelper
  */
 class ControlsFragment : Fragment() {
 
-    private var castContext: CastContext? = null
+    private val args: ControlsFragmentArgs by navArgs()
 
     private lateinit var songTitleView: TextView
     private lateinit var slideNumberView: TextView
     private lateinit var slidePreviewView: TextView
 
-    private val args: ControlsFragmentArgs by navArgs()
+    private var castContext: CastContext? = null
 
     private var currentSlide = 0
 

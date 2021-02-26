@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:46 PM
+ * Last modified 2/26/21 7:06 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -27,7 +27,9 @@ import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
 
 class SongEditorActivity : AppCompatActivity() {
-    private val tag = "SongEditorActivity"
+    private companion object {
+        const val TAG = "SongEditorActivity"
+    }
 
     private lateinit var sectionNameInput: TextInputLayout
     private var selectedTab: TabLayout.Tab? = null
@@ -121,13 +123,13 @@ class SongEditorActivity : AppCompatActivity() {
 
         val songFilePath = "${SongsContext.songsDirectory}$songNormalizedTitle"
 
-        Log.d(tag, "Saving song")
-        Log.d(tag, song.toJSON().toString())
+        Log.d(TAG, "Saving song")
+        Log.d(TAG, song.toJSON().toString())
         File("$songFilePath.metadata.json").create()
             .writeText(song.toJSON())
 
-        Log.d(tag, "Saving lyrics")
-        Log.d(tag, songLyrics.toJSON().toString())
+        Log.d(TAG, "Saving lyrics")
+        Log.d(TAG, songLyrics.toJSON().toString())
         File("$songFilePath.json").create()
             .writeText(songLyrics.toJSON())
 

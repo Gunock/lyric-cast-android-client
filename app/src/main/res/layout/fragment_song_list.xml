@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 11/1/20 11:22 AM
+  ~ Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/26/21 6:55 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -65,11 +65,13 @@
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_category">
+        app:layout_constraintTop_toBottomOf="@+id/spinner_category"
+        tools:listitem="@layout/item_song">
 
     </androidx.recyclerview.widget.RecyclerView>
 
