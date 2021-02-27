@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 2:29 AM
+  ~ Last modified 2/27/21 3:33 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,6 +15,7 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -30,7 +31,7 @@
 
     <Spinner
         android:id="@+id/spinner_song_editor_category"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
+        style="@style/AppTheme.Widget.Spinner.Underlined"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="1dp"

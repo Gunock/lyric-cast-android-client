@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:39 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:38 PM
+ * Last modified 2/27/21 12:42 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -54,8 +54,8 @@ class SetlistEditorFragment : Fragment() {
         setlistNameInput = view.findViewById(R.id.text_input_setlist_name)
 
         if (!args.selectedSongs.isNullOrEmpty()) {
-            SongsContext.songItemList.forEach {
-                it.isSelected = args.selectedSongs!!.contains(it.title)
+            SongsContext.songItemList.forEach { songItem ->
+                songItem.isSelected = args.selectedSongs!!.contains(songItem.title)
             }
             setlistNameInput.text = args.setlistName
         } else if (setlistName != null) {
@@ -63,8 +63,8 @@ class SetlistEditorFragment : Fragment() {
 
             val setlist = SetlistsContext.getSetlist(setlistName)!!
 
-            SongsContext.songItemList.forEach {
-                it.isSelected = setlist.songTitles.contains(it.title)
+            SongsContext.songItemList.forEach { songItem ->
+                songItem.isSelected = setlist.songTitles.contains(songItem.title)
             }
         }
 
@@ -79,7 +79,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        selectedSongs = SongsContext.songItemList.filter { it.isSelected }
+        selectedSongs = SongsContext.songItemList.filter { song -> song.isSelected }
         songsRecyclerView.adapter = SongListAdapter(selectedSongs.toMutableList())
     }
 
@@ -89,7 +89,7 @@ class SetlistEditorFragment : Fragment() {
 
             val action = SetlistEditorFragmentDirections
                 .actionSetlistEditorFragmentToSetlistEditorSongListFragment(
-                    selectedSongs = selectedSongs.map { it.title }.toTypedArray(),
+                    selectedSongs = selectedSongs.map { songItem -> songItem.title }.toTypedArray(),
                     setlistName = setlistNameInput.text.toString()
                 )
 
@@ -101,7 +101,7 @@ class SetlistEditorFragment : Fragment() {
             setlist.name = setlistNameInput.text.toString()
 
             val selectedSongs: List<SongItemModel> =
-                SongsContext.songItemList.filter { it.isSelected }
+                SongsContext.songItemList.filter { song -> song.isSelected }
 
             if (selectedSongs.isEmpty()) {
                 val toast = Toast.makeText(
@@ -113,7 +113,7 @@ class SetlistEditorFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            setlist.songTitles = selectedSongs.map { it.title }
+            setlist.songTitles = selectedSongs.map { songItem -> songItem.title }
 
             SetlistsContext.setlistList.add(setlist)
             SetlistsContext.saveSetlist(setlist)

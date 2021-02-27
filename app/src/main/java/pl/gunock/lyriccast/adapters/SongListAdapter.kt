@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:40 PM
+ * Last modified 2/27/21 12:42 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -21,23 +21,20 @@ import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
 import pl.gunock.lyriccast.models.SongItemModel
 
 class SongListAdapter(
-    var songs: MutableList<SongItemModel>,
+    var songItems: MutableList<SongItemModel>,
     var showCheckBox: Boolean = false,
     val showRowNumber: Boolean = false,
     val showAuthor: Boolean = true,
     val onLongClickListener: LongClickAdapterListener<SongViewHolder>? = null,
     val onClickListener: ClickAdapterListener<SongViewHolder>? = null
 ) : RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {
-    private companion object {
-        const val TAG = "SongListAdapter"
-    }
 
     inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
-        val titleTextView: TextView = itemView.findViewById(R.id.song_title)
-        val authorTextView: TextView = itemView.findViewById(R.id.song_author)
-        val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
         val checkBox: CheckBox = itemView.findViewById(R.id.song_checkbox)
+        private val titleTextView: TextView = itemView.findViewById(R.id.song_title)
+        private val authorTextView: TextView = itemView.findViewById(R.id.song_author)
+        private val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
+        private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
 
         fun bind(item: SongItemModel, isSelected: Boolean) = with(itemView) {
             if (!showRowNumber) {
@@ -88,22 +85,22 @@ class SongListAdapter(
 
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        val item = songs[position]
+        val item = songItems[position]
 
         if (onLongClickListener != null) {
-            holder.itemView.setOnLongClickListener {
-                onLongClickListener.execute(holder, position, it)
+            holder.itemView.setOnLongClickListener { view ->
+                onLongClickListener.execute(holder, position, view)
             }
         }
 
         if (onClickListener != null) {
-            holder.itemView.setOnClickListener {
-                onClickListener.execute(holder, position, it)
+            holder.itemView.setOnClickListener { view ->
+                onClickListener.execute(holder, position, view)
             }
         }
 
         holder.bind(item, item.highlight)
     }
 
-    override fun getItemCount() = songs.size
+    override fun getItemCount() = songItems.size
 }

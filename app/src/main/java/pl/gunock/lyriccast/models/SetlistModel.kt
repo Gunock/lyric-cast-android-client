@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 9:57 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 9:57 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/27/21 12:51 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -11,6 +11,7 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.utils.JsonHelper
 
 open class SetlistModel() : Comparable<SetlistModel> {
+
     var name: String = ""
     var songTitles: List<String> = listOf()
     var category: String = ""
@@ -21,19 +22,17 @@ open class SetlistModel() : Comparable<SetlistModel> {
     }
 
     override fun toString(): String {
-        val builder: StringBuilder = StringBuilder()
-
-        builder.append("(name: $name, ")
-        builder.append("songs: $songTitles)")
-
-        return builder.toString()
+        return StringBuilder().apply {
+            append("(name: $name, ")
+            append("songs: $songTitles)")
+        }.toString()
     }
 
     fun toJson(): JSONObject {
-        val result = JSONObject()
-        result.put("name", name)
-        result.put("songTitles", JSONArray(songTitles))
-        return result
+        return JSONObject().apply {
+            put("name", name)
+            put("songTitles", JSONArray(songTitles))
+        }
     }
 
     override fun compareTo(other: SetlistModel): Int {

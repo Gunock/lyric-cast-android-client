@@ -1,12 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/22/21 6:00 PM
+ * Last modified 2/27/21 11:59 AM
  */
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = '1.4.30'
+    ext.kotlin_version = '1.4.31'
     repositories {
         google()
         jcenter()

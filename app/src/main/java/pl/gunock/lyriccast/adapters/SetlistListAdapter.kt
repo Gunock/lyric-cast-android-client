@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:36 PM
+ * Last modified 2/27/21 12:42 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -21,20 +21,20 @@ import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
 import pl.gunock.lyriccast.models.SetlistItemModel
 
 class SetlistListAdapter(
-    var setlists: MutableList<SetlistItemModel>,
+    var setlistItems: MutableList<SetlistItemModel>,
     var showCheckBox: Boolean = false,
     val onLongClickListener: LongClickAdapterListener<SetlistViewHolder>? = null,
     val onClickListener: ClickAdapterListener<SetlistViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistListAdapter.SetlistViewHolder>() {
 
     inner class SetlistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemLayout: LinearLayout = itemView.findViewById(R.id.item_setlist)
-        val titleTextView: TextView = itemView.findViewById(R.id.setlist_name)
-        val categoryCardView: CardView = itemView.findViewById(R.id.card_setlist_category)
         val checkBox: CheckBox = itemView.findViewById(R.id.setlist_checkbox)
+        private val titleTextView: TextView = itemView.findViewById(R.id.setlist_name)
+        private val categoryCardView: CardView = itemView.findViewById(R.id.card_setlist_category)
+        private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_setlist)
 
         fun bind(item: SetlistItemModel) = with(itemView) {
-            titleTextView.text = setlists[layoutPosition].name
+            titleTextView.text = setlistItems[layoutPosition].name
 
             if (item.category.isBlank()) {
                 categoryCardView.visibility = View.INVISIBLE
@@ -72,22 +72,22 @@ class SetlistListAdapter(
     }
 
     override fun onBindViewHolder(holder: SetlistViewHolder, position: Int) {
-        val item = setlists[position]
+        val item = setlistItems[position]
 
         if (onLongClickListener != null) {
-            holder.itemView.setOnLongClickListener {
-                onLongClickListener.execute(holder, position, it)
+            holder.itemView.setOnLongClickListener { view ->
+                onLongClickListener.execute(holder, position, view)
             }
         }
 
         if (onClickListener != null) {
-            holder.itemView.setOnClickListener {
-                onClickListener.execute(holder, position, it)
+            holder.itemView.setOnClickListener { view ->
+                onClickListener.execute(holder, position, view)
             }
         }
 
         holder.bind(item)
     }
 
-    override fun getItemCount() = setlists.size
+    override fun getItemCount() = setlistItems.size
 }

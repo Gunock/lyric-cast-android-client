@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 2:28 AM
+ * Last modified 2/27/21 12:31 PM
  */
 
 package pl.gunock.lyriccast
@@ -75,11 +75,11 @@ object SongsContext {
         songMap[song.title] = song
     }
 
-    fun getSongLyrics(title: String): SongLyricsModel {
-        return songMap[title]!!.loadLyrics(songsDirectory)
+    fun getSongLyrics(title: String): SongLyricsModel? {
+        return songMap[title]?.loadLyrics(songsDirectory)
     }
 
-    fun getSongMetadata(title: String): SongMetadataModel {
-        return songMap[title]!!
+    fun getSongMetadata(title: String): SongMetadataModel? {
+        return songMap[title]
     }
 }

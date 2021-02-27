@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:08 PM
+ * Last modified 2/27/21 1:04 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -24,20 +24,23 @@ object FileHelper {
         createDirIfNotExists(targetLocation)
 
         val zipIn = ZipInputStream(inputStream)
-        var zipEntry: ZipEntry?
 
-        while (zipIn.nextEntry.also { zipEntry = it } != null) {
-            if (zipEntry!!.isDirectory) {
+        var zipEntryInput: ZipEntry?
+        while (zipIn.nextEntry.also { zipEntryInput = it } != null) {
+            val zipEntry = zipEntryInput!!
+
+            if (zipEntry.isDirectory) {
                 continue
             }
 
-            Log.d(TAG, "Extracting file: ${zipEntry!!.name}")
+            Log.d(TAG, "Extracting file: ${zipEntry.name}")
 
-            val filename: String = zipEntry!!.name.split("/").last()
+            val filename: String = zipEntry.name.split("/").last()
             Log.d(TAG, "Extracting file to: ${targetLocation + filename}")
 
-            resolver.openOutputStream(File(targetLocation + filename).toUri()).use {
-                it!!.write(zipIn.readBytes())
+            val fileUri = File(targetLocation + filename).toUri()
+            with(resolver.openOutputStream(fileUri)) {
+                this!!.write(zipIn.readBytes())
                 zipIn.closeEntry()
             }
             Log.d(TAG, "File extracted to: ${targetLocation + filename}")
@@ -50,15 +53,15 @@ object FileHelper {
         Log.d(TAG, "Zipping files from '$sourceLocation'")
         createDirIfNotExists(sourceLocation)
 
-        ZipOutputStream(outputStream).use { zipOut ->
+        with(ZipOutputStream(outputStream)) {
             for (file in File(sourceLocation).listFiles()) {
                 if (file.isDirectory) {
                     continue
                 }
 
-                zipOut.putNextEntry(ZipEntry(file.name))
-                zipOut.write(file.readBytes())
-                zipOut.closeEntry()
+                putNextEntry(ZipEntry(file.name))
+                write(file.readBytes())
+                closeEntry()
             }
         }
     }

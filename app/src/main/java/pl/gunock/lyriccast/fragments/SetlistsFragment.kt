@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:33 PM
+ * Last modified 2/27/21 1:04 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +33,7 @@ import java.util.*
 class SetlistsFragment : Fragment() {
 
     private lateinit var menu: Menu
-    private lateinit var searchView: TextInputLayout
+    private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var setlistRecyclerView: RecyclerView
 
@@ -55,7 +56,8 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchView = view.findViewById(R.id.text_view_filter_setlists)
+        val searchView: TextInputLayout = view.findViewById(R.id.text_view_filter_setlists)
+        searchViewEditText = searchView.editText!!
         categorySpinner = view.findViewById(R.id.spinner_setlist_category)
 
         setlistRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_setlists).apply {
@@ -94,14 +96,14 @@ class SetlistsFragment : Fragment() {
 
         val onLongClickListener =
             LongClickAdapterListener { holder: SetlistListAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistListAdapter.setlists[position]
+                val item = setlistListAdapter.setlistItems[position]
                 selectSetlist(item, holder)
                 return@LongClickAdapterListener true
             }
 
         val onClickListener =
             ClickAdapterListener { holder: SetlistListAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistListAdapter.setlists[position]
+                val item = setlistListAdapter.setlistItems[position]
                 if (selectionCount == 0) {
                     pickSetlist(item)
                 } else {
@@ -111,21 +113,22 @@ class SetlistsFragment : Fragment() {
 
         SetlistsContext.setlistList = SetlistsContext.loadSetlists()
         SetlistsContext.setlistItemList = SetlistsContext.setlistList
-            .map { SetlistItemModel(it) }.toMutableList()
+            .map { setlist -> SetlistItemModel(setlist) }
+            .toMutableList()
 
         setlistListAdapter = SetlistListAdapter(
             SetlistsContext.setlistItemList,
             onLongClickListener = onLongClickListener,
             onClickListener = onClickListener
         )
-        setlistListAdapter.setlists = SetlistsContext.setlistItemList
+        setlistListAdapter.setlistItems = SetlistsContext.setlistItemList
 
         requireView()
             .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistListAdapter
 
         setupCategorySpinner()
 
-        searchView.editText!!.setText("")
+        searchViewEditText.setText("")
         categorySpinner.setSelection(0)
     }
 
@@ -136,19 +139,17 @@ class SetlistsFragment : Fragment() {
             SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.apply {
-            adapter = categorySpinnerAdapter
-        }
+        categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupListeners() {
-        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
-            filterSetlists(it, categorySpinner.selectedItem.toString())
+        searchViewEditText.addTextChangedListener(InputTextChangeListener { newText ->
+            filterSetlists(newText, categorySpinner.selectedItem.toString())
         })
 
         categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
             filterSetlists(
-                searchView.editText!!.editableText.toString(),
+                searchViewEditText.editableText.toString(),
                 categorySpinner.selectedItem.toString()
             )
         }
@@ -212,8 +213,8 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedSetlist = setlistListAdapter.setlists
-            .first { it.isSelected }
+        val selectedSetlist = setlistListAdapter.setlistItems
+            .first { setlistItem -> setlistItem.isSelected }
 
         val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
         intent.putExtra("setlistName", selectedSetlist.name)
@@ -227,18 +228,18 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun deleteSelectedSetlists(): Boolean {
-        val selectedSetlists = setlistListAdapter.setlists
-            .filter { it.isSelected }
-            .map { it.name }
+        val selectedSetlists = setlistListAdapter.setlistItems
+            .filter { setlist -> setlist.isSelected }
+            .map { setlist -> setlist.name }
 
         SetlistsContext.deleteSetlists(selectedSetlists)
 
-        val remainingSetlists =
-            setlistListAdapter.setlists.filter { !selectedSetlists.contains(it.name) }
+        val remainingSetlists = setlistListAdapter.setlistItems
+            .filter { setlistItem -> !selectedSetlists.contains(setlistItem.name) }
         setlistListAdapter.showCheckBox = false
 
-        setlistListAdapter.setlists.clear()
-        setlistListAdapter.setlists.addAll(remainingSetlists)
+        setlistListAdapter.setlistItems.clear()
+        setlistListAdapter.setlistItems.addAll(remainingSetlists)
         setlistListAdapter.notifyDataSetChanged()
 
         selectionCount = 0
@@ -247,7 +248,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun filterSetlists(name: String, category: String = "All") {
-        setlistListAdapter.setlists = SetlistsContext.setlistItemList.filter { setlist ->
+        setlistListAdapter.setlistItems = SetlistsContext.setlistItemList.filter { setlist ->
             setlist.name.contains(name, ignoreCase = true)
                     && (category == "All" || setlist.category == category)
         }.toMutableList()

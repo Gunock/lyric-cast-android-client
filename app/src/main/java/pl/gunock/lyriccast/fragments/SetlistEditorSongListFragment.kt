@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:36 PM
+ * Last modified 2/27/21 1:04 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
@@ -38,7 +39,7 @@ class SetlistEditorSongListFragment : Fragment() {
 
     private val args: SetlistEditorSongListFragmentArgs by navArgs()
 
-    private lateinit var searchView: TextInputLayout
+    private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var selectedSongsSwitch: SwitchCompat
 
@@ -63,12 +64,13 @@ class SetlistEditorSongListFragment : Fragment() {
 
         selectedSongTitles = args.selectedSongs.toMutableSet()
 
-        searchView = view.findViewById(R.id.text_view_filter_songs)
+        val searchView: TextInputLayout = view.findViewById(R.id.text_view_filter_songs)
+        searchViewEditText = searchView.editText!!
         categorySpinner = view.findViewById(R.id.spinner_category)
         selectedSongsSwitch = view.findViewById(R.id.switch_selected_songs)
 
         songListAdapter = SongListAdapter(SongsContext.songItemList, showCheckBox = true)
-        view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
+        with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = songListAdapter
@@ -83,9 +85,7 @@ class SetlistEditorSongListFragment : Fragment() {
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        categorySpinner.apply {
-            adapter = categorySpinnerAdapter
-        }
+        categorySpinner.adapter = categorySpinnerAdapter
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -107,21 +107,21 @@ class SetlistEditorSongListFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchView.editText!!.addTextChangedListener(InputTextChangeListener {
-            filterSongs(it, categorySpinner.selectedItem.toString())
+        searchViewEditText.addTextChangedListener(InputTextChangeListener { newText ->
+            filterSongs(newText, categorySpinner.selectedItem.toString())
         })
 
         categorySpinner.onItemSelectedListener =
             SpinnerItemSelectedListener { _, _ ->
                 filterSongs(
-                    searchView.editText!!.editableText.toString(),
+                    searchViewEditText.editableText.toString(),
                     categorySpinner.selectedItem.toString()
                 )
             }
 
         selectedSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
             filterSongs(
-                searchView.editText!!.editableText.toString(),
+                searchViewEditText.editableText.toString(),
                 categorySpinner.selectedItem.toString(),
                 isSelected = if (isChecked) true else null
             )
@@ -152,7 +152,7 @@ class SetlistEditorSongListFragment : Fragment() {
         }
 
         val duration = measureTimeMillis {
-            songListAdapter.songs = SongsContext.songItemList.filter(predicate).toMutableList()
+            songListAdapter.songItems = SongsContext.songItemList.filter(predicate).toMutableList()
         }
         Log.d(TAG, "Filtering took : ${duration}ms")
 
@@ -160,7 +160,7 @@ class SetlistEditorSongListFragment : Fragment() {
     }
 
     private fun updateSelectedSongs() {
-        for (songItem in songListAdapter.songs) {
+        for (songItem in songListAdapter.songItems) {
             if (songItem.isSelected) {
                 selectedSongTitles.add(songItem.title)
             } else {

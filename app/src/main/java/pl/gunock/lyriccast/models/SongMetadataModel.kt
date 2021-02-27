@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/31/20 8:37 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/27/21 12:51 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -38,23 +38,21 @@ class SongMetadataModel() {
     }
 
     fun toJSON(): JSONObject {
-        val json = JSONObject()
-        json.put("lyricsFilename", lyricsFilename)
-        json.put("title", title)
-        json.put("author", author)
-        json.put("copyright", copyright)
-        json.put("category", category)
-        json.put("presentation", JSONArray(presentation))
-        return json
+        return JSONObject().apply {
+            put("lyricsFilename", lyricsFilename)
+            put("title", title)
+            put("author", author)
+            put("copyright", copyright)
+            put("category", category)
+            put("presentation", JSONArray(presentation))
+        }
     }
 
     override fun toString(): String {
-        val builder: StringBuilder = StringBuilder()
-
-        builder.append("(title: $title, ")
-        builder.append("author: $author)")
-
-        return builder.toString()
+        return StringBuilder().apply {
+            append("(title: $title, ")
+            append("author: $author)")
+        }.toString()
     }
 
 }

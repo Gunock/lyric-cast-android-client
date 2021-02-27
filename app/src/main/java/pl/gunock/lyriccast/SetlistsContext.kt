@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:36 PM
+ * Last modified 2/27/21 11:51 AM
  */
 
 package pl.gunock.lyriccast
@@ -56,11 +56,13 @@ object SetlistsContext {
             val setlistFile = File("$setlistsDirectory/${setlistName}.json")
             setlistFile.delete()
         }
-        setlistList = setlistList.filter { !setlistNames.contains(it.name) }.toSortedSet()
+        setlistList = setlistList.filter { setlist ->
+            !setlistNames.contains(setlist.name)
+        }.toSortedSet()
     }
 
     fun getSetlist(setlistName: String): SetlistModel? {
-        return setlistList.first { it.name == setlistName }
+        return setlistList.first { setlist -> setlist.name == setlistName }
     }
 
 }

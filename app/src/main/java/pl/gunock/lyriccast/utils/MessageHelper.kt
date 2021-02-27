@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:08 PM
+ * Last modified 2/27/21 12:51 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -45,10 +45,29 @@ object MessageHelper {
     }
 
     fun sendControlMessage(context: CastContext, action: ControlAction) {
-        return sendControlMessage(context, action, null)
+        sendControlMessage(context, action, null)
     }
 
-    fun sendControlMessage(context: CastContext, action: ControlAction, value: String?) {
+
+    fun sendControlMessage(context: CastContext, action: ControlAction, json: JSONObject) {
+        val castSession = context.sessionManager.currentCastSession
+        val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), null)
+        val messageJson = JSONObject(messageContent).apply {
+            put("value", json)
+        }
+
+        Log.d(TAG, "Sending control message")
+        Log.d(TAG, "Namespace: $CONTROL_NAMESPACE")
+        Log.d(TAG, "Content: $messageJson")
+        if (castSession == null) {
+            Log.d(TAG, "Message not sent (no session)")
+            return
+        }
+
+        castSession.sendMessage(CONTROL_NAMESPACE, messageJson.toString())
+    }
+
+    private fun sendControlMessage(context: CastContext, action: ControlAction, value: String?) {
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), value)
 
@@ -61,22 +80,5 @@ object MessageHelper {
         }
 
         castSession.sendMessage(CONTROL_NAMESPACE, messageContent)
-    }
-
-    fun sendControlMessage(context: CastContext, action: ControlAction, json: JSONObject) {
-        val castSession = context.sessionManager.currentCastSession
-        val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), null)
-        val messageJson = JSONObject(messageContent)
-        messageJson.put("value", json)
-
-        Log.d(TAG, "Sending control message")
-        Log.d(TAG, "Namespace: $CONTROL_NAMESPACE")
-        Log.d(TAG, "Content: $messageJson")
-        if (castSession == null) {
-            Log.d(TAG, "Message not sent (no session)")
-            return
-        }
-
-        castSession.sendMessage(CONTROL_NAMESPACE, messageJson.toString())
     }
 }

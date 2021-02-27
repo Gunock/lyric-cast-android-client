@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/19/20 4:40 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/19/20 4:22 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/27/21 12:42 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -12,8 +12,8 @@ import org.json.JSONObject
 object JsonHelper {
 
     fun arrayToStringList(jsonArray: JSONArray): List<String> {
-        return List<String>(jsonArray.length()) {
-            jsonArray.getString(it)
+        return List<String>(jsonArray.length()) { position ->
+            jsonArray.getString(position)
         }
     }
 

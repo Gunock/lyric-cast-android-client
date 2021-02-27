@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 2:17 AM
+ * Last modified 2/27/21 1:04 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -105,10 +105,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val uri = data?.data!!
+
         when (requestCode) {
             SELECT_FILE_RESULT_CODE -> {
-                val uri = data?.data!!
-
                 Log.d(TAG, "Selected file URI: $uri")
                 Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
 
@@ -123,16 +123,12 @@ class MainActivity : AppCompatActivity() {
                 SongsContext.loadSongsMetadata()
             }
             EXPORT_SONGS_RESULT_CODE -> {
-                val uri = data?.data!!
-
                 FileHelper.zip(
                     contentResolver.openOutputStream(uri)!!,
                     SongsContext.songsDirectory
                 )
             }
             EXPORT_SETLISTS_RESULT_CODE -> {
-                val uri = data?.data!!
-
                 FileHelper.zip(
                     contentResolver.openOutputStream(uri)!!,
                     SetlistsContext.setlistsDirectory
@@ -143,13 +139,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpListeners() {
         findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
-            TabItemSelectedListener {
+            TabItemSelectedListener { tab ->
+                tab ?: return@TabItemSelectedListener
+
                 val navController = findNavController(R.id.main_nav_host)
 
-                if (it!!.text == getString(R.string.songs)) {
+                if (tab.text == getString(R.string.songs)) {
                     Log.d(TAG, "Switching to song list")
                     navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
-                } else if (it.text == getString(R.string.setlists)) {
+                } else if (tab.text == getString(R.string.setlists)) {
                     Log.d(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
                 }

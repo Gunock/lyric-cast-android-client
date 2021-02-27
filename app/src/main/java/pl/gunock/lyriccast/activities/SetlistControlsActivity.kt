@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 10:51 PM
+ * Last modified 2/27/21 12:31 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -26,10 +26,6 @@ import pl.gunock.lyriccast.utils.ControlAction
 import pl.gunock.lyriccast.utils.MessageHelper
 
 class SetlistControlsActivity : AppCompatActivity() {
-    private companion object {
-        private const val TAG = "SetlistControlsActivity"
-    }
-
     private lateinit var slidePreviewView: TextView
     private lateinit var songTitleView: TextView
 
@@ -58,7 +54,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         sessionCreatedListener = SessionCreatedListener {
             sendSlide()
         }
-        castContext!!.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
+        castContext?.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
 
         slidePreviewView = findViewById(R.id.text_view_slide_preview2)
         songTitleView = findViewById(R.id.current_song_title)
@@ -66,8 +62,9 @@ class SetlistControlsActivity : AppCompatActivity() {
         val songsMetadata = SongsContext.songMap
         var setlistLyricsIndex = 0
         setlistLyrics = setlist.songTitles.flatMap { songTitle ->
-            val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
-            val lyrics = songsMetadata[songTitle]!!.presentation.map { songLyrics[it]!! }
+            val songLyrics = SongsContext.getSongLyrics(songTitle)!!.lyrics
+            val lyrics = songsMetadata[songTitle]!!.presentation
+                .map { sectionName -> songLyrics[sectionName]!! }
 
             songTitles[setlistLyricsIndex] = songTitle
             songTitles[setlistLyricsIndex + lyrics.size - 1] = songTitle
@@ -78,7 +75,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             lyrics
         }
 
-        findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
+        with(findViewById<RecyclerView>(R.id.recycler_view_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
 
@@ -112,7 +109,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         val backgroundColor = prefs.getString("backgroundColor", "Black")
         val fontColor = prefs.getString("fontColor", "White")
         val configurationJson = JSONObject()
-        configurationJson.run {
+
+        with(configurationJson) {
             put("fontSize", "${fontSize}px")
             put("backgroundColor", backgroundColor)
             put("fontColor", fontColor)
