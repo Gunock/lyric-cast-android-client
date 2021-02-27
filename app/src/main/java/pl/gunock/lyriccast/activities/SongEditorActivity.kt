@@ -1,13 +1,15 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 4:14 PM
+ * Last modified 2/27/21 4:39 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
+import android.text.InputFilter.AllCaps
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.*
@@ -25,7 +27,6 @@ import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
 
-// TODO: Make section name case insensitive
 class SongEditorActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "SongEditorActivity"
@@ -124,13 +125,14 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val sectionNameTextView: TextInputLayout = findViewById(R.id.text_view_section_name)
-        sectionNameInput = sectionNameTextView.editText!!
 
         songTitleInputLayout = findViewById(R.id.text_view_song_title)
         songTitleInput = findViewById(R.id.text_input_song_title)
+        sectionNameInput = findViewById(R.id.text_input_section_name)
         sectionLyricsInput = findViewById(R.id.text_input_section_lyrics)
         songSectionTabLayout = findViewById(R.id.tab_layout_song_section)
+
+        sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
 
         intentSongTitle = intent.getStringExtra("songTitle")
         if (intentSongTitle != null) {

@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 3:44 PM
+  ~ Last modified 2/27/21 4:33 PM
   -->
 
 <resources>
@@ -28,7 +28,7 @@
     <string name="delete">Delete</string>
     <string name="add_song">Add song</string>
     <string name="add_setlist">Add setlist</string>
-    <string name="chorus">Chorus</string>
+    <string name="chorus">CHORUS</string>
     <string name="song_item_title_template">%d. %s</string>
 
     <!--  Strings used for inputs  -->
@@ -37,8 +37,8 @@
     <string name="selected">Selected</string>
     <string name="section_name">Section name</string>
     <string name="new_song">New song</string>
-    <string name="new_section">New section</string>
-    <string name="new_section_template">New section %d</string>
+    <string name="new_section">NEW SECTION</string>
+    <string name="new_section_template">NEW SECTION %d</string>
     <string name="hint_enter_lyrics">Enter lyrics</string>
 
     <!--  Strings used for buttons  -->

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:31 PM
+ * Last modified 2/27/21 4:19 PM
  */
 
 package pl.gunock.lyriccast
@@ -22,7 +22,6 @@ object SongsContext {
     var songsDirectory: String = ""
     var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
 
-    // TODO: Try to move adapters to activities/fragments
     val songItemList: MutableList<SongItemModel> = mutableListOf()
 
     var categories: MutableSet<String> = mutableSetOf()
