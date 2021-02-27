@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 5:07 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/26/21 10:35 PM
+  ~ Last modified 2/27/21 5:03 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -78,11 +78,10 @@
         android:id="@+id/text_view_slide_number"
         android:layout_width="64dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:paddingStart="0dp"
         android:paddingEnd="8dp"
-        android:text="10/10"
+        android:text="99/99"
         android:textAlignment="textEnd"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"

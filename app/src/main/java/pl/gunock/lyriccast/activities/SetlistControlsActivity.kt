@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 5:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:31 PM
+ * Last modified 2/27/21 5:07 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,8 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
+import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.models.SetlistModel
 import pl.gunock.lyriccast.models.SongItemModel
@@ -36,7 +39,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var setlistLyrics: List<String>
     private var songTitles: MutableMap<Int, String> = mutableMapOf()
     private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
-    private var currentLyricsIndex: Int = 0
+    private var currentLyricsPosition: Int = 0
 
     private lateinit var setlist: SetlistModel
 
@@ -94,11 +97,28 @@ class SetlistControlsActivity : AppCompatActivity() {
                 }
             }
 
-            songListAdapter = SongListAdapter(songItemList, showRowNumber = true)
+            val onLongClickListener =
+                LongClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    selectSong(position)
+                }
+
+            val onClickListener =
+                ClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    selectSong(position)
+                }
+
+            songListAdapter = SongListAdapter(
+                songItemList,
+                showRowNumber = true,
+                onClickListener = onClickListener,
+                onLongClickListener = onLongClickListener
+            )
             adapter = songListAdapter
         }
 
-        setUpListeners()
+        setupListeners()
     }
 
     override fun onResume() {
@@ -124,52 +144,60 @@ class SetlistControlsActivity : AppCompatActivity() {
         sendSlide()
     }
 
-    private fun setUpListeners() {
+    private fun setupListeners() {
         findViewById<Button>(R.id.button_control_blank2).setOnClickListener {
             MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
         }
 
         findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
-            if (currentLyricsIndex <= 0) {
+            if (currentLyricsPosition <= 0) {
                 return@setOnClickListener
             }
-            currentLyricsIndex--
+            currentLyricsPosition--
             sendSlide()
         }
 
         findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
-            if (currentLyricsIndex >= setlistLyrics.size - 1) {
+            if (currentLyricsPosition >= setlistLyrics.size - 1) {
                 return@setOnClickListener
             }
-            currentLyricsIndex++
+            currentLyricsPosition++
             sendSlide()
         }
     }
 
-    // TODO: Find a workaround for programmatic item highlight
-//    private fun highlightSong(title: String) {
-//        val songItemPosition: Int = songListAdapter.songs.indexOfFirst { it.title == title }
-//        songListAdapter.songs.forEach { it.highlight = it.title == title }
-//
-//        findViewById<RecyclerView>(R.id.recycler_view_songs).run {
-//            scrollToPosition(songItemPosition)
-//            postInvalidate()
-//        }
-//
-//    }
+    private fun highlightSong(title: String) {
+        val songItemPosition: Int = songListAdapter.songItems
+            .indexOfFirst { songItem -> songItem.title == title }
+        songListAdapter.songItems.forEach { songItem ->
+            songItem.highlight = songItem.title == title
+        }
+        songListAdapter.notifyDataSetChanged()
+
+        findViewById<RecyclerView>(R.id.recycler_view_songs).run {
+            scrollToPosition(songItemPosition)
+            postInvalidate()
+        }
+    }
 
     private fun sendSlide() {
-        if (songTitles.containsKey(currentLyricsIndex)) {
-            val songTitle = songTitles[currentLyricsIndex]!!
+        if (songTitles.containsKey(currentLyricsPosition)) {
+            val songTitle = songTitles[currentLyricsPosition]!!
             songTitleView.text = songTitle
-//            highlightSong(songTitle)
+            highlightSong(songTitle)
         }
 
-        slidePreviewView.text = setlistLyrics[currentLyricsIndex]
+        slidePreviewView.text = setlistLyrics[currentLyricsPosition]
         MessageHelper.sendContentMessage(
             castContext!!,
-            setlistLyrics[currentLyricsIndex]
+            setlistLyrics[currentLyricsPosition]
         )
     }
 
+    private fun selectSong(position: Int): Boolean {
+        val item: SongItemModel = songListAdapter.songItems[position]
+        currentLyricsPosition = songStartPoints[item.title]!!
+        sendSlide()
+        return true
+    }
 }
