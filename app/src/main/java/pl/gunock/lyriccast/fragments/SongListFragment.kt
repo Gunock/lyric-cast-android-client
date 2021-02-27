@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:08 PM
+ * Last modified 2/27/21 2:28 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -14,8 +14,6 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
+import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongListAdapter
 import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
@@ -34,7 +33,6 @@ import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
 import pl.gunock.lyriccast.models.SongItemModel
-import pl.gunock.lyriccast.models.SongMetadataModel
 import kotlin.system.measureTimeMillis
 
 
@@ -45,7 +43,7 @@ class SongListFragment : Fragment() {
 
     private var castContext: CastContext? = null
 
-    private lateinit var menu: Menu
+    private var menu: Menu? = null
     private lateinit var searchView: TextInputLayout
     private lateinit var categorySpinner: Spinner
     private lateinit var songListRecyclerView: RecyclerView
@@ -101,7 +99,11 @@ class SongListFragment : Fragment() {
             adapter = null
         }
 
-        loadSongs()
+        CoroutineScope(Dispatchers.Main).launch {
+            setupCategorySpinner()
+            setupSongList()
+            setupListeners()
+        }
     }
 
     override fun onStart() {
@@ -111,6 +113,12 @@ class SongListFragment : Fragment() {
         categorySpinner.setSelection(0)
 
         setupSongList()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        resetSelection()
     }
 
     private fun setupListeners() {
@@ -155,25 +163,6 @@ class SongListFragment : Fragment() {
         songListAdapter.notifyDataSetChanged()
     }
 
-    private fun loadSongs() {
-        if (SongsContext.songMap.isEmpty()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val songList: List<SongMetadataModel> = SongsContext.loadSongsMetadata()
-                CoroutineScope(Dispatchers.Main).launch {
-                    SongsContext.fillSongsList(songList)
-                    setupCategorySpinner()
-                    setupSongList()
-                    setupListeners()
-                }
-            }
-        } else if (SongsContext.categories.toList().isNotEmpty()) {
-            CoroutineScope(Dispatchers.Main).launch {
-                setupCategorySpinner()
-                setupListeners()
-            }
-        }
-    }
-
     private fun setupSongList() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val showAuthor = prefs.getBoolean("showAuthor", true)
@@ -196,6 +185,7 @@ class SongListFragment : Fragment() {
                 if (selectionCount == 0) {
                     pickSong(item)
                 } else {
+                    requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     selectSong(item, holder)
                 }
             }
@@ -211,18 +201,27 @@ class SongListFragment : Fragment() {
         songListRecyclerView.adapter = songListAdapter
     }
 
+    private fun setupCategorySpinner() {
+        val categorySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            SongsContext.categories.toList()
+        )
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        categorySpinner.apply {
+            adapter = categorySpinnerAdapter
+        }
+    }
+
     private fun pickSong(item: SongItemModel) {
         val songSections = SongsContext.getSongLyrics(item.title).lyrics
         val songMetadata = SongsContext.getSongMetadata(item.title)
         val lyrics = songMetadata.presentation.map { songSections[it]!! }
 
-        val action =
-            SongListFragmentDirections.actionSongListFragmentToControlsFragment(
-                songTitle = item.title,
-                lyrics = lyrics.toTypedArray()
-            )
-
-        findNavController().navigate(action)
+        val intent = Intent(requireContext(), SongControlsActivity::class.java)
+        intent.putExtra("songTitle", item.title)
+        intent.putExtra("lyrics", lyrics.toTypedArray())
+        startActivity(intent)
     }
 
     private fun selectSong(item: SongItemModel, holder: SongListAdapter.SongViewHolder) {
@@ -238,27 +237,27 @@ class SongListFragment : Fragment() {
                 datasetChanged = true
                 songListAdapter.showCheckBox = false
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu!!.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = false
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu!!.findItem(R.id.action_edit)
                 editActionItem.isVisible = false
             }
             1 -> {
                 datasetChanged = true
                 songListAdapter.showCheckBox = true
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu!!.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu!!.findItem(R.id.action_edit)
                 editActionItem.isVisible = true
             }
             2 -> {
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu!!.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu!!.findItem(R.id.action_edit)
                 editActionItem.isVisible = false
             }
         }
@@ -270,19 +269,6 @@ class SongListFragment : Fragment() {
         } else {
             holder.checkBox.isChecked = item.isSelected
         }
-
-    }
-
-    private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.apply {
-            adapter = categorySpinnerAdapter
-        }
     }
 
     private fun editSelectedSong(): Boolean {
@@ -292,9 +278,7 @@ class SongListFragment : Fragment() {
         intent.putExtra("songTitle", selectedSong.title)
         startActivity(intent)
 
-        songListAdapter.showCheckBox = false
-        songListAdapter.notifyDataSetChanged()
-        selectionCount = 0
+        resetSelection()
 
         return true
     }
@@ -311,10 +295,25 @@ class SongListFragment : Fragment() {
 
         songListAdapter.songs.clear()
         songListAdapter.songs.addAll(remainingSongs)
-        songListAdapter.notifyDataSetChanged()
 
-        selectionCount = 0
+        resetSelection()
 
         return true
+    }
+
+    private fun resetSelection() {
+        songListAdapter.showCheckBox = false
+        songListAdapter.notifyDataSetChanged()
+        selectionCount = 0
+
+        if (menu == null) {
+            return
+        }
+
+        val deleteActionItem = menu!!.findItem(R.id.action_delete)
+        deleteActionItem.isVisible = false
+
+        val editActionItem = menu!!.findItem(R.id.action_edit)
+        editActionItem.isVisible = false
     }
 }

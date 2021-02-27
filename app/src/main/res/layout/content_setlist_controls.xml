@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/23/20 7:53 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/26/21 10:32 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -85,7 +86,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_slide_preview2">
+        app:layout_constraintTop_toBottomOf="@+id/text_view_slide_preview2"
+        tools:listitem="@layout/item_song">
 
     </androidx.recyclerview.widget.RecyclerView>
 

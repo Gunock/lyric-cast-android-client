@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:24 PM
+ * Last modified 2/26/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -47,12 +47,12 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val setlistName = intent.getStringExtra("setlistName")!!
-        setlist = SetlistsContext.getSetlist(setlistName)!!
-
         setContentView(R.layout.activity_setlist_controls)
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        val setlistName = intent.getStringExtra("setlistName")!!
+        setlist = SetlistsContext.getSetlist(setlistName)!!
 
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {

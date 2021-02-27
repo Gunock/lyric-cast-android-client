@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/31/20 10:35 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 2/27/21 2:29 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -30,6 +30,7 @@
 
     <Spinner
         android:id="@+id/spinner_song_editor_category"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="1dp"
@@ -42,6 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner_song_editor_category" />
@@ -80,13 +82,14 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@null"
         android:ems="10"
         android:gravity="top"
         android:hint="@string/hint_enter_lyrics"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
+        app:layout_constraintBottom_toTopOf="@+id/button_delete_section"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_section_name" />
@@ -96,8 +99,51 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_section_lyrics" />
+
+    <Button
+        android:id="@+id/button_delete_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/delete_section"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/button_move_section_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:contentDescription="@string/move_left"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
+        app:layout_constraintEnd_toStartOf="@+id/button_delete_section"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_section_lyrics"
+        app:srcCompat="@drawable/baseline_arrow_back_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/button_move_section_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:contentDescription="@string/move_right"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
+        app:layout_constraintStart_toEndOf="@+id/button_delete_section"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_section_lyrics"
+        app:srcCompat="@drawable/baseline_arrow_forward_black_24dp" />
+
+    <View
+        android:id="@+id/divider7"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.tabs.TabLayout

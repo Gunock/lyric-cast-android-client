@@ -1,17 +1,16 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 7:06 PM
+ * Last modified 2/27/21 2:24 AM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
@@ -26,15 +25,57 @@ import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
 import java.io.File
 
+// TODO: Make section name case insensitive
 class SongEditorActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "SongEditorActivity"
     }
 
-    private lateinit var sectionNameInput: TextInputLayout
-    private var selectedTab: TabLayout.Tab? = null
+    inner class SectionNameTextWatcher : TextWatcher {
+        var ignoreBeforeTextChanged: Boolean = false
 
-    private val sectionLyrics: MutableMap<TabLayout.Tab, String> = mutableMapOf()
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            if (ignoreBeforeTextChanged) {
+                ignoreBeforeTextChanged = false
+                return
+            }
+
+            val oldText = s.toString()
+            if (tabCountMap[oldText] == 1) {
+                sectionLyrics.remove(oldText)
+                tabCountMap.remove(oldText)
+            } else {
+                tabCountMap[oldText] = tabCountMap[oldText]!! - 1
+            }
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            val newText = s.toString()
+            selectedTab.text = newText
+
+            if (sectionLyrics.containsKey(newText)) {
+                sectionLyricsInput.setText(sectionLyrics[newText]!!)
+                tabCountMap[newText] = tabCountMap[newText]!! + 1
+            } else {
+                sectionLyrics[newText] = sectionLyricsInput.text.toString()
+                tabCountMap[newText] = 1
+            }
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+        }
+    }
+
+    private lateinit var sectionNameInput: TextInputLayout
+    private lateinit var sectionLyricsInput: EditText
+    private lateinit var songSectionTabLayout: TabLayout
+    private lateinit var selectedTab: TabLayout.Tab
+
+    private val textWatcher: SectionNameTextWatcher = SectionNameTextWatcher()
+    private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
+    private val tabCountMap: MutableMap<String, Int> = mutableMapOf()
+
+    private var newSectionCount = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,14 +85,16 @@ class SongEditorActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         sectionNameInput = findViewById(R.id.text_view_section_name)
+        sectionLyricsInput = findViewById(R.id.text_input_section_lyrics)
+        songSectionTabLayout = findViewById(R.id.tab_layout_song_section)
 
         val songTitle = intent.getStringExtra("songTitle")
         if (songTitle != null) {
             loadSongData(songTitle)
+            selectedTab = songSectionTabLayout.getTabAt(0)!!
         } else {
-            val songSectionTabLayout: TabLayout = findViewById(R.id.tab_layout_song_section)
-            selectedTab = songSectionTabLayout.getTabAt(0)
-            sectionLyrics[selectedTab!!] = ""
+            selectedTab = songSectionTabLayout.getTabAt(0)!!
+            sectionLyrics[selectedTab.text.toString()] = ""
         }
 
         setupCategorySpinner()
@@ -71,39 +114,68 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        sectionNameInput.editText!!.addTextChangedListener(InputTextChangeListener {
-            selectedTab!!.text = it
-        })
+        sectionNameInput.editText!!.addTextChangedListener(textWatcher)
 
-        findViewById<EditText>(R.id.text_input_section_lyrics).addTextChangedListener(
+        sectionLyricsInput.addTextChangedListener(
             InputTextChangeListener {
-                sectionLyrics[selectedTab!!] = it
+                sectionLyrics[selectedTab.text.toString()] = it
             })
+
+        songSectionTabLayout.addOnTabSelectedListener(
+            TabItemSelectedListener {
+                selectedTab = it!!
+
+                textWatcher.ignoreBeforeTextChanged = true
+
+                when (val tabText = it.text.toString()) {
+                    getString(R.string.add) -> {
+                        if (songSectionTabLayout.tabCount <= 1) {
+                            return@TabItemSelectedListener
+                        }
+
+                        val newSectionText = getString(R.string.new_section)
+                        while (
+                            tabCountMap.keys.any { it1 ->
+                                it1.contains(newSectionText)
+                                        && it1.split(" ").last() == newSectionCount.toString()
+                            }
+                        ) {
+                            newSectionCount++
+                        }
+
+                        val newTabText =
+                            getString(R.string.new_section_template).format(newSectionCount)
+                        sectionLyricsInput.setText("")
+                        sectionNameInput.editText!!.setText(newTabText)
+
+                        val newAddTab = songSectionTabLayout.newTab()
+                        newAddTab.text = getString(R.string.add)
+                        addTab(newAddTab)
+                    }
+                    else -> {
+                        sectionNameInput.editText!!.setText(tabText)
+                        sectionLyricsInput.setText(sectionLyrics[tabText])
+                    }
+                }
+            }
+        )
 
         findViewById<Button>(R.id.button_save_song).setOnClickListener {
             saveSong()
             finish()
         }
 
-        findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
-            TabItemSelectedListener {
-                selectedTab = it
+        findViewById<ImageButton>(R.id.button_move_section_left).setOnClickListener {
+            moveTabLeft(selectedTab)
+        }
 
-                if (it!!.text == getString(R.string.add)) {
-                    sectionNameInput.editText!!.setText(getString(R.string.new_section))
+        findViewById<ImageButton>(R.id.button_move_section_right).setOnClickListener {
+            moveTabRight(selectedTab)
+        }
 
-                    sectionLyrics[it] = ""
-                    findViewById<EditText>(R.id.text_input_section_lyrics).setText("")
-
-                    val newAddTab = it.parent!!.newTab()
-                    newAddTab.text = getString(R.string.add)
-                    it.parent!!.addTab(newAddTab)
-                } else {
-                    sectionNameInput.editText!!.setText(it.text)
-                    findViewById<EditText>(R.id.text_input_section_lyrics).setText(sectionLyrics[it])
-                }
-            }
-        )
+        findViewById<Button>(R.id.button_delete_section).setOnClickListener {
+            removeTab(selectedTab)
+        }
     }
 
     private fun saveSong() {
@@ -113,13 +185,13 @@ class SongEditorActivity : AppCompatActivity() {
         song.title = songTitleInput.editText!!.editableText.toString()
         val songNormalizedTitle = song.title.normalize()
 
+        val addText = getString(R.string.add)
         song.lyricsFilename = "$songNormalizedTitle.json"
-        song.presentation = List(sectionLyrics.size) {
-            sectionLyrics.keys.toList()[it].text.toString()
-        }
+        song.presentation = sectionLyrics.keys.toList()
+            .filter { it != addText }
 
         val songLyrics = SongLyricsModel()
-        songLyrics.lyrics = sectionLyrics.map { it.key.text.toString() to it.value }.toMap()
+        songLyrics.lyrics = sectionLyrics.filter { it.key != addText }
 
         val songFilePath = "${SongsContext.songsDirectory}$songNormalizedTitle"
 
@@ -143,25 +215,98 @@ class SongEditorActivity : AppCompatActivity() {
         val songMetadata = SongsContext.getSongMetadata(songTitle)
         val songLyrics = SongsContext.getSongLyrics(songTitle).lyrics
 
-        val songSectionTabLayout: TabLayout = findViewById(R.id.tab_layout_song_section)
         songSectionTabLayout.removeAllTabs()
 
         for (sectionName in songMetadata.presentation) {
             val newTab = songSectionTabLayout.newTab()
-            songSectionTabLayout.addTab(newTab)
+            addTab(newTab, sectionName)
 
             sectionNameInput.editText!!.setText(sectionName)
 
-            sectionLyrics[newTab] = songLyrics[sectionName]!!
+            sectionLyrics[sectionName] = songLyrics[sectionName]!!
 
             newTab.text = sectionName
         }
 
         val newAddTab = songSectionTabLayout.newTab()
-        songSectionTabLayout.addTab(newAddTab)
+        addTab(newAddTab)
         newAddTab.text = getString(R.string.add)
 
         val sectionLyricsInput = findViewById<EditText>(R.id.text_input_section_lyrics)
         sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
+    }
+
+    private fun moveTabLeft(tab: TabLayout.Tab) {
+        val position = tab.position
+        if (position == 0) {
+            return
+        }
+
+        val otherTab = songSectionTabLayout.getTabAt(position - 1)!!
+
+        val newTab = songSectionTabLayout.newTab()
+        newTab.text = tab.text
+
+        val newOtherTab = songSectionTabLayout.newTab()
+        newOtherTab.text = otherTab.text
+
+        songSectionTabLayout.removeTab(tab)
+        songSectionTabLayout.removeTab(otherTab)
+
+        songSectionTabLayout.addTab(newTab, position - 1)
+        songSectionTabLayout.addTab(newOtherTab, position)
+
+        songSectionTabLayout.selectTab(newTab)
+    }
+
+    private fun moveTabRight(tab: TabLayout.Tab) {
+        val position = tab.position
+        if (position == songSectionTabLayout.tabCount - 2) {
+            return
+        }
+
+        val otherTab = songSectionTabLayout.getTabAt(position + 1)!!
+
+        val newTab = songSectionTabLayout.newTab()
+        newTab.text = tab.text
+
+        val newOtherTab = songSectionTabLayout.newTab()
+        newOtherTab.text = otherTab.text
+
+        songSectionTabLayout.removeTab(tab)
+        songSectionTabLayout.removeTab(otherTab)
+
+        songSectionTabLayout.addTab(newOtherTab, position)
+        songSectionTabLayout.addTab(newTab, position + 1)
+
+        songSectionTabLayout.selectTab(newTab)
+    }
+
+    private fun addTab(tab: TabLayout.Tab, tabText: String = "") {
+        songSectionTabLayout.addTab(tab)
+
+        if (tabText.isBlank()) {
+            return
+        }
+
+        if (tabCountMap.containsKey(tabText)) {
+            tabCountMap[tabText] = tabCountMap[tabText]!! + 1
+        } else {
+            tabCountMap[tabText] = 1
+        }
+    }
+
+    private fun removeTab(tab: TabLayout.Tab) {
+        val tabText = tab.text.toString()
+        songSectionTabLayout.removeTab(tab)
+
+        val tabCount = tabCountMap[tabText]!! - 1
+
+        if (tabCount == 0) {
+            tabCountMap.remove(tabText)
+            sectionLyrics.remove(tabText)
+        } else {
+            tabCountMap[tabText] = tabCount
+        }
     }
 }

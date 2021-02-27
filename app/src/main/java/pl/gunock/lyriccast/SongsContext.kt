@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:39 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:38 PM
+ * Last modified 2/27/21 2:28 AM
  */
 
 package pl.gunock.lyriccast
@@ -27,7 +27,7 @@ object SongsContext {
 
     var categories: MutableSet<String> = mutableSetOf()
 
-    fun loadSongsMetadata(): List<SongMetadataModel> {
+    fun loadSongsMetadata() {
         val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
         categories.clear()
@@ -35,7 +35,7 @@ object SongsContext {
         val fileList = File(songsDirectory).listFiles(fileFilter)
 
         if (fileList == null || fileList.isEmpty()) {
-            return listOf()
+            throw RuntimeException("Could not load songs metadata.")
         }
 
         for (file in fileList) {
@@ -51,7 +51,7 @@ object SongsContext {
         }
         Log.d(TAG, "Parsed metadata files: $loadedSongsMetadata")
 
-        return loadedSongsMetadata
+        fillSongsList(loadedSongsMetadata)
     }
 
     fun deleteSongs(songTitles: List<String>) {
@@ -64,7 +64,7 @@ object SongsContext {
         }
     }
 
-    fun fillSongsList(songs: List<SongMetadataModel>) {
+    private fun fillSongsList(songs: List<SongMetadataModel>) {
         songItemList.clear()
         for (song in songs) {
             addSong(song)

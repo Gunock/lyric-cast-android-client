@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/25/21 9:55 PM
+  ~ Last modified 2/26/21 10:35 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,7 +9,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ControlsFragment">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <Button
         android:id="@+id/button_next"

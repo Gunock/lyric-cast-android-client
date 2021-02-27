@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:59 PM
+ * Last modified 2/27/21 2:28 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-import com.google.android.gms.cast.framework.CastContext
 import pl.gunock.lyriccast.R
 
 class SettingsActivity : AppCompatActivity() {
@@ -17,12 +16,11 @@ class SettingsActivity : AppCompatActivity() {
         private const val TAG = "SettingsActivity"
     }
 
-    private var castContext: CastContext? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         setSupportActionBar(findViewById(R.id.toolbar_settings))
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
             supportFragmentManager
@@ -32,8 +30,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        castContext = CastContext.getSharedInstance(this)
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

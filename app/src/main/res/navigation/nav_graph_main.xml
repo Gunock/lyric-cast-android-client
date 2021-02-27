@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/25/21 9:53 PM
+  ~ Last modified 2/26/21 10:42 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/SongListFragment">
+    app:startDestination="@id/EmptyFragment">
+
+    <fragment
+        android:id="@+id/EmptyFragment"
+        android:name="androidx.fragment.app.Fragment"
+        android:label="@string/songs"
+        tools:layout="@layout/fragment_empty">
+
+        <action
+            android:id="@+id/action_EmptyFragment_to_SongListFragment"
+            app:destination="@id/SongListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/SongListFragment"
@@ -17,12 +28,10 @@
         tools:layout="@layout/fragment_song_list">
 
         <action
-            android:id="@+id/action_SongListFragment_to_ControlsFragment"
-            app:destination="@id/ControlsFragment" />
-        <action
             android:id="@+id/action_SongListFragment_to_SetlistsFragment"
             app:destination="@id/SetlistsFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/SetlistsFragment"
         android:name="pl.gunock.lyriccast.fragments.SetlistsFragment"
@@ -32,21 +41,5 @@
             android:id="@+id/action_SetlistsFragment_to_SongListFragment"
             app:destination="@id/SongListFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/ControlsFragment"
-        android:name="pl.gunock.lyriccast.fragments.ControlsFragment"
-        android:label="@string/controls"
-        tools:layout="@layout/fragment_controls">
 
-        <action
-            android:id="@+id/action_ControlsFragment_to_SongListFragment"
-            app:destination="@id/SongListFragment" />
-
-        <argument
-            android:name="songTitle"
-            app:argType="string" />
-        <argument
-            android:name="lyrics"
-            app:argType="string[]" />
-    </fragment>
 </navigation>

@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/26/21 7:20 PM
+  ~ Last modified 2/27/21 2:29 AM
   -->
 
 <resources>
@@ -37,6 +37,7 @@
     <string name="selected">Selected</string>
     <string name="section_name">Section name</string>
     <string name="new_section">New section</string>
+    <string name="new_section_template">New section %d</string>
     <string name="hint_enter_lyrics">Enter lyrics</string>
 
     <!--  Strings used for buttons  -->
@@ -55,4 +56,7 @@
     <string name="placeholder_name">Name</string>
     <string name="placeholder_author">Author</string>
     <string name="placeholder_category">Category</string>
+    <string name="delete_section">Delete section</string>
+    <string name="move_left">Move left</string>
+    <string name="move_right">Move right</string>
 </resources>

@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/25/21 9:55 PM
+  ~ Last modified 2/26/21 11:46 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,13 +12,13 @@
 
     <item
         android:id="@+id/action_edit"
-        android:icon="@drawable/baseline_mode_edit_black_24dp"
+        android:icon="@drawable/baseline_mode_edit_white_24dp"
         android:title="@string/edit"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_delete"
-        android:icon="@drawable/baseline_delete_outline_black_24dp"
+        android:icon="@drawable/baseline_delete_outline_white_24dp"
         android:title="@string/delete"
         app:showAsAction="always" />
 
@@ -27,7 +27,7 @@
         android:title="@string/cast"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
         app:showAsAction="always"
-        tools:icon="@drawable/mr_button_light" />
+        tools:icon="@drawable/mr_button_dark" />
 
     <item
         android:id="@+id/menu_settings"

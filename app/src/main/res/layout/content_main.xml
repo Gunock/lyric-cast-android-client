@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+  ~ Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/25/21 6:08 PM
+  ~ Last modified 2/26/21 11:47 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,7 +70,7 @@
             android:visibility="visible"
             app:fabCustomSize="40dp"
             app:maxImageSize="24dp"
-            app:srcCompat="@drawable/baseline_playlist_add_black_24dp" />
+            app:srcCompat="@drawable/baseline_playlist_add_white_24dp" />
 
     </LinearLayout>
 
@@ -115,7 +115,7 @@
             android:scaleType="center"
             android:visibility="visible"
             app:fabCustomSize="40dp"
-            app:srcCompat="@drawable/baseline_music_note_black_24dp"
+            app:srcCompat="@drawable/baseline_music_note_white_24dp"
             app:useCompatPadding="false" />
     </LinearLayout>
 

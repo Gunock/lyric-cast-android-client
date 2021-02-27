@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 9:31 PM
+ * Last modified 2/27/21 2:17 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,13 +17,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.navigation.fragment.NavHostFragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
@@ -61,13 +65,15 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
         findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+
+        if (SongsContext.songItemList.isEmpty()) {
+            loadData()
+        } else {
+            goToSongListFragment()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -138,9 +144,7 @@ class MainActivity : AppCompatActivity() {
     private fun setUpListeners() {
         findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
             TabItemSelectedListener {
-                val navHostFragment =
-                    supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-                val navController = navHostFragment.navController
+                val navController = findNavController(R.id.main_nav_host)
 
                 if (it!!.text == getString(R.string.songs)) {
                     Log.d(TAG, "Switching to song list")
@@ -151,24 +155,30 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+        val addSongFab = findViewById<LinearLayout>(R.id.fab_view_add_song)
+        val addSetlistFab = findViewById<LinearLayout>(R.id.fab_view_add_setlist)
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
-            if (findViewById<LinearLayout>(R.id.fab_view_add_song).isVisible) {
-                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
-                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+            if (addSongFab.isVisible) {
+                addSongFab.visibility = View.GONE
+                addSetlistFab.visibility = View.GONE
             } else {
-                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.VISIBLE
-                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.VISIBLE
+                addSongFab.visibility = View.VISIBLE
+                addSetlistFab.visibility = View.VISIBLE
             }
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
             val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
+            addSongFab.visibility = View.GONE
+            addSetlistFab.visibility = View.GONE
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
             val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
+            addSongFab.visibility = View.GONE
+            addSetlistFab.visibility = View.GONE
         }
     }
 
@@ -198,4 +208,27 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun loadData() {
+        val alertDialog: AlertDialog = AlertDialog.Builder(this)
+            .setMessage("Loading songs ...")
+            .create()
+
+
+        alertDialog.show()
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            SongsContext.loadSongsMetadata()
+
+            lifecycleScope.launch(Dispatchers.Main) {
+                alertDialog.hide()
+            }
+
+            goToSongListFragment()
+        }
+    }
+
+    private fun goToSongListFragment() {
+        val navController = findNavController(R.id.main_nav_host)
+        navController.navigate(R.id.action_EmptyFragment_to_SongListFragment)
+    }
 }

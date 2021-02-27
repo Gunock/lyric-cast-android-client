@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/26/21 9:36 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/26/21 9:36 PM
+ * Last modified 2/26/21 11:06 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -24,17 +24,6 @@ class SetlistEditorActivity : AppCompatActivity() {
 
         setupListeners()
     }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            android.R.id.home -> {
-//                onBackPressed()
-//                return true // Ignores default behaviour
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
 
     private fun setupListeners() {
         // TODO: Add necessary listeners
