@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 1:04 PM
+ * Last modified 2/27/21 8:36 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -47,6 +47,8 @@ class SetlistEditorSongListFragment : Fragment() {
 
     private lateinit var selectedSongTitles: MutableSet<String>
 
+    private var songItems: Set<SongItemModel> = setOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -69,7 +71,12 @@ class SetlistEditorSongListFragment : Fragment() {
         categorySpinner = view.findViewById(R.id.spinner_category)
         selectedSongsSwitch = view.findViewById(R.id.switch_selected_songs)
 
-        songListAdapter = SongListAdapter(SongsContext.songItemList, showCheckBox = true)
+        songItems = SongsContext.getSongItems()
+        songItems.forEach { songItem ->
+            songItem.isSelected = selectedSongTitles.contains(songItem.title)
+        }
+
+        songListAdapter = SongListAdapter(songItems.toMutableList(), showCheckBox = true)
         with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
@@ -133,26 +140,26 @@ class SetlistEditorSongListFragment : Fragment() {
 
         updateSelectedSongs()
 
-        val predicate = if (isSelected == null) { song: SongItemModel ->
-            val titleCondition = song.title.normalize()
-                .contains(title.normalize(), ignoreCase = true)
-            val categoryCondition = (category == "All" || song.category == category)
+        val normalizedTitle = title.normalize()
 
-            titleCondition && categoryCondition
-        } else { song: SongItemModel ->
-            if (song.isSelected != isSelected) {
-                false
-            } else {
-                val titleCondition = song.title.normalize()
-                    .contains(title.normalize(), ignoreCase = true)
-                val categoryCondition = (category == "All" || song.category == category)
+        val predicates: MutableList<(SongItemModel) -> Boolean> = mutableListOf()
 
-                titleCondition && categoryCondition
-            }
+        if (isSelected != null) {
+            predicates.add { songItem -> songItem.isSelected }
+        }
+
+        if (category != "All") {
+            predicates.add { songItem -> songItem.category == category }
+        }
+
+        predicates.add { songItem ->
+            songItem.title.normalize().contains(normalizedTitle, ignoreCase = true)
         }
 
         val duration = measureTimeMillis {
-            songListAdapter.songItems = SongsContext.songItemList.filter(predicate).toMutableList()
+            songListAdapter.songItems = songItems.filter { songItem ->
+                predicates.all { predicate -> predicate(songItem) }
+            }.toMutableList()
         }
         Log.d(TAG, "Filtering took : ${duration}ms")
 

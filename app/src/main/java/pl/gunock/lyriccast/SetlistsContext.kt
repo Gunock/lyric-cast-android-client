@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 4:19 PM
+ * Last modified 2/27/21 8:15 PM
  */
 
 package pl.gunock.lyriccast
@@ -19,17 +19,15 @@ object SetlistsContext {
 
     var setlistsDirectory: String = ""
 
-    var setlistList: SortedSet<SetlistModel> = sortedSetOf()
+    private var setlists: SortedSet<SetlistModel> = sortedSetOf()
 
-    var setlistItemList: MutableList<SetlistItemModel> = mutableListOf()
-
-    fun loadSetlists(): SortedSet<SetlistModel> {
+    fun loadSetlists() {
         val loadedSetlists: SortedSet<SetlistModel> = sortedSetOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".json") }
         val fileList = File(setlistsDirectory).listFiles(fileFilter)
 
         if (fileList == null || fileList.isEmpty()) {
-            return sortedSetOf()
+            return
         }
 
         for (file in fileList) {
@@ -40,7 +38,7 @@ object SetlistsContext {
         }
         Log.d(TAG, "Parsed setlist files: $loadedSetlists")
 
-        return loadedSetlists
+        setlists = loadedSetlists
     }
 
     fun saveSetlist(setlist: SetlistModel) {
@@ -48,6 +46,8 @@ object SetlistsContext {
         val setlistFile = File("$setlistsDirectory/${setlist.name}.json")
         File(setlistsDirectory).mkdirs()
         setlistFile.writeText(json.toString())
+
+        setlists.add(setlist)
     }
 
     fun deleteSetlists(setlistNames: List<String>) {
@@ -55,13 +55,18 @@ object SetlistsContext {
             val setlistFile = File("$setlistsDirectory/${setlistName}.json")
             setlistFile.delete()
         }
-        setlistList = setlistList.filter { setlist ->
+
+        setlists = setlists.filter { setlist ->
             !setlistNames.contains(setlist.name)
         }.toSortedSet()
     }
 
-    fun getSetlist(setlistName: String): SetlistModel? {
-        return setlistList.first { setlist -> setlist.name == setlistName }
+    fun getSetlist(setlistName: String): SetlistModel {
+        return setlists.first { setlist -> setlist.name == setlistName }
+    }
+
+    fun getSetlistItems(): Set<SetlistItemModel> {
+        return setlists.map { setlist -> SetlistItemModel(setlist) }.toSet()
     }
 
 }

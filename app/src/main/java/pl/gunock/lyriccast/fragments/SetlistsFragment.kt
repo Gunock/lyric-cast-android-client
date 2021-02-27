@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 1:04 PM
+ * Last modified 2/27/21 8:15 PM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -24,19 +25,25 @@ import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistListAdapter
 import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
 import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
+import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
 import pl.gunock.lyriccast.models.SetlistItemModel
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 
 class SetlistsFragment : Fragment() {
+    private companion object {
+        const val TAG = "SetlistsFragment"
+    }
 
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var setlistRecyclerView: RecyclerView
 
+    private var setlistItems: Set<SetlistItemModel> = setOf()
     private var selectionCount: Int = 0
 
     private lateinit var setlistListAdapter: SetlistListAdapter
@@ -111,17 +118,14 @@ class SetlistsFragment : Fragment() {
                 }
             }
 
-        SetlistsContext.setlistList = SetlistsContext.loadSetlists()
-        SetlistsContext.setlistItemList = SetlistsContext.setlistList
-            .map { setlist -> SetlistItemModel(setlist) }
-            .toMutableList()
+        SetlistsContext.loadSetlists()
+        setlistItems = SetlistsContext.getSetlistItems()
 
         setlistListAdapter = SetlistListAdapter(
-            SetlistsContext.setlistItemList,
+            setlistItems = setlistItems.toMutableList(),
             onLongClickListener = onLongClickListener,
             onClickListener = onClickListener
         )
-        setlistListAdapter.setlistItems = SetlistsContext.setlistItemList
 
         requireView()
             .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistListAdapter
@@ -144,7 +148,10 @@ class SetlistsFragment : Fragment() {
 
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangeListener { newText ->
-            filterSetlists(newText, categorySpinner.selectedItem.toString())
+            filterSetlists(
+                newText,
+                categorySpinner.selectedItem.toString()
+            )
         })
 
         categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
@@ -248,10 +255,27 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun filterSetlists(name: String, category: String = "All") {
-        setlistListAdapter.setlistItems = SetlistsContext.setlistItemList.filter { setlist ->
-            setlist.name.contains(name, ignoreCase = true)
-                    && (category == "All" || setlist.category == category)
-        }.toMutableList()
+        Log.v(TAG, "filterSetlists invoked")
+
+        val normalizedName = name.normalize()
+
+        val predicates: MutableList<(SetlistItemModel) -> Boolean> = mutableListOf()
+
+        if (category != "All") {
+            predicates.add { setlistItem -> setlistItem.category == category }
+        }
+
+        predicates.add { setlistItem ->
+            setlistItem.name.normalize().contains(normalizedName, ignoreCase = true)
+        }
+
+        val duration = measureTimeMillis {
+            setlistListAdapter.setlistItems = setlistItems.filter { setlistItem ->
+                predicates.all { predicate -> predicate(setlistItem) }
+            }.toMutableList()
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
+
         setlistListAdapter.notifyDataSetChanged()
     }
 }

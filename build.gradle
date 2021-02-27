@@ -1,20 +1,20 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 11:59 AM
+ * Last modified 2/27/21 8:39 PM
  */
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    ext {
+        nav_version = '2.3.3'
+    }
     ext.kotlin_version = '1.4.31'
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        // TODO: Add global nav_version variable
-        def nav_version = "2.3.3"
-
         classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"

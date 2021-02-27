@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 1:04 PM
+ * Last modified 2/27/21 8:21 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,12 +20,12 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
@@ -53,6 +53,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
+        findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
             val turnWifiOn = Intent(Settings.ACTION_WIFI_SETTINGS)
@@ -66,10 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         castContext = CastContext.getSharedInstance(this)
 
-        findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
-
-        if (SongsContext.songItemList.isEmpty()) {
+        if (SongsContext.getSongMap().isEmpty()) {
             loadData()
         } else {
             goToSongListFragment()
@@ -121,6 +121,9 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 SongsContext.loadSongsMetadata()
+                finish()
+                val intent = Intent(baseContext, this.javaClass)
+                startActivity(intent)
             }
             EXPORT_SONGS_RESULT_CODE -> {
                 FileHelper.zip(
@@ -211,13 +214,12 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Loading songs ...")
             .create()
 
-
         alertDialog.show()
-        lifecycleScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
 
             SongsContext.loadSongsMetadata()
 
-            lifecycleScope.launch(Dispatchers.Main) {
+            CoroutineScope(Dispatchers.Main).launch {
                 alertDialog.hide()
             }
 

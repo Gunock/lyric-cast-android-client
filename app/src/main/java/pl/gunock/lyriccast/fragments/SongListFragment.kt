@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 1:04 PM
+ * Last modified 2/27/21 8:44 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -49,6 +49,7 @@ class SongListFragment : Fragment() {
     private lateinit var categorySpinner: Spinner
     private lateinit var songListRecyclerView: RecyclerView
 
+    private var songItems: Set<SongItemModel> = setOf()
     private lateinit var songListAdapter: SongListAdapter
     private var selectionCount: Int = 0
 
@@ -96,6 +97,8 @@ class SongListFragment : Fragment() {
 
         view.findViewById<SwitchCompat>(R.id.switch_selected_songs).visibility = View.GONE
 
+        songItems = SongsContext.getSongItems()
+
         with(songListRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
@@ -126,54 +129,33 @@ class SongListFragment : Fragment() {
 
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangeListener {
-            filterSongs(categorySpinner.selectedItem.toString())
+            filterSongs(
+                searchViewEditText.editableText.toString(),
+                category = categorySpinner.selectedItem.toString()
+            )
         })
 
         categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
-                categorySpinner.selectedItem.toString()
+                category = categorySpinner.selectedItem.toString()
             )
         }
     }
 
-    private fun filterSongs(title: String, category: String = "All", isSelected: Boolean? = null) {
-        Log.d(TAG, "filterSongs invoked")
-
-        val predicate = if (isSelected == null) { song: SongItemModel ->
-            val titleCondition = song.title.normalize()
-                .contains(title.normalize(), ignoreCase = true)
-            val categoryCondition = (category == "All" || song.category == category)
-
-            titleCondition && categoryCondition
-        } else { song: SongItemModel ->
-            if (song.isSelected != isSelected) {
-                false
-            } else {
-                val titleCondition = song.title.normalize()
-                    .contains(title.normalize(), ignoreCase = true)
-                val categoryCondition = (category == "All" || song.category == category)
-
-                titleCondition && categoryCondition
-            }
-        }
-
-        val duration = measureTimeMillis {
-            songListAdapter.songItems = SongsContext.songItemList.filter(predicate).toMutableList()
-        }
-        Log.d(TAG, "Filtering took : ${duration}ms")
-
-        songListAdapter.notifyDataSetChanged()
+    private fun setupCategorySpinner() {
+        val categorySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            SongsContext.categories.toList()
+        )
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupSongList() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val showAuthor = prefs.getBoolean("showAuthor", true)
-
-        SongsContext.songItemList.clear()
-        for (i in SongsContext.songMap.values.indices) {
-            SongsContext.songItemList.add(SongItemModel(SongsContext.songMap.values.elementAt(i)))
-        }
 
         val onLongClickListener =
             LongClickAdapterListener { holder: SongListAdapter.SongViewHolder, position: Int, _ ->
@@ -194,7 +176,7 @@ class SongListFragment : Fragment() {
             }
 
         songListAdapter = SongListAdapter(
-            SongsContext.songItemList,
+            songItems.toMutableList(),
             showCheckBox = false,
             showAuthor = showAuthor,
             onLongClickListener = onLongClickListener,
@@ -204,14 +186,31 @@ class SongListFragment : Fragment() {
         songListRecyclerView.adapter = songListAdapter
     }
 
-    private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = categorySpinnerAdapter
+    private fun filterSongs(title: String, category: String = "All") {
+        Log.v(TAG, "filterSongs invoked")
+
+        resetSelection()
+
+        val normalizedTitle = title.normalize()
+
+        val predicates: MutableList<(SongItemModel) -> Boolean> = mutableListOf()
+
+        if (category != "All") {
+            predicates.add { songItem -> songItem.category == category }
+        }
+
+        predicates.add { songItem ->
+            songItem.title.normalize().contains(normalizedTitle, ignoreCase = true)
+        }
+
+        val duration = measureTimeMillis {
+            songListAdapter.songItems = songItems.filter { songItem ->
+                predicates.all { predicate -> predicate(songItem) }
+            }.toMutableList()
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
+
+        songListAdapter.notifyDataSetChanged()
     }
 
     private fun pickSong(item: SongItemModel) {

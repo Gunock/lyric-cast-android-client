@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 5:07 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 5:07 PM
+ * Last modified 2/27/21 8:36 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -51,7 +51,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         val setlistName = intent.getStringExtra("setlistName")!!
-        setlist = SetlistsContext.getSetlist(setlistName)!!
+        setlist = SetlistsContext.getSetlist(setlistName)
 
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {
@@ -62,7 +62,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         slidePreviewView = findViewById(R.id.text_view_slide_preview2)
         songTitleView = findViewById(R.id.current_song_title)
 
-        val songsMetadata = SongsContext.songMap
+        val songsMetadata = SongsContext.getSongMap()
         var setlistLyricsIndex = 0
         setlistLyrics = setlist.songTitles.flatMap { songTitle ->
             val songLyrics = SongsContext.getSongLyrics(songTitle)!!.lyrics
@@ -75,48 +75,10 @@ class SetlistControlsActivity : AppCompatActivity() {
 
             setlistLyricsIndex += lyrics.size
 
-            lyrics
+            return@flatMap lyrics
         }
 
-        with(findViewById<RecyclerView>(R.id.recycler_view_songs)) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
-
-            val songTitles = setlist.songTitles
-            val songItemList: MutableList<SongItemModel> = mutableListOf()
-            for (i in songTitles.indices) {
-                songItemList.add(SongItemModel(SongsContext.songMap.getValue(songTitles[i])))
-            }
-
-            val iterator = songItemList.listIterator()
-            while (iterator.hasNext()) {
-                val oldValue = iterator.next()
-                if (oldValue.title == songTitles[0]) {
-                    oldValue.highlight = true
-                    iterator.set(oldValue)
-                }
-            }
-
-            val onLongClickListener =
-                LongClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(position)
-                }
-
-            val onClickListener =
-                ClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(position)
-                }
-
-            songListAdapter = SongListAdapter(
-                songItemList,
-                showRowNumber = true,
-                onClickListener = onClickListener,
-                onLongClickListener = onLongClickListener
-            )
-            adapter = songListAdapter
-        }
+        setupRecyclerView()
 
         setupListeners()
     }
@@ -142,6 +104,38 @@ class SetlistControlsActivity : AppCompatActivity() {
             configurationJson
         )
         sendSlide()
+    }
+
+    private fun setupRecyclerView() {
+        val songTitles: List<String> = setlist.songTitles
+        val songItemList: List<SongItemModel> = SongsContext.getSongItems()
+            .filter { songItem -> songTitles.contains(songItem.title) }
+
+        with(findViewById<RecyclerView>(R.id.recycler_view_songs)) {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+
+            val onLongClickListener =
+                LongClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    selectSong(position)
+                }
+
+            val onClickListener =
+                ClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    selectSong(position)
+                }
+
+            songListAdapter = SongListAdapter(
+                songItemList.toMutableList(),
+                showRowNumber = true,
+                onClickListener = onClickListener,
+                onLongClickListener = onLongClickListener
+            )
+
+            adapter = songListAdapter
+        }
     }
 
     private fun setupListeners() {

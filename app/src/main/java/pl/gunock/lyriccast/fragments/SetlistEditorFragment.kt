@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:42 PM
+ * Last modified 2/27/21 8:36 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -34,38 +34,36 @@ class SetlistEditorFragment : Fragment() {
 
     private val args: SetlistEditorFragmentArgs by navArgs()
 
-    private lateinit var selectedSongs: List<SongItemModel>
     private lateinit var songsRecyclerView: RecyclerView
     private lateinit var setlistNameInput: TextView
+    private var setlistSongs: List<SongItemModel> = listOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_setlist_editor, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val setlistName = requireActivity().intent.getStringExtra("setlistName")
+        val setlistName: String? = requireActivity().intent.getStringExtra("setlistName")
 
         setlistNameInput = view.findViewById(R.id.text_input_setlist_name)
 
-        if (!args.selectedSongs.isNullOrEmpty()) {
-            SongsContext.songItemList.forEach { songItem ->
-                songItem.isSelected = args.selectedSongs!!.contains(songItem.title)
-            }
+        if (args.selectedSongs != null) {
+            setlistSongs = SongsContext.getSongItems()
+                .filter { songItem -> args.selectedSongs!!.contains(songItem.title) }
+
             setlistNameInput.text = args.setlistName
         } else if (setlistName != null) {
             setlistNameInput.text = setlistName
 
-            val setlist = SetlistsContext.getSetlist(setlistName)!!
+            val setlist = SetlistsContext.getSetlist(setlistName)
 
-            SongsContext.songItemList.forEach { songItem ->
-                songItem.isSelected = setlist.songTitles.contains(songItem.title)
-            }
+            setlistSongs = SongsContext.getSongItems()
+                .filter { songItem -> setlist.songTitles.contains(songItem.title) }
         }
 
         songsRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
@@ -79,8 +77,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        selectedSongs = SongsContext.songItemList.filter { song -> song.isSelected }
-        songsRecyclerView.adapter = SongListAdapter(selectedSongs.toMutableList())
+        songsRecyclerView.adapter = SongListAdapter(setlistSongs.toMutableList())
     }
 
     private fun setupListeners(view: View) {
@@ -89,7 +86,7 @@ class SetlistEditorFragment : Fragment() {
 
             val action = SetlistEditorFragmentDirections
                 .actionSetlistEditorFragmentToSetlistEditorSongListFragment(
-                    selectedSongs = selectedSongs.map { songItem -> songItem.title }.toTypedArray(),
+                    selectedSongs = setlistSongs.map { songItem -> songItem.title }.toTypedArray(),
                     setlistName = setlistNameInput.text.toString()
                 )
 
@@ -100,10 +97,7 @@ class SetlistEditorFragment : Fragment() {
             val setlist = SetlistModel()
             setlist.name = setlistNameInput.text.toString()
 
-            val selectedSongs: List<SongItemModel> =
-                SongsContext.songItemList.filter { song -> song.isSelected }
-
-            if (selectedSongs.isEmpty()) {
+            if (setlistSongs.isEmpty()) {
                 val toast = Toast.makeText(
                     requireContext(),
                     "Empty setlists are not allowed!",
@@ -113,9 +107,8 @@ class SetlistEditorFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            setlist.songTitles = selectedSongs.map { songItem -> songItem.title }
+            setlist.songTitles = setlistSongs.map { songItem -> songItem.title }
 
-            SetlistsContext.setlistList.add(setlist)
             SetlistsContext.saveSetlist(setlist)
 
             requireActivity().finish()

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 4:39 PM
+ * Last modified 2/27/21 8:44 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -46,7 +46,7 @@ class SongEditorActivity : AppCompatActivity() {
                 songTitleInputLayout.error = " "
                 songTitleInput.error = "Please enter song title"
                 return
-            } else if (SongsContext.songMap.containsKey(newText)
+            } else if (songTitles.contains(newText)
                 && (intentSongTitle.isNullOrBlank() || intentSongTitle != newText)
             ) {
                 songTitleInputLayout.error = " "
@@ -103,6 +103,7 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private var intentSongTitle: String? = null
+    private var songTitles: Set<String> = setOf()
 
     private lateinit var sectionNameInput: EditText
     private lateinit var songTitleInputLayout: TextInputLayout
@@ -110,6 +111,7 @@ class SongEditorActivity : AppCompatActivity() {
     private lateinit var sectionLyricsInput: EditText
     private lateinit var songSectionTabLayout: TabLayout
     private lateinit var selectedTab: TabLayout.Tab
+    private lateinit var categorySpinner: Spinner
 
     private val sectionNameTextWatcher: SectionNameTextWatcher = SectionNameTextWatcher()
     private val songTitleTextWatcher: SongTitleTextWatcher = SongTitleTextWatcher()
@@ -125,26 +127,32 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-
         songTitleInputLayout = findViewById(R.id.text_view_song_title)
         songTitleInput = findViewById(R.id.text_input_song_title)
         sectionNameInput = findViewById(R.id.text_input_section_name)
         sectionLyricsInput = findViewById(R.id.text_input_section_lyrics)
         songSectionTabLayout = findViewById(R.id.tab_layout_song_section)
+        categorySpinner = findViewById(R.id.spinner_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
+
+        songTitles = SongsContext.getSongMap().keys
+
+        setupCategorySpinner()
 
         intentSongTitle = intent.getStringExtra("songTitle")
         if (intentSongTitle != null) {
             loadSongData(intentSongTitle!!)
             selectedTab = songSectionTabLayout.getTabAt(0)!!
+
+            val songMetadata = SongsContext.getSongMetadata(intentSongTitle!!)!!
+            categorySpinner.setSelection(SongsContext.categories.indexOf(songMetadata.category))
         } else {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
             sectionLyrics[selectedTab.text.toString()] = ""
             tabCountMap[selectedTab.text.toString()] = 1
         }
 
-        setupCategorySpinner()
         setupListeners()
     }
 
@@ -155,9 +163,7 @@ class SongEditorActivity : AppCompatActivity() {
             SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        with(findViewById<Spinner>(R.id.spinner_song_editor_category)) {
-            adapter = categorySpinnerAdapter
-        }
+        categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupListeners() {
@@ -244,9 +250,6 @@ class SongEditorActivity : AppCompatActivity() {
             return false
         }
 
-        val song = SongMetadataModel()
-        song.title = songTitleInput.text.toString()
-        val songNormalizedTitle = song.title.normalize()
 
         val addText = getString(R.string.add)
 
@@ -261,11 +264,14 @@ class SongEditorActivity : AppCompatActivity() {
             presentation.add(tab.text.toString())
         }
 
+        val songNormalizedTitle = songTitle.normalize()
+        val song = SongMetadataModel()
+        song.title = songTitle
+        song.category = categorySpinner.selectedItem.toString()
         song.lyricsFilename = "$songNormalizedTitle.json"
         song.presentation = presentation
 
         val songLyrics = SongLyricsModel()
-
         songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
 
         val songFilePath = "${SongsContext.songsDirectory}$songNormalizedTitle"
@@ -280,6 +286,9 @@ class SongEditorActivity : AppCompatActivity() {
         File("$songFilePath.json").create()
             .writeText(songLyrics.toJSON())
 
+        if (intentSongTitle != null) {
+            SongsContext.deleteSongs(listOf(intentSongTitle!!))
+        }
         SongsContext.addSong(song)
         return true
     }

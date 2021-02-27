@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 4:19 PM
+ * Last modified 2/27/21 8:36 PM
  */
 
 package pl.gunock.lyriccast
@@ -20,36 +20,34 @@ object SongsContext {
     private const val TAG = "SongsContext"
 
     var songsDirectory: String = ""
-    var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
+    private var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
 
-    val songItemList: MutableList<SongItemModel> = mutableListOf()
-
-    var categories: MutableSet<String> = mutableSetOf()
+    var categories: Set<String> = setOf()
 
     fun loadSongsMetadata() {
         val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
-        categories.clear()
-        categories.add("All")
-        val fileList = File(songsDirectory).listFiles(fileFilter)
 
-        if (fileList == null || fileList.isEmpty()) {
-            throw RuntimeException("Could not load songs metadata.")
-        }
+        val fileList = File(songsDirectory).listFiles(fileFilter) ?: return
 
+        val newCategories: SortedSet<String> = sortedSetOf()
         for (file in fileList) {
-            Log.d(TAG, "Reading file : ${file.name}")
+            Log.v(TAG, "Reading file : ${file.name}")
             val fileText = file.readText(Charsets.UTF_8)
-            Log.d(TAG, "File content : ${fileText.replace("\n", "")}")
+            Log.v(TAG, "File content : ${fileText.replace("\n", "")}")
             val json = JSONObject(fileText)
-            Log.d(TAG, "Parsed JSON : $json")
+            Log.v(TAG, "Parsed JSON : $json")
 
             val songMetadata = SongMetadataModel(json)
             loadedSongsMetadata.add(songMetadata)
-            categories.add(songMetadata.category)
-        }
-        Log.d(TAG, "Parsed metadata files: $loadedSongsMetadata")
 
+            if (!songMetadata.category.isNullOrBlank()) {
+                newCategories.add(songMetadata.category)
+            }
+        }
+        Log.v(TAG, "Parsed metadata files: $loadedSongsMetadata")
+
+        categories = setOf("All") + newCategories
         fillSongsList(loadedSongsMetadata)
     }
 
@@ -64,7 +62,6 @@ object SongsContext {
     }
 
     private fun fillSongsList(songs: List<SongMetadataModel>) {
-        songItemList.clear()
         for (song in songs) {
             addSong(song)
         }
@@ -72,6 +69,16 @@ object SongsContext {
 
     fun addSong(song: SongMetadataModel) {
         songMap[song.title] = song
+    }
+
+    fun getSongMap(): Map<String, SongMetadataModel> {
+        return songMap.toMap()
+    }
+
+    fun getSongItems(): Set<SongItemModel> {
+        return songMap.map { songMapEntry ->
+            SongItemModel(songMapEntry.value)
+        }.toSet()
     }
 
     fun getSongLyrics(title: String): SongLyricsModel? {
