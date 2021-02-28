@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:46 PM
+ * Last modified 3/1/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,33 +11,19 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.AllCaps
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.extensions.create
-import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.extensions.writeText
+import pl.gunock.lyriccast.enums.TitleValidationState
 import pl.gunock.lyriccast.listeners.InputTextChangeListener
 import pl.gunock.lyriccast.listeners.TabItemSelectedListener
 import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
-import java.io.File
 
 class SongEditorActivity : AppCompatActivity() {
-    private companion object {
-        const val TAG = "SongEditorActivity"
-    }
-
-    private enum class TitleValidationState {
-        VALID,
-        EMPTY,
-        ALREADY_IN_USE
-    }
-
     inner class SongTitleTextWatcher : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         }
@@ -276,32 +262,19 @@ class SongEditorActivity : AppCompatActivity() {
             presentation.add(tab.text.toString())
         }
 
-        val songNormalizedTitle = songTitle.normalize()
         val song = SongMetadataModel()
         song.title = songTitle
         song.category = categorySpinner.selectedItem?.toString()
-        song.lyricsFilename = "$songNormalizedTitle.json"
         song.presentation = presentation
 
         val songLyrics = SongLyricsModel()
         songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
 
-        val songFilePath = "${SongsContext.songsDirectory}$songNormalizedTitle"
-
-        Log.d(TAG, "Saving song")
-        Log.d(TAG, song.toJSON().toString())
-        File("$songFilePath.metadata.json").create()
-            .writeText(song.toJSON())
-
-        Log.d(TAG, "Saving lyrics")
-        Log.d(TAG, songLyrics.toJSON().toString())
-        File("$songFilePath.json").create()
-            .writeText(songLyrics.toJSON())
-
         if (intentSongTitle != null) {
-            SongsContext.deleteSongs(listOf(intentSongTitle!!))
+            SongsContext.replaceSong(intentSongTitle!!, song, songLyrics)
+        } else {
+            SongsContext.addSong(song, songLyrics)
         }
-        SongsContext.addSong(song)
         return true
     }
 

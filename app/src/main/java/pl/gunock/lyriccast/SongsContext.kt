@@ -1,14 +1,16 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:26 PM
+ * Last modified 3/1/21 12:09 AM
  */
 
 package pl.gunock.lyriccast
 
 import android.util.Log
 import org.json.JSONObject
+import pl.gunock.lyriccast.extensions.create
 import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.extensions.writeText
 import pl.gunock.lyriccast.models.SongItemModel
 import pl.gunock.lyriccast.models.SongLyricsModel
 import pl.gunock.lyriccast.models.SongMetadataModel
@@ -52,7 +54,18 @@ object SongsContext {
         fillSongsList(loadedSongsMetadata)
     }
 
-    fun deleteSongs(songTitles: List<String>) {
+    fun replaceSong(oldSongTitle: String, song: SongMetadataModel, songLyrics: SongLyricsModel) {
+        val songTitleNormalized = oldSongTitle.normalize()
+
+        File("$songsDirectory$songTitleNormalized.json").delete()
+        File("$songsDirectory$songTitleNormalized.metadata.json").delete()
+        songMap.remove(oldSongTitle)
+
+        addSong(song, songLyrics)
+        SetlistsContext.replaceSong(oldSongTitle, song.title)
+    }
+
+    fun deleteSongs(songTitles: Collection<String>) {
         for (songTitle in songTitles) {
             val songTitleNormalized = songTitle.normalize()
 
@@ -60,15 +73,23 @@ object SongsContext {
             File("$songsDirectory$songTitleNormalized.metadata.json").delete()
             songMap.remove(songTitle)
         }
+        SetlistsContext.removeSongs(songTitles)
     }
 
-    private fun fillSongsList(songs: List<SongMetadataModel>) {
-        for (song in songs) {
-            addSong(song)
-        }
-    }
+    fun addSong(song: SongMetadataModel, songLyrics: SongLyricsModel) {
+        val songNormalizedTitle = song.title.normalize()
+        val songFilePath = "$songsDirectory$songNormalizedTitle"
 
-    fun addSong(song: SongMetadataModel) {
+        Log.d(TAG, "Saving song")
+        Log.d(TAG, song.toJSON().toString())
+        File("$songFilePath.metadata.json").create()
+            .writeText(song.toJSON())
+
+        Log.d(TAG, "Saving lyrics")
+        Log.d(TAG, songLyrics.toJSON().toString())
+        File("$songFilePath.json").create()
+            .writeText(songLyrics.toJSON())
+
         songMap[song.title] = song
     }
 
@@ -88,5 +109,11 @@ object SongsContext {
 
     fun getSongMetadata(title: String): SongMetadataModel? {
         return songMap[title]
+    }
+
+    private fun fillSongsList(songs: List<SongMetadataModel>) {
+        for (song in songs) {
+            songMap[song.title] = song
+        }
     }
 }

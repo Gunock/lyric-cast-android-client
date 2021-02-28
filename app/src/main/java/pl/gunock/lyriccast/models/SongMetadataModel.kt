@@ -1,20 +1,29 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
+ * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 12:47 PM
+ * Last modified 2/28/21 11:40 PM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
+import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.utils.JsonHelper.arrayToStringList
 import java.io.File
 import java.util.*
 
 class SongMetadataModel() {
-    var lyricsFilename: String = ""
-    var title: String = ""
+    private var lyricsFilename: String = ""
+
+    private var _title: String = ""
+    var title: String
+        get() = _title
+        set(value) {
+            _title = value
+            lyricsFilename = "${title.normalize()}.json"
+        }
+
     var author: String = ""
     var copyright: String = ""
 
@@ -24,11 +33,12 @@ class SongMetadataModel() {
         set(value) {
             _category = if (value.isNullOrBlank() || value == null.toString()) null else value
         }
+
     var presentation: List<String> = listOf()
 
     constructor(json: JSONObject) : this() {
         lyricsFilename = json.getString("lyricsFilename")
-        title = json.getString("title")
+        _title = json.getString("title")
         author = json.getString("author")
         copyright = json.getString("copyright")
         category = json.getString("category")
@@ -46,7 +56,7 @@ class SongMetadataModel() {
     fun toJSON(): JSONObject {
         return JSONObject().apply {
             put("lyricsFilename", lyricsFilename)
-            put("title", title)
+            put("title", _title)
             put("author", author)
             put("copyright", copyright)
             put("category", _category ?: JSONObject.NULL)
@@ -56,7 +66,7 @@ class SongMetadataModel() {
 
     override fun toString(): String {
         return StringBuilder().apply {
-            append("(title: $title, ")
+            append("(title: $_title, ")
             append("author: $author)")
         }.toString()
     }
