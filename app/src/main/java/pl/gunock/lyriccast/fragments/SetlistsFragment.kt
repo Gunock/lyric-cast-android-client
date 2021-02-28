@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:15 PM
+ * Last modified 2/28/21 11:15 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -98,8 +98,18 @@ class SetlistsFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
+
+        setupSetlistList()
+        setupCategorySpinner()
+
+        searchViewEditText.setText("")
+        categorySpinner.setSelection(0)
+    }
+
+    private fun setupSetlistList() {
+        setlistItems = SetlistsContext.getSetlistItems()
 
         val onLongClickListener =
             LongClickAdapterListener { holder: SetlistListAdapter.SetlistViewHolder, position: Int, _ ->
@@ -118,9 +128,6 @@ class SetlistsFragment : Fragment() {
                 }
             }
 
-        SetlistsContext.loadSetlists()
-        setlistItems = SetlistsContext.getSetlistItems()
-
         setlistListAdapter = SetlistListAdapter(
             setlistItems = setlistItems.toMutableList(),
             onLongClickListener = onLongClickListener,
@@ -129,18 +136,13 @@ class SetlistsFragment : Fragment() {
 
         requireView()
             .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistListAdapter
-
-        setupCategorySpinner()
-
-        searchViewEditText.setText("")
-        categorySpinner.setSelection(0)
     }
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
+            listOf("All") + SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter

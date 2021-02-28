@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:00 PM
+ * Last modified 2/28/21 11:18 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -69,10 +69,6 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         CoroutineScope(Dispatchers.Main).launch {
             loadData()
@@ -206,18 +202,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
-        if (SongsContext.getSongMap().isNotEmpty()) {
+        if (SongsContext.getSongMap().isNotEmpty() && SetlistsContext.getSetlistItems()
+                .isNotEmpty()
+        ) {
             return
         }
 
         // TODO: Potential leak
         val alertDialog: AlertDialog = AlertDialog.Builder(this)
-            .setMessage("Loading songs ...")
+            .setMessage("Loading...")
             .create()
-
         alertDialog.show()
 
-        SongsContext.loadSongsMetadata()
+        if (SongsContext.getSongMap().isEmpty()) {
+            SongsContext.loadSongsMetadata()
+        }
+
+        if (SetlistsContext.getSetlistItems().isEmpty()) {
+            SetlistsContext.loadSetlists()
+        }
+
         alertDialog.hide()
     }
 

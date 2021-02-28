@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:03 PM
+ * Last modified 2/28/21 10:46 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -32,6 +32,12 @@ class SongEditorActivity : AppCompatActivity() {
         const val TAG = "SongEditorActivity"
     }
 
+    private enum class TitleValidationState {
+        VALID,
+        EMPTY,
+        ALREADY_IN_USE
+    }
+
     inner class SongTitleTextWatcher : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         }
@@ -42,19 +48,19 @@ class SongEditorActivity : AppCompatActivity() {
         override fun afterTextChanged(s: Editable?) {
             val newText = s.toString()
 
-            if (newText.isBlank()) {
-                songTitleInputLayout.error = " "
-                songTitleInput.error = "Please enter song title"
-                return
-            } else if (songTitles.contains(newText)
-                && (intentSongTitle.isNullOrBlank() || intentSongTitle != newText)
-            ) {
-                songTitleInputLayout.error = " "
-                songTitleInput.error = "Song title already in use"
-                return
-            } else {
-                songTitleInputLayout.error = null
-                songTitleInput.error = null
+            when (validateSongTitle(newText)) {
+                TitleValidationState.EMPTY -> {
+                    songTitleInputLayout.error = " "
+                    songTitleInput.error = "Please enter song title"
+                }
+                TitleValidationState.ALREADY_IN_USE -> {
+                    songTitleInputLayout.error = " "
+                    songTitleInput.error = "Song title already in use"
+                }
+                TitleValidationState.VALID -> {
+                    songTitleInputLayout.error = null
+                    songTitleInput.error = null
+                }
             }
         }
     }
@@ -238,18 +244,24 @@ class SongEditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun validateSongTitle(songTitle: String): TitleValidationState {
+        return if (songTitle.isBlank()) {
+            TitleValidationState.EMPTY
+        } else if (intentSongTitle != songTitle && songTitles.contains(songTitle)) {
+            TitleValidationState.ALREADY_IN_USE
+        } else {
+            TitleValidationState.VALID
+        }
+    }
+
     private fun saveSong(): Boolean {
         val songTitle = songTitleInput.text.toString()
 
-        if (songTitle.isEmpty()) {
-            songTitleInput.setText("")
-        }
-
-        if (!songTitleInput.error.isNullOrBlank()) {
+        if (validateSongTitle(songTitle) != TitleValidationState.VALID) {
+            songTitleInput.setText(songTitle)
             songTitleInput.requestFocus()
             return false
         }
-
 
         val addText = getString(R.string.add)
 

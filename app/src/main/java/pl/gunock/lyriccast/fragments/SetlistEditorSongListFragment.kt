@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:36 PM
+ * Last modified 2/28/21 11:15 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -71,24 +71,13 @@ class SetlistEditorSongListFragment : Fragment() {
         categorySpinner = view.findViewById(R.id.spinner_category)
         selectedSongsSwitch = view.findViewById(R.id.switch_selected_songs)
 
-        songItems = SongsContext.getSongItems()
-        songItems.forEach { songItem ->
-            songItem.isSelected = selectedSongTitles.contains(songItem.title)
-        }
-
-        songListAdapter = SongListAdapter(songItems.toMutableList(), showCheckBox = true)
-        with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = songListAdapter
-        }
-
+        setupSongList(view)
         setupListeners()
 
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
+            listOf("All") + SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
@@ -132,6 +121,20 @@ class SetlistEditorSongListFragment : Fragment() {
                 categorySpinner.selectedItem.toString(),
                 isSelected = if (isChecked) true else null
             )
+        }
+    }
+
+    private fun setupSongList(view: View) {
+        songItems = SongsContext.getSongItems()
+        songItems.forEach { songItem ->
+            songItem.isSelected = selectedSongTitles.contains(songItem.title)
+        }
+
+        songListAdapter = SongListAdapter(songItems.toMutableList(), showCheckBox = true)
+        with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = songListAdapter
         }
     }
 

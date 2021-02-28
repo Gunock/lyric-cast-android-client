@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:03 PM
+ * Last modified 2/28/21 10:55 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -94,8 +94,6 @@ class SongListFragment : Fragment() {
 
         view.findViewById<SwitchCompat>(R.id.switch_selected_songs).visibility = View.GONE
 
-        songItems = SongsContext.getSongItems()
-
         with(songListRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
@@ -105,20 +103,15 @@ class SongListFragment : Fragment() {
         setupListeners()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        setupCategorySpinner()
-        setupSongList()
-
-        searchViewEditText.setText("")
-        categorySpinner.setSelection(0)
-    }
-
     override fun onResume() {
         super.onResume()
 
+        setupCategorySpinner()
+        setupSongList()
         resetSelection()
+
+        searchViewEditText.setText("")
+        categorySpinner.setSelection(0)
     }
 
     private fun setupListeners() {
@@ -141,13 +134,15 @@ class SongListFragment : Fragment() {
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
+            listOf("All") + SongsContext.categories.toList()
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupSongList() {
+        songItems = SongsContext.getSongItems()
+
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val showAuthor = prefs.getBoolean("showAuthor", true)
 

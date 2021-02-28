@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:36 PM
+ * Last modified 2/28/21 10:26 PM
  */
 
 package pl.gunock.lyriccast
@@ -23,6 +23,7 @@ object SongsContext {
     private var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
 
     var categories: Set<String> = setOf()
+        private set
 
     fun loadSongsMetadata() {
         val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
@@ -47,7 +48,7 @@ object SongsContext {
         }
         Log.v(TAG, "Parsed metadata files: $loadedSongsMetadata")
 
-        categories = setOf("All") + newCategories
+        categories = newCategories
         fillSongsList(loadedSongsMetadata)
     }
 
