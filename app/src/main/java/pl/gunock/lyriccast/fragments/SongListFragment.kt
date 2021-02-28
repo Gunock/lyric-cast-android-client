@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:44 PM
+ * Last modified 2/28/21 10:03 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -20,9 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
@@ -105,20 +102,17 @@ class SongListFragment : Fragment() {
             adapter = null
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            setupCategorySpinner()
-            setupSongList()
-            setupListeners()
-        }
+        setupListeners()
     }
 
     override fun onStart() {
         super.onStart()
 
+        setupCategorySpinner()
+        setupSongList()
+
         searchViewEditText.setText("")
         categorySpinner.setSelection(0)
-
-        setupSongList()
     }
 
     override fun onResume() {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 1:04 PM
+ * Last modified 2/28/21 6:05 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -21,7 +21,7 @@ object FileHelper {
 
     fun unzip(resolver: ContentResolver, inputStream: InputStream, targetLocation: String) {
         Log.d(TAG, "Unzipping stream to '$targetLocation'")
-        createDirIfNotExists(targetLocation)
+        createDirectory(targetLocation)
 
         val zipIn = ZipInputStream(inputStream)
 
@@ -35,15 +35,16 @@ object FileHelper {
 
             Log.d(TAG, "Extracting file: ${zipEntry.name}")
 
-            val filename: String = zipEntry.name.split("/").last()
-            Log.d(TAG, "Extracting file to: ${targetLocation + filename}")
+            val file = File("$targetLocation/${zipEntry.name}")
+            val fileUri = file.toUri()
+            Log.d(TAG, "Extracting file to: $fileUri")
 
-            val fileUri = File(targetLocation + filename).toUri()
+            createDirectory(file.parent?.toUri().toString())
             with(resolver.openOutputStream(fileUri)) {
                 this!!.write(zipIn.readBytes())
                 zipIn.closeEntry()
             }
-            Log.d(TAG, "File extracted to: ${targetLocation + filename}")
+            Log.d(TAG, "File extracted to: $fileUri")
         }
         zipIn.close()
     }
@@ -51,11 +52,12 @@ object FileHelper {
     @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun zip(outputStream: OutputStream, sourceLocation: String) {
         Log.d(TAG, "Zipping files from '$sourceLocation'")
-        createDirIfNotExists(sourceLocation)
+        createDirectory(sourceLocation)
 
         with(ZipOutputStream(outputStream)) {
             for (file in File(sourceLocation).listFiles()) {
                 if (file.isDirectory) {
+                    zipDirectory(this, file, file.name)
                     continue
                 }
 
@@ -66,7 +68,26 @@ object FileHelper {
         }
     }
 
-    private fun createDirIfNotExists(path: String) {
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    private fun zipDirectory(
+        outputStream: ZipOutputStream,
+        directory: File,
+        directoryPath: String
+    ) {
+        for (file in directory.listFiles()) {
+            val outputFilePath = "$directoryPath/${file.name}"
+            if (file.isDirectory) {
+                zipDirectory(outputStream, file, outputFilePath)
+                continue
+            }
+
+            outputStream.putNextEntry(ZipEntry(outputFilePath))
+            outputStream.write(file.readBytes())
+            outputStream.closeEntry()
+        }
+    }
+
+    private fun createDirectory(path: String) {
         val file = File(path)
         if (!file.exists()) {
             Log.d(TAG, "'$path' does not exists")

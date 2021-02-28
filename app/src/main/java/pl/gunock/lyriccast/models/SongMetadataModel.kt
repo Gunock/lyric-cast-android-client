@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 6:15 PM
+ * Last modified 2/28/21 12:47 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -17,7 +17,13 @@ class SongMetadataModel() {
     var title: String = ""
     var author: String = ""
     var copyright: String = ""
-    var category: String? = null
+
+    private var _category: String? = null
+    var category: String?
+        get() = _category
+        set(value) {
+            _category = if (value.isNullOrBlank() || value == null.toString()) null else value
+        }
     var presentation: List<String> = listOf()
 
     constructor(json: JSONObject) : this() {
@@ -43,7 +49,7 @@ class SongMetadataModel() {
             put("title", title)
             put("author", author)
             put("copyright", copyright)
-            put("category", category ?: JSONObject.NULL)
+            put("category", _category ?: JSONObject.NULL)
             put("presentation", JSONArray(presentation))
         }
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
+  ~ Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 4:36 PM
+  ~ Last modified 2/28/21 6:14 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/section_name"
             android:singleLine="true"
-            android:text="@string/chorus" />
+            android:text="@string/new_section" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -162,7 +162,7 @@
             android:id="@+id/tab_chorus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/chorus" />
+            android:text="@string/new_section" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_add"

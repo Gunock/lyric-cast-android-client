@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:42 PM
+  ~ Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 4:33 PM
+  ~ Last modified 2/28/21 6:14 PM
   -->
 
 <resources>
@@ -13,9 +13,8 @@
     <string name="setlist_editor">Setlist editor</string>
 
     <!-- Strings used for fragments for navigation -->
-    <string name="import_songs">Import songs</string>
-    <string name="export_songs">Export songs</string>
-    <string name="export_setlists">Export setlists</string>
+    <string name="menu_import">Import</string>
+    <string name="export">Export</string>
     <string name="songs">Songs</string>
     <string name="setlists">Setlists</string>
     <string name="controls">Controls</string>
@@ -28,7 +27,6 @@
     <string name="delete">Delete</string>
     <string name="add_song">Add song</string>
     <string name="add_setlist">Add setlist</string>
-    <string name="chorus">CHORUS</string>
     <string name="song_item_title_template">%d. %s</string>
 
     <!--  Strings used for inputs  -->

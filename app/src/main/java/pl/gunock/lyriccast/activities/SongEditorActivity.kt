@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:44 PM
+ * Last modified 2/28/21 10:03 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -267,7 +267,7 @@ class SongEditorActivity : AppCompatActivity() {
         val songNormalizedTitle = songTitle.normalize()
         val song = SongMetadataModel()
         song.title = songTitle
-        song.category = categorySpinner.selectedItem.toString()
+        song.category = categorySpinner.selectedItem?.toString()
         song.lyricsFilename = "$songNormalizedTitle.json"
         song.presentation = presentation
 

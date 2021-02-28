@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 2/28/21 10:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:21 PM
+ * Last modified 2/28/21 10:00 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
@@ -27,6 +28,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
@@ -39,17 +41,16 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "MainActivity"
-        const val EXPORT_SONGS_RESULT_CODE = 1
-        const val EXPORT_SETLISTS_RESULT_CODE = 2
-        const val SELECT_FILE_RESULT_CODE = 3
+        const val EXPORT_RESULT_CODE = 1
+        const val IMPORT_RESULT_CODE = 2
     }
 
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         MessageHelper.initialize(applicationContext)
 
-        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
@@ -68,10 +69,13 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
+    }
 
-        if (SongsContext.getSongMap().isEmpty()) {
+    override fun onStart() {
+        super.onStart()
+
+        CoroutineScope(Dispatchers.Main).launch {
             loadData()
-        } else {
             goToSongListFragment()
         }
     }
@@ -91,9 +95,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_settings -> goToSettings()
-            R.id.menu_import_songs -> importSongs()
-            R.id.menu_export_songs -> exportFiles(EXPORT_SONGS_RESULT_CODE)
-            R.id.menu_export_setlists -> exportFiles(EXPORT_SETLISTS_RESULT_CODE)
+            R.id.menu_import_songs -> import()
+            R.id.menu_export_all -> exportFiles()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -106,9 +109,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         val uri = data?.data!!
-
         when (requestCode) {
-            SELECT_FILE_RESULT_CODE -> {
+            IMPORT_RESULT_CODE -> {
                 Log.d(TAG, "Selected file URI: $uri")
                 Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
 
@@ -117,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                 FileHelper.unzip(
                     contentResolver,
                     contentResolver.openInputStream(uri)!!,
-                    SongsContext.songsDirectory
+                    filesDir.path
                 )
 
                 SongsContext.loadSongsMetadata()
@@ -125,17 +127,11 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(baseContext, this.javaClass)
                 startActivity(intent)
             }
-            EXPORT_SONGS_RESULT_CODE -> {
-                FileHelper.zip(
-                    contentResolver.openOutputStream(uri)!!,
-                    SongsContext.songsDirectory
-                )
-            }
-            EXPORT_SETLISTS_RESULT_CODE -> {
-                FileHelper.zip(
-                    contentResolver.openOutputStream(uri)!!,
-                    SetlistsContext.setlistsDirectory
-                )
+            EXPORT_RESULT_CODE -> {
+                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
+                finish()
+                val intent = Intent(baseContext, this.javaClass)
+                startActivity(intent)
             }
         }
     }
@@ -183,22 +179,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun exportFiles(resultCode: Int): Boolean {
+    private fun exportFiles(): Boolean {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
-        startActivityForResult(chooserIntent, resultCode)
+        startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
         return true
     }
 
-    private fun importSongs(): Boolean {
+    private fun import(): Boolean {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, SELECT_FILE_RESULT_CODE)
+        startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
         return true
     }
 
@@ -210,24 +206,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        if (SongsContext.getSongMap().isNotEmpty()) {
+            return
+        }
+
+        // TODO: Potential leak
         val alertDialog: AlertDialog = AlertDialog.Builder(this)
             .setMessage("Loading songs ...")
             .create()
 
         alertDialog.show()
-        CoroutineScope(Dispatchers.IO).launch {
 
-            SongsContext.loadSongsMetadata()
-
-            CoroutineScope(Dispatchers.Main).launch {
-                alertDialog.hide()
-            }
-
-            goToSongListFragment()
-        }
+        SongsContext.loadSongsMetadata()
+        alertDialog.hide()
     }
 
-    private fun goToSongListFragment() {
+    private suspend fun goToSongListFragment() {
+        while (findViewById<FragmentContainerView>(R.id.main_nav_host) == null) {
+            delay(100)
+        }
+
         val navController = findNavController(R.id.main_nav_host)
         navController.navigate(R.id.action_EmptyFragment_to_SongListFragment)
     }
