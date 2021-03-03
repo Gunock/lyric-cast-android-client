@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:51 PM
+ * Last modified 3/3/21 10:48 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -21,10 +21,10 @@ object MessageHelper {
     private var CONTROL_MESSAGE_TEMPLATE: String = ""
 
     fun initialize(context: Context) {
-        CONTENT_NAMESPACE = context.getString(R.string.content_namespace)
-        CONTROL_NAMESPACE = context.getString(R.string.control_namespace)
-        CONTENT_MESSAGE_TEMPLATE = context.getString(R.string.content_message_template)
-        CONTROL_MESSAGE_TEMPLATE = context.getString(R.string.control_message_template)
+        CONTENT_NAMESPACE = context.getString(R.string.chromecast_content_namespace)
+        CONTROL_NAMESPACE = context.getString(R.string.chromecast_control_namespace)
+        CONTENT_MESSAGE_TEMPLATE = context.getString(R.string.chromecast_content_message_template)
+        CONTROL_MESSAGE_TEMPLATE = context.getString(R.string.chromecast_control_message_template)
     }
 
     fun sendContentMessage(context: CastContext, message: String) {

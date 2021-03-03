@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 12:09 PM
+  ~ Last modified 3/3/21 10:48 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,7 +38,7 @@
                 android:layout_height="0dp"
                 android:background="@color/colorPrimary"
                 android:backgroundTintMode="src_in"
-                android:text="@string/save"
+                android:text="@string/button_save"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

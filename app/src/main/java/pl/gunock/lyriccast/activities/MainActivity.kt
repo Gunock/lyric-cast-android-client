@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 11:18 PM
+ * Last modified 3/3/21 10:48 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -139,10 +139,10 @@ class MainActivity : AppCompatActivity() {
 
                 val navController = findNavController(R.id.main_nav_host)
 
-                if (tab.text == getString(R.string.songs)) {
+                if (tab.text == getString(R.string.label_songs)) {
                     Log.d(TAG, "Switching to song list")
                     navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
-                } else if (tab.text == getString(R.string.setlists)) {
+                } else if (tab.text == getString(R.string.label_setlists)) {
                     Log.d(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
                 }

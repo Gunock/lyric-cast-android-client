@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/1/21 12:07 AM
+ * Last modified 3/3/21 10:48 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -175,14 +175,14 @@ class SongEditorActivity : AppCompatActivity() {
                 sectionNameTextWatcher.ignoreBeforeTextChanged = true
 
                 when (val tabText = tab.text.toString()) {
-                    getString(R.string.add) -> {
+                    getString(R.string.button_add) -> {
                         if (songSectionTabLayout.tabCount <= 1) {
                             return@TabItemSelectedListener
                         }
 
                         sectionLyricsInput.setText("")
 
-                        val newSectionText = getString(R.string.new_section)
+                        val newSectionText = getString(R.string.input_new_section)
                         while (
                             tabCountMap.keys.any { sectionName ->
                                 sectionName.contains(newSectionText)
@@ -194,12 +194,12 @@ class SongEditorActivity : AppCompatActivity() {
                         }
 
                         val newTabText =
-                            getString(R.string.new_section_template).format(newSectionCount)
+                            getString(R.string.input_new_section_template).format(newSectionCount)
                         sectionNameInput.setText(newTabText)
                         newSectionCount++
 
                         val newAddTab = songSectionTabLayout.newTab()
-                        newAddTab.text = getString(R.string.add)
+                        newAddTab.text = getString(R.string.button_add)
                         addTab(newAddTab)
                     }
                     else -> {
@@ -249,7 +249,7 @@ class SongEditorActivity : AppCompatActivity() {
             return false
         }
 
-        val addText = getString(R.string.add)
+        val addText = getString(R.string.button_add)
 
         val presentation: MutableList<String> = mutableListOf()
         for (position in 0 until songSectionTabLayout.tabCount) {
@@ -300,7 +300,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         val newAddTab = songSectionTabLayout.newTab()
         addTab(newAddTab)
-        newAddTab.text = getString(R.string.add)
+        newAddTab.text = getString(R.string.button_add)
 
         val sectionLyricsInput = findViewById<EditText>(R.id.text_input_section_lyrics)
         sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
@@ -371,7 +371,7 @@ class SongEditorActivity : AppCompatActivity() {
     private fun removeTab(tab: TabLayout.Tab) {
         val tabText = tab.text.toString()
 
-        if (tabText == getString(R.string.add)) {
+        if (tabText == getString(R.string.button_add)) {
             return
         }
 
@@ -388,7 +388,7 @@ class SongEditorActivity : AppCompatActivity() {
             songSectionTabLayout.removeTab(tab)
         } else {
             newSectionCount = 1
-            val newTabText = getString(R.string.new_section_template).format(newSectionCount)
+            val newTabText = getString(R.string.input_new_section_template).format(newSectionCount)
 
             tabCountMap[tabText] = 1
             tab.text = newTabText

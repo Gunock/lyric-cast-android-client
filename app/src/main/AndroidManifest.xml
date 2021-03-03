@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/27/21 12:09 PM
+  ~ Last modified 3/3/21 10:48 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -39,14 +39,14 @@
 
         <activity
             android:name=".activities.SetlistEditorActivity"
-            android:label="@string/setlist_editor"
+            android:label="@string/label_setlist_editor"
             android:parentActivityName="pl.gunock.lyriccast.activities.SetlistEditorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.SongEditorActivity"
-            android:label="@string/song_editor"
+            android:label="@string/label_song_editor"
             android:parentActivityName="pl.gunock.lyriccast.activities.SongEditorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -54,21 +54,21 @@
 
         <activity
             android:name=".activities.SongControlsActivity"
-            android:label="@string/controls"
+            android:label="@string/label_controls"
             android:parentActivityName="pl.gunock.lyriccast.activities.SongControlsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.SetlistControlsActivity"
-            android:label="@string/controls"
+            android:label="@string/label_controls"
             android:parentActivityName="pl.gunock.lyriccast.activities.SetlistControlsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/settings"
+            android:label="@string/label_settings"
             android:parentActivityName="pl.gunock.lyriccast.activities.SettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />

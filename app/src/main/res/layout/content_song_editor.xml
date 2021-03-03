@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/28/21 10:36 PM
+  ~ Last modified 3/3/21 10:48 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,9 +26,9 @@
             android:id="@+id/text_input_song_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/song_title"
+            android:hint="@string/hint_song_title"
             android:singleLine="true"
-            android:text="@string/new_song" />
+            android:text="@string/input_new_song" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,9 +69,9 @@
             android:id="@+id/text_input_section_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/section_name"
+            android:hint="@string/input_section_name"
             android:singleLine="true"
-            android:text="@string/new_section" />
+            android:text="@string/input_new_section" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,7 +118,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="@string/delete_section"
+        android:text="@string/button_delete_section"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -128,7 +128,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:contentDescription="@string/move_left"
+        android:contentDescription="@string/button_move_left"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintEnd_toStartOf="@+id/button_delete_section"
         app:layout_constraintTop_toBottomOf="@+id/text_input_section_lyrics"
@@ -139,7 +139,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:contentDescription="@string/move_right"
+        android:contentDescription="@string/button_move_right"
         app:layout_constraintBottom_toTopOf="@+id/tab_layout_song_section"
         app:layout_constraintStart_toEndOf="@+id/button_delete_section"
         app:layout_constraintTop_toBottomOf="@+id/text_input_section_lyrics"
@@ -169,13 +169,13 @@
             android:id="@+id/tab_chorus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_section" />
+            android:text="@string/input_new_section" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add" />
+            android:text="@string/button_add" />
 
     </com.google.android.material.tabs.TabLayout>
 

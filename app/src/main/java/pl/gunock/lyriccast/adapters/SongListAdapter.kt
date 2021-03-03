@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 6:01 PM
+ * Last modified 3/3/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -41,7 +41,11 @@ class SongListAdapter(
                 titleTextView.text = item.title
             } else {
                 titleTextView.text = itemView.resources
-                    .getString(R.string.song_item_title_template, layoutPosition + 1, item.title)
+                    .getString(
+                        R.string.item_song_item_title_template,
+                        layoutPosition + 1,
+                        item.title
+                    )
             }
             authorTextView.text = item.author
 
