@@ -1,25 +1,26 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/11/20 11:21 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~  Last modified 10/10/20 4:13 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:31 PM
   -->
 
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.LyricCast.Light.DarkActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="Theme.LyricCast.Light.NoActionBar" parent="Theme.LyricCast.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="ThemeOverlay.LyricCast.Dark.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="ThemeOverlay.LyricCast.Light" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Widget.LyricCast.Spinner.Underlined" parent="Widget.AppCompat.Spinner.Underlined" />
 </resources>

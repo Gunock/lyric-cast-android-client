@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/31/20 9:05 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/27/21 12:09 PM
  */
 
 package pl.gunock.lyriccast.extensions
@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.CsvSource
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@Suppress("SpellCheckingInspection")
 class StringExtensionTest {
     @ParameterizedTest
     @CsvSource(

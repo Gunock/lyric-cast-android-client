@@ -1,29 +1,44 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/22/20 9:49 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:23 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pl.gunock.lyriccast.activities.MainActivity">
+    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/menu_edit"
+        android:icon="@drawable/baseline_mode_edit_white_24dp"
+        android:title="@string/button_edit"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_delete"
+        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:title="@string/button_delete"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/menu_cast"
-        android:title="@string/cast"
+        android:title="@string/option_cast"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
         app:showAsAction="always"
-        tools:icon="@drawable/mr_button_light" />
+        tools:icon="@drawable/mr_button_dark" />
+
     <item
         android:id="@+id/menu_settings"
-        android:title="@string/settings" />
+        android:title="@string/label_settings" />
+
     <item
         android:id="@+id/menu_import_songs"
-        android:title="@string/import_songs" />
+        android:title="@string/option_menu_import" />
+
     <item
-        android:id="@+id/menu_export_songs"
-        android:title="@string/export_songs" />
-    <item
-        android:id="@+id/menu_export_setlists"
-        android:title="@string/export_setlists" />
+        android:id="@+id/menu_export_all"
+        android:title="@string/option_export" />
+
 </menu>

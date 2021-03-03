@@ -1,46 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:24 AM
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:41 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/SongListFragment">
+    app:startDestination="@id/Start">
 
     <fragment
-        android:id="@+id/SongListFragment"
+        android:id="@+id/Start"
+        android:name="androidx.fragment.app.Fragment"
+        android:label="@string/label_songs"
+        tools:layout="@layout/fragment_empty">
+
+        <action
+            android:id="@+id/action_Start_to_Songs"
+            app:destination="@id/Songs" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/Songs"
         android:name="pl.gunock.lyriccast.fragments.SongListFragment"
-        android:label="@string/songs"
+        android:label="@string/label_songs"
         tools:layout="@layout/fragment_song_list">
 
         <action
-            android:id="@+id/action_SongListFragment_to_ControlsFragment"
-            app:destination="@id/ControlsFragment" />
-        <action
-            android:id="@+id/action_SongListFragment_to_SetlistsFragment"
-            app:destination="@id/SetlistsFragment" />
+            android:id="@+id/action_Songs_to_Setlists"
+            app:destination="@id/Setlists" />
     </fragment>
+
     <fragment
-        android:id="@+id/SetlistsFragment"
+        android:id="@+id/Setlists"
         android:name="pl.gunock.lyriccast.fragments.SetlistsFragment"
-        android:label="@string/setlists"
+        android:label="@string/label_setlists"
         tools:layout="@layout/fragment_setlists">
         <action
-            android:id="@+id/action_SetlistsFragment_to_SongListFragment"
-            app:destination="@id/SongListFragment" />
+            android:id="@+id/action_Setlists_to_Songs"
+            app:destination="@id/Songs" />
     </fragment>
-    <fragment
-        android:id="@+id/ControlsFragment"
-        android:name="pl.gunock.lyriccast.fragments.ControlsFragment"
-        android:label="@string/controls"
-        tools:layout="@layout/fragment_controls">
 
-        <action
-            android:id="@+id/action_ControlsFragment_to_SongListFragment"
-            app:destination="@id/SongListFragment" />
-    </fragment>
 </navigation>

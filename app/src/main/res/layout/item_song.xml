@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/23/20 8:01 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:26 PM
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,7 +23,7 @@
         android:layout_height="match_parent">
 
         <CheckBox
-            android:id="@+id/song_checkbox"
+            android:id="@+id/chk_item_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/song_title"
+            android:id="@+id/tv_item_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -46,7 +46,7 @@
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/song_checkbox"
+            app:layout_constraintStart_toEndOf="@+id/chk_item_song"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -56,7 +56,7 @@
         android:layout_weight="1">
 
         <TextView
-            android:id="@+id/song_author"
+            android:id="@+id/tv_item_song_author"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -67,14 +67,15 @@
             android:textAlignment="textStart"
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/card_song_category"
+            app:layout_constraintEnd_toStartOf="@+id/cdv_song_category"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/card_song_category"
+            android:id="@+id/cdv_song_category"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="@color/colorPrimaryDark"
             app:cardBackgroundColor="@color/colorPrimaryDark"
@@ -84,7 +85,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/song_category"
+                android:id="@+id/tv_song_category"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -99,7 +100,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/HorizontalDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="0dp"

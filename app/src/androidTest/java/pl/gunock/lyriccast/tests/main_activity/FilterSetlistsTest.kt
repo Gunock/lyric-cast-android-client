@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:43 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.tests.main_activity
@@ -40,18 +40,18 @@ class FilterSetlistsTest {
         addSetlist(setlistName3)
 
         // TODO: Improve to be text independent
-        onView(allOf(isDescendantOfA(withId(R.id.tab_layout_song_section)), withText("Setlists")))
+        onView(allOf(isDescendantOfA(withId(R.id.tbl_song_section)), withText("Setlists")))
             .perform(click())
 
-        onView(withId(R.id.recycler_view_setlists))
+        onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlistName1))))
             .check(matches(hasDescendant(withText(setlistName2))))
             .check(matches(hasDescendant(withText(setlistName3))))
 
-        onView(withId(R.id.text_input_setlist_filter))
+        onView(withId(R.id.tin_setlist_filter))
             .perform(replaceText(setlistName2.last().toString()))
 
-        onView(withId(R.id.recycler_view_setlists))
+        onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlistName2))))
             .check(matches(not(hasDescendant(withText(setlistName1)))))
             .check(matches(not(hasDescendant(withText(setlistName3)))))
@@ -67,15 +67,15 @@ class FilterSetlistsTest {
         // TODO: Add category when song categories improved
 
         // TODO: Improve to be text independent
-        onView(allOf(isDescendantOfA(withId(R.id.tab_layout_song_section)), withText("Setlists")))
+        onView(allOf(isDescendantOfA(withId(R.id.tbl_song_section)), withText("Setlists")))
             .perform(click())
 
-        onView(withId(R.id.text_input_setlist_filter))
+        onView(withId(R.id.tin_setlist_filter))
             .perform(replaceText("Test"))
 
         addSetlist("filterResetsAfterSetlistAdd 1")
 
-        onView(withId(R.id.text_input_setlist_filter))
+        onView(withId(R.id.tin_setlist_filter))
             .check(matches(withText("")))
     }
 

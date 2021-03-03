@@ -1,33 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:24 AM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:41 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_setlist_editor"
-    app:startDestination="@id/SetlistEditorFragment">
+    app:startDestination="@id/SetlistEditor">
 
     <fragment
-        android:id="@+id/SetlistEditorSongListFragment"
+        android:id="@+id/SetlistEditorSongs"
         android:name="pl.gunock.lyriccast.fragments.SetlistEditorSongListFragment"
-        android:label="@string/songs"
+        android:label="@string/label_songs"
         tools:layout="@layout/fragment_song_list">
 
         <action
-            android:id="@+id/action_SetlistEditorSongListFragment_to_SetlistEditorFragment"
-            app:destination="@id/SetlistEditorFragment" />
+            android:id="@+id/action_SetlistEditorSongs_to_SetlistEditor"
+            app:destination="@id/SetlistEditor" />
+        <argument
+            android:name="selectedSongs"
+            app:argType="string[]" />
+        <argument
+            android:name="setlistName"
+            app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/SetlistEditorFragment"
+        android:id="@+id/SetlistEditor"
         android:name="pl.gunock.lyriccast.fragments.SetlistEditorFragment"
-        android:label="@string/songs"
+        android:label="@string/label_songs"
         tools:layout="@layout/fragment_setlist_editor">
 
         <action
-            android:id="@+id/action_SetlistEditorFragment_to_SetlistEditorSongListFragment"
-            app:destination="@id/SetlistEditorSongListFragment" />
+            android:id="@+id/action_SetlistEditor_to_SetlistEditorSongs"
+            app:destination="@id/SetlistEditorSongs" />
+        <argument
+            android:name="selectedSongs"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="setlistName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

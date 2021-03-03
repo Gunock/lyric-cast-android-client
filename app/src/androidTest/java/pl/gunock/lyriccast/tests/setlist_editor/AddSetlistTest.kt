@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 3:43 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.tests.setlist_editor
@@ -21,7 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.MainActivity
-import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.utils.addSong
 
 
@@ -45,51 +45,51 @@ class AddSetlistTest {
 
         onView(withId(R.id.fab_add))
             .perform(click())
-        onView(withId(R.id.fab_view_add_song))
+        onView(withId(R.id.lns_fab_add_song))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.fab_view_add_setlist))
+        onView(withId(R.id.lns_fab_add_setlist))
             .check(matches(isDisplayed()))
 
         onView(withId(R.id.fab_add_setlist))
             .perform(click())
 
-        onView(withId(R.id.text_input_setlist_name))
+        onView(withId(R.id.tin_setlist_name))
             .perform(typeText(setlistName))
         Espresso.closeSoftKeyboard()
 
-        onView(withId(R.id.button_pick_setlist_songs))
+        onView(withId(R.id.btn_pick_setlist_songs))
             .perform(click())
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .perform(
-                RecyclerViewActions.scrollTo<SongListAdapter.SongViewHolder>(
+                RecyclerViewActions.scrollTo<SongItemsAdapter.SongViewHolder>(
                     hasDescendant(withText(songTitle3))
                 )
             )
 
-        onView(allOf(withId(R.id.song_checkbox), hasSibling(withText(songTitle1))))
+        onView(allOf(withId(R.id.chk_item_song), hasSibling(withText(songTitle1))))
             .perform(click())
-        onView(allOf(withId(R.id.song_checkbox), hasSibling(withText(songTitle2))))
+        onView(allOf(withId(R.id.chk_item_song), hasSibling(withText(songTitle2))))
             .perform(click())
-        onView(allOf(withId(R.id.song_checkbox), hasSibling(withText(songTitle3))))
+        onView(allOf(withId(R.id.chk_item_song), hasSibling(withText(songTitle3))))
             .perform(click())
 
         // TODO: Move song picking to separate activity
         Espresso.pressBack()
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(songTitle1))))
             .check(matches(hasDescendant(withText(songTitle2))))
             .check(matches(hasDescendant(withText(songTitle3))))
 
-        onView(withId(R.id.button_save_setlist))
+        onView(withId(R.id.btn_save_setlist))
             .perform(click())
 
         // TODO: Improve to be text independent
-        onView(allOf(isDescendantOfA(withId(R.id.tab_layout_song_section)), withText("Setlists")))
+        onView(allOf(isDescendantOfA(withId(R.id.tbl_song_section)), withText("Setlists")))
             .perform(click())
 
-        onView(withId(R.id.recycler_view_setlists))
+        onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlistName))))
     }
 }

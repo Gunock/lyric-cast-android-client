@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/25/20 10:05 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/23/20 10:04 PM
+ * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 2/27/21 11:59 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
 
 class SetlistEditorActivity : AppCompatActivity() {
-    private val tag = "SetlistEditorActivity"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -22,7 +20,6 @@ class SetlistEditorActivity : AppCompatActivity() {
 
         setupListeners()
     }
-
 
     private fun setupListeners() {
         // TODO: Add necessary listeners

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:43 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.tests.main_activity
@@ -37,15 +37,15 @@ class FilterSongsTest {
         addSong(songTitle2)
         addSong(songTitle3)
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(songTitle1))))
             .check(matches(hasDescendant(withText(songTitle2))))
             .check(matches(hasDescendant(withText(songTitle3))))
 
-        onView(withId(R.id.text_input_song_filter))
+        onView(withId(R.id.tin_song_filter))
             .perform(replaceText(songTitle2.last().toString()))
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(songTitle2))))
             .check(matches(not(hasDescendant(withText(songTitle1)))))
             .check(matches(not(hasDescendant(withText(songTitle3)))))
@@ -60,12 +60,12 @@ class FilterSongsTest {
     fun filterResetsAfterSongAdd() {
         // TODO: Add category when song categories improved
 
-        onView(withId(R.id.text_input_song_filter))
+        onView(withId(R.id.tin_song_filter))
             .perform(replaceText("Test"))
 
         addSong("filterResetsAfterSongAdd 1")
 
-        onView(withId(R.id.text_input_song_filter))
+        onView(withId(R.id.tin_song_filter))
             .check(matches(withText("")))
     }
 

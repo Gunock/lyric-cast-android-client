@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/31/20 11:08 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:41 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,37 +17,47 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.navigation.fragment.NavHostFragment
+import androidx.fragment.app.FragmentContainerView
+import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.listeners.TabItemSelectedListener
-import pl.gunock.lyriccast.utils.FileHelper
-import pl.gunock.lyriccast.utils.MessageHelper
+import pl.gunock.lyriccast.helpers.FileHelper
+import pl.gunock.lyriccast.helpers.MessageHelper
+import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    private val tag = "MainActivity"
+    private companion object {
+        const val TAG = "MainActivity"
+        const val EXPORT_RESULT_CODE = 1
+        const val IMPORT_RESULT_CODE = 2
+    }
 
-    private val exportSongsResultCode = 1
-    private val exportSetlistsResultCode = 2
-    private val selectFileResultCode = 3
     private var castContext: CastContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         MessageHelper.initialize(applicationContext)
 
-        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
-        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        findViewById<LinearLayout>(R.id.lns_fab_add_song).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.lns_fab_add_setlist).visibility = View.GONE
+
+        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
             val turnWifiOn = Intent(Settings.ACTION_WIFI_SETTINGS)
             startActivity(turnWifiOn)
@@ -59,31 +69,30 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
-    }
 
-    override fun onStart() {
-        super.onStart()
-
-        findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+        CoroutineScope(Dispatchers.Main).launch {
+            loadData()
+            goToSongListFragment()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+
         CastButtonFactory.setUpMediaRouteButton(
-            applicationContext,
+            baseContext,
             menu,
             R.id.menu_cast
         )
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_settings -> goToSettings()
-            R.id.menu_import_songs -> importSongs()
-            R.id.menu_export_songs -> exportFiles(exportSongsResultCode)
-            R.id.menu_export_setlists -> exportFiles(exportSetlistsResultCode)
+            R.id.menu_import_songs -> import()
+            R.id.menu_export_all -> exportFiles()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -95,95 +104,93 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val uri = data?.data!!
         when (requestCode) {
-            selectFileResultCode -> {
-                val uri = data?.data!!
-
-                Log.d(tag, "Selected file URI: $uri")
-                Log.d(tag, "Target path: ${SongsContext.songsDirectory}")
+            IMPORT_RESULT_CODE -> {
+                Log.d(TAG, "Selected file URI: $uri")
+                Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
 
                 File(SongsContext.songsDirectory).deleteRecursively()
 
                 FileHelper.unzip(
                     contentResolver,
                     contentResolver.openInputStream(uri)!!,
-                    SongsContext.songsDirectory
+                    filesDir.path
                 )
 
                 SongsContext.loadSongsMetadata()
+                finish()
+                val intent = Intent(baseContext, this.javaClass)
+                startActivity(intent)
             }
-            exportSongsResultCode -> {
-                val uri = data?.data!!
-
-                FileHelper.zip(
-                    contentResolver.openOutputStream(uri)!!,
-                    SongsContext.songsDirectory
-                )
-            }
-            exportSetlistsResultCode -> {
-                val uri = data?.data!!
-
-                FileHelper.zip(
-                    contentResolver.openOutputStream(uri)!!,
-                    SetlistsContext.setlistsDirectory
-                )
+            EXPORT_RESULT_CODE -> {
+                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
+                finish()
+                val intent = Intent(baseContext, this.javaClass)
+                startActivity(intent)
             }
         }
     }
 
     private fun setUpListeners() {
-        findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
-            TabItemSelectedListener {
-                val navHostFragment =
-                    supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-                val navController = navHostFragment.navController
+        findViewById<TabLayout>(R.id.tbl_song_section).addOnTabSelectedListener(
+            ItemSelectedTabListener { tab ->
+                tab ?: return@ItemSelectedTabListener
 
-                if (it!!.text == getString(R.string.songs)) {
-                    Log.d(tag, "Switching to song list")
-                    navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
-                } else if (it.text == getString(R.string.setlists)) {
-                    Log.d(tag, "Switching to setlists")
-                    navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
+                val navController = findNavController(R.id.navh_main)
+
+                if (tab.text == getString(R.string.label_songs)) {
+                    Log.d(TAG, "Switching to song list")
+                    navController.navigate(R.id.action_Setlists_to_Songs)
+                } else if (tab.text == getString(R.string.label_setlists)) {
+                    Log.d(TAG, "Switching to setlists")
+                    navController.navigate(R.id.action_Songs_to_Setlists)
                 }
             })
 
+        val addSongFab = findViewById<LinearLayout>(R.id.lns_fab_add_song)
+        val addSetlistFab = findViewById<LinearLayout>(R.id.lns_fab_add_setlist)
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
-            if (findViewById<LinearLayout>(R.id.fab_view_add_song).isVisible) {
-                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
-                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+            if (addSongFab.isVisible) {
+                addSongFab.visibility = View.GONE
+                addSetlistFab.visibility = View.GONE
             } else {
-                findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.VISIBLE
-                findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.VISIBLE
+                addSongFab.visibility = View.VISIBLE
+                addSetlistFab.visibility = View.VISIBLE
             }
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
-            val intent = Intent(this, SetlistEditorActivity::class.java)
+            val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
+            addSongFab.visibility = View.GONE
+            addSetlistFab.visibility = View.GONE
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
-            val intent = Intent(this, SongEditorActivity::class.java)
+            val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
+            addSongFab.visibility = View.GONE
+            addSetlistFab.visibility = View.GONE
         }
     }
 
-    private fun exportFiles(resultCode: Int): Boolean {
+    private fun exportFiles(): Boolean {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
-        startActivityForResult(chooserIntent, resultCode)
+        startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
         return true
     }
 
-    private fun importSongs(): Boolean {
+    private fun import(): Boolean {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, selectFileResultCode)
+        startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
         return true
     }
 
@@ -194,4 +201,36 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun loadData() {
+        if (SongsContext.getSongMap().isNotEmpty() && SetlistsContext.getSetlistItems()
+                .isNotEmpty()
+        ) {
+            return
+        }
+
+        // TODO: Potential leak
+        val alertDialog: AlertDialog = AlertDialog.Builder(this)
+            .setMessage("Loading...")
+            .create()
+        alertDialog.show()
+
+        if (SongsContext.getSongMap().isEmpty()) {
+            SongsContext.loadSongsMetadata()
+        }
+
+        if (SetlistsContext.getSetlistItems().isEmpty()) {
+            SetlistsContext.loadSetlists()
+        }
+
+        alertDialog.hide()
+    }
+
+    private suspend fun goToSongListFragment() {
+        while (findViewById<FragmentContainerView>(R.id.navh_main) == null) {
+            delay(100)
+        }
+
+        val navController = findNavController(R.id.navh_main)
+        navController.navigate(R.id.action_Start_to_Songs)
+    }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 11/1/20 2:11 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:26 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,44 +12,49 @@
     tools:context=".fragments.SetlistsFragment">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_view_filter_setlists"
+        android:id="@+id/tv_filter_setlists"
         android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text_input_setlist_filter"
+            android:id="@+id/tin_setlist_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/setlist_name"
+            android:hint="@string/hint_setlist_name"
             android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
-        android:id="@+id/spinner_setlist_category"
+        android:id="@+id/spn_setlist_category"
         android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_filter_setlists" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_filter_setlists" />
 
     <View
         android:id="@+id/HorizontalDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/rcv_setlists"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_setlist_category" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_setlists"
+        android:id="@+id/rcv_setlists"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:fadeScrollbars="false"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
         android:scrollbarAlwaysDrawVerticalTrack="false"
@@ -60,7 +65,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_setlist_category">
+        app:layout_constraintTop_toBottomOf="@+id/spn_setlist_category"
+        tools:listitem="@layout/item_setlist">
 
     </androidx.recyclerview.widget.RecyclerView>
 

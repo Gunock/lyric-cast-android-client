@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 11/1/20 9:57 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 11/1/20 9:47 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:31 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +15,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/ThemeOverlay.LyricCast.Dark.ActionBar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -25,19 +25,20 @@
                 android:id="@+id/toolbar_main"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_save_song"
+                app:layout_constraintEnd_toStartOf="@+id/btn_save_song"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                app:popupTheme="@style/ThemeOverlay.LyricCast.Light" />
 
             <Button
-                android:id="@+id/button_save_song"
+                android:id="@+id/btn_save_song"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:background="@null"
-                android:text="@string/save"
+                android:background="@color/colorPrimary"
+                android:backgroundTintMode="src_in"
+                android:text="@string/button_save"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

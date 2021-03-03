@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 2:43 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.tests.main_activity
@@ -27,21 +27,21 @@ class NavigationTabTest {
 
     @Test
     fun navigationTabsAreWorking() {
-        onView(withId(R.id.text_input_song_filter))
+        onView(withId(R.id.tin_song_filter))
             .check(matches(isDisplayed()))
 
         // TODO: Improve to be text independent
-        onView(allOf(isDescendantOfA(withId(R.id.tab_layout_song_section)), withText("Setlists")))
+        onView(allOf(isDescendantOfA(withId(R.id.tbl_song_section)), withText("Setlists")))
             .perform(ViewActions.click())
 
-        onView(withId(R.id.text_input_setlist_filter))
+        onView(withId(R.id.tin_setlist_filter))
             .check(matches(isDisplayed()))
 
         // TODO: Improve to be text independent
-        onView(allOf(isDescendantOfA(withId(R.id.tab_layout_song_section)), withText("Songs")))
+        onView(allOf(isDescendantOfA(withId(R.id.tbl_song_section)), withText("Songs")))
             .perform(ViewActions.click())
 
-        onView(withId(R.id.text_input_song_filter))
+        onView(withId(R.id.tin_song_filter))
             .check(matches(isDisplayed()))
     }
 }
