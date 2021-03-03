@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -59,8 +59,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
         castContext?.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
 
-        slidePreviewView = findViewById(R.id.text_view_slide_preview2)
-        songTitleView = findViewById(R.id.current_song_title)
+        slidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
+        songTitleView = findViewById(R.id.tv_current_song_title)
 
         val songsMetadata = SongsContext.getSongMap()
         var setlistLyricsIndex = 0
@@ -111,7 +111,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         val songItemList: List<SongItem> = SongsContext.getSongItems()
             .filter { songItem -> songTitles.contains(songItem.title) }
 
-        with(findViewById<RecyclerView>(R.id.recycler_view_songs)) {
+        with(findViewById<RecyclerView>(R.id.rcv_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
 
@@ -139,11 +139,11 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        findViewById<Button>(R.id.button_control_blank2).setOnClickListener {
+        findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
             MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
         }
 
-        findViewById<Button>(R.id.button_setlist_prev).setOnClickListener {
+        findViewById<Button>(R.id.btn_setlist_prev).setOnClickListener {
             if (currentLyricsPosition <= 0) {
                 return@setOnClickListener
             }
@@ -151,7 +151,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<Button>(R.id.button_setlist_next).setOnClickListener {
+        findViewById<Button>(R.id.btn_setlist_next).setOnClickListener {
             if (currentLyricsPosition >= setlistLyrics.size - 1) {
                 return@setOnClickListener
             }
@@ -168,7 +168,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
         songItemsAdapter.notifyDataSetChanged()
 
-        findViewById<RecyclerView>(R.id.recycler_view_songs).run {
+        findViewById<RecyclerView>(R.id.rcv_songs).run {
             scrollToPosition(songItemPosition)
             postInvalidate()
         }

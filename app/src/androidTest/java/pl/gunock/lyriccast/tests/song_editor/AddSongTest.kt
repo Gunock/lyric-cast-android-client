@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 10:56 PM
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.tests.song_editor
@@ -41,32 +41,32 @@ class AddSongTest {
 
         onView(withId(R.id.fab_add))
             .perform(click())
-        onView(withId(R.id.fab_view_add_song))
+        onView(withId(R.id.lns_fab_add_song))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.fab_view_add_setlist))
+        onView(withId(R.id.lns_fab_add_setlist))
             .check(matches(isDisplayed()))
 
         onView(withId(R.id.fab_add_song))
             .perform(click())
 
-        onView(withId(R.id.text_input_song_title))
+        onView(withId(R.id.tin_song_title))
             .perform(typeText(songTitle))
         closeSoftKeyboard()
 
-        onView(withId(R.id.text_input_section_lyrics))
+        onView(withId(R.id.tin_section_lyrics))
             .perform(typeText(songText))
 
-        onView(withId(R.id.button_save_song))
+        onView(withId(R.id.btn_save_song))
             .perform(click())
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .perform(
                 RecyclerViewActions.scrollTo<SongItemsAdapter.SongViewHolder>(
                     hasDescendant(withText(songTitle))
                 )
             )
 
-        onView(withId(R.id.recycler_view_songs))
+        onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(songTitle))))
     }
 }

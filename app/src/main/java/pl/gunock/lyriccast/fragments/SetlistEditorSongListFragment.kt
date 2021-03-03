@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:02 PM
+ * Last modified 3/3/21 11:42 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -66,10 +66,10 @@ class SetlistEditorSongListFragment : Fragment() {
 
         selectedSongTitles = args.selectedSongs.toMutableSet()
 
-        val searchView: TextInputLayout = view.findViewById(R.id.text_view_filter_songs)
+        val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
         searchViewEditText = searchView.editText!!
-        categorySpinner = view.findViewById(R.id.spinner_category)
-        selectedSongsSwitch = view.findViewById(R.id.switch_selected_songs)
+        categorySpinner = view.findViewById(R.id.spn_category)
+        selectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
 
         setupSongList(view)
         setupListeners()
@@ -90,7 +90,7 @@ class SetlistEditorSongListFragment : Fragment() {
                 updateSelectedSongs()
 
                 val action = SetlistEditorSongListFragmentDirections
-                    .actionSetlistEditorSongListFragmentToSetlistEditorFragment(
+                    .actionSetlistEditorSongsToSetlistEditor(
                         selectedSongs = selectedSongTitles.toTypedArray(),
                         setlistName = args.setlistName
                     )
@@ -131,7 +131,7 @@ class SetlistEditorSongListFragment : Fragment() {
         }
 
         songItemsAdapter = SongItemsAdapter(songItems.toMutableList(), showCheckBox = true)
-        with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
+        with(view.findViewById<RecyclerView>(R.id.rcv_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = songItemsAdapter

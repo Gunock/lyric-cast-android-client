@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -66,17 +66,17 @@ class SongListFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        val deleteActionItem = menu.findItem(R.id.action_delete)
+        val deleteActionItem = menu.findItem(R.id.menu_delete)
         deleteActionItem.isVisible = false
 
-        val editActionItem = menu.findItem(R.id.action_edit)
+        val editActionItem = menu.findItem(R.id.menu_edit)
         editActionItem.isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_delete -> deleteSelectedSongs()
-            R.id.action_edit -> editSelectedSong()
+            R.id.menu_delete -> deleteSelectedSongs()
+            R.id.menu_edit -> editSelectedSong()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -86,13 +86,13 @@ class SongListFragment : Fragment() {
 
         castContext = CastContext.getSharedInstance()
 
-        val searchView: TextInputLayout = view.findViewById(R.id.text_view_filter_songs)
+        val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
         searchViewEditText = searchView.editText!!
 
-        categorySpinner = view.findViewById(R.id.spinner_category)
-        songItemsRecyclerView = view.findViewById(R.id.recycler_view_songs)
+        categorySpinner = view.findViewById(R.id.spn_category)
+        songItemsRecyclerView = view.findViewById(R.id.rcv_songs)
 
-        view.findViewById<SwitchCompat>(R.id.switch_selected_songs).visibility = View.GONE
+        view.findViewById<SwitchCompat>(R.id.swt_selected_songs).visibility = View.GONE
 
         with(songItemsRecyclerView) {
             setHasFixedSize(true)
@@ -226,27 +226,27 @@ class SongListFragment : Fragment() {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = false
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = false
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = false
             }
             1 -> {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = true
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = true
             }
             2 -> {
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = false
             }
         }
@@ -300,10 +300,10 @@ class SongListFragment : Fragment() {
             return
         }
 
-        val deleteActionItem = menu.findItem(R.id.action_delete)
+        val deleteActionItem = menu.findItem(R.id.menu_delete)
         deleteActionItem.isVisible = false
 
-        val editActionItem = menu.findItem(R.id.action_edit)
+        val editActionItem = menu.findItem(R.id.menu_edit)
         editActionItem.isVisible = false
     }
 }

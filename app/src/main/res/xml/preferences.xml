@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 12/30/20 4:48 PM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 12/26/20 10:54 PM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:33 PM
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,38 +9,38 @@
 
     <PreferenceCategory app:title="Chromecast">
         <ListPreference
-            android:id="@+id/backgroundColor"
+            android:id="@+id/pref_backgroundColor"
+            app:key="backgroundColor"
+            app:title="Background color"
             app:defaultValue="Black"
             app:entries="@array/color_entries"
             app:entryValues="@array/color_values"
-            app:key="backgroundColor"
-            app:title="Background color"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:id="@+id/fontColor"
+            android:id="@+id/pref_fontColor"
+            app:key="fontColor"
+            app:title="Font color"
             app:defaultValue="White"
             app:entries="@array/color_entries"
             app:entryValues="@array/color_values"
-            app:key="fontColor"
-            app:title="Font color"
             app:useSimpleSummaryProvider="true" />
 
 
         <EditTextPreference
-            android:id="@+id/modelCategory"
-            app:defaultValue="20"
+            android:id="@+id/pref_modelCategory"
             app:key="fontSize"
             app:title="Font size"
+            app:defaultValue="20"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Application">
         <CheckBoxPreference
-            android:id="@+id/showAuthor"
-            app:defaultValue="true"
+            android:id="@+id/pref_showAuthor"
             app:key="showAuthor"
             app:title="Show author"
+            app:defaultValue="true"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:02 PM
+ * Last modified 3/3/21 11:36 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -28,9 +28,10 @@ class SetlistItemsAdapter(
 ) : RecyclerView.Adapter<SetlistItemsAdapter.SetlistViewHolder>() {
 
     inner class SetlistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.setlist_checkbox)
-        private val titleTextView: TextView = itemView.findViewById(R.id.setlist_name)
-        private val categoryCardView: CardView = itemView.findViewById(R.id.card_setlist_category)
+        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
+        private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
+        private val categoryCardView: CardView =
+            itemView.findViewById(R.id.cdv_item_setlist_category)
         private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_setlist)
 
         fun bind(item: SetlistItem) = with(itemView) {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:02 PM
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -30,10 +30,10 @@ class SongItemsAdapter(
 ) : RecyclerView.Adapter<SongItemsAdapter.SongViewHolder>() {
 
     inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.song_checkbox)
-        private val titleTextView: TextView = itemView.findViewById(R.id.song_title)
-        private val authorTextView: TextView = itemView.findViewById(R.id.song_author)
-        private val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
+        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
+        private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
+        private val authorTextView: TextView = itemView.findViewById(R.id.tv_item_song_author)
+        private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
         private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
 
         fun bind(item: SongItem, isSelected: Boolean) = with(itemView) {
@@ -52,7 +52,7 @@ class SongItemsAdapter(
             if (!item.category.isNullOrBlank()) {
                 categoryTextView.text = item.category
             } else {
-                itemView.findViewById<CardView>(R.id.card_song_category).visibility = View.INVISIBLE
+                itemView.findViewById<CardView>(R.id.cdv_song_category).visibility = View.INVISIBLE
             }
 
             if (!showAuthor) {

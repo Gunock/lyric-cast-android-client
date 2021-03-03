@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 10/19/20 12:26 AM
-  ~ Copyright (c) 2020 . All rights reserved.
-  ~ Last modified 10/19/20 12:15 AM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/3/21 11:14 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,7 +11,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/setlist_editor_nav_host"
+        android:id="@+id/navh_setlist_editor"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

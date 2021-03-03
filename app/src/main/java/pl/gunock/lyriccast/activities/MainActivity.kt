@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:41 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -54,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
-        findViewById<LinearLayout>(R.id.fab_view_add_song).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.fab_view_add_setlist).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.lns_fab_add_song).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.lns_fab_add_setlist).visibility = View.GONE
 
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
@@ -133,23 +133,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
-        findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
+        findViewById<TabLayout>(R.id.tbl_song_section).addOnTabSelectedListener(
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
-                val navController = findNavController(R.id.main_nav_host)
+                val navController = findNavController(R.id.navh_main)
 
                 if (tab.text == getString(R.string.label_songs)) {
                     Log.d(TAG, "Switching to song list")
-                    navController.navigate(R.id.action_SetlistsFragment_to_SongListFragment)
+                    navController.navigate(R.id.action_Setlists_to_Songs)
                 } else if (tab.text == getString(R.string.label_setlists)) {
                     Log.d(TAG, "Switching to setlists")
-                    navController.navigate(R.id.action_SongListFragment_to_SetlistsFragment)
+                    navController.navigate(R.id.action_Songs_to_Setlists)
                 }
             })
 
-        val addSongFab = findViewById<LinearLayout>(R.id.fab_view_add_song)
-        val addSetlistFab = findViewById<LinearLayout>(R.id.fab_view_add_setlist)
+        val addSongFab = findViewById<LinearLayout>(R.id.lns_fab_add_song)
+        val addSetlistFab = findViewById<LinearLayout>(R.id.lns_fab_add_setlist)
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
             if (addSongFab.isVisible) {
                 addSongFab.visibility = View.GONE
@@ -226,11 +226,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun goToSongListFragment() {
-        while (findViewById<FragmentContainerView>(R.id.main_nav_host) == null) {
+        while (findViewById<FragmentContainerView>(R.id.navh_main) == null) {
             delay(100)
         }
 
-        val navController = findNavController(R.id.main_nav_host)
-        navController.navigate(R.id.action_EmptyFragment_to_SongListFragment)
+        val navController = findNavController(R.id.navh_main)
+        navController.navigate(R.id.action_Start_to_Songs)
     }
 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -63,11 +63,11 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val searchView: TextInputLayout = view.findViewById(R.id.text_view_filter_setlists)
+        val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_setlists)
         searchViewEditText = searchView.editText!!
-        categorySpinner = view.findViewById(R.id.spinner_setlist_category)
+        categorySpinner = view.findViewById(R.id.spn_setlist_category)
 
-        setlistRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_setlists).apply {
+        setlistRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_setlists).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
@@ -83,17 +83,17 @@ class SetlistsFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        val deleteActionItem = menu.findItem(R.id.action_delete)
+        val deleteActionItem = menu.findItem(R.id.menu_delete)
         deleteActionItem.isVisible = false
 
-        val editActionItem = menu.findItem(R.id.action_edit)
+        val editActionItem = menu.findItem(R.id.menu_edit)
         editActionItem.isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_delete -> deleteSelectedSetlists()
-            R.id.action_edit -> editSelectedSetlist()
+            R.id.menu_delete -> deleteSelectedSetlists()
+            R.id.menu_edit -> editSelectedSetlist()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -135,7 +135,7 @@ class SetlistsFragment : Fragment() {
         )
 
         requireView()
-            .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistItemsAdapter
+            .findViewById<RecyclerView>(R.id.rcv_setlists)!!.adapter = setlistItemsAdapter
     }
 
     private fun setupCategorySpinner() {
@@ -186,27 +186,27 @@ class SetlistsFragment : Fragment() {
                 datasetChanged = true
                 setlistItemsAdapter.showCheckBox = false
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = false
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = false
             }
             1 -> {
                 datasetChanged = true
                 setlistItemsAdapter.showCheckBox = true
 
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = true
             }
             2 -> {
-                val deleteActionItem = menu.findItem(R.id.action_delete)
+                val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = true
 
-                val editActionItem = menu.findItem(R.id.action_edit)
+                val editActionItem = menu.findItem(R.id.menu_edit)
                 editActionItem.isVisible = false
             }
         }

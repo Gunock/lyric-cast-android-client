@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 2/28/21 11:52 PM
+  ~ Last modified 3/3/21 11:26 PM
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,7 +22,7 @@
         android:layout_height="match_parent">
 
         <CheckBox
-            android:id="@+id/setlist_checkbox"
+            android:id="@+id/chk_item_setlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/setlist_name"
+            android:id="@+id/tv_item_setlist_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,7 +45,7 @@
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/setlist_checkbox"
+            app:layout_constraintStart_toEndOf="@+id/chk_item_setlist"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -55,7 +55,7 @@
         android:layout_weight="1">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/card_setlist_category"
+            android:id="@+id/cdv_item_setlist_category"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -68,7 +68,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/setlist_category"
+                android:id="@+id/tv_item_setlist_category"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -83,7 +83,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/HorizontalDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="0dp"

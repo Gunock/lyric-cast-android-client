@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:15 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -42,9 +42,9 @@ class SongControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        songTitleView = findViewById(R.id.text_view_controls_song_title)
-        slideNumberView = findViewById(R.id.text_view_slide_number)
-        slidePreviewView = findViewById(R.id.text_view_slide_preview)
+        songTitleView = findViewById(R.id.tv_controls_song_title)
+        slideNumberView = findViewById(R.id.tv_song_slide_number)
+        slidePreviewView = findViewById(R.id.tv_slide_preview)
 
         lyrics = intent.getStringArrayExtra("lyrics")!!
 
@@ -78,11 +78,11 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        findViewById<Button>(R.id.button_control_blank).setOnClickListener {
+        findViewById<Button>(R.id.btn_song_blank).setOnClickListener {
             sendBlank()
         }
 
-        findViewById<Button>(R.id.button_prev).setOnClickListener {
+        findViewById<Button>(R.id.btn_song_prev).setOnClickListener {
             if (currentSlide <= 0) {
                 return@setOnClickListener
             }
@@ -90,7 +90,7 @@ class SongControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<Button>(R.id.button_next).setOnClickListener {
+        findViewById<Button>(R.id.btn_song_next).setOnClickListener {
             if (currentSlide >= lyrics.size - 1) {
                 return@setOnClickListener
             }

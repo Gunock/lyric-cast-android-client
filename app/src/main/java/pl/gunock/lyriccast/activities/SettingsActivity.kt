@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 11:59 AM
+ * Last modified 3/3/21 11:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -21,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
+                .replace(R.id.fml_settings, SettingsFragment())
                 .commit()
         }
 

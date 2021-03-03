@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/3/21 11:55 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -87,8 +87,8 @@ class SetlistEditorFragment : Fragment() {
         intentSetlistName = requireActivity().intent.getStringExtra("setlistName")
         setlistNames = SetlistsContext.getSetlistItems().map { setlistItem -> setlistItem.name }
 
-        setlistNameInputLayout = view.findViewById(R.id.text_view_setlist_name)
-        setlistNameInput = view.findViewById(R.id.text_input_setlist_name)
+        setlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
+        setlistNameInput = view.findViewById(R.id.tin_setlist_name)
 
         if (args.selectedSongs != null) {
             setlistSongs = SongsContext.getSongItems()
@@ -104,7 +104,7 @@ class SetlistEditorFragment : Fragment() {
                 .filter { songItem -> setlist.songTitles.contains(songItem.title) }
         }
 
-        songsRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_songs).apply {
+        songsRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_songs).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
@@ -121,19 +121,18 @@ class SetlistEditorFragment : Fragment() {
     private fun setupListeners(view: View) {
         setlistNameInput.addTextChangedListener(setlistNameTextWatcher)
 
-        view.findViewById<Button>(R.id.button_pick_setlist_songs).setOnClickListener {
+        view.findViewById<Button>(R.id.btn_pick_setlist_songs).setOnClickListener {
             KeyboardHelper.hideKeyboard(view)
 
-            val action = SetlistEditorFragmentDirections
-                .actionSetlistEditorFragmentToSetlistEditorSongListFragment(
-                    selectedSongs = setlistSongs.map { songItem -> songItem.title }.toTypedArray(),
-                    setlistName = setlistNameInput.text.toString()
-                )
+            val action = SetlistEditorFragmentDirections.actionSetlistEditorToSetlistEditorSongs(
+                selectedSongs = setlistSongs.map { songItem -> songItem.title }.toTypedArray(),
+                setlistName = setlistNameInput.text.toString()
+            )
 
             findNavController().navigate(action)
         }
 
-        view.findViewById<Button>(R.id.button_save_setlist).setOnClickListener {
+        view.findViewById<Button>(R.id.btn_save_setlist).setOnClickListener {
             if (saveSetlist()) {
                 requireActivity().finish()
             }

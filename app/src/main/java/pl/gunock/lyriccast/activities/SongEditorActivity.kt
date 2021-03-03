@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:02 PM
+ * Last modified 3/3/21 11:26 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -119,12 +119,12 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        songTitleInputLayout = findViewById(R.id.text_view_song_title)
-        songTitleInput = findViewById(R.id.text_input_song_title)
-        sectionNameInput = findViewById(R.id.text_input_section_name)
-        sectionLyricsInput = findViewById(R.id.text_input_section_lyrics)
-        songSectionTabLayout = findViewById(R.id.tab_layout_song_section)
-        categorySpinner = findViewById(R.id.spinner_song_editor_category)
+        songTitleInputLayout = findViewById(R.id.tv_song_title)
+        songTitleInput = findViewById(R.id.tin_song_title)
+        sectionNameInput = findViewById(R.id.tin_section_name)
+        sectionLyricsInput = findViewById(R.id.tin_section_lyrics)
+        songSectionTabLayout = findViewById(R.id.tbl_song_section)
+        categorySpinner = findViewById(R.id.spn_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
 
@@ -211,21 +211,21 @@ class SongEditorActivity : AppCompatActivity() {
             }
         )
 
-        findViewById<Button>(R.id.button_save_song).setOnClickListener {
+        findViewById<Button>(R.id.btn_save_song).setOnClickListener {
             if (saveSong()) {
                 finish()
             }
         }
 
-        findViewById<ImageButton>(R.id.button_move_section_left).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_move_section_left).setOnClickListener {
             moveTabLeft(selectedTab)
         }
 
-        findViewById<ImageButton>(R.id.button_move_section_right).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_move_section_right).setOnClickListener {
             moveTabRight(selectedTab)
         }
 
-        findViewById<Button>(R.id.button_delete_section).setOnClickListener {
+        findViewById<Button>(R.id.btn_delete_section).setOnClickListener {
             removeTab(selectedTab)
         }
     }
@@ -279,7 +279,7 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun loadSongData(songTitle: String) {
-        val songTitleInput: TextInputLayout = findViewById(R.id.text_view_song_title)
+        val songTitleInput: TextInputLayout = findViewById(R.id.tv_song_title)
         songTitleInput.editText!!.setText(songTitle)
 
         val songMetadata = SongsContext.getSongMetadata(songTitle)!!
@@ -302,7 +302,7 @@ class SongEditorActivity : AppCompatActivity() {
         addTab(newAddTab)
         newAddTab.text = getString(R.string.button_add)
 
-        val sectionLyricsInput = findViewById<EditText>(R.id.text_input_section_lyrics)
+        val sectionLyricsInput = findViewById<EditText>(R.id.tin_section_lyrics)
         sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
     }
 
