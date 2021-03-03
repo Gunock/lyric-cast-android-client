@@ -1,16 +1,16 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 6:01 PM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast.models
 
-class SongItemModel(songMetadataModel: SongMetadataModel) {
+class SongItem(songMetadata: SongMetadata) {
 
-    val title: String = songMetadataModel.title
-    val author: String = songMetadataModel.author
-    val category: String? = songMetadataModel.category
+    val title: String = songMetadata.title
+    val author: String = songMetadata.author
+    val category: String? = songMetadata.category
 
     var highlight: Boolean = false
     var isSelected: Boolean = false

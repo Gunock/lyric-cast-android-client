@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:16 PM
+ * Last modified 3/3/21 10:59 PM
  */
 
 package pl.gunock.lyriccast.listeners
@@ -9,7 +9,7 @@ package pl.gunock.lyriccast.listeners
 import android.text.Editable
 import android.text.TextWatcher
 
-class InputTextChangeListener(
+class InputTextChangedListener(
     private val mListener: (newText: String) -> Unit
 ) : TextWatcher {
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 10:48 PM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -18,10 +18,10 @@ import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.enums.TitleValidationState
-import pl.gunock.lyriccast.listeners.InputTextChangeListener
-import pl.gunock.lyriccast.listeners.TabItemSelectedListener
-import pl.gunock.lyriccast.models.SongLyricsModel
-import pl.gunock.lyriccast.models.SongMetadataModel
+import pl.gunock.lyriccast.listeners.InputTextChangedListener
+import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
+import pl.gunock.lyriccast.models.SongLyrics
+import pl.gunock.lyriccast.models.SongMetadata
 
 class SongEditorActivity : AppCompatActivity() {
     inner class SongTitleTextWatcher : TextWatcher {
@@ -164,12 +164,12 @@ class SongEditorActivity : AppCompatActivity() {
         sectionNameInput.addTextChangedListener(sectionNameTextWatcher)
 
         sectionLyricsInput.addTextChangedListener(
-            InputTextChangeListener { newText ->
+            InputTextChangedListener { newText ->
                 sectionLyrics[selectedTab.text.toString()] = newText
             })
 
         songSectionTabLayout.addOnTabSelectedListener(
-            TabItemSelectedListener { tab ->
+            ItemSelectedTabListener { tab ->
                 selectedTab = tab!!
 
                 sectionNameTextWatcher.ignoreBeforeTextChanged = true
@@ -177,7 +177,7 @@ class SongEditorActivity : AppCompatActivity() {
                 when (val tabText = tab.text.toString()) {
                     getString(R.string.button_add) -> {
                         if (songSectionTabLayout.tabCount <= 1) {
-                            return@TabItemSelectedListener
+                            return@ItemSelectedTabListener
                         }
 
                         sectionLyricsInput.setText("")
@@ -262,12 +262,12 @@ class SongEditorActivity : AppCompatActivity() {
             presentation.add(tab.text.toString())
         }
 
-        val song = SongMetadataModel()
+        val song = SongMetadata()
         song.title = songTitle
         song.category = categorySpinner.selectedItem?.toString()
         song.presentation = presentation
 
-        val songLyrics = SongLyricsModel()
+        val songLyrics = SongLyrics()
         songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
 
         if (intentSongTitle != null) {

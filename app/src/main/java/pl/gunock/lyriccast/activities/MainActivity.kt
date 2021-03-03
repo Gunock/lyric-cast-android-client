@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 10:48 PM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -33,9 +33,9 @@ import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.listeners.TabItemSelectedListener
-import pl.gunock.lyriccast.utils.FileHelper
-import pl.gunock.lyriccast.utils.MessageHelper
+import pl.gunock.lyriccast.helpers.FileHelper
+import pl.gunock.lyriccast.helpers.MessageHelper
+import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -134,8 +134,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpListeners() {
         findViewById<TabLayout>(R.id.tab_layout_song_section).addOnTabSelectedListener(
-            TabItemSelectedListener { tab ->
-                tab ?: return@TabItemSelectedListener
+            ItemSelectedTabListener { tab ->
+                tab ?: return@ItemSelectedTabListener
 
                 val navController = findNavController(R.id.main_nav_host)
 

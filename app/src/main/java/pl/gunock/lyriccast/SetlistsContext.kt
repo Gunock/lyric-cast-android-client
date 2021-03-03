@@ -1,15 +1,15 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 11:44 PM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast
 
 import android.util.Log
 import org.json.JSONObject
-import pl.gunock.lyriccast.models.SetlistItemModel
-import pl.gunock.lyriccast.models.SetlistModel
+import pl.gunock.lyriccast.models.Setlist
+import pl.gunock.lyriccast.models.SetlistItem
 import java.io.File
 import java.io.FilenameFilter
 import java.util.*
@@ -19,10 +19,10 @@ object SetlistsContext {
 
     var setlistsDirectory: String = ""
 
-    private var setlists: SortedSet<SetlistModel> = sortedSetOf()
+    private var setlists: SortedSet<Setlist> = sortedSetOf()
 
     fun loadSetlists() {
-        val loadedSetlists: SortedSet<SetlistModel> = sortedSetOf()
+        val loadedSetlists: SortedSet<Setlist> = sortedSetOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".json") }
         val fileList = File(setlistsDirectory).listFiles(fileFilter)
 
@@ -33,7 +33,7 @@ object SetlistsContext {
         for (file in fileList) {
             Log.d(TAG, "Reading file: ${file.name}")
             val json = JSONObject(file.readText(Charsets.UTF_8))
-            val setlist = SetlistModel(json)
+            val setlist = Setlist(json)
             loadedSetlists.add(setlist)
         }
         Log.d(TAG, "Parsed setlist files: $loadedSetlists")
@@ -41,7 +41,7 @@ object SetlistsContext {
         setlists = loadedSetlists
     }
 
-    fun saveSetlist(setlist: SetlistModel) {
+    fun saveSetlist(setlist: Setlist) {
         val json = setlist.toJson()
         val setlistFile = File("$setlistsDirectory/${setlist.name}.json")
         File(setlistsDirectory).mkdirs()
@@ -62,7 +62,7 @@ object SetlistsContext {
     }
 
     fun replaceSong(oldSongTitle: String, newSongTitle: String) {
-        val modifiedSetlists: MutableList<SetlistModel> = mutableListOf()
+        val modifiedSetlists: MutableList<Setlist> = mutableListOf()
         setlists.forEach { setlist ->
             val modifiedSongTitles = setlist.songTitles.map { songTitle ->
                 if (songTitle == oldSongTitle) newSongTitle else songTitle
@@ -81,7 +81,7 @@ object SetlistsContext {
     }
 
     fun removeSongs(songTitles: Collection<String>) {
-        val modifiedSetlists: MutableList<SetlistModel> = mutableListOf()
+        val modifiedSetlists: MutableList<Setlist> = mutableListOf()
         setlists.forEach { setlist ->
             val modifiedSongTitles = setlist.songTitles.filter { songTitle ->
                 !songTitles.contains(songTitle)
@@ -103,12 +103,12 @@ object SetlistsContext {
         }
     }
 
-    fun getSetlist(setlistName: String): SetlistModel {
+    fun getSetlist(setlistName: String): Setlist {
         return setlists.first { setlist -> setlist.name == setlistName }
     }
 
-    fun getSetlistItems(): Set<SetlistItemModel> {
-        return setlists.map { setlist -> SetlistItemModel(setlist) }.toSet()
+    fun getSetlistItems(): Set<SetlistItem> {
+        return setlists.map { setlist -> SetlistItem(setlist) }.toSet()
     }
 
 }

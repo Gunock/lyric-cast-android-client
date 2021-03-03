@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/1/21 12:07 AM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,11 +24,11 @@ import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.enums.TitleValidationState
-import pl.gunock.lyriccast.models.SetlistModel
-import pl.gunock.lyriccast.models.SongItemModel
-import pl.gunock.lyriccast.utils.KeyboardHelper
+import pl.gunock.lyriccast.helpers.KeyboardHelper
+import pl.gunock.lyriccast.models.Setlist
+import pl.gunock.lyriccast.models.SongItem
 
 
 /**
@@ -69,7 +69,7 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var songsRecyclerView: RecyclerView
     private lateinit var setlistNameInputLayout: TextInputLayout
     private lateinit var setlistNameInput: TextView
-    private var setlistSongs: List<SongItemModel> = listOf()
+    private var setlistSongs: List<SongItem> = listOf()
 
     private var intentSetlistName: String? = null
     private var setlistNames: Collection<String> = listOf()
@@ -115,7 +115,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        songsRecyclerView.adapter = SongListAdapter(setlistSongs.toMutableList())
+        songsRecyclerView.adapter = SongItemsAdapter(setlistSongs.toMutableList())
     }
 
     private fun setupListeners(view: View) {
@@ -169,7 +169,7 @@ class SetlistEditorFragment : Fragment() {
             return false
         }
 
-        val setlist = SetlistModel()
+        val setlist = Setlist()
         setlist.name = setlistName
         setlist.songTitles = setlistSongs.map { songItem -> songItem.title }
 

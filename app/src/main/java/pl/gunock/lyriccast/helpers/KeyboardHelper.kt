@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 10/20/20 10:55 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 10/20/20 10:54 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 11:03 PM
  */
 
-package pl.gunock.lyriccast.utils
+package pl.gunock.lyriccast.helpers
 
 import android.view.View
 import android.view.inputmethod.InputMethodManager

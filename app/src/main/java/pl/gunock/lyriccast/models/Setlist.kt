@@ -1,16 +1,16 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:51 PM
+ * Last modified 3/3/21 11:03 PM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.utils.JsonHelper
+import pl.gunock.lyriccast.helpers.JsonHelper
 
-open class SetlistModel() : Comparable<SetlistModel> {
+open class Setlist() : Comparable<Setlist> {
 
     var name: String = ""
     var songTitles: List<String> = listOf()
@@ -35,7 +35,7 @@ open class SetlistModel() : Comparable<SetlistModel> {
         }
     }
 
-    override fun compareTo(other: SetlistModel): Int {
+    override fun compareTo(other: Setlist): Int {
         return name.compareTo(other.name)
     }
 }

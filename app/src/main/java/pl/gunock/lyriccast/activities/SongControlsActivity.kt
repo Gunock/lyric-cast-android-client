@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 2:30 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 2:28 AM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,9 +16,9 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.enums.ControlAction
+import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
-import pl.gunock.lyriccast.utils.ControlAction
-import pl.gunock.lyriccast.utils.MessageHelper
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.

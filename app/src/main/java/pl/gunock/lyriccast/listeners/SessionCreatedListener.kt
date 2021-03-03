@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:16 PM
+ * Last modified 3/3/21 10:59 PM
  */
 
 package pl.gunock.lyriccast.listeners
@@ -13,31 +13,31 @@ class SessionCreatedListener(
     private val mListener: (session: Session) -> Unit
 ) : SessionManagerListener<Session> {
 
-    override fun onSessionStarting(p0: Session?) {
+    override fun onSessionStarting(session: Session?) {
     }
 
-    override fun onSessionStarted(p0: Session?, p1: String?) {
-        mListener(p0!!)
+    override fun onSessionStarted(session: Session?, p1: String?) {
+        mListener(session!!)
     }
 
-    override fun onSessionStartFailed(p0: Session?, p1: Int) {
+    override fun onSessionStartFailed(session: Session?, p1: Int) {
     }
 
-    override fun onSessionEnding(p0: Session?) {
+    override fun onSessionEnding(session: Session?) {
     }
 
-    override fun onSessionEnded(p0: Session?, p1: Int) {
+    override fun onSessionEnded(session: Session?, p1: Int) {
     }
 
-    override fun onSessionResuming(p0: Session?, p1: String?) {
+    override fun onSessionResuming(session: Session?, p1: String?) {
     }
 
-    override fun onSessionResumed(p0: Session?, p1: Boolean) {
+    override fun onSessionResumed(session: Session?, p1: Boolean) {
     }
 
-    override fun onSessionResumeFailed(p0: Session?, p1: Int) {
+    override fun onSessionResumeFailed(session: Session?, p1: Int) {
     }
 
-    override fun onSessionSuspended(p0: Session?, p1: Int) {
+    override fun onSessionSuspended(session: Session?, p1: Int) {
     }
 }

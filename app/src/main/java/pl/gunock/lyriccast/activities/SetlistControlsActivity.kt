@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 8:44 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 8:36 PM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,14 +19,14 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.SongListAdapter
-import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
-import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
+import pl.gunock.lyriccast.enums.ControlAction
+import pl.gunock.lyriccast.helpers.MessageHelper
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
-import pl.gunock.lyriccast.models.SetlistModel
-import pl.gunock.lyriccast.models.SongItemModel
-import pl.gunock.lyriccast.utils.ControlAction
-import pl.gunock.lyriccast.utils.MessageHelper
+import pl.gunock.lyriccast.models.Setlist
+import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var slidePreviewView: TextView
@@ -34,14 +34,14 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private var castContext: CastContext? = null
     private var sessionCreatedListener: SessionCreatedListener? = null
-    private lateinit var songListAdapter: SongListAdapter
+    private lateinit var songItemsAdapter: SongItemsAdapter
 
     private lateinit var setlistLyrics: List<String>
     private var songTitles: MutableMap<Int, String> = mutableMapOf()
     private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
     private var currentLyricsPosition: Int = 0
 
-    private lateinit var setlist: SetlistModel
+    private lateinit var setlist: Setlist
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +108,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val songTitles: List<String> = setlist.songTitles
-        val songItemList: List<SongItemModel> = SongsContext.getSongItems()
+        val songItemList: List<SongItem> = SongsContext.getSongItems()
             .filter { songItem -> songTitles.contains(songItem.title) }
 
         with(findViewById<RecyclerView>(R.id.recycler_view_songs)) {
@@ -116,25 +116,25 @@ class SetlistControlsActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context)
 
             val onLongClickListener =
-                LongClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                LongClickAdapterItemListener { _: SongItemsAdapter.SongViewHolder, position: Int, _ ->
                     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     selectSong(position)
                 }
 
             val onClickListener =
-                ClickAdapterListener { _: SongListAdapter.SongViewHolder, position: Int, _ ->
+                ClickAdapterItemListener { _: SongItemsAdapter.SongViewHolder, position: Int, _ ->
                     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     selectSong(position)
                 }
 
-            songListAdapter = SongListAdapter(
+            songItemsAdapter = SongItemsAdapter(
                 songItemList.toMutableList(),
                 showRowNumber = true,
-                onClickListener = onClickListener,
-                onLongClickListener = onLongClickListener
+                onItemClickListener = onClickListener,
+                onItemLongClickListener = onLongClickListener
             )
 
-            adapter = songListAdapter
+            adapter = songItemsAdapter
         }
     }
 
@@ -161,12 +161,12 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun highlightSong(title: String) {
-        val songItemPosition: Int = songListAdapter.songItems
+        val songItemPosition: Int = songItemsAdapter.songItems
             .indexOfFirst { songItem -> songItem.title == title }
-        songListAdapter.songItems.forEach { songItem ->
+        songItemsAdapter.songItems.forEach { songItem ->
             songItem.highlight = songItem.title == title
         }
-        songListAdapter.notifyDataSetChanged()
+        songItemsAdapter.notifyDataSetChanged()
 
         findViewById<RecyclerView>(R.id.recycler_view_songs).run {
             scrollToPosition(songItemPosition)
@@ -189,7 +189,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun selectSong(position: Int): Boolean {
-        val item: SongItemModel = songListAdapter.songItems[position]
+        val item: SongItem = songItemsAdapter.songItems[position]
         currentLyricsPosition = songStartPoints[item.title]!!
         sendSlide()
         return true

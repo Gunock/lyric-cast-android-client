@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 11/1/20 3:44 PM
- * Copyright (c) 2020 . All rights reserved.
- * Last modified 11/1/20 3:43 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Copyright (c) 2021 . All rights reserved.
+ * Last modified 3/3/21 10:56 PM
  */
 
 package pl.gunock.lyriccast.tests.setlist_editor
@@ -21,7 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.MainActivity
-import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.utils.addSong
 
 
@@ -62,7 +62,7 @@ class AddSetlistTest {
 
         onView(withId(R.id.recycler_view_songs))
             .perform(
-                RecyclerViewActions.scrollTo<SongListAdapter.SongViewHolder>(
+                RecyclerViewActions.scrollTo<SongItemsAdapter.SongViewHolder>(
                     hasDescendant(withText(songTitle3))
                 )
             )

@@ -1,15 +1,15 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/25/21 10:00 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/25/21 2:28 AM
+ * Last modified 3/3/21 10:59 PM
  */
 
-package pl.gunock.lyriccast.adapters.listeners
+package pl.gunock.lyriccast.listeners
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-class LongClickAdapterListener<T>(
+class LongClickAdapterItemListener<T>(
     val mListener: (T, Int, View) -> Boolean
 ) where T : RecyclerView.ViewHolder {
 

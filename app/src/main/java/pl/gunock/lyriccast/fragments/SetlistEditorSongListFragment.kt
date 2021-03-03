@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 11:15 PM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,11 +24,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.SongListAdapter
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.listeners.InputTextChangeListener
-import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
-import pl.gunock.lyriccast.models.SongItemModel
+import pl.gunock.lyriccast.listeners.InputTextChangedListener
+import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
+import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
@@ -43,11 +43,11 @@ class SetlistEditorSongListFragment : Fragment() {
     private lateinit var categorySpinner: Spinner
     private lateinit var selectedSongsSwitch: SwitchCompat
 
-    private lateinit var songListAdapter: SongListAdapter
+    private lateinit var songItemsAdapter: SongItemsAdapter
 
     private lateinit var selectedSongTitles: MutableSet<String>
 
-    private var songItems: Set<SongItemModel> = setOf()
+    private var songItems: Set<SongItem> = setOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,12 +103,12 @@ class SetlistEditorSongListFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangeListener { newText ->
+        searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
             filterSongs(newText, categorySpinner.selectedItem.toString())
         })
 
         categorySpinner.onItemSelectedListener =
-            SpinnerItemSelectedListener { _, _ ->
+            ItemSelectedSpinnerListener { _, _ ->
                 filterSongs(
                     searchViewEditText.editableText.toString(),
                     categorySpinner.selectedItem.toString()
@@ -130,11 +130,11 @@ class SetlistEditorSongListFragment : Fragment() {
             songItem.isSelected = selectedSongTitles.contains(songItem.title)
         }
 
-        songListAdapter = SongListAdapter(songItems.toMutableList(), showCheckBox = true)
+        songItemsAdapter = SongItemsAdapter(songItems.toMutableList(), showCheckBox = true)
         with(view.findViewById<RecyclerView>(R.id.recycler_view_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = songListAdapter
+            adapter = songItemsAdapter
         }
     }
 
@@ -145,7 +145,7 @@ class SetlistEditorSongListFragment : Fragment() {
 
         val normalizedTitle = title.normalize()
 
-        val predicates: MutableList<(SongItemModel) -> Boolean> = mutableListOf()
+        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
         if (isSelected != null) {
             predicates.add { songItem -> songItem.isSelected }
@@ -160,17 +160,17 @@ class SetlistEditorSongListFragment : Fragment() {
         }
 
         val duration = measureTimeMillis {
-            songListAdapter.songItems = songItems.filter { songItem ->
+            songItemsAdapter.songItems = songItems.filter { songItem ->
                 predicates.all { predicate -> predicate(songItem) }
             }.toMutableList()
         }
         Log.d(TAG, "Filtering took : ${duration}ms")
 
-        songListAdapter.notifyDataSetChanged()
+        songItemsAdapter.notifyDataSetChanged()
     }
 
     private fun updateSelectedSongs() {
-        for (songItem in songListAdapter.songItems) {
+        for (songItem in songItemsAdapter.songItems) {
             if (songItem.isSelected) {
                 selectedSongTitles.add(songItem.title)
             } else {

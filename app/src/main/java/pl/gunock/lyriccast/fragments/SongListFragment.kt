@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 10:55 PM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,13 +24,13 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
-import pl.gunock.lyriccast.adapters.SongListAdapter
-import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
-import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
+import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.listeners.InputTextChangeListener
-import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
-import pl.gunock.lyriccast.models.SongItemModel
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
+import pl.gunock.lyriccast.listeners.InputTextChangedListener
+import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
@@ -44,10 +44,10 @@ class SongListFragment : Fragment() {
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
-    private lateinit var songListRecyclerView: RecyclerView
+    private lateinit var songItemsRecyclerView: RecyclerView
 
-    private var songItems: Set<SongItemModel> = setOf()
-    private lateinit var songListAdapter: SongListAdapter
+    private var songItems: Set<SongItem> = setOf()
+    private lateinit var songItemsAdapter: SongItemsAdapter
     private var selectionCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,11 +90,11 @@ class SongListFragment : Fragment() {
         searchViewEditText = searchView.editText!!
 
         categorySpinner = view.findViewById(R.id.spinner_category)
-        songListRecyclerView = view.findViewById(R.id.recycler_view_songs)
+        songItemsRecyclerView = view.findViewById(R.id.recycler_view_songs)
 
         view.findViewById<SwitchCompat>(R.id.switch_selected_songs).visibility = View.GONE
 
-        with(songListRecyclerView) {
+        with(songItemsRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = null
@@ -115,14 +115,14 @@ class SongListFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangeListener {
+        searchViewEditText.addTextChangedListener(InputTextChangedListener {
             filterSongs(
                 searchViewEditText.editableText.toString(),
                 category = categorySpinner.selectedItem.toString()
             )
         })
 
-        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
                 category = categorySpinner.selectedItem.toString()
@@ -147,15 +147,15 @@ class SongListFragment : Fragment() {
         val showAuthor = prefs.getBoolean("showAuthor", true)
 
         val onLongClickListener =
-            LongClickAdapterListener { holder: SongListAdapter.SongViewHolder, position: Int, _ ->
-                val item = songListAdapter.songItems[position]
+            LongClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+                val item = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
-                return@LongClickAdapterListener true
+                return@LongClickAdapterItemListener true
             }
 
         val onClickListener =
-            ClickAdapterListener { holder: SongListAdapter.SongViewHolder, position: Int, _ ->
-                val item: SongItemModel = songListAdapter.songItems[position]
+            ClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+                val item: SongItem = songItemsAdapter.songItems[position]
                 if (selectionCount == 0) {
                     pickSong(item)
                 } else {
@@ -164,15 +164,15 @@ class SongListFragment : Fragment() {
                 }
             }
 
-        songListAdapter = SongListAdapter(
+        songItemsAdapter = SongItemsAdapter(
             songItems.toMutableList(),
             showCheckBox = false,
             showAuthor = showAuthor,
-            onLongClickListener = onLongClickListener,
-            onClickListener = onClickListener
+            onItemLongClickListener = onLongClickListener,
+            onItemClickListener = onClickListener
         )
 
-        songListRecyclerView.adapter = songListAdapter
+        songItemsRecyclerView.adapter = songItemsAdapter
     }
 
     private fun filterSongs(title: String, category: String = "All") {
@@ -182,7 +182,7 @@ class SongListFragment : Fragment() {
 
         val normalizedTitle = title.normalize()
 
-        val predicates: MutableList<(SongItemModel) -> Boolean> = mutableListOf()
+        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
         if (category != "All") {
             predicates.add { songItem -> songItem.category == category }
@@ -193,16 +193,16 @@ class SongListFragment : Fragment() {
         }
 
         val duration = measureTimeMillis {
-            songListAdapter.songItems = songItems.filter { songItem ->
+            songItemsAdapter.songItems = songItems.filter { songItem ->
                 predicates.all { predicate -> predicate(songItem) }
             }.toMutableList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
 
-        songListAdapter.notifyDataSetChanged()
+        songItemsAdapter.notifyDataSetChanged()
     }
 
-    private fun pickSong(item: SongItemModel) {
+    private fun pickSong(item: SongItem) {
         val songSections = SongsContext.getSongLyrics(item.title)!!.lyrics
         val songMetadata = SongsContext.getSongMetadata(item.title)!!
         val lyrics = songMetadata.presentation.map { sectionName -> songSections[sectionName]!! }
@@ -213,7 +213,7 @@ class SongListFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSong(item: SongItemModel, holder: SongListAdapter.SongViewHolder) {
+    private fun selectSong(item: SongItem, holder: SongItemsAdapter.SongViewHolder) {
         if (!item.isSelected) {
             selectionCount++
         } else {
@@ -224,7 +224,7 @@ class SongListFragment : Fragment() {
         when (selectionCount) {
             0 -> {
                 datasetChanged = true
-                songListAdapter.showCheckBox = false
+                songItemsAdapter.showCheckBox = false
 
                 val deleteActionItem = menu.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = false
@@ -234,7 +234,7 @@ class SongListFragment : Fragment() {
             }
             1 -> {
                 datasetChanged = true
-                songListAdapter.showCheckBox = true
+                songItemsAdapter.showCheckBox = true
 
                 val deleteActionItem = menu.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = true
@@ -254,14 +254,14 @@ class SongListFragment : Fragment() {
         item.isSelected = !item.isSelected
 
         if (datasetChanged) {
-            songListAdapter.notifyDataSetChanged()
+            songItemsAdapter.notifyDataSetChanged()
         } else {
             holder.checkBox.isChecked = item.isSelected
         }
     }
 
     private fun editSelectedSong(): Boolean {
-        val selectedSong = songListAdapter.songItems.first { songItem -> songItem.isSelected }
+        val selectedSong = songItemsAdapter.songItems.first { songItem -> songItem.isSelected }
 
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("songTitle", selectedSong.title)
@@ -273,18 +273,18 @@ class SongListFragment : Fragment() {
     }
 
     private fun deleteSelectedSongs(): Boolean {
-        val selectedSongs = songListAdapter.songItems
+        val selectedSongs = songItemsAdapter.songItems
             .filter { song -> song.isSelected }
             .map { song -> song.title }
 
         SongsContext.deleteSongs(selectedSongs)
 
-        val remainingSongs = songListAdapter.songItems
+        val remainingSongs = songItemsAdapter.songItems
             .filter { songItem -> !selectedSongs.contains(songItem.title) }
-        songListAdapter.showCheckBox = false
+        songItemsAdapter.showCheckBox = false
 
-        songListAdapter.songItems.clear()
-        songListAdapter.songItems.addAll(remainingSongs)
+        songItemsAdapter.songItems.clear()
+        songItemsAdapter.songItems.addAll(remainingSongs)
 
         resetSelection()
 
@@ -292,8 +292,8 @@ class SongListFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        songListAdapter.showCheckBox = false
-        songListAdapter.notifyDataSetChanged()
+        songItemsAdapter.showCheckBox = false
+        songItemsAdapter.notifyDataSetChanged()
         selectionCount = 0
 
         if (!this::menu.isInitialized) {

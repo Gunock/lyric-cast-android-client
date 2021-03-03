@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/27/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/27/21 12:42 PM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -16,16 +16,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
-import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
-import pl.gunock.lyriccast.models.SetlistItemModel
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.models.SetlistItem
 
-class SetlistListAdapter(
-    var setlistItems: MutableList<SetlistItemModel>,
+class SetlistItemsAdapter(
+    var setlistItems: MutableList<SetlistItem>,
     var showCheckBox: Boolean = false,
-    val onLongClickListener: LongClickAdapterListener<SetlistViewHolder>? = null,
-    val onClickListener: ClickAdapterListener<SetlistViewHolder>? = null
-) : RecyclerView.Adapter<SetlistListAdapter.SetlistViewHolder>() {
+    val onItemLongClickListener: LongClickAdapterItemListener<SetlistViewHolder>? = null,
+    val onItemClickListener: ClickAdapterItemListener<SetlistViewHolder>? = null
+) : RecyclerView.Adapter<SetlistItemsAdapter.SetlistViewHolder>() {
 
     inner class SetlistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.setlist_checkbox)
@@ -33,7 +33,7 @@ class SetlistListAdapter(
         private val categoryCardView: CardView = itemView.findViewById(R.id.card_setlist_category)
         private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_setlist)
 
-        fun bind(item: SetlistItemModel) = with(itemView) {
+        fun bind(item: SetlistItem) = with(itemView) {
             titleTextView.text = setlistItems[layoutPosition].name
 
             if (item.category.isBlank()) {
@@ -74,15 +74,15 @@ class SetlistListAdapter(
     override fun onBindViewHolder(holder: SetlistViewHolder, position: Int) {
         val item = setlistItems[position]
 
-        if (onLongClickListener != null) {
+        if (onItemLongClickListener != null) {
             holder.itemView.setOnLongClickListener { view ->
-                onLongClickListener.execute(holder, position, view)
+                onItemLongClickListener.execute(holder, position, view)
             }
         }
 
-        if (onClickListener != null) {
+        if (onItemClickListener != null) {
             holder.itemView.setOnClickListener { view ->
-                onClickListener.execute(holder, position, view)
+                onItemClickListener.execute(holder, position, view)
             }
         }
 

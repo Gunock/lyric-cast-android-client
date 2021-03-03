@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 2/28/21 11:18 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 11:15 PM
+ * Last modified 3/3/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -22,13 +22,13 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
-import pl.gunock.lyriccast.adapters.SetlistListAdapter
-import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
-import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
+import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.listeners.InputTextChangeListener
-import pl.gunock.lyriccast.listeners.SpinnerItemSelectedListener
-import pl.gunock.lyriccast.models.SetlistItemModel
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
+import pl.gunock.lyriccast.listeners.InputTextChangedListener
+import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.models.SetlistItem
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -43,10 +43,10 @@ class SetlistsFragment : Fragment() {
     private lateinit var categorySpinner: Spinner
     private lateinit var setlistRecyclerView: RecyclerView
 
-    private var setlistItems: Set<SetlistItemModel> = setOf()
+    private var setlistItems: Set<SetlistItem> = setOf()
     private var selectionCount: Int = 0
 
-    private lateinit var setlistListAdapter: SetlistListAdapter
+    private lateinit var setlistItemsAdapter: SetlistItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,26 +101,26 @@ class SetlistsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        setupSetlistList()
+        setupSetlists()
         setupCategorySpinner()
 
         searchViewEditText.setText("")
         categorySpinner.setSelection(0)
     }
 
-    private fun setupSetlistList() {
+    private fun setupSetlists() {
         setlistItems = SetlistsContext.getSetlistItems()
 
         val onLongClickListener =
-            LongClickAdapterListener { holder: SetlistListAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistListAdapter.setlistItems[position]
+            LongClickAdapterItemListener { holder: SetlistItemsAdapter.SetlistViewHolder, position: Int, _ ->
+                val item = setlistItemsAdapter.setlistItems[position]
                 selectSetlist(item, holder)
-                return@LongClickAdapterListener true
+                return@LongClickAdapterItemListener true
             }
 
         val onClickListener =
-            ClickAdapterListener { holder: SetlistListAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistListAdapter.setlistItems[position]
+            ClickAdapterItemListener { holder: SetlistItemsAdapter.SetlistViewHolder, position: Int, _ ->
+                val item = setlistItemsAdapter.setlistItems[position]
                 if (selectionCount == 0) {
                     pickSetlist(item)
                 } else {
@@ -128,14 +128,14 @@ class SetlistsFragment : Fragment() {
                 }
             }
 
-        setlistListAdapter = SetlistListAdapter(
+        setlistItemsAdapter = SetlistItemsAdapter(
             setlistItems = setlistItems.toMutableList(),
-            onLongClickListener = onLongClickListener,
-            onClickListener = onClickListener
+            onItemLongClickListener = onLongClickListener,
+            onItemClickListener = onClickListener
         )
 
         requireView()
-            .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistListAdapter
+            .findViewById<RecyclerView>(R.id.recycler_view_setlists)!!.adapter = setlistItemsAdapter
     }
 
     private fun setupCategorySpinner() {
@@ -149,14 +149,14 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangeListener { newText ->
+        searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
             filterSetlists(
                 newText,
                 categorySpinner.selectedItem.toString()
             )
         })
 
-        categorySpinner.onItemSelectedListener = SpinnerItemSelectedListener { _, _ ->
+        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSetlists(
                 searchViewEditText.editableText.toString(),
                 categorySpinner.selectedItem.toString()
@@ -164,15 +164,15 @@ class SetlistsFragment : Fragment() {
         }
     }
 
-    private fun pickSetlist(item: SetlistItemModel) {
+    private fun pickSetlist(item: SetlistItem) {
         val intent = Intent(context, SetlistControlsActivity::class.java)
         intent.putExtra("setlistName", item.name)
         startActivity(intent)
     }
 
     private fun selectSetlist(
-        item: SetlistItemModel,
-        holder: SetlistListAdapter.SetlistViewHolder
+        item: SetlistItem,
+        holder: SetlistItemsAdapter.SetlistViewHolder
     ) {
         if (!item.isSelected) {
             selectionCount++
@@ -184,7 +184,7 @@ class SetlistsFragment : Fragment() {
         when (selectionCount) {
             0 -> {
                 datasetChanged = true
-                setlistListAdapter.showCheckBox = false
+                setlistItemsAdapter.showCheckBox = false
 
                 val deleteActionItem = menu.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = false
@@ -194,7 +194,7 @@ class SetlistsFragment : Fragment() {
             }
             1 -> {
                 datasetChanged = true
-                setlistListAdapter.showCheckBox = true
+                setlistItemsAdapter.showCheckBox = true
 
                 val deleteActionItem = menu.findItem(R.id.action_delete)
                 deleteActionItem.isVisible = true
@@ -214,7 +214,7 @@ class SetlistsFragment : Fragment() {
         item.isSelected = !item.isSelected
 
         if (datasetChanged) {
-            setlistListAdapter.notifyDataSetChanged()
+            setlistItemsAdapter.notifyDataSetChanged()
         } else {
             holder.checkBox.isChecked = item.isSelected
         }
@@ -222,34 +222,34 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedSetlist = setlistListAdapter.setlistItems
+        val selectedSetlist = setlistItemsAdapter.setlistItems
             .first { setlistItem -> setlistItem.isSelected }
 
         val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
         intent.putExtra("setlistName", selectedSetlist.name)
         startActivity(intent)
 
-        setlistListAdapter.showCheckBox = false
-        setlistListAdapter.notifyDataSetChanged()
+        setlistItemsAdapter.showCheckBox = false
+        setlistItemsAdapter.notifyDataSetChanged()
         selectionCount = 0
 
         return true
     }
 
     private fun deleteSelectedSetlists(): Boolean {
-        val selectedSetlists = setlistListAdapter.setlistItems
+        val selectedSetlists = setlistItemsAdapter.setlistItems
             .filter { setlist -> setlist.isSelected }
             .map { setlist -> setlist.name }
 
         SetlistsContext.deleteSetlists(selectedSetlists)
 
-        val remainingSetlists = setlistListAdapter.setlistItems
+        val remainingSetlists = setlistItemsAdapter.setlistItems
             .filter { setlistItem -> !selectedSetlists.contains(setlistItem.name) }
-        setlistListAdapter.showCheckBox = false
+        setlistItemsAdapter.showCheckBox = false
 
-        setlistListAdapter.setlistItems.clear()
-        setlistListAdapter.setlistItems.addAll(remainingSetlists)
-        setlistListAdapter.notifyDataSetChanged()
+        setlistItemsAdapter.setlistItems.clear()
+        setlistItemsAdapter.setlistItems.addAll(remainingSetlists)
+        setlistItemsAdapter.notifyDataSetChanged()
 
         selectionCount = 0
 
@@ -261,7 +261,7 @@ class SetlistsFragment : Fragment() {
 
         val normalizedName = name.normalize()
 
-        val predicates: MutableList<(SetlistItemModel) -> Boolean> = mutableListOf()
+        val predicates: MutableList<(SetlistItem) -> Boolean> = mutableListOf()
 
         if (category != "All") {
             predicates.add { setlistItem -> setlistItem.category == category }
@@ -272,12 +272,12 @@ class SetlistsFragment : Fragment() {
         }
 
         val duration = measureTimeMillis {
-            setlistListAdapter.setlistItems = setlistItems.filter { setlistItem ->
+            setlistItemsAdapter.setlistItems = setlistItems.filter { setlistItem ->
                 predicates.all { predicate -> predicate(setlistItem) }
             }.toMutableList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
 
-        setlistListAdapter.notifyDataSetChanged()
+        setlistItemsAdapter.notifyDataSetChanged()
     }
 }

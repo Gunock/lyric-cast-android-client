@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 10:51 PM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -16,18 +16,18 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.adapters.listeners.ClickAdapterListener
-import pl.gunock.lyriccast.adapters.listeners.LongClickAdapterListener
-import pl.gunock.lyriccast.models.SongItemModel
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.models.SongItem
 
-class SongListAdapter(
-    var songItems: MutableList<SongItemModel>,
+class SongItemsAdapter(
+    var songItems: MutableList<SongItem>,
     var showCheckBox: Boolean = false,
     val showRowNumber: Boolean = false,
     val showAuthor: Boolean = true,
-    val onLongClickListener: LongClickAdapterListener<SongViewHolder>? = null,
-    val onClickListener: ClickAdapterListener<SongViewHolder>? = null
-) : RecyclerView.Adapter<SongListAdapter.SongViewHolder>() {
+    val onItemLongClickListener: LongClickAdapterItemListener<SongViewHolder>? = null,
+    val onItemClickListener: ClickAdapterItemListener<SongViewHolder>? = null
+) : RecyclerView.Adapter<SongItemsAdapter.SongViewHolder>() {
 
     inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.song_checkbox)
@@ -36,7 +36,7 @@ class SongListAdapter(
         private val categoryTextView: TextView = itemView.findViewById(R.id.song_category)
         private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
 
-        fun bind(item: SongItemModel, isSelected: Boolean) = with(itemView) {
+        fun bind(item: SongItem, isSelected: Boolean) = with(itemView) {
             if (!showRowNumber) {
                 titleTextView.text = item.title
             } else {
@@ -91,15 +91,15 @@ class SongListAdapter(
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val item = songItems[position]
 
-        if (onLongClickListener != null) {
+        if (onItemLongClickListener != null) {
             holder.itemView.setOnLongClickListener { view ->
-                onLongClickListener.execute(holder, position, view)
+                onItemLongClickListener.execute(holder, position, view)
             }
         }
 
-        if (onClickListener != null) {
+        if (onItemClickListener != null) {
             holder.itemView.setOnClickListener { view ->
-                onClickListener.execute(holder, position, view)
+                onItemClickListener.execute(holder, position, view)
             }
         }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 2/28/21 11:40 PM
+ * Last modified 3/3/21 11:03 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -9,11 +9,11 @@ package pl.gunock.lyriccast.models
 import org.json.JSONArray
 import org.json.JSONObject
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.utils.JsonHelper.arrayToStringList
+import pl.gunock.lyriccast.helpers.JsonHelper.arrayToStringList
 import java.io.File
 import java.util.*
 
-class SongMetadataModel() {
+class SongMetadata() {
     private var lyricsFilename: String = ""
 
     private var _title: String = ""
@@ -48,9 +48,9 @@ class SongMetadataModel() {
         copyright = if (copyright.toLowerCase(Locale.ROOT) != "null") copyright else ""
     }
 
-    fun loadLyrics(sourceDirectory: String): SongLyricsModel {
+    fun loadLyrics(sourceDirectory: String): SongLyrics {
         val lyricsContent = File("$sourceDirectory$lyricsFilename").readText(Charsets.UTF_8)
-        return SongLyricsModel(JSONObject(lyricsContent))
+        return SongLyrics(JSONObject(lyricsContent))
     }
 
     fun toJSON(): JSONObject {

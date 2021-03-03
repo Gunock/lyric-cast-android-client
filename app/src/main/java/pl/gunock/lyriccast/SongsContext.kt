@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/1/21 12:09 AM
+ * Last modified 3/3/21 11:02 PM
  */
 
 package pl.gunock.lyriccast
@@ -11,9 +11,9 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.extensions.create
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.extensions.writeText
-import pl.gunock.lyriccast.models.SongItemModel
-import pl.gunock.lyriccast.models.SongLyricsModel
-import pl.gunock.lyriccast.models.SongMetadataModel
+import pl.gunock.lyriccast.models.SongItem
+import pl.gunock.lyriccast.models.SongLyrics
+import pl.gunock.lyriccast.models.SongMetadata
 import java.io.File
 import java.io.FilenameFilter
 import java.util.*
@@ -22,13 +22,13 @@ object SongsContext {
     private const val TAG = "SongsContext"
 
     var songsDirectory: String = ""
-    private var songMap: SortedMap<String, SongMetadataModel> = sortedMapOf()
+    private var songMap: SortedMap<String, SongMetadata> = sortedMapOf()
 
     var categories: Set<String> = setOf()
         private set
 
     fun loadSongsMetadata() {
-        val loadedSongsMetadata: MutableList<SongMetadataModel> = mutableListOf()
+        val loadedSongsMetadata: MutableList<SongMetadata> = mutableListOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
 
         val fileList = File(songsDirectory).listFiles(fileFilter) ?: return
@@ -41,7 +41,7 @@ object SongsContext {
             val json = JSONObject(fileText)
             Log.v(TAG, "Parsed JSON : $json")
 
-            val songMetadata = SongMetadataModel(json)
+            val songMetadata = SongMetadata(json)
             loadedSongsMetadata.add(songMetadata)
 
             if (!songMetadata.category.isNullOrBlank()) {
@@ -54,7 +54,7 @@ object SongsContext {
         fillSongsList(loadedSongsMetadata)
     }
 
-    fun replaceSong(oldSongTitle: String, song: SongMetadataModel, songLyrics: SongLyricsModel) {
+    fun replaceSong(oldSongTitle: String, song: SongMetadata, songLyrics: SongLyrics) {
         val songTitleNormalized = oldSongTitle.normalize()
 
         File("$songsDirectory$songTitleNormalized.json").delete()
@@ -76,7 +76,7 @@ object SongsContext {
         SetlistsContext.removeSongs(songTitles)
     }
 
-    fun addSong(song: SongMetadataModel, songLyrics: SongLyricsModel) {
+    fun addSong(song: SongMetadata, songLyrics: SongLyrics) {
         val songNormalizedTitle = song.title.normalize()
         val songFilePath = "$songsDirectory$songNormalizedTitle"
 
@@ -93,25 +93,25 @@ object SongsContext {
         songMap[song.title] = song
     }
 
-    fun getSongMap(): Map<String, SongMetadataModel> {
+    fun getSongMap(): Map<String, SongMetadata> {
         return songMap.toMap()
     }
 
-    fun getSongItems(): Set<SongItemModel> {
+    fun getSongItems(): Set<SongItem> {
         return songMap.map { songMapEntry ->
-            SongItemModel(songMapEntry.value)
+            SongItem(songMapEntry.value)
         }.toSet()
     }
 
-    fun getSongLyrics(title: String): SongLyricsModel? {
+    fun getSongLyrics(title: String): SongLyrics? {
         return songMap[title]?.loadLyrics(songsDirectory)
     }
 
-    fun getSongMetadata(title: String): SongMetadataModel? {
+    fun getSongMetadata(title: String): SongMetadata? {
         return songMap[title]
     }
 
-    private fun fillSongsList(songs: List<SongMetadataModel>) {
+    private fun fillSongsList(songs: List<SongMetadata>) {
         for (song in songs) {
             songMap[song.title] = song
         }
