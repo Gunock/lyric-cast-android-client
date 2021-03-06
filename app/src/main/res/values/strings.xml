@@ -1,13 +1,14 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 10:51 PM
+  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 10:48 PM
+  ~ Last modified 3/6/21 9:20 PM
   -->
 
 <resources>
     <string name="app_name">LyricCast</string>
 
     <!--  Strings used for action bar -->
+    <string name="label_category_manager">Category manager</string>
     <string name="label_settings">Settings</string>
     <string name="label_song_editor">Song editor</string>
     <string name="label_setlist_editor">Setlist editor</string>
@@ -23,6 +24,7 @@
     <!--  Strings used for inputs  -->
     <string name="hint_song_title">Song title</string>
     <string name="hint_setlist_name">Setlist name</string>
+    <string name="hint_category_name">Category name</string>
     <string name="hint_selected">Selected</string>
     <string name="hint_enter_lyrics">Enter lyrics</string>
     <string name="input_section_name">Section name</string>
@@ -53,6 +55,7 @@
     <string name="chromecast_control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
 
     <!--  Strings used as placeholders -->
+    <string name="placeholder_color">Color</string>
     <string name="placeholder_title">Title</string>
     <string name="placeholder_name">Name</string>
     <string name="placeholder_author">Author</string>

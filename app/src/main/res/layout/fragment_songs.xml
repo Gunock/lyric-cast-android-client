@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 11:26 PM
+  ~ Last modified 3/6/21 9:40 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,7 +10,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.SongListFragment">
+    tools:context=".fragments.SongsFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tv_filter_songs"
@@ -33,6 +33,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
+        style="@style/Widget.LyricCast.Spinner.Underlined"
         android:id="@+id/spn_category"
         android:layout_width="0dp"
         android:layout_height="50dp"
@@ -40,7 +41,8 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toStartOf="@+id/swt_selected_songs"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_filter_songs" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_filter_songs"
+        tools:listitem="@android:layout/simple_spinner_item" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/swt_selected_songs"
@@ -67,6 +69,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:fadeScrollbars="false"
+        android:outlineProvider="none"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"

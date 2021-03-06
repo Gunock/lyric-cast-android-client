@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/6/21 10:09 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -34,9 +34,9 @@ import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
-class SongListFragment : Fragment() {
+class SongsFragment : Fragment() {
     private companion object {
-        const val TAG = "SongListFragment"
+        const val TAG = "SongsFragment"
     }
 
     private var castContext: CastContext? = null
@@ -59,26 +59,7 @@ class SongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_song_list, container, false)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
-
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedSongs()
-            R.id.menu_edit -> editSelectedSong()
-            else -> super.onOptionsItemSelected(item)
-        }
+        return inflater.inflate(R.layout.fragment_songs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,11 +88,30 @@ class SongListFragment : Fragment() {
         super.onResume()
 
         setupCategorySpinner()
-        setupSongList()
+        setupSongs()
         resetSelection()
 
         searchViewEditText.setText("")
         categorySpinner.setSelection(0)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        this.menu = menu
+        super.onCreateOptionsMenu(menu, inflater)
+
+        val deleteActionItem = menu.findItem(R.id.menu_delete)
+        deleteActionItem.isVisible = false
+
+        val editActionItem = menu.findItem(R.id.menu_edit)
+        editActionItem.isVisible = false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_delete -> deleteSelectedSongs()
+            R.id.menu_edit -> editSelectedSong()
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupListeners() {
@@ -140,7 +140,7 @@ class SongListFragment : Fragment() {
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
-    private fun setupSongList() {
+    private fun setupSongs() {
         songItems = SongsContext.getSongItems()
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())

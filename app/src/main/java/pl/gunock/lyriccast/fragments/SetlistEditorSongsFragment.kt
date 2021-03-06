@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:42 PM
+ * Last modified 3/6/21 10:09 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -32,12 +32,12 @@ import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
-class SetlistEditorSongListFragment : Fragment() {
+class SetlistEditorSongsFragment : Fragment() {
     private companion object {
-        const val TAG = "SetlistEditorSongListFg"
+        const val TAG = "SetlistEditorSongsFg"
     }
 
-    private val args: SetlistEditorSongListFragmentArgs by navArgs()
+    private val args: SetlistEditorSongsFragmentArgs by navArgs()
 
     private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
@@ -58,7 +58,7 @@ class SetlistEditorSongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_song_list, container, false)
+        return inflater.inflate(R.layout.fragment_songs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,7 +71,7 @@ class SetlistEditorSongListFragment : Fragment() {
         categorySpinner = view.findViewById(R.id.spn_category)
         selectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
 
-        setupSongList(view)
+        setupSongs(view)
         setupListeners()
 
         val categorySpinnerAdapter = ArrayAdapter(
@@ -89,7 +89,7 @@ class SetlistEditorSongListFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
-                val action = SetlistEditorSongListFragmentDirections
+                val action = SetlistEditorSongsFragmentDirections
                     .actionSetlistEditorSongsToSetlistEditor(
                         selectedSongs = selectedSongTitles.toTypedArray(),
                         setlistName = args.setlistName
@@ -124,7 +124,7 @@ class SetlistEditorSongListFragment : Fragment() {
         }
     }
 
-    private fun setupSongList(view: View) {
+    private fun setupSongs(view: View) {
         songItems = SongsContext.getSongItems()
         songItems.forEach { songItem ->
             songItem.isSelected = selectedSongTitles.contains(songItem.title)

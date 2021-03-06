@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/6/21 10:37 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -52,7 +52,7 @@ class SongItemsAdapter(
             if (!item.category.isNullOrBlank()) {
                 categoryTextView.text = item.category
             } else {
-                itemView.findViewById<CardView>(R.id.cdv_song_category).visibility = View.INVISIBLE
+                itemView.findViewById<CardView>(R.id.cdv_category_color).visibility = View.INVISIBLE
             }
 
             if (!showAuthor) {
@@ -86,7 +86,6 @@ class SongItemsAdapter(
 
         return SongViewHolder(view)
     }
-
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val item = songItems[position]
