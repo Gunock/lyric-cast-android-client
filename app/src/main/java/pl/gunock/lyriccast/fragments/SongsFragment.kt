@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/6/21 10:09 PM
+ * Last modified 3/7/21 3:15 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -99,11 +99,7 @@ class SongsFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
-
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
+        showMenuActions(showDelete = false, showEdit = false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -226,29 +222,15 @@ class SongsFragment : Fragment() {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = false
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = false
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
+                showMenuActions(showDelete = false, showEdit = false)
             }
             1 -> {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = true
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = true
+                showMenuActions()
             }
-            2 -> {
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
-            }
+            2 -> showMenuActions(showEdit = false)
         }
 
         item.isSelected = !item.isSelected
@@ -281,7 +263,6 @@ class SongsFragment : Fragment() {
 
         val remainingSongs = songItemsAdapter.songItems
             .filter { songItem -> !selectedSongs.contains(songItem.title) }
-        songItemsAdapter.showCheckBox = false
 
         songItemsAdapter.songItems.clear()
         songItemsAdapter.songItems.addAll(remainingSongs)
@@ -300,10 +281,15 @@ class SongsFragment : Fragment() {
             return
         }
 
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
+        showMenuActions(showDelete = false, showEdit = false)
+    }
 
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
+    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
+        if (!this::menu.isInitialized) {
+            return
+        }
+
+        menu.findItem(R.id.menu_delete).isVisible = showDelete
+        menu.findItem(R.id.menu_edit).isVisible = showEdit
     }
 }

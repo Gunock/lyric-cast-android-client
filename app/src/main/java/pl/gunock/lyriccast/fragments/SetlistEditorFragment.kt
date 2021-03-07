@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:55 PM
+ * Last modified 3/7/21 11:16 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -25,7 +25,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
-import pl.gunock.lyriccast.enums.TitleValidationState
+import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.models.Setlist
 import pl.gunock.lyriccast.models.SongItem
@@ -35,33 +35,6 @@ import pl.gunock.lyriccast.models.SongItem
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class SetlistEditorFragment : Fragment() {
-
-    inner class SetlistNameTextWatcher : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
-
-            when (validateSetlistName(newText)) {
-                TitleValidationState.EMPTY -> {
-                    setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Please enter setlist name"
-                }
-                TitleValidationState.ALREADY_IN_USE -> {
-                    setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Setlist name already in use"
-                }
-                TitleValidationState.VALID -> {
-                    setlistNameInputLayout.error = null
-                    setlistNameInput.error = null
-                }
-            }
-        }
-    }
 
     private val args: SetlistEditorFragmentArgs by navArgs()
     private val setlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
@@ -139,20 +112,20 @@ class SetlistEditorFragment : Fragment() {
         }
     }
 
-    private fun validateSetlistName(songTitle: String): TitleValidationState {
+    private fun validateSetlistName(songTitle: String): NameValidationState {
         return if (songTitle.isBlank()) {
-            TitleValidationState.EMPTY
+            NameValidationState.EMPTY
         } else if (intentSetlistName != songTitle && setlistNames.contains(songTitle)) {
-            TitleValidationState.ALREADY_IN_USE
+            NameValidationState.ALREADY_IN_USE
         } else {
-            TitleValidationState.VALID
+            NameValidationState.VALID
         }
     }
 
     private fun saveSetlist(): Boolean {
         val setlistName = setlistNameInput.text.toString()
 
-        if (validateSetlistName(setlistName) != TitleValidationState.VALID) {
+        if (validateSetlistName(setlistName) != NameValidationState.VALID) {
             setlistNameInput.text = setlistName
             setlistNameInput.requestFocus()
             return false
@@ -176,4 +149,32 @@ class SetlistEditorFragment : Fragment() {
 
         return true
     }
+
+    inner class SetlistNameTextWatcher : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            val newText = s.toString()
+
+            when (validateSetlistName(newText)) {
+                NameValidationState.EMPTY -> {
+                    setlistNameInputLayout.error = " "
+                    setlistNameInput.error = "Please enter setlist name"
+                }
+                NameValidationState.ALREADY_IN_USE -> {
+                    setlistNameInputLayout.error = " "
+                    setlistNameInput.error = "Setlist name already in use"
+                }
+                NameValidationState.VALID -> {
+                    setlistNameInputLayout.error = null
+                    setlistNameInput.error = null
+                }
+            }
+        }
+    }
+
 }

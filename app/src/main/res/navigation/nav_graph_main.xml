@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 9:42 PM
+  ~ Last modified 3/7/21 2:29 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,8 @@
 
         <action
             android:id="@+id/action_Start_to_Songs"
-            app:destination="@id/Songs" />
+            app:destination="@id/Songs"
+            app:enterAnim="@anim/fragment_fade_enter" />
     </fragment>
 
     <fragment

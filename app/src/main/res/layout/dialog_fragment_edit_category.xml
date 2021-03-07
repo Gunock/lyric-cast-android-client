@@ -1,43 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 11:15 PM
+  ~ Last modified 3/7/21 11:44 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:padding="16dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tv_category_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/ting_category_name"
+            android:id="@+id/tin_category_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_category_name" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
-        android:id="@+id/spinner2"
+        android:id="@+id/spn_category_color2"
         style="@style/Widget.LyricCast.Spinner.Underlined"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_category_name"
         tools:listitem="@layout/spinner_item_color" />
+
+    <Button
+        android:id="@+id/btn_cancel"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@android:string/cancel"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_save_category"
+        app:layout_constraintTop_toBottomOf="@+id/spn_category_color2" />
+
+    <Button
+        android:id="@+id/btn_save_category"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/button_save"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spn_category_color2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,12 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/1/21 12:09 AM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/1/21 12:07 AM
+ * Last modified 3/7/21 11:16 PM
  */
 
 package pl.gunock.lyriccast.enums
 
-enum class TitleValidationState {
+enum class NameValidationState {
     VALID,
     EMPTY,
     ALREADY_IN_USE

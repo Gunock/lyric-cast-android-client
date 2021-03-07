@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/6/21 11:15 PM
+ * Last modified 3/7/21 10:09 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -35,12 +35,12 @@ class ColorSpinnerAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    override fun getItem(position: Int): Any? {
-        return null
+    override fun getItem(position: Int): Any {
+        return colors[position]
     }
 
     override fun getItemId(position: Int): Long {
-        return 0
+        return 0L
     }
 
     override fun getCount(): Int {

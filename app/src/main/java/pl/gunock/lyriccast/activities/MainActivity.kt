@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/5/21 7:51 PM
+ * Last modified 3/7/21 10:29 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_category_manager -> goToCategoryManager()
+            R.id.menu_add -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> import()
             R.id.menu_export_all -> export()
@@ -206,6 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
         startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
+
         return true
     }
 

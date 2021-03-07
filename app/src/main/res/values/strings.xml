@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 9:20 PM
+  ~ Last modified 3/7/21 11:41 PM
   -->
 
 <resources>
@@ -9,12 +9,14 @@
 
     <!--  Strings used for action bar -->
     <string name="label_category_manager">Category manager</string>
+    <string name="label_categories">Categories</string>
     <string name="label_settings">Settings</string>
     <string name="label_song_editor">Song editor</string>
     <string name="label_setlist_editor">Setlist editor</string>
     <string name="label_controls">Controls</string>
     <string name="label_setlists">Setlists</string>
     <string name="label_songs">Songs</string>
+    <string name="label_add_category">Add category</string>
     <string name="option_cast">Cast</string>
     <string name="option_export">Export</string>
     <string name="option_menu_import">Import</string>
