@@ -1,0 +1,18 @@
+<!--
+  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/8/21 12:37 AM
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/menu_save"
+        android:title="@string/button_save"
+        app:showAsAction="always" />
+
+</menu>

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 2:42 PM
+ * Last modified 3/8/21 12:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -61,11 +61,11 @@ class SongItemsAdapter(
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
         val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
-        fun bind(item: SongItem) = with(itemView) {
+        fun bind(item: SongItem) {
             if (!showRowNumber) {
                 titleTextView.text = item.title
             } else {
-                val titleText = context.resources.getString(
+                val titleText = itemView.context.resources.getString(
                     R.string.item_song_item_title_template,
                     layoutPosition + 1,
                     item.title

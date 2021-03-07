@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 3:15 PM
+ * Last modified 3/8/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -78,7 +78,6 @@ class SongsFragment : Fragment() {
         with(songItemsRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = null
         }
 
         setupListeners()

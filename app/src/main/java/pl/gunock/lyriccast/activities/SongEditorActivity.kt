@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 11:16 PM
+ * Last modified 3/8/21 12:39 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,6 +11,8 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.AllCaps
 import android.text.TextWatcher
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
@@ -80,6 +82,24 @@ class SongEditorActivity : AppCompatActivity() {
         setupListeners()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_song_editor, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_save -> {
+                if (saveSong()) {
+                    finish()
+                }
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = ArrayAdapter(
             baseContext,
@@ -142,12 +162,6 @@ class SongEditorActivity : AppCompatActivity() {
                 }
             }
         )
-
-        findViewById<Button>(R.id.btn_save_song).setOnClickListener {
-            if (saveSong()) {
-                finish()
-            }
-        }
 
         findViewById<ImageButton>(R.id.btn_move_section_left).setOnClickListener {
             songSectionTabLayout.moveTabLeft(selectedTab)

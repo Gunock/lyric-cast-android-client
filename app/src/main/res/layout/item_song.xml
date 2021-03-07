@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:43 PM
+  ~ Last modified 3/8/21 12:09 AM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,10 +20,8 @@
     android:longClickable="true"
     android:outlineProvider="background"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
-    app:cardMaxElevation="@dimen/dimen_card_elevation_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

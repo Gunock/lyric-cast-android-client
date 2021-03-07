@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 10:58 PM
+ * Last modified 3/8/21 12:36 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -63,7 +63,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         this.menu = menu
         menuInflater.inflate(R.menu.menu_category_manager, menu)
 
-        showMenuActions(showAdd = true)
+        showMenuActions(showDelete = false, showEdit = false)
         return true
     }
 
