@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 10:43 PM
+ * Last modified 3/8/21 10:21 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -26,15 +26,6 @@ class CategoryItemsAdapter(
     val onItemLongClickListener: LongClickAdapterItemListener<CategoryViewHolder>? = null,
     val onItemClickListener: ClickAdapterItemListener<CategoryViewHolder>? = null
 ) : RecyclerView.Adapter<CategoryItemsAdapter.CategoryViewHolder>() {
-
-    private val colorMap: Map<String, Int>
-
-    init {
-        val colorNames = context.resources.getStringArray(R.array.category_color_names)
-        val colorValues = context.resources.getIntArray(R.array.category_color_values)
-
-        colorMap = colorNames.zip<String, Int>(colorValues.toList()).toMap()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val textView: View = LayoutInflater.from(parent.context)
@@ -65,7 +56,7 @@ class CategoryItemsAdapter(
     inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
         private val name: TextView = itemView.findViewById(R.id.tv_category_name)
-        private val categoryCard: CardView = itemView.findViewById(R.id.cdv_category_color)
+        private val colorCard: CardView = itemView.findViewById(R.id.cdv_category_color)
 
         fun bind(item: CategoryItem) = with(itemView) {
             name.text = categoryItems[layoutPosition].name
@@ -81,8 +72,9 @@ class CategoryItemsAdapter(
                 checkBox.isChecked = item.isSelected
             }
 
-            val color = colorMap[item.color]!!
-            categoryCard.setCardBackgroundColor(color)
+            if (item.color != null) {
+                colorCard.setCardBackgroundColor(item.color)
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 10:27 PM
+  ~ Last modified 3/8/21 10:01 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -44,7 +44,7 @@
         <TextView
             android:id="@+id/tv_category_name"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="32dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="2"

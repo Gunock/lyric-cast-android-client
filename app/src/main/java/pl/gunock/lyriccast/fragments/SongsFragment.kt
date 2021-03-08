@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:12 AM
+ * Last modified 3/8/21 10:10 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
@@ -126,10 +127,13 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupCategorySpinner() {
+        val categories = CategoriesContext.getCategoryItems()
+            .map { categoryItem -> categoryItem.name }
+
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            listOf("All") + SongsContext.categories.toList()
+            listOf("All") + categories
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter

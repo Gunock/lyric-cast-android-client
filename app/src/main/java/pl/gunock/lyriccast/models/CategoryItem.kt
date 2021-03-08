@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 10:57 PM
+ * Last modified 3/8/21 9:41 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -11,6 +11,6 @@ class CategoryItem(
     var isSelected: Boolean = false
 ) : Category(category.name, category.color) {
 
-    constructor(name: String, color: String) : this(Category(name, color))
+    constructor(name: String, color: Int) : this(Category(name, color))
 
 }

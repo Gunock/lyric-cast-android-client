@@ -15,18 +15,22 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.models.ColorItem
+import pl.gunock.lyriccast.models.Category
 
-
-class ColorSpinnerAdapter(
+class CategorySpinnerAdapter(
     context: Context,
-    private val colors: Array<ColorItem>
+    private val categories: Array<Category>
 ) : BaseAdapter() {
+
+    constructor(context: Context, categories: Set<Category>) : this(
+        context,
+        categories.toTypedArray()
+    )
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getItem(position: Int): Any {
-        return colors[position]
+        return categories[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -34,7 +38,7 @@ class ColorSpinnerAdapter(
     }
 
     override fun getCount(): Int {
-        return colors.size
+        return categories.size
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -42,7 +46,7 @@ class ColorSpinnerAdapter(
         if (convertView == null) {
             view = inflater.inflate(R.layout.spinner_item_color, parent, false)
             val vh = CategoryViewHolder(view)
-            val item = colors[position]
+            val item = categories[position]
             vh.bind(item)
         } else {
             view = convertView
@@ -55,9 +59,13 @@ class ColorSpinnerAdapter(
         private val name: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
         private val colorCard: CardView = itemView.findViewById(R.id.cdv_spinner_category_color)
 
-        fun bind(item: ColorItem) {
+        fun bind(item: Category) {
             name.text = item.name
-            colorCard.setCardBackgroundColor(item.value)
+            if (item.color != null) {
+                colorCard.setCardBackgroundColor(item.color)
+            } else {
+                colorCard.visibility = View.GONE
+            }
         }
     }
 

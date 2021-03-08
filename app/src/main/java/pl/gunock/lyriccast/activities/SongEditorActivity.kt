@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:39 AM
+ * Last modified 3/8/21 10:18 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,19 +17,21 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
+import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.extensions.moveTabLeft
 import pl.gunock.lyriccast.extensions.moveTabRight
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
+import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongLyrics
 import pl.gunock.lyriccast.models.SongMetadata
 
 class SongEditorActivity : AppCompatActivity() {
     private var intentSongTitle: String? = null
-    private var songTitles: Set<String> = setOf()
 
     private lateinit var sectionNameInput: EditText
     private lateinit var songTitleInputLayout: TextInputLayout
@@ -41,6 +43,8 @@ class SongEditorActivity : AppCompatActivity() {
 
     private val sectionNameTextWatcher: SectionNameTextWatcher = SectionNameTextWatcher()
     private val songTitleTextWatcher: SongTitleTextWatcher = SongTitleTextWatcher()
+
+    private lateinit var categories: Set<Category>
     private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
     private val tabCountMap: MutableMap<String, Int> = mutableMapOf()
 
@@ -61,8 +65,7 @@ class SongEditorActivity : AppCompatActivity() {
         categorySpinner = findViewById(R.id.spn_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
-
-        songTitles = SongsContext.getSongMap().keys
+        categories = setOf(Category("No category", null)) + CategoriesContext.getCategoryItems()
 
         setupCategorySpinner()
 
@@ -72,7 +75,11 @@ class SongEditorActivity : AppCompatActivity() {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
 
             val songMetadata = SongsContext.getSongMetadata(intentSongTitle!!)!!
-            categorySpinner.setSelection(SongsContext.categories.indexOf(songMetadata.category))
+            categorySpinner.setSelection(
+                CategoriesContext.getCategoryItems()
+                    .map { categoryItem -> categoryItem.name }
+                    .indexOf(songMetadata.category)
+            )
         } else {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
             sectionLyrics[selectedTab.text.toString()] = ""
@@ -101,12 +108,7 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = ArrayAdapter(
-            baseContext,
-            android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext, categories)
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
@@ -179,7 +181,7 @@ class SongEditorActivity : AppCompatActivity() {
     private fun validateSongTitle(songTitle: String): NameValidationState {
         return if (songTitle.isBlank()) {
             NameValidationState.EMPTY
-        } else if (intentSongTitle != songTitle && songTitles.contains(songTitle)) {
+        } else if (intentSongTitle != songTitle && SongsContext.containsSong(songTitle)) {
             NameValidationState.ALREADY_IN_USE
         } else {
             NameValidationState.VALID
@@ -200,17 +202,16 @@ class SongEditorActivity : AppCompatActivity() {
         val presentation: MutableList<String> = mutableListOf()
         for (position in 0 until songSectionTabLayout.tabCount) {
             val tab = songSectionTabLayout.getTabAt(position)!!
-
             if (tab.text == addText) {
                 continue
             }
-
             presentation.add(tab.text.toString())
         }
 
+        val selectedCategory = categorySpinner.selectedItem as Category
         val song = SongMetadata()
         song.title = songTitle
-        song.category = categorySpinner.selectedItem?.toString()
+        song.category = if (selectedCategory.name != "No category") selectedCategory.name else null
         song.presentation = presentation
 
         val songLyrics = SongLyrics()

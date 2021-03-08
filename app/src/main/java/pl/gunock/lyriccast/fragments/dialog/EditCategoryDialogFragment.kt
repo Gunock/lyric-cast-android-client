@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 11:18 PM
+ * Last modified 3/8/21 9:52 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
@@ -60,19 +60,13 @@ class EditCategoryDialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel = ViewModelProvider(requireActivity()).get(EditCategoryViewModel::class.java)
+
         nameInputLayout = view.findViewById(R.id.tv_category_name)
         nameInput = view.findViewById(R.id.tin_category_name)
         colorSpinner = view.findViewById(R.id.spn_category_color2)
+
         setupColorSpinner()
-
-        if (category != null) {
-            val colorNames = resources.getStringArray(R.array.category_color_names)
-            nameInput.text = category.name
-            colorSpinner.setSelection(colorNames.indexOf(category.color))
-        }
-
-        viewModel = ViewModelProvider(requireActivity()).get(EditCategoryViewModel::class.java)
-
         setupListeners()
     }
 
@@ -88,6 +82,11 @@ class EditCategoryDialogFragment(
             colors
         )
         colorSpinner.adapter = colorSpinnerAdapter
+
+        if (category?.color != null) {
+            nameInput.text = category.name
+            colorSpinner.setSelection(colorValues.indexOf(category.color))
+        }
     }
 
     private fun setupListeners() {
@@ -104,7 +103,7 @@ class EditCategoryDialogFragment(
             val selectedColor = colorSpinner.selectedItem as ColorItem
             val newCategory = CategoryItem(
                 nameInput.text.toString(),
-                selectedColor.name
+                selectedColor.value
             )
 
             viewModel.category.value = EditCategoryViewModel.CategoryDto(newCategory, category)

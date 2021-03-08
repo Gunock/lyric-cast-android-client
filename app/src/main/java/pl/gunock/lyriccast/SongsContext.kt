@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:02 PM
+ * Last modified 3/8/21 10:08 PM
  */
 
 package pl.gunock.lyriccast
@@ -24,16 +24,12 @@ object SongsContext {
     var songsDirectory: String = ""
     private var songMap: SortedMap<String, SongMetadata> = sortedMapOf()
 
-    var categories: Set<String> = setOf()
-        private set
-
     fun loadSongsMetadata() {
         val loadedSongsMetadata: MutableList<SongMetadata> = mutableListOf()
         val fileFilter = FilenameFilter { _, name -> name.endsWith(".metadata.json") }
 
         val fileList = File(songsDirectory).listFiles(fileFilter) ?: return
 
-        val newCategories: SortedSet<String> = sortedSetOf()
         for (file in fileList) {
             Log.v(TAG, "Reading file : ${file.name}")
             val fileText = file.readText(Charsets.UTF_8)
@@ -43,15 +39,14 @@ object SongsContext {
 
             val songMetadata = SongMetadata(json)
             loadedSongsMetadata.add(songMetadata)
-
-            if (!songMetadata.category.isNullOrBlank()) {
-                newCategories.add(songMetadata.category)
-            }
         }
         Log.v(TAG, "Parsed metadata files: $loadedSongsMetadata")
 
-        categories = newCategories
         fillSongsList(loadedSongsMetadata)
+    }
+
+    fun containsSong(title: String): Boolean {
+        return songMap.containsKey(title)
     }
 
     fun replaceSong(oldSongTitle: String, song: SongMetadata, songLyrics: SongLyrics) {
