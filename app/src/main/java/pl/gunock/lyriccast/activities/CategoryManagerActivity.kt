@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:36 AM
+ * Last modified 3/8/21 11:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -55,8 +55,6 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
 
         setupCategories()
-
-        setupListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,9 +72,6 @@ class CategoryManagerActivity : AppCompatActivity() {
             R.id.menu_add -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun setupListeners() {
     }
 
     private fun setupCategories() {

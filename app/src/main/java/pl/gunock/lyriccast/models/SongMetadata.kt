@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:03 PM
+ * Last modified 3/8/21 11:06 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -27,12 +27,7 @@ class SongMetadata() {
     var author: String = ""
     var copyright: String = ""
 
-    private var _category: String? = null
-    var category: String?
-        get() = _category
-        set(value) {
-            _category = if (value.isNullOrBlank() || value == null.toString()) null else value
-        }
+    var categoryId: Long? = null
 
     var presentation: List<String> = listOf()
 
@@ -41,7 +36,7 @@ class SongMetadata() {
         _title = json.getString("title")
         author = json.getString("author")
         copyright = json.getString("copyright")
-        category = json.getString("category")
+        categoryId = json.getLong("category")
         presentation = arrayToStringList(json.getJSONArray("presentation"))
 
         author = if (author.toLowerCase(Locale.ROOT) != "null") author else "Unknown"
@@ -59,7 +54,7 @@ class SongMetadata() {
             put("title", _title)
             put("author", author)
             put("copyright", copyright)
-            put("category", _category ?: JSONObject.NULL)
+            put("category", categoryId ?: JSONObject.NULL)
             put("presentation", JSONArray(presentation))
         }
     }

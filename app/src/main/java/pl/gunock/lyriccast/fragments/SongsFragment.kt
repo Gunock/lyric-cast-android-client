@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:10 PM
+ * Last modified 3/8/21 11:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -31,6 +31,7 @@ import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
@@ -114,26 +115,25 @@ class SongsFragment : Fragment() {
         searchViewEditText.addTextChangedListener(InputTextChangedListener {
             filterSongs(
                 searchViewEditText.editableText.toString(),
-                category = categorySpinner.selectedItem.toString()
+                category = categorySpinner.selectedItem as Category
             )
         })
 
         categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
-                category = categorySpinner.selectedItem.toString()
+                category = categorySpinner.selectedItem as Category
             )
         }
     }
 
     private fun setupCategorySpinner() {
-        val categories = CategoriesContext.getCategoryItems()
-            .map { categoryItem -> categoryItem.name }
+        val categories = CategoriesContext.getCategories()
 
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            listOf("All") + categories
+            listOf(Category("All")) + categories
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter
@@ -174,7 +174,7 @@ class SongsFragment : Fragment() {
         songItemsRecyclerView.adapter = songItemsAdapter
     }
 
-    private fun filterSongs(title: String, category: String = "All") {
+    private fun filterSongs(title: String, category: Category = Category("All")) {
         Log.v(TAG, "filterSongs invoked")
 
         resetSelection()
@@ -183,8 +183,8 @@ class SongsFragment : Fragment() {
 
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
-        if (category != "All") {
-            predicates.add { songItem -> songItem.category == category }
+        if (category.name != "All") {
+            predicates.add { songItem -> songItem.category?.id == category.id }
         }
 
         predicates.add { songItem ->

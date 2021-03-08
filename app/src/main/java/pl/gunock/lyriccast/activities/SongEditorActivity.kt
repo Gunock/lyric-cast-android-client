@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:18 PM
+ * Last modified 3/8/21 11:06 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -65,7 +65,7 @@ class SongEditorActivity : AppCompatActivity() {
         categorySpinner = findViewById(R.id.spn_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
-        categories = setOf(Category("No category", null)) + CategoriesContext.getCategoryItems()
+        categories = setOf(Category("No category")) + CategoriesContext.getCategoryItems()
 
         setupCategorySpinner()
 
@@ -77,8 +77,8 @@ class SongEditorActivity : AppCompatActivity() {
             val songMetadata = SongsContext.getSongMetadata(intentSongTitle!!)!!
             categorySpinner.setSelection(
                 CategoriesContext.getCategoryItems()
-                    .map { categoryItem -> categoryItem.name }
-                    .indexOf(songMetadata.category)
+                    .map { categoryItem -> categoryItem.id }
+                    .indexOf(songMetadata.categoryId)
             )
         } else {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
@@ -211,7 +211,7 @@ class SongEditorActivity : AppCompatActivity() {
         val selectedCategory = categorySpinner.selectedItem as Category
         val song = SongMetadata()
         song.title = songTitle
-        song.category = if (selectedCategory.name != "No category") selectedCategory.name else null
+        song.categoryId = if (selectedCategory.name != "No category") selectedCategory.id else null
         song.presentation = presentation
 
         val songLyrics = SongLyrics()
