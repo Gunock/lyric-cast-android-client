@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/8/21 10:18 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,91 +11,27 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.AllCaps
 import android.text.TextWatcher
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.enums.TitleValidationState
+import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
+import pl.gunock.lyriccast.enums.NameValidationState
+import pl.gunock.lyriccast.extensions.moveTabLeft
+import pl.gunock.lyriccast.extensions.moveTabRight
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
+import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongLyrics
 import pl.gunock.lyriccast.models.SongMetadata
 
 class SongEditorActivity : AppCompatActivity() {
-    inner class SongTitleTextWatcher : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
-
-            when (validateSongTitle(newText)) {
-                TitleValidationState.EMPTY -> {
-                    songTitleInputLayout.error = " "
-                    songTitleInput.error = "Please enter song title"
-                }
-                TitleValidationState.ALREADY_IN_USE -> {
-                    songTitleInputLayout.error = " "
-                    songTitleInput.error = "Song title already in use"
-                }
-                TitleValidationState.VALID -> {
-                    songTitleInputLayout.error = null
-                    songTitleInput.error = null
-                }
-            }
-        }
-    }
-
-    inner class SectionNameTextWatcher : TextWatcher {
-        var ignoreBeforeTextChanged: Boolean = false
-        var ignoreOnTextChanged: Boolean = false
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            if (ignoreBeforeTextChanged) {
-                ignoreBeforeTextChanged = false
-                return
-            }
-
-            val oldText = s.toString()
-            val oldTabCount = tabCountMap[oldText]!!
-            if (oldTabCount <= 1) {
-                sectionLyrics.remove(oldText)
-                tabCountMap.remove(oldText)
-            } else {
-                tabCountMap[oldText] = oldTabCount - 1
-            }
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            if (ignoreOnTextChanged) {
-                ignoreOnTextChanged = false
-                return
-            }
-
-            val newText = s.toString()
-            selectedTab.text = newText
-
-            tabCountMap[newText] =
-                if (tabCountMap.containsKey(newText)) tabCountMap[newText]!! + 1 else 1
-
-            if (sectionLyrics.containsKey(newText)) {
-                sectionLyricsInput.setText(sectionLyrics[newText]!!)
-            } else {
-                sectionLyrics[newText] = sectionLyricsInput.text.toString()
-            }
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-        }
-    }
-
     private var intentSongTitle: String? = null
-    private var songTitles: Set<String> = setOf()
 
     private lateinit var sectionNameInput: EditText
     private lateinit var songTitleInputLayout: TextInputLayout
@@ -107,6 +43,8 @@ class SongEditorActivity : AppCompatActivity() {
 
     private val sectionNameTextWatcher: SectionNameTextWatcher = SectionNameTextWatcher()
     private val songTitleTextWatcher: SongTitleTextWatcher = SongTitleTextWatcher()
+
+    private lateinit var categories: Set<Category>
     private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
     private val tabCountMap: MutableMap<String, Int> = mutableMapOf()
 
@@ -127,8 +65,7 @@ class SongEditorActivity : AppCompatActivity() {
         categorySpinner = findViewById(R.id.spn_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
-
-        songTitles = SongsContext.getSongMap().keys
+        categories = setOf(Category("No category", null)) + CategoriesContext.getCategoryItems()
 
         setupCategorySpinner()
 
@@ -138,7 +75,11 @@ class SongEditorActivity : AppCompatActivity() {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
 
             val songMetadata = SongsContext.getSongMetadata(intentSongTitle!!)!!
-            categorySpinner.setSelection(SongsContext.categories.indexOf(songMetadata.category))
+            categorySpinner.setSelection(
+                CategoriesContext.getCategoryItems()
+                    .map { categoryItem -> categoryItem.name }
+                    .indexOf(songMetadata.category)
+            )
         } else {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
             sectionLyrics[selectedTab.text.toString()] = ""
@@ -148,13 +89,26 @@ class SongEditorActivity : AppCompatActivity() {
         setupListeners()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_song_editor, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_save -> {
+                if (saveSong()) {
+                    finish()
+                }
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = ArrayAdapter(
-            baseContext,
-            android.R.layout.simple_spinner_item,
-            SongsContext.categories.toList()
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext, categories)
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
@@ -211,18 +165,12 @@ class SongEditorActivity : AppCompatActivity() {
             }
         )
 
-        findViewById<Button>(R.id.btn_save_song).setOnClickListener {
-            if (saveSong()) {
-                finish()
-            }
-        }
-
         findViewById<ImageButton>(R.id.btn_move_section_left).setOnClickListener {
-            moveTabLeft(selectedTab)
+            songSectionTabLayout.moveTabLeft(selectedTab)
         }
 
         findViewById<ImageButton>(R.id.btn_move_section_right).setOnClickListener {
-            moveTabRight(selectedTab)
+            songSectionTabLayout.moveTabRight(selectedTab)
         }
 
         findViewById<Button>(R.id.btn_delete_section).setOnClickListener {
@@ -230,20 +178,20 @@ class SongEditorActivity : AppCompatActivity() {
         }
     }
 
-    private fun validateSongTitle(songTitle: String): TitleValidationState {
+    private fun validateSongTitle(songTitle: String): NameValidationState {
         return if (songTitle.isBlank()) {
-            TitleValidationState.EMPTY
-        } else if (intentSongTitle != songTitle && songTitles.contains(songTitle)) {
-            TitleValidationState.ALREADY_IN_USE
+            NameValidationState.EMPTY
+        } else if (intentSongTitle != songTitle && SongsContext.containsSong(songTitle)) {
+            NameValidationState.ALREADY_IN_USE
         } else {
-            TitleValidationState.VALID
+            NameValidationState.VALID
         }
     }
 
     private fun saveSong(): Boolean {
         val songTitle = songTitleInput.text.toString()
 
-        if (validateSongTitle(songTitle) != TitleValidationState.VALID) {
+        if (validateSongTitle(songTitle) != NameValidationState.VALID) {
             songTitleInput.setText(songTitle)
             songTitleInput.requestFocus()
             return false
@@ -254,17 +202,16 @@ class SongEditorActivity : AppCompatActivity() {
         val presentation: MutableList<String> = mutableListOf()
         for (position in 0 until songSectionTabLayout.tabCount) {
             val tab = songSectionTabLayout.getTabAt(position)!!
-
             if (tab.text == addText) {
                 continue
             }
-
             presentation.add(tab.text.toString())
         }
 
+        val selectedCategory = categorySpinner.selectedItem as Category
         val song = SongMetadata()
         song.title = songTitle
-        song.category = categorySpinner.selectedItem?.toString()
+        song.category = if (selectedCategory.name != "No category") selectedCategory.name else null
         song.presentation = presentation
 
         val songLyrics = SongLyrics()
@@ -306,54 +253,6 @@ class SongEditorActivity : AppCompatActivity() {
         sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
     }
 
-    private fun moveTabLeft(tab: TabLayout.Tab) {
-        val position = tab.position
-        if (position == 0) {
-            return
-        }
-
-        val otherTab = songSectionTabLayout.getTabAt(position - 1)!!
-
-        swapTabs(tab, otherTab)
-    }
-
-    private fun moveTabRight(tab: TabLayout.Tab) {
-        val position = tab.position
-        if (position == songSectionTabLayout.tabCount - 2) {
-            return
-        }
-
-        val otherTab = songSectionTabLayout.getTabAt(position + 1)!!
-
-        swapTabs(tab, otherTab)
-    }
-
-    private fun swapTabs(tab1: TabLayout.Tab, tab2: TabLayout.Tab) {
-        val position1 = tab1.position
-        val position2 = tab2.position
-
-        val tabLeft: TabLayout.Tab = if (position1 < position2) tab1 else tab2
-        val tabRight: TabLayout.Tab = if (position1 < position2) tab2 else tab1
-        val isLeftTabSelected = tabLeft.isSelected
-
-        val newTabLeft = songSectionTabLayout.newTab()
-        newTabLeft.text = tabLeft.text
-
-        val newTabRight = songSectionTabLayout.newTab()
-        newTabRight.text = tabRight.text
-
-        val positionLeft = tabLeft.position
-        val positionRight = tabRight.position
-
-        songSectionTabLayout.removeTab(tabLeft)
-        songSectionTabLayout.removeTab(tabRight)
-
-        songSectionTabLayout.addTab(newTabRight, positionLeft)
-        songSectionTabLayout.addTab(newTabLeft, positionRight)
-
-        songSectionTabLayout.selectTab(if (isLeftTabSelected) newTabLeft else newTabRight)
-    }
-
     private fun addTab(tab: TabLayout.Tab, tabText: String = "") {
         songSectionTabLayout.addTab(tab)
 
@@ -392,6 +291,76 @@ class SongEditorActivity : AppCompatActivity() {
 
             tabCountMap[tabText] = 1
             tab.text = newTabText
+        }
+    }
+
+    inner class SongTitleTextWatcher : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            val newText = s.toString()
+
+            when (validateSongTitle(newText)) {
+                NameValidationState.EMPTY -> {
+                    songTitleInputLayout.error = " "
+                    songTitleInput.error = "Please enter song title"
+                }
+                NameValidationState.ALREADY_IN_USE -> {
+                    songTitleInputLayout.error = " "
+                    songTitleInput.error = "Song title already in use"
+                }
+                NameValidationState.VALID -> {
+                    songTitleInputLayout.error = null
+                    songTitleInput.error = null
+                }
+            }
+        }
+    }
+
+    inner class SectionNameTextWatcher : TextWatcher {
+        var ignoreBeforeTextChanged: Boolean = false
+        var ignoreOnTextChanged: Boolean = false
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            if (ignoreBeforeTextChanged) {
+                ignoreBeforeTextChanged = false
+                return
+            }
+
+            val oldText = s.toString()
+            val oldTabCount = tabCountMap[oldText]!!
+            if (oldTabCount <= 1) {
+                sectionLyrics.remove(oldText)
+                tabCountMap.remove(oldText)
+            } else {
+                tabCountMap[oldText] = oldTabCount - 1
+            }
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (ignoreOnTextChanged) {
+                ignoreOnTextChanged = false
+                return
+            }
+
+            val newText = s.toString()
+            selectedTab.text = newText
+
+            tabCountMap[newText] =
+                if (tabCountMap.containsKey(newText)) tabCountMap[newText]!! + 1 else 1
+
+            if (sectionLyrics.containsKey(newText)) {
+                sectionLyricsInput.setText(sectionLyrics[newText]!!)
+            } else {
+                sectionLyrics[newText] = sectionLyricsInput.text.toString()
+            }
+        }
+
+        override fun afterTextChanged(s: Editable?) {
         }
     }
 }

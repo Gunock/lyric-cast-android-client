@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 11:31 PM
+  ~ Last modified 3/7/21 12:27 AM
   -->
 
 <resources>
@@ -23,4 +23,10 @@
     <style name="ThemeOverlay.LyricCast.Light" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="Widget.LyricCast.Spinner.Underlined" parent="Widget.AppCompat.Spinner.Underlined" />
+
+    <style name="Theme.LyricCast.Light.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowMinWidthMajor">75%</item>
+        <item name="android:windowMinWidthMinor">75%</item>
+        <item name="android:windowNoTitle">false</item>
+    </style>
 </resources>

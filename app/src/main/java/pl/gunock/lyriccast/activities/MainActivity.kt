@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:41 PM
+ * Last modified 3/7/21 10:29 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             loadData()
-            goToSongListFragment()
+            goToSongs()
         }
     }
 
@@ -90,9 +90,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.menu_add -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> import()
-            R.id.menu_export_all -> exportFiles()
+            R.id.menu_export_all -> export()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -175,32 +176,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun exportFiles(): Boolean {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.type = "application/zip"
-
-        val chooserIntent = Intent.createChooser(intent, "Choose a directory")
-        startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
-        return true
-    }
-
-    private fun import(): Boolean {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "application/zip"
-
-        val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
-        return true
-    }
-
-    private fun goToSettings(): Boolean {
-        val intent = Intent(this, SettingsActivity::class.java)
-
-        startActivity(intent)
-        return true
-    }
-
     private fun loadData() {
         if (SongsContext.getSongMap().isNotEmpty() && SetlistsContext.getSetlistItems()
                 .isNotEmpty()
@@ -225,7 +200,39 @@ class MainActivity : AppCompatActivity() {
         alertDialog.hide()
     }
 
-    private suspend fun goToSongListFragment() {
+    private fun export(): Boolean {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.type = "application/zip"
+
+        val chooserIntent = Intent.createChooser(intent, "Choose a directory")
+        startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
+
+        return true
+    }
+
+    private fun import(): Boolean {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "application/zip"
+
+        val chooserIntent = Intent.createChooser(intent, "Choose a file")
+        startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
+        return true
+    }
+
+    private fun goToSettings(): Boolean {
+        val intent = Intent(baseContext, SettingsActivity::class.java)
+        startActivity(intent)
+        return true
+    }
+
+    private fun goToCategoryManager(): Boolean {
+        val intent = Intent(baseContext, CategoryManagerActivity::class.java)
+        startActivity(intent)
+        return true
+    }
+
+    private suspend fun goToSongs() {
         while (findViewById<FragmentContainerView>(R.id.navh_main) == null) {
             delay(100)
         }

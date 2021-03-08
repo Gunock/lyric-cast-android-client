@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/8/21 10:10 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
@@ -34,9 +35,9 @@ import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
-class SongListFragment : Fragment() {
+class SongsFragment : Fragment() {
     private companion object {
-        const val TAG = "SongListFragment"
+        const val TAG = "SongsFragment"
     }
 
     private var castContext: CastContext? = null
@@ -59,26 +60,7 @@ class SongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_song_list, container, false)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
-
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedSongs()
-            R.id.menu_edit -> editSelectedSong()
-            else -> super.onOptionsItemSelected(item)
-        }
+        return inflater.inflate(R.layout.fragment_songs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,7 +79,6 @@ class SongListFragment : Fragment() {
         with(songItemsRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = null
         }
 
         setupListeners()
@@ -107,11 +88,26 @@ class SongListFragment : Fragment() {
         super.onResume()
 
         setupCategorySpinner()
-        setupSongList()
+        setupSongs()
         resetSelection()
 
         searchViewEditText.setText("")
         categorySpinner.setSelection(0)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        this.menu = menu
+        super.onCreateOptionsMenu(menu, inflater)
+
+        showMenuActions(showDelete = false, showEdit = false)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_delete -> deleteSelectedSongs()
+            R.id.menu_edit -> editSelectedSong()
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupListeners() {
@@ -131,16 +127,19 @@ class SongListFragment : Fragment() {
     }
 
     private fun setupCategorySpinner() {
+        val categories = CategoriesContext.getCategoryItems()
+            .map { categoryItem -> categoryItem.name }
+
         val categorySpinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            listOf("All") + SongsContext.categories.toList()
+            listOf("All") + categories
         )
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
-    private fun setupSongList() {
+    private fun setupSongs() {
         songItems = SongsContext.getSongItems()
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -226,29 +225,15 @@ class SongListFragment : Fragment() {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = false
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = false
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
+                showMenuActions(showDelete = false, showEdit = false)
             }
             1 -> {
                 datasetChanged = true
                 songItemsAdapter.showCheckBox = true
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = true
+                showMenuActions()
             }
-            2 -> {
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
-            }
+            2 -> showMenuActions(showEdit = false)
         }
 
         item.isSelected = !item.isSelected
@@ -281,7 +266,6 @@ class SongListFragment : Fragment() {
 
         val remainingSongs = songItemsAdapter.songItems
             .filter { songItem -> !selectedSongs.contains(songItem.title) }
-        songItemsAdapter.showCheckBox = false
 
         songItemsAdapter.songItems.clear()
         songItemsAdapter.songItems.addAll(remainingSongs)
@@ -300,10 +284,15 @@ class SongListFragment : Fragment() {
             return
         }
 
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
+        showMenuActions(showDelete = false, showEdit = false)
+    }
 
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
+    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
+        if (!this::menu.isInitialized) {
+            return
+        }
+
+        menu.findItem(R.id.menu_delete).isVisible = showDelete
+        menu.findItem(R.id.menu_edit).isVisible = showEdit
     }
 }

@@ -1,3 +1,9 @@
+<!--
+  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/6/21 11:03 PM
+  -->
+
 <resources>
     <!-- Color Preference -->
     <string-array name="color_entries">
@@ -13,5 +19,17 @@
         <item>Blue</item>
         <item>Red</item>
         <item>DeepPink</item>
+    </string-array>
+
+    <!-- Category colors -->
+    <string-array name="category_color_names">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+    </string-array>
+    <string-array name="category_color_values">
+        <item>@color/red</item>
+        <item>@color/green</item>
+        <item>@color/blue</item>
     </string-array>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 11:41 PM
+  ~ Last modified 3/7/21 11:49 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,14 +18,15 @@
 
         <action
             android:id="@+id/action_Start_to_Songs"
-            app:destination="@id/Songs" />
+            app:destination="@id/Songs"
+            app:enterAnim="@android:anim/fade_in" />
     </fragment>
 
     <fragment
         android:id="@+id/Songs"
-        android:name="pl.gunock.lyriccast.fragments.SongListFragment"
+        android:name="pl.gunock.lyriccast.fragments.SongsFragment"
         android:label="@string/label_songs"
-        tools:layout="@layout/fragment_song_list">
+        tools:layout="@layout/fragment_songs">
 
         <action
             android:id="@+id/action_Songs_to_Setlists"

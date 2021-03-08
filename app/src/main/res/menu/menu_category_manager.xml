@@ -1,7 +1,7 @@
 <!--
   ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 12:30 AM
+  ~ Last modified 3/7/21 11:43 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,24 +23,8 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/menu_cast"
-        android:title="@string/option_cast"
-        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
-        app:showAsAction="always"
-        tools:icon="@drawable/mr_button_dark" />
-
-    <item
         android:id="@+id/menu_add"
-        android:title="@string/label_category_manager" />
-    <item
-        android:id="@+id/menu_settings"
-        android:title="@string/label_settings" />
-    <item
-        android:id="@+id/menu_import_songs"
-        android:title="@string/option_menu_import" />
-
-    <item
-        android:id="@+id/menu_export_all"
-        android:title="@string/option_export" />
+        android:title="@string/button_add"
+        app:showAsAction="always" />
 
 </menu>

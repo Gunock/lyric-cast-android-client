@@ -1,17 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:42 PM
+ * Last modified 3/8/21 10:11 PM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -22,22 +19,25 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
+import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
 
-class SetlistEditorSongListFragment : Fragment() {
+class SetlistEditorSongsFragment : Fragment() {
     private companion object {
-        const val TAG = "SetlistEditorSongListFg"
+        const val TAG = "SetlistEditorSongsFg"
     }
 
-    private val args: SetlistEditorSongListFragmentArgs by navArgs()
+    private val args: SetlistEditorSongsFragmentArgs by navArgs()
 
     private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
@@ -58,7 +58,7 @@ class SetlistEditorSongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_song_list, container, false)
+        return inflater.inflate(R.layout.fragment_songs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,17 +71,9 @@ class SetlistEditorSongListFragment : Fragment() {
         categorySpinner = view.findViewById(R.id.spn_category)
         selectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
 
-        setupSongList(view)
+        setupSongs(view)
+        setupCategorySpinner()
         setupListeners()
-
-        val categorySpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            listOf("All") + SongsContext.categories.toList()
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        categorySpinner.adapter = categorySpinnerAdapter
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,7 +81,7 @@ class SetlistEditorSongListFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
-                val action = SetlistEditorSongListFragmentDirections
+                val action = SetlistEditorSongsFragmentDirections
                     .actionSetlistEditorSongsToSetlistEditor(
                         selectedSongs = selectedSongTitles.toTypedArray(),
                         setlistName = args.setlistName
@@ -124,18 +116,56 @@ class SetlistEditorSongListFragment : Fragment() {
         }
     }
 
-    private fun setupSongList(view: View) {
+    private fun setupCategorySpinner() {
+        val categories = CategoriesContext.getCategoryItems()
+            .map { categoryItem -> categoryItem.name }
+
+        val categorySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            listOf("All") + categories
+        )
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        categorySpinner.adapter = categorySpinnerAdapter
+    }
+
+    private fun setupSongs(view: View) {
         songItems = SongsContext.getSongItems()
         songItems.forEach { songItem ->
             songItem.isSelected = selectedSongTitles.contains(songItem.title)
         }
 
-        songItemsAdapter = SongItemsAdapter(songItems.toMutableList(), showCheckBox = true)
+        val onClickListener =
+            ClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+                val item: SongItem = songItemsAdapter.songItems[position]
+                selectSong(item, holder)
+            }
+
+        val onLongClickListener =
+            LongClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+                val item = songItemsAdapter.songItems[position]
+                selectSong(item, holder)
+                return@LongClickAdapterItemListener true
+            }
+
+        songItemsAdapter = SongItemsAdapter(
+            songItems.toMutableList(),
+            showCheckBox = true,
+            onItemClickListener = onClickListener,
+            onItemLongClickListener = onLongClickListener
+        )
+
         with(view.findViewById<RecyclerView>(R.id.rcv_songs)) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = songItemsAdapter
         }
+    }
+
+    private fun selectSong(item: SongItem, holder: SongItemsAdapter.SongViewHolder) {
+        item.isSelected = !item.isSelected
+        holder.checkBox.isChecked = item.isSelected
     }
 
     private fun filterSongs(title: String, category: String = "All", isSelected: Boolean? = null) {

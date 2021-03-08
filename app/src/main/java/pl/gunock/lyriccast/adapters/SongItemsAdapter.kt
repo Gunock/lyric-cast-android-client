@@ -1,17 +1,15 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/8/21 12:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -29,30 +27,57 @@ class SongItemsAdapter(
     val onItemClickListener: ClickAdapterItemListener<SongViewHolder>? = null
 ) : RecyclerView.Adapter<SongItemsAdapter.SongViewHolder>() {
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
+        val view: View = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_song, parent, false)
+
+        return SongViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
+        val item = songItems[position]
+
+        if (onItemLongClickListener != null) {
+            holder.itemCardView.setOnLongClickListener { view ->
+                onItemLongClickListener.execute(holder, position, view)
+            }
+        }
+
+        if (onItemClickListener != null) {
+            holder.itemCardView.setOnClickListener { view ->
+                onItemClickListener.execute(holder, position, view)
+            }
+        }
+
+        holder.bind(item)
+    }
+
+    override fun getItemCount() = songItems.size
+
     inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
         private val authorTextView: TextView = itemView.findViewById(R.id.tv_item_song_author)
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
-        private val itemLayout: LinearLayout = itemView.findViewById(R.id.item_song)
+        val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
-        fun bind(item: SongItem, isSelected: Boolean) = with(itemView) {
+        fun bind(item: SongItem) {
             if (!showRowNumber) {
                 titleTextView.text = item.title
             } else {
-                titleTextView.text = itemView.resources
-                    .getString(
-                        R.string.item_song_item_title_template,
-                        layoutPosition + 1,
-                        item.title
-                    )
+                val titleText = itemView.context.resources.getString(
+                    R.string.item_song_item_title_template,
+                    layoutPosition + 1,
+                    item.title
+                )
+                titleTextView.text = titleText
             }
             authorTextView.text = item.author
 
             if (!item.category.isNullOrBlank()) {
                 categoryTextView.text = item.category
             } else {
-                itemView.findViewById<CardView>(R.id.cdv_song_category).visibility = View.INVISIBLE
+                itemView.findViewById<CardView>(R.id.cdv_category_color).visibility = View.INVISIBLE
             }
 
             if (!showAuthor) {
@@ -69,42 +94,7 @@ class SongItemsAdapter(
 
                 checkBox.isChecked = item.isSelected
             }
-
-            if (isSelected) {
-                itemLayout.setBackgroundColor(
-                    itemView.resources.getColor(R.color.colorAccent, null)
-                )
-            } else {
-                itemLayout.setBackgroundColor(Color.TRANSPARENT)
-            }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
-        val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_song, parent, false)
-
-        return SongViewHolder(view)
-    }
-
-
-    override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        val item = songItems[position]
-
-        if (onItemLongClickListener != null) {
-            holder.itemView.setOnLongClickListener { view ->
-                onItemLongClickListener.execute(holder, position, view)
-            }
-        }
-
-        if (onItemClickListener != null) {
-            holder.itemView.setOnClickListener { view ->
-                onItemClickListener.execute(holder, position, view)
-            }
-        }
-
-        holder.bind(item, item.highlight)
-    }
-
-    override fun getItemCount() = songItems.size
 }
