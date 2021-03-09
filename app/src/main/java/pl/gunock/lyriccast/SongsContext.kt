@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:08 PM
+ * Last modified 3/9/21 1:59 AM
  */
 
 package pl.gunock.lyriccast
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast
 import android.util.Log
 import org.json.JSONObject
 import pl.gunock.lyriccast.extensions.create
-import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.extensions.writeText
 import pl.gunock.lyriccast.models.SongItem
 import pl.gunock.lyriccast.models.SongLyrics
@@ -22,7 +21,7 @@ object SongsContext {
     private const val TAG = "SongsContext"
 
     var songsDirectory: String = ""
-    private var songMap: SortedMap<String, SongMetadata> = sortedMapOf()
+    private var songMap: SortedMap<Long, SongMetadata> = sortedMapOf()
 
     fun loadSongsMetadata() {
         val loadedSongsMetadata: MutableList<SongMetadata> = mutableListOf()
@@ -46,49 +45,46 @@ object SongsContext {
     }
 
     fun containsSong(title: String): Boolean {
-        return songMap.containsKey(title)
+        return songMap.values.firstOrNull { song -> song.title == title } != null
     }
 
-    fun replaceSong(oldSongTitle: String, song: SongMetadata, songLyrics: SongLyrics) {
-        val songTitleNormalized = oldSongTitle.normalize()
-
-        File("$songsDirectory$songTitleNormalized.json").delete()
-        File("$songsDirectory$songTitleNormalized.metadata.json").delete()
-        songMap.remove(oldSongTitle)
-
-        addSong(song, songLyrics)
-        SetlistsContext.replaceSong(oldSongTitle, song.title)
-    }
-
-    fun deleteSongs(songTitles: Collection<String>) {
-        for (songTitle in songTitles) {
-            val songTitleNormalized = songTitle.normalize()
-
-            File("$songsDirectory$songTitleNormalized.json").delete()
-            File("$songsDirectory$songTitleNormalized.metadata.json").delete()
-            songMap.remove(songTitle)
+    fun deleteSongs(songIds: Collection<Long>) {
+        for (songId in songIds) {
+            File("$songsDirectory$songId.json").delete()
+            File("$songsDirectory$songId.metadata.json").delete()
+            songMap.remove(songId)
         }
-        SetlistsContext.removeSongs(songTitles)
+        SetlistsContext.removeSongs(songIds)
     }
 
-    fun addSong(song: SongMetadata, songLyrics: SongLyrics) {
-        val songNormalizedTitle = song.title.normalize()
-        val songFilePath = "$songsDirectory$songNormalizedTitle"
+    fun saveSong(
+        title: String,
+        categoryId: Long,
+        presentation: List<String>,
+        songLyrics: SongLyrics,
+        id: Long = System.currentTimeMillis()
+    ) {
+        val song = SongMetadata(id)
+        song.title = title
+        song.categoryId = categoryId
+        song.presentation = presentation
+
+        val songFilePath = "$songsDirectory${id}"
 
         Log.d(TAG, "Saving song")
-        Log.d(TAG, song.toJSON().toString())
+        Log.d(TAG, song.toJson().toString())
         File("$songFilePath.metadata.json").create()
-            .writeText(song.toJSON())
+            .writeText(song.toJson())
 
         Log.d(TAG, "Saving lyrics")
-        Log.d(TAG, songLyrics.toJSON().toString())
+        Log.d(TAG, songLyrics.toJson().toString())
         File("$songFilePath.json").create()
-            .writeText(songLyrics.toJSON())
+            .writeText(songLyrics.toJson())
 
-        songMap[song.title] = song
+        songMap[song.id] = song
     }
 
-    fun getSongMap(): Map<String, SongMetadata> {
+    fun getSongMap(): Map<Long, SongMetadata> {
         return songMap.toMap()
     }
 
@@ -98,17 +94,45 @@ object SongsContext {
         }.toSet()
     }
 
-    fun getSongLyrics(title: String): SongLyrics? {
-        return songMap[title]?.loadLyrics(songsDirectory)
+    fun getSongTitle(id: Long): String {
+        return getSongMetadata(id)!!.title
     }
 
-    fun getSongMetadata(title: String): SongMetadata? {
-        return songMap[title]
+    fun getSongLyrics(id: Long): SongLyrics? {
+        return songMap[id]?.loadLyrics(songsDirectory)
+    }
+
+    fun getSongMetadata(id: Long): SongMetadata? {
+        return songMap[id]
+    }
+
+    fun removeCategories(ids: Collection<Long>) {
+        val modifiedSongIds: MutableList<Long> = mutableListOf()
+        songMap.forEach { mapEntry ->
+            if (ids.contains(mapEntry.value.categoryId)) {
+                mapEntry.value.categoryId = Long.MIN_VALUE
+                modifiedSongIds.add(mapEntry.value.id)
+            }
+        }
+
+        for (id in modifiedSongIds) {
+            val song = songMap[id]!!
+            saveSong(song)
+        }
     }
 
     private fun fillSongsList(songs: List<SongMetadata>) {
         for (song in songs) {
-            songMap[song.title] = song
+            songMap[song.id] = song
         }
+    }
+
+    private fun saveSong(song: SongMetadata) {
+        val songFilePath = "$songsDirectory${song.id}"
+
+        Log.d(TAG, "Saving song")
+        Log.d(TAG, song.toJson().toString())
+        File("$songFilePath.metadata.json").create()
+            .writeText(song.toJson())
     }
 }

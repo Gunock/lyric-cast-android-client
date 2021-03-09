@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:18 PM
+ * Last modified 3/9/21 1:09 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -28,9 +28,9 @@ import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongLyrics
-import pl.gunock.lyriccast.models.SongMetadata
 
 class SongEditorActivity : AppCompatActivity() {
+    private var intentSongId: Long = Long.MIN_VALUE
     private var intentSongTitle: String? = null
 
     private lateinit var sectionNameInput: EditText
@@ -65,20 +65,21 @@ class SongEditorActivity : AppCompatActivity() {
         categorySpinner = findViewById(R.id.spn_song_editor_category)
 
         sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
-        categories = setOf(Category("No category", null)) + CategoriesContext.getCategoryItems()
+        categories = setOf(Category("No category")) + CategoriesContext.getCategoryItems()
 
         setupCategorySpinner()
 
-        intentSongTitle = intent.getStringExtra("songTitle")
-        if (intentSongTitle != null) {
-            loadSongData(intentSongTitle!!)
+        intentSongId = intent.getLongExtra("songId", Long.MIN_VALUE)
+        if (intentSongId != Long.MIN_VALUE) {
+            loadSongData(intentSongId)
+
             selectedTab = songSectionTabLayout.getTabAt(0)!!
 
-            val songMetadata = SongsContext.getSongMetadata(intentSongTitle!!)!!
+            val songMetadata = SongsContext.getSongMetadata(intentSongId)!!
             categorySpinner.setSelection(
                 CategoriesContext.getCategoryItems()
-                    .map { categoryItem -> categoryItem.name }
-                    .indexOf(songMetadata.category)
+                    .map { categoryItem -> categoryItem.id }
+                    .indexOf(songMetadata.categoryId)
             )
         } else {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
@@ -189,10 +190,10 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun saveSong(): Boolean {
-        val songTitle = songTitleInput.text.toString()
+        val title = songTitleInput.text.toString()
 
-        if (validateSongTitle(songTitle) != NameValidationState.VALID) {
-            songTitleInput.setText(songTitle)
+        if (validateSongTitle(title) != NameValidationState.VALID) {
+            songTitleInput.setText(title)
             songTitleInput.requestFocus()
             return false
         }
@@ -209,28 +210,26 @@ class SongEditorActivity : AppCompatActivity() {
         }
 
         val selectedCategory = categorySpinner.selectedItem as Category
-        val song = SongMetadata()
-        song.title = songTitle
-        song.category = if (selectedCategory.name != "No category") selectedCategory.name else null
-        song.presentation = presentation
+        val categoryId = selectedCategory.id
 
         val songLyrics = SongLyrics()
         songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
 
-        if (intentSongTitle != null) {
-            SongsContext.replaceSong(intentSongTitle!!, song, songLyrics)
+        if (intentSongId != Long.MIN_VALUE) {
+            SongsContext.saveSong(title, categoryId, presentation, songLyrics, intentSongId)
         } else {
-            SongsContext.addSong(song, songLyrics)
+            SongsContext.saveSong(title, categoryId, presentation, songLyrics)
         }
         return true
     }
 
-    private fun loadSongData(songTitle: String) {
-        val songTitleInput: TextInputLayout = findViewById(R.id.tv_song_title)
-        songTitleInput.editText!!.setText(songTitle)
+    private fun loadSongData(songId: Long) {
+        val songMetadata = SongsContext.getSongMetadata(songId)!!
+        val songLyrics = SongsContext.getSongLyrics(songId)!!.lyrics
+        intentSongTitle = songMetadata.title
 
-        val songMetadata = SongsContext.getSongMetadata(songTitle)!!
-        val songLyrics = SongsContext.getSongLyrics(songTitle)!!.lyrics
+        val songTitleInput: TextInputLayout = findViewById(R.id.tv_song_title)
+        songTitleInput.editText!!.setText(songMetadata.title)
 
         songSectionTabLayout.removeAllTabs()
 
@@ -239,9 +238,7 @@ class SongEditorActivity : AppCompatActivity() {
             addTab(newTab, sectionName)
 
             sectionLyricsInput.setText(sectionName)
-
             sectionLyrics[sectionName] = songLyrics[sectionName]!!
-
             newTab.text = sectionName
         }
 

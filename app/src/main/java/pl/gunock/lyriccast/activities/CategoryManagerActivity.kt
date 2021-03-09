@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:36 AM
+ * Last modified 3/9/21 1:56 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -55,8 +55,6 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
 
         setupCategories()
-
-        setupListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,9 +72,6 @@ class CategoryManagerActivity : AppCompatActivity() {
             R.id.menu_add -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun setupListeners() {
     }
 
     private fun setupCategories() {
@@ -110,9 +105,13 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun deleteSelectedCategories(): Boolean {
+        val selectedCategories = categoryItemsAdapter.categoryItems
+            .filter { category -> category.isSelected }
+            .map { category -> category.id }
+        CategoriesContext.deleteCategories(selectedCategories)
+
         val remainingCategories = categoryItemsAdapter.categoryItems
             .filter { category -> !category.isSelected }
-
 
         categoryItemsAdapter.categoryItems.clear()
         categoryItemsAdapter.categoryItems.addAll(remainingCategories)
@@ -215,7 +214,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         viewModel.category.value = null
 
         if (categoryDto.oldCategory == null) {
-            CategoriesContext.addCategory(categoryDto.category)
+            CategoriesContext.saveCategory(categoryDto.category)
         } else {
             CategoriesContext.replaceCategory(categoryDto.category, categoryDto.oldCategory)
         }

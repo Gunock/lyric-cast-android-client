@@ -1,37 +1,41 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:03 PM
+ * Last modified 3/9/21 1:23 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.helpers.JsonHelper
+import pl.gunock.lyriccast.extensions.getLongArray
 
-open class Setlist() : Comparable<Setlist> {
+open class Setlist(
+    val id: Long,
+    val name: String,
+    var songIds: List<Long>
+) : Comparable<Setlist> {
 
-    var name: String = ""
-    var songTitles: List<String> = listOf()
     var category: String = ""
 
-    constructor(json: JSONObject) : this() {
-        name = json.getString("name")
-        songTitles = JsonHelper.arrayToStringList(json.getJSONArray("songTitles"))
-    }
+    constructor(json: JSONObject) : this(
+        json.getLong("id"),
+        json.getString("name"),
+        json.getLongArray("songIds").toList()
+    )
 
     override fun toString(): String {
         return StringBuilder().apply {
             append("(name: $name, ")
-            append("songs: $songTitles)")
+            append("songs: $songIds)")
         }.toString()
     }
 
     fun toJson(): JSONObject {
         return JSONObject().apply {
+            put("id", id)
             put("name", name)
-            put("songTitles", JSONArray(songTitles))
+            put("songIds", JSONArray(songIds))
         }
     }
 

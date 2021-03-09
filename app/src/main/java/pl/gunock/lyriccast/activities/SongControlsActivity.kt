@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:15 PM
+ * Last modified 3/9/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -54,7 +54,6 @@ class SongControlsActivity : AppCompatActivity() {
         }
         castContext?.sessionManager?.addSessionManagerListener(sessionCreatedListener)
 
-
         songTitleView.text = intent.getStringExtra("songTitle")
 
         setupListeners()
@@ -70,10 +69,6 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        // TODO: Remove unused code
-//        if (castContext!!.sessionManager!!.currentSession != null) {
-//            castContext!!.sessionManager!!.endCurrentSession(true)
-//        }
         castContext?.sessionManager?.removeSessionManagerListener(sessionCreatedListener)
     }
 

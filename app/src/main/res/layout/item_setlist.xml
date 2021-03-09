@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+  ~ Created by Tomasz Kiljańczyk on 3/9/21 2:36 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/8/21 12:09 AM
+  ~ Last modified 3/9/21 2:33 AM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,7 +10,9 @@
     android:id="@+id/item_setlist"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
     android:clickable="true"
     android:clipToPadding="false"
     android:descendantFocusability="blocksDescendants"

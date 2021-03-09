@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:05 AM
+ * Last modified 3/8/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -59,6 +59,7 @@ class SongItemsAdapter(
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
         private val authorTextView: TextView = itemView.findViewById(R.id.tv_item_song_author)
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
+        private val categoryCardView: CardView = itemView.findViewById(R.id.cdv_category_color)
         val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
         fun bind(item: SongItem) {
@@ -74,8 +75,9 @@ class SongItemsAdapter(
             }
             authorTextView.text = item.author
 
-            if (!item.category.isNullOrBlank()) {
-                categoryTextView.text = item.category
+            if (item.category != null) {
+                categoryTextView.text = item.category.name
+                categoryCardView.setCardBackgroundColor(item.category.color!!)
             } else {
                 itemView.findViewById<CardView>(R.id.cdv_category_color).visibility = View.INVISIBLE
             }

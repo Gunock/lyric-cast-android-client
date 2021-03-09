@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:07 PM
+ * Last modified 3/9/21 12:30 AM
  */
 
 package pl.gunock.lyriccast
@@ -41,9 +41,15 @@ object SetlistsContext {
         setlists = loadedSetlists
     }
 
-    fun saveSetlist(setlist: Setlist) {
+    fun saveSetlist(
+        setlistName: String,
+        songIds: List<Long>,
+        id: Long = System.currentTimeMillis()
+    ) {
+        val setlist = Setlist(id, setlistName, songIds)
+
         val json = setlist.toJson()
-        val setlistFile = File("$setlistsDirectory/${setlist.name}.json")
+        val setlistFile = File("$setlistsDirectory/${setlist.id}.json")
         File(setlistsDirectory).mkdirs()
         setlistFile.writeText(json.toString())
 
@@ -61,44 +67,25 @@ object SetlistsContext {
         }.toSortedSet()
     }
 
-    fun replaceSong(oldSongTitle: String, newSongTitle: String) {
+    fun removeSongs(songIds: Collection<Long>) {
         val modifiedSetlists: MutableList<Setlist> = mutableListOf()
         setlists.forEach { setlist ->
-            val modifiedSongTitles = setlist.songTitles.map { songTitle ->
-                if (songTitle == oldSongTitle) newSongTitle else songTitle
+            val modifiedSongTitles = setlist.songIds.filter { songId ->
+                !songIds.contains(songId)
             }
 
-            if (setlist.songTitles != modifiedSetlists) {
+            if (setlist.songIds != modifiedSongTitles) {
                 modifiedSetlists.add(setlist)
             }
 
-            setlist.songTitles = modifiedSongTitles
+            setlist.songIds = modifiedSongTitles
         }
 
         for (setlist in modifiedSetlists) {
-            saveSetlist(setlist)
-        }
-    }
-
-    fun removeSongs(songTitles: Collection<String>) {
-        val modifiedSetlists: MutableList<Setlist> = mutableListOf()
-        setlists.forEach { setlist ->
-            val modifiedSongTitles = setlist.songTitles.filter { songTitle ->
-                !songTitles.contains(songTitle)
-            }
-
-            if (setlist.songTitles != modifiedSongTitles) {
-                modifiedSetlists.add(setlist)
-            }
-
-            setlist.songTitles = modifiedSongTitles
-        }
-
-        for (setlist in modifiedSetlists) {
-            if (setlist.songTitles.isEmpty()) {
+            if (setlist.songIds.isEmpty()) {
                 deleteSetlists(listOf(setlist.name))
             } else {
-                saveSetlist(setlist)
+                saveSetlist(setlist.name, setlist.songIds, setlist.id)
             }
         }
     }

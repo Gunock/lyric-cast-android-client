@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:41 PM
+  ~ Last modified 3/9/21 12:19 AM
   -->
 
 <resources>
@@ -16,7 +16,6 @@
     <string name="label_controls">Controls</string>
     <string name="label_setlists">Setlists</string>
     <string name="label_songs">Songs</string>
-    <string name="label_add_category">Add category</string>
     <string name="option_cast">Cast</string>
     <string name="option_export">Export</string>
     <string name="option_menu_import">Import</string>

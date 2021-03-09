@@ -1,51 +1,28 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:03 PM
+ * Last modified 3/9/21 2:01 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.helpers.JsonHelper.arrayToStringList
+import pl.gunock.lyriccast.extensions.getStringArray
 import java.io.File
-import java.util.*
 
-class SongMetadata() {
-    private var lyricsFilename: String = ""
-
-    private var _title: String = ""
-    var title: String
-        get() = _title
-        set(value) {
-            _title = value
-            lyricsFilename = "${title.normalize()}.json"
-        }
-
+class SongMetadata(val id: Long) {
+    private var lyricsFilename: String = "$id.json"
+    var title: String = ""
     var author: String = ""
-    var copyright: String = ""
-
-    private var _category: String? = null
-    var category: String?
-        get() = _category
-        set(value) {
-            _category = if (value.isNullOrBlank() || value == null.toString()) null else value
-        }
-
+    var categoryId: Long = Long.MIN_VALUE
     var presentation: List<String> = listOf()
 
-    constructor(json: JSONObject) : this() {
-        lyricsFilename = json.getString("lyricsFilename")
-        _title = json.getString("title")
+    constructor(json: JSONObject) : this(json.getLong("id")) {
+        title = json.getString("title")
         author = json.getString("author")
-        copyright = json.getString("copyright")
-        category = json.getString("category")
-        presentation = arrayToStringList(json.getJSONArray("presentation"))
-
-        author = if (author.toLowerCase(Locale.ROOT) != "null") author else "Unknown"
-        copyright = if (copyright.toLowerCase(Locale.ROOT) != "null") copyright else ""
+        categoryId = json.getLong("categoryId")
+        presentation = json.getStringArray("presentation").toList()
     }
 
     fun loadLyrics(sourceDirectory: String): SongLyrics {
@@ -53,20 +30,19 @@ class SongMetadata() {
         return SongLyrics(JSONObject(lyricsContent))
     }
 
-    fun toJSON(): JSONObject {
+    fun toJson(): JSONObject {
         return JSONObject().apply {
-            put("lyricsFilename", lyricsFilename)
-            put("title", _title)
+            put("id", id)
+            put("title", title)
             put("author", author)
-            put("copyright", copyright)
-            put("category", _category ?: JSONObject.NULL)
+            put("categoryId", categoryId)
             put("presentation", JSONArray(presentation))
         }
     }
 
     override fun toString(): String {
         return StringBuilder().apply {
-            append("(title: $_title, ")
+            append("(title: $title, ")
             append("author: $author)")
         }.toString()
     }
