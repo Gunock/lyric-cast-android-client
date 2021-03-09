@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:00 AM
+ * Last modified 3/9/21 2:10 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -30,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         setUpListeners()
 
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
+        CategoriesContext.categoriesDirectory = "${filesDir.path}/categories/"
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
@@ -177,9 +179,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
-        val areSongsEmpty = SongsContext.getSongMap().isNotEmpty()
-        val areSetlistsEmpty = SetlistsContext.getSetlistItems().isNotEmpty()
-        if (areSongsEmpty && areSetlistsEmpty) {
+        val areSongsNotEmpty = SongsContext.getSongMap().isNotEmpty()
+        val areSetlistsNotEmpty = SetlistsContext.getSetlistItems().isNotEmpty()
+        val areCategoriesNotEmpty = CategoriesContext.getCategoryItems().isNotEmpty()
+        if (areSongsNotEmpty || areSetlistsNotEmpty || areCategoriesNotEmpty) {
             return
         }
 
@@ -189,11 +192,15 @@ class MainActivity : AppCompatActivity() {
             .create()
         alertDialog.show()
 
-        if (SongsContext.getSongMap().isEmpty()) {
+        if (!areCategoriesNotEmpty) {
+            CategoriesContext.loadCategories()
+        }
+
+        if (!areSongsNotEmpty) {
             SongsContext.loadSongsMetadata()
         }
 
-        if (SetlistsContext.getSetlistItems().isEmpty()) {
+        if (!areCategoriesNotEmpty) {
             SetlistsContext.loadSetlists()
         }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:04 AM
+ * Last modified 3/9/21 1:09 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -216,9 +216,9 @@ class SongEditorActivity : AppCompatActivity() {
         songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
 
         if (intentSongId != Long.MIN_VALUE) {
-            SongsContext.replaceSong(intentSongId, title, categoryId, presentation, songLyrics)
+            SongsContext.saveSong(title, categoryId, presentation, songLyrics, intentSongId)
         } else {
-            SongsContext.addSong(title, categoryId, presentation, songLyrics)
+            SongsContext.saveSong(title, categoryId, presentation, songLyrics)
         }
         return true
     }

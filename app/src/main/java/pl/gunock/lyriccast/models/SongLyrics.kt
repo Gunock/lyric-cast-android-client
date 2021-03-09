@@ -1,22 +1,22 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:03 PM
+ * Last modified 3/9/21 1:29 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONObject
-import pl.gunock.lyriccast.helpers.JsonHelper.objectToMap
+import pl.gunock.lyriccast.extensions.toMap
 
 class SongLyrics() {
     var lyrics: Map<String, String> = mapOf()
 
     constructor(json: JSONObject) : this() {
-        lyrics = objectToMap(json.getJSONObject("lyrics"))
+        lyrics = json.getJSONObject("lyrics").toMap()
     }
 
-    fun toJSON(): JSONObject {
+    fun toJson(): JSONObject {
         return JSONObject().apply {
             put("lyrics", JSONObject(lyrics))
         }

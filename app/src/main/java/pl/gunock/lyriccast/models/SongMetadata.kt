@@ -1,14 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:06 AM
+ * Last modified 3/9/21 2:01 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.helpers.JsonHelper.arrayToStringList
+import pl.gunock.lyriccast.extensions.getStringArray
 import java.io.File
 
 class SongMetadata(val id: Long) {
@@ -21,10 +21,8 @@ class SongMetadata(val id: Long) {
     constructor(json: JSONObject) : this(json.getLong("id")) {
         title = json.getString("title")
         author = json.getString("author")
-        categoryId = json.getLong("category")
-        presentation = arrayToStringList(json.getJSONArray("presentation"))
-
-        author = if (!author.equals("null", true)) author else "Unknown"
+        categoryId = json.getLong("categoryId")
+        presentation = json.getStringArray("presentation").toList()
     }
 
     fun loadLyrics(sourceDirectory: String): SongLyrics {
@@ -32,12 +30,12 @@ class SongMetadata(val id: Long) {
         return SongLyrics(JSONObject(lyricsContent))
     }
 
-    fun toJSON(): JSONObject {
+    fun toJson(): JSONObject {
         return JSONObject().apply {
             put("id", id)
             put("title", title)
             put("author", author)
-            put("category", categoryId)
+            put("categoryId", categoryId)
             put("presentation", JSONArray(presentation))
         }
     }
