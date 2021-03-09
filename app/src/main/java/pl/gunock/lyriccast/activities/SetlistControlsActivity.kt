@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:14 PM
+ * Last modified 3/9/21 12:03 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -64,9 +64,10 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val songsMetadata = SongsContext.getSongMap()
         var setlistLyricsIndex = 0
-        setlistLyrics = setlist.songTitles.flatMap { songTitle ->
-            val songLyrics = SongsContext.getSongLyrics(songTitle)!!.lyrics
-            val lyrics = songsMetadata[songTitle]!!.presentation
+        setlistLyrics = setlist.songIds.flatMap { songId ->
+            val songTitle = SongsContext.getSongTitle(songId)
+            val songLyrics = SongsContext.getSongLyrics(songId)!!.lyrics
+            val lyrics = songsMetadata[songId]!!.presentation
                 .map { sectionName -> songLyrics[sectionName]!! }
 
             songTitles[setlistLyricsIndex] = songTitle
@@ -107,7 +108,10 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        val songTitles: List<String> = setlist.songTitles
+        val songTitles: List<String> = setlist.songIds.map { songId ->
+            SongsContext.getSongTitle(songId)
+        }
+
         val songItemList: List<SongItem> = SongsContext.getSongItems()
             .filter { songItem -> songTitles.contains(songItem.title) }
 

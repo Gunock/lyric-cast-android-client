@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 11:16 PM
+ * Last modified 3/9/21 1:07 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -27,7 +27,6 @@ import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.helpers.KeyboardHelper
-import pl.gunock.lyriccast.models.Setlist
 import pl.gunock.lyriccast.models.SongItem
 
 
@@ -74,7 +73,7 @@ class SetlistEditorFragment : Fragment() {
             val setlist = SetlistsContext.getSetlist(intentSetlistName!!)
 
             setlistSongs = SongsContext.getSongItems()
-                .filter { songItem -> setlist.songTitles.contains(songItem.title) }
+                .filter { songItem -> setlist.songIds.contains(songItem.id) }
         }
 
         songsRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_songs).apply {
@@ -141,11 +140,8 @@ class SetlistEditorFragment : Fragment() {
             return false
         }
 
-        val setlist = Setlist()
-        setlist.name = setlistName
-        setlist.songTitles = setlistSongs.map { songItem -> songItem.title }
-
-        SetlistsContext.saveSetlist(setlist)
+        val songIds = setlistSongs.map { songItem -> songItem.id }
+        SetlistsContext.saveSetlist(setlistName, songIds)
 
         return true
     }

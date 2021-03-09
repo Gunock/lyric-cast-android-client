@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 11:07 PM
+ * Last modified 3/9/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -202,8 +202,8 @@ class SongsFragment : Fragment() {
     }
 
     private fun pickSong(item: SongItem) {
-        val songSections = SongsContext.getSongLyrics(item.title)!!.lyrics
-        val songMetadata = SongsContext.getSongMetadata(item.title)!!
+        val songSections = SongsContext.getSongLyrics(item.id)!!.lyrics
+        val songMetadata = SongsContext.getSongMetadata(item.id)!!
         val lyrics = songMetadata.presentation.map { sectionName -> songSections[sectionName]!! }
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
@@ -249,7 +249,7 @@ class SongsFragment : Fragment() {
         val selectedSong = songItemsAdapter.songItems.first { songItem -> songItem.isSelected }
 
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
-        intent.putExtra("songTitle", selectedSong.title)
+        intent.putExtra("songId", selectedSong.id)
         startActivity(intent)
 
         resetSelection()
@@ -260,12 +260,12 @@ class SongsFragment : Fragment() {
     private fun deleteSelectedSongs(): Boolean {
         val selectedSongs = songItemsAdapter.songItems
             .filter { song -> song.isSelected }
-            .map { song -> song.title }
+            .map { song -> song.id }
 
         SongsContext.deleteSongs(selectedSongs)
 
         val remainingSongs = songItemsAdapter.songItems
-            .filter { songItem -> !selectedSongs.contains(songItem.title) }
+            .filter { songItem -> !selectedSongs.contains(songItem.id) }
 
         songItemsAdapter.songItems.clear()
         songItemsAdapter.songItems.addAll(remainingSongs)

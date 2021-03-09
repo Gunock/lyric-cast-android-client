@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 11:18 PM
+ * Last modified 3/9/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -53,7 +53,6 @@ class SongControlsActivity : AppCompatActivity() {
             sendSlide()
         }
         castContext?.sessionManager?.addSessionManagerListener(sessionCreatedListener)
-
 
         songTitleView.text = intent.getStringExtra("songTitle")
 

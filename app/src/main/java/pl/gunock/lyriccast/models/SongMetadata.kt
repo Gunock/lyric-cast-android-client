@@ -1,46 +1,30 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 11:06 PM
+ * Last modified 3/9/21 1:06 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.JsonHelper.arrayToStringList
 import java.io.File
-import java.util.*
 
-class SongMetadata() {
-    private var lyricsFilename: String = ""
-
-    private var _title: String = ""
-    var title: String
-        get() = _title
-        set(value) {
-            _title = value
-            lyricsFilename = "${title.normalize()}.json"
-        }
-
+class SongMetadata(val id: Long) {
+    private var lyricsFilename: String = "$id.json"
+    var title: String = ""
     var author: String = ""
-    var copyright: String = ""
-
-    var categoryId: Long? = null
-
+    var categoryId: Long = Long.MIN_VALUE
     var presentation: List<String> = listOf()
 
-    constructor(json: JSONObject) : this() {
-        lyricsFilename = json.getString("lyricsFilename")
-        _title = json.getString("title")
+    constructor(json: JSONObject) : this(json.getLong("id")) {
+        title = json.getString("title")
         author = json.getString("author")
-        copyright = json.getString("copyright")
         categoryId = json.getLong("category")
         presentation = arrayToStringList(json.getJSONArray("presentation"))
 
-        author = if (author.toLowerCase(Locale.ROOT) != "null") author else "Unknown"
-        copyright = if (copyright.toLowerCase(Locale.ROOT) != "null") copyright else ""
+        author = if (!author.equals("null", true)) author else "Unknown"
     }
 
     fun loadLyrics(sourceDirectory: String): SongLyrics {
@@ -50,18 +34,17 @@ class SongMetadata() {
 
     fun toJSON(): JSONObject {
         return JSONObject().apply {
-            put("lyricsFilename", lyricsFilename)
-            put("title", _title)
+            put("id", id)
+            put("title", title)
             put("author", author)
-            put("copyright", copyright)
-            put("category", categoryId ?: JSONObject.NULL)
+            put("category", categoryId)
             put("presentation", JSONArray(presentation))
         }
     }
 
     override fun toString(): String {
         return StringBuilder().apply {
-            append("(title: $_title, ")
+            append("(title: $title, ")
             append("author: $author)")
         }.toString()
     }

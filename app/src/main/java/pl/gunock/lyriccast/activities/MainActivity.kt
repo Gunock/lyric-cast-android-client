@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 10:29 PM
+ * Last modified 3/9/21 1:00 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -177,13 +177,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
-        if (SongsContext.getSongMap().isNotEmpty() && SetlistsContext.getSetlistItems()
-                .isNotEmpty()
-        ) {
+        val areSongsEmpty = SongsContext.getSongMap().isNotEmpty()
+        val areSetlistsEmpty = SetlistsContext.getSetlistItems().isNotEmpty()
+        if (areSongsEmpty && areSetlistsEmpty) {
             return
         }
 
-        // TODO: Potential leak
+        // TODO: Potential leak (verify)
         val alertDialog: AlertDialog = AlertDialog.Builder(this)
             .setMessage("Loading...")
             .create()
