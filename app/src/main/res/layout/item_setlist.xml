@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/9/21 2:36 AM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/9/21 2:33 AM
+  ~ Last modified 3/12/21 3:45 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,6 +21,7 @@
     android:hapticFeedbackEnabled="true"
     android:longClickable="true"
     android:outlineProvider="background"
+    android:soundEffectsEnabled="false"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
@@ -62,28 +63,6 @@
             app:layout_constraintStart_toEndOf="@+id/chk_item_setlist"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cdv_item_setlist_category"
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            app:cardBackgroundColor="@color/colorPrimaryDark"
-            app:cardCornerRadius="@dimen/dimen_card_radius_big"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_item_setlist_name">
-
-            <TextView
-                android:id="@+id/tv_item_setlist_category"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:maxLines="1"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:text="@string/placeholder_category"
-                android:textAlignment="viewStart"
-                android:textColor="@color/common_google_signin_btn_text_dark_default" />
-        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

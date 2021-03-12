@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 11:03 PM
+  ~ Last modified 3/9/21 1:24 PM
   -->
 
 <resources>
@@ -23,13 +23,33 @@
 
     <!-- Category colors -->
     <string-array name="category_color_names">
-        <item>Red</item>
-        <item>Green</item>
-        <item>Blue</item>
+        <item>Maroon</item>
+        <item>Tomato</item>
+        <item>Golden rod</item>
+        <item>Olive drab</item>
+        <item>Dark cyan</item>
+        <item>Turquoise</item>
+        <item>Royal blue</item>
+        <item>Blue violet</item>
+        <item>Deep pink</item>
+        <item>Navajo white</item>
+        <item>Slate gray</item>
+        <item>Gray</item>
+        <item>Light steel blue</item>
     </string-array>
     <string-array name="category_color_values">
-        <item>@color/red</item>
-        <item>@color/green</item>
-        <item>@color/blue</item>
+        <item>@color/maroon</item>
+        <item>@color/tomato</item>
+        <item>@color/golden_rod</item>
+        <item>@color/olive_drab</item>
+        <item>@color/dark_cyan</item>
+        <item>@color/turquoise</item>
+        <item>@color/royal_blue</item>
+        <item>@color/blue_violet</item>
+        <item>@color/deep_pink</item>
+        <item>@color/navajo_white</item>
+        <item>@color/slate_gray</item>
+        <item>@color/gray</item>
+        <item>@color/light_steel_blue</item>
     </string-array>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/9/21 2:36 AM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/9/21 2:33 AM
+  ~ Last modified 3/12/21 3:45 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,11 +14,13 @@
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
     android:clickable="true"
+    android:clipChildren="false"
     android:clipToPadding="false"
     android:elevation="@dimen/dimen_card_elevation_small"
     android:focusable="true"
     android:longClickable="true"
     android:outlineProvider="background"
+    android:soundEffectsEnabled="false"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
@@ -28,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"
+        android:clipToPadding="false"
         android:padding="8dp">
 
         <CheckBox
@@ -55,6 +58,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:text="@string/placeholder_category"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/cdv_category_color"
             app:layout_constraintStart_toEndOf="@+id/chk_item_category"

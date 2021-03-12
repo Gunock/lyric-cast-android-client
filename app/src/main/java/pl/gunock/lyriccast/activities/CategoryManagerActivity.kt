@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:56 AM
+ * Last modified 3/12/21 2:00 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -69,7 +69,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_delete -> deleteSelectedCategories()
             R.id.menu_edit -> editSelectedCategory()
-            R.id.menu_add -> showAddCategoryDialog()
+            R.id.menu_category_manager -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -201,7 +201,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         showDelete: Boolean = true,
         showEdit: Boolean = true
     ) {
-        menu.findItem(R.id.menu_add).isVisible = showAdd
+        menu.findItem(R.id.menu_category_manager).isVisible = showAdd
         menu.findItem(R.id.menu_delete).isVisible = showDelete
         menu.findItem(R.id.menu_edit).isVisible = showEdit
     }

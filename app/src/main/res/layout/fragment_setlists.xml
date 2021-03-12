@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/8/21 12:05 AM
+  ~ Last modified 3/12/21 1:40 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -40,17 +40,6 @@
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-        <Spinner
-            android:id="@+id/spn_setlist_category"
-            style="@style/Widget.LyricCast.Spinner.Underlined"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_filter_setlists"
-            tools:listitem="@android:layout/simple_spinner_item" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

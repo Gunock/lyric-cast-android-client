@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 9:52 PM
+ * Last modified 3/12/21 3:06 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,7 @@ import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.models.CategoryItem
 import pl.gunock.lyriccast.models.ColorItem
 import pl.gunock.lyriccast.viewmodels.EditCategoryViewModel
+import java.util.*
 
 
 class EditCategoryDialogFragment(
@@ -66,6 +68,8 @@ class EditCategoryDialogFragment(
         nameInput = view.findViewById(R.id.tin_category_name)
         colorSpinner = view.findViewById(R.id.spn_category_color2)
 
+        nameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(20))
+
         setupColorSpinner()
         setupListeners()
     }
@@ -84,7 +88,7 @@ class EditCategoryDialogFragment(
         colorSpinner.adapter = colorSpinnerAdapter
 
         if (category?.color != null) {
-            nameInput.text = category.name
+            nameInput.text = category.name.toUpperCase(Locale.ROOT)
             colorSpinner.setSelection(colorValues.indexOf(category.color))
         }
     }

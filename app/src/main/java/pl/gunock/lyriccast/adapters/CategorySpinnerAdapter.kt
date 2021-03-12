@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 9:59 PM
+ * Last modified 3/12/21 3:23 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -19,12 +19,12 @@ import pl.gunock.lyriccast.models.Category
 
 class CategorySpinnerAdapter(
     context: Context,
-    private val categories: Array<Category>
+    private val categories: List<Category>
 ) : BaseAdapter() {
 
     constructor(context: Context, categories: Set<Category>) : this(
         context,
-        categories.toTypedArray()
+        categories.toList()
     )
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
@@ -42,15 +42,11 @@ class CategorySpinnerAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View
-        if (convertView == null) {
-            view = inflater.inflate(R.layout.spinner_item_color, parent, false)
-            val vh = CategoryViewHolder(view)
-            val item = categories[position]
-            vh.bind(item)
-        } else {
-            view = convertView
-        }
+        val view: View = convertView ?: inflater.inflate(R.layout.spinner_item_color, parent, false)
+
+        val vh = CategoryViewHolder(view)
+        val item = categories[position]
+        vh.bind(item)
 
         return view
     }
