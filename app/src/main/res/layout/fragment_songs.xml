@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/8/21 11:10 PM
+  ~ Last modified 3/12/21 3:20 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,7 +32,7 @@
             app:layout_constraintEnd_toStartOf="@+id/swt_selected_songs"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_filter_songs"
-            tools:listitem="@android:layout/simple_spinner_item" />
+            tools:listitem="@layout/spinner_item_color" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_filter_songs"

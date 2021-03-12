@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:07 AM
+ * Last modified 3/12/21 4:03 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,7 +26,6 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
-import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.models.SongItem
 
 
@@ -94,8 +93,6 @@ class SetlistEditorFragment : Fragment() {
         setlistNameInput.addTextChangedListener(setlistNameTextWatcher)
 
         view.findViewById<Button>(R.id.btn_pick_setlist_songs).setOnClickListener {
-            KeyboardHelper.hideKeyboard(view)
-
             val action = SetlistEditorFragmentDirections.actionSetlistEditorToSetlistEditorSongs(
                 selectedSongs = setlistSongs.map { songItem -> songItem.title }.toTypedArray(),
                 setlistName = setlistNameInput.text.toString()

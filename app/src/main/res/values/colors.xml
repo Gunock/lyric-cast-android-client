@@ -1,16 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 11:00 PM
+  ~ Last modified 3/11/21 11:38 PM
   -->
 
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorPrimary">@color/royal_blue</color>
+    <color name="colorPrimaryDark">@color/royal_blue_dark</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="black">#000000</color>
-    <color name="red">#FF0000</color>
-    <color name="green">#00FF00</color>
-    <color name="blue">#0000FF</color>
+
+    <!--    Value source: https://www.rapidtables.com/web/color/RGB_Color.html -->
+    <color name="maroon">#800000</color>
+    <color name="tomato">#FF6347</color>
+    <color name="golden_rod">#DAA520</color>
+    <color name="olive_drab">#6B8E23</color>
+    <color name="dark_cyan">#008B8B</color>
+    <color name="turquoise">#40E0D0</color>
+    <color name="royal_blue">#4169E1</color>
+    <color name="royal_blue_dark">#2149C1</color>
+    <color name="blue_violet">#8A2BE2</color>
+    <color name="deep_pink">#FF1493</color>
+    <color name="navajo_white">#F5DEB3</color>
+    <color name="slate_gray">#708090</color>
+    <color name="gray">#808080</color>
+    <color name="light_steel_blue">#B0C4DE</color>
 </resources>

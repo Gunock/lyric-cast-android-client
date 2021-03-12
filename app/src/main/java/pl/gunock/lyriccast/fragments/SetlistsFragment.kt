@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:21 PM
+ * Last modified 3/12/21 1:40 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,14 +10,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
@@ -26,7 +23,6 @@ import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
-import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.models.SetlistItem
 import java.util.*
@@ -40,7 +36,6 @@ class SetlistsFragment : Fragment() {
 
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
-    private lateinit var categorySpinner: Spinner
     private lateinit var setlistRecyclerView: RecyclerView
 
     private var setlistItems: Set<SetlistItem> = setOf()
@@ -65,7 +60,6 @@ class SetlistsFragment : Fragment() {
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_setlists)
         searchViewEditText = searchView.editText!!
-        categorySpinner = view.findViewById(R.id.spn_setlist_category)
 
         setlistRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_setlists).apply {
             setHasFixedSize(true)
@@ -73,7 +67,6 @@ class SetlistsFragment : Fragment() {
         }
 
         setupListeners()
-        setupCategorySpinner()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -99,10 +92,8 @@ class SetlistsFragment : Fragment() {
         super.onResume()
 
         setupSetlists()
-        setupCategorySpinner()
 
         searchViewEditText.setText("")
-        categorySpinner.setSelection(0)
     }
 
     private fun setupSetlists() {
@@ -135,33 +126,12 @@ class SetlistsFragment : Fragment() {
             .findViewById<RecyclerView>(R.id.rcv_setlists)!!.adapter = setlistItemsAdapter
     }
 
-    private fun setupCategorySpinner() {
-        val categories = CategoriesContext.getCategoryItems()
-            .map { categoryItem -> categoryItem.name }
-
-        val categorySpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            listOf("All") + categories
-        )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = categorySpinnerAdapter
-    }
-
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
             filterSetlists(
-                newText,
-                categorySpinner.selectedItem.toString()
+                newText
             )
         })
-
-        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            filterSetlists(
-                searchViewEditText.editableText.toString(),
-                categorySpinner.selectedItem.toString()
-            )
-        }
     }
 
     private fun pickSetlist(item: SetlistItem) {
@@ -256,24 +226,14 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun filterSetlists(name: String, category: String = "All") {
+    private fun filterSetlists(name: String) {
         Log.v(TAG, "filterSetlists invoked")
 
         val normalizedName = name.normalize()
 
-        val predicates: MutableList<(SetlistItem) -> Boolean> = mutableListOf()
-
-        if (category != "All") {
-            predicates.add { setlistItem -> setlistItem.category == category }
-        }
-
-        predicates.add { setlistItem ->
-            setlistItem.name.normalize().contains(normalizedName, ignoreCase = true)
-        }
-
         val duration = measureTimeMillis {
             setlistItemsAdapter.setlistItems = setlistItems.filter { setlistItem ->
-                predicates.all { predicate -> predicate(setlistItem) }
+                setlistItem.name.normalize().contains(normalizedName, ignoreCase = true)
             }.toMutableList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 9:59 PM
+ * Last modified 3/9/21 1:27 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -38,15 +38,11 @@ class ColorSpinnerAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View
-        if (convertView == null) {
-            view = inflater.inflate(R.layout.spinner_item_color, parent, false)
-            val vh = CategoryViewHolder(view)
-            val item = colors[position]
-            vh.bind(item)
-        } else {
-            view = convertView
-        }
+        val view: View = convertView ?: inflater.inflate(R.layout.spinner_item_color, parent, false)
+
+        val vh = CategoryViewHolder(view)
+        val item = colors[position]
+        vh.bind(item)
 
         return view
     }
