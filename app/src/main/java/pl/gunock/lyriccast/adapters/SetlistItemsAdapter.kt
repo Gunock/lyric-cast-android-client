@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 12:42 AM
+ * Last modified 3/12/21 4:03 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
@@ -55,15 +54,9 @@ class SetlistItemsAdapter(
     inner class SetlistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
         private val nameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
-        private val categoryCardView: CardView =
-            itemView.findViewById(R.id.cdv_item_setlist_category)
 
         fun bind(item: SetlistItem) {
             nameTextView.text = setlistItems[layoutPosition].name
-
-            if (item.category.isBlank()) {
-                categoryCardView.visibility = View.INVISIBLE
-            }
 
             if (!showCheckBox) {
                 checkBox.visibility = View.GONE

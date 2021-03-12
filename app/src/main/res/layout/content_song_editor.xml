@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 9:20 PM
+  ~ Last modified 3/12/21 3:34 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,80 +11,72 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tv_song_title"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:errorEnabled="true"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground"
+        android:elevation="6dp"
+        android:outlineProvider="background"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tin_song_title"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tv_song_title"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="50"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tin_song_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_song_title"
+                android:singleLine="true"
+                android:text="@string/input_new_song" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/spn_song_editor_category"
+            style="@style/Widget.LyricCast.Spinner.Underlined"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_song_title"
+            tools:listitem="@layout/spinner_item_color" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tv_section_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_song_title"
-            android:singleLine="true"
-            android:text="@string/input_new_song" />
+            android:layout_marginTop="8dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tin_section_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/input_section_name"
+                android:singleLine="true"
+                android:text="@string/input_new_section" />
 
-    <Spinner
-        android:id="@+id/spn_song_editor_category"
-        style="@style/Widget.LyricCast.Spinner.Underlined"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_song_title"
-        tools:listitem="@android:layout/simple_spinner_item" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <View
-        android:id="@+id/HorizontalDivider1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tv_section_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tin_section_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/input_section_name"
-            android:singleLine="true"
-            android:text="@string/input_new_section" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <View
-        android:id="@+id/HorizontalDivider2"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/tin_section_lyrics"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/tin_section_lyrics"
@@ -100,85 +92,74 @@
         android:hint="@string/hint_enter_lyrics"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/btn_delete_section"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_section_name" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 
-    <View
-        android:id="@+id/HorizontalDivider3"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tin_section_lyrics" />
-
-    <Button
-        android:id="@+id/btn_delete_section"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/button_delete_section"
-        app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:background="?android:attr/windowBackground"
+        android:elevation="6dp"
+        android:paddingTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <ImageButton
-        android:id="@+id/btn_move_section_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:contentDescription="@string/button_move_left"
-        app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
-        app:layout_constraintEnd_toStartOf="@+id/btn_delete_section"
-        app:layout_constraintTop_toBottomOf="@+id/tin_section_lyrics"
-        app:srcCompat="@drawable/baseline_arrow_back_black_24dp" />
-
-    <ImageButton
-        android:id="@+id/btn_move_section_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:contentDescription="@string/button_move_right"
-        app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
-        app:layout_constraintStart_toEndOf="@+id/btn_delete_section"
-        app:layout_constraintTop_toBottomOf="@+id/tin_section_lyrics"
-        app:srcCompat="@drawable/baseline_arrow_forward_black_24dp" />
-
-    <View
-        android:id="@+id/HorizontalDivider4"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tbl_song_section"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:tabMode="scrollable">
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_chorus"
+        <ImageButton
+            android:id="@+id/btn_move_section_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/input_new_section" />
+            android:layout_marginEnd="32dp"
+            android:contentDescription="@string/button_move_left"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
+            app:layout_constraintEnd_toStartOf="@+id/btn_delete_section"
+            app:layout_constraintTop_toTopOf="@+id/btn_delete_section"
+            app:srcCompat="@drawable/baseline_arrow_back_black_24dp" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_add"
+        <Button
+            android:id="@+id/btn_delete_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_add" />
+            android:layout_marginBottom="8dp"
+            android:text="@string/button_delete_section"
+            app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </com.google.android.material.tabs.TabLayout>
+        <ImageButton
+            android:id="@+id/btn_move_section_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:contentDescription="@string/button_move_right"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
+            app:layout_constraintStart_toEndOf="@+id/btn_delete_section"
+            app:layout_constraintTop_toTopOf="@+id/btn_delete_section"
+            app:srcCompat="@drawable/baseline_arrow_forward_black_24dp" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tbl_song_section"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:tabMode="scrollable">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tab_chorus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_new_section" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tab_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_add" />
+
+        </com.google.android.material.tabs.TabLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

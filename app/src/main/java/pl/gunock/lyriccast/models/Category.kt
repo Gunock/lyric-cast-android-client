@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:29 AM
+ * Last modified 3/12/21 12:00 AM
  */
 
 package pl.gunock.lyriccast.models
@@ -26,6 +26,14 @@ open class Category(
         json.getString("name"),
         json.getIntOrNull("color")
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other.javaClass != Category::javaClass) {
+            return false
+        }
+        val otherCategory = other as Category
+        return id == otherCategory.id
+    }
 
     override fun compareTo(other: Category): Int {
         return name.compareTo(other.name)

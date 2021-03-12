@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 12:12 AM
+ * Last modified 3/12/21 4:03 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,7 +10,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
@@ -25,6 +24,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
+import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
@@ -130,12 +130,10 @@ class SongsFragment : Fragment() {
     private fun setupCategorySpinner() {
         val categories = CategoriesContext.getCategories()
 
-        val categorySpinnerAdapter = ArrayAdapter(
+        val categorySpinnerAdapter = CategorySpinnerAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
-            listOf(Category("All")) + categories
+            setOf(Category("All")) + categories
         )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categorySpinnerAdapter
     }
 

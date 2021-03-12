@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:23 AM
+ * Last modified 3/12/21 1:24 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -15,8 +15,6 @@ open class Setlist(
     val name: String,
     var songIds: List<Long>
 ) : Comparable<Setlist> {
-
-    var category: String = ""
 
     constructor(json: JSONObject) : this(
         json.getLong("id"),

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:44 PM
+  ~ Last modified 3/12/21 3:02 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,6 +16,8 @@
         android:id="@+id/tv_category_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:counterEnabled="true"
+        app:counterMaxLength="20"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,7 +26,8 @@
             android:id="@+id/tin_category_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_category_name" />
+            android:hint="@string/hint_category_name"
+            android:maxLength="21" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner

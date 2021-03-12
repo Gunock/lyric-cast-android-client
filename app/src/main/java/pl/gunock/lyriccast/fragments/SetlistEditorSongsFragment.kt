@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 11:19 PM
+ * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 11:06 PM
+ * Last modified 3/12/21 4:00 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast.fragments
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
@@ -22,8 +21,10 @@ import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
+import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
@@ -40,7 +41,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private val args: SetlistEditorSongsFragmentArgs by navArgs()
 
-    private lateinit var searchViewEditText: EditText
+    private lateinit var songTitleInput: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var selectedSongsSwitch: SwitchCompat
 
@@ -68,13 +69,25 @@ class SetlistEditorSongsFragment : Fragment() {
         selectedSongTitles = args.selectedSongs.toMutableSet()
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
-        searchViewEditText = searchView.editText!!
+        songTitleInput = searchView.editText!!
         categorySpinner = view.findViewById(R.id.spn_category)
         selectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
 
         setupSongs(view)
         setupCategorySpinner()
         setupListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        KeyboardHelper.showKeyboard(requireView())
+        songTitleInput.requestFocus()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        KeyboardHelper.hideKeyboard(requireView())
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,21 +109,21 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
+        songTitleInput.addTextChangedListener(InputTextChangedListener { newText ->
             filterSongs(newText, categorySpinner.selectedItem as Category)
         })
 
         categorySpinner.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->
                 filterSongs(
-                    searchViewEditText.editableText.toString(),
+                    songTitleInput.editableText.toString(),
                     categorySpinner.selectedItem as Category
                 )
             }
 
         selectedSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
             filterSongs(
-                searchViewEditText.editableText.toString(),
+                songTitleInput.editableText.toString(),
                 categorySpinner.selectedItem as Category,
                 isSelected = if (isChecked) true else null
             )
@@ -120,12 +133,10 @@ class SetlistEditorSongsFragment : Fragment() {
     private fun setupCategorySpinner() {
         val categories = CategoriesContext.getCategories()
 
-        val categorySpinnerAdapter = ArrayAdapter(
+        val categorySpinnerAdapter = CategorySpinnerAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
             listOf(Category("All")) + categories
         )
-        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         categorySpinner.adapter = categorySpinnerAdapter
     }
@@ -138,6 +149,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
         val onClickListener =
             ClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+                requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val item: SongItem = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
             }

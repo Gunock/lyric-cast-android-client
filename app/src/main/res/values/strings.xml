@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/9/21 12:19 AM
+  ~ Last modified 3/12/21 3:20 PM
   -->
 
 <resources>
@@ -56,7 +56,7 @@
     <string name="chromecast_control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
 
     <!--  Strings used as placeholders -->
-    <string name="placeholder_color">Color</string>
+    <string name="placeholder_text">Text</string>
     <string name="placeholder_title">Title</string>
     <string name="placeholder_name">Name</string>
     <string name="placeholder_author">Author</string>
