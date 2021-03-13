@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:41 PM
+  ~ Last modified 3/13/21 4:05 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,7 +25,7 @@
         android:theme="@style/Theme.LyricCast.Light.DarkActionBar">
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.LaunchActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar"
@@ -36,6 +36,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.LyricCast.Light.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".activities.SetlistEditorActivity"

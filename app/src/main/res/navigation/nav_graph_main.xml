@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:49 PM
+  ~ Last modified 3/13/21 3:48 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/Start">
-
-    <fragment
-        android:id="@+id/Start"
-        android:name="androidx.fragment.app.Fragment"
-        android:label="@string/label_songs"
-        tools:layout="@layout/fragment_empty">
-
-        <action
-            android:id="@+id/action_Start_to_Songs"
-            app:destination="@id/Songs"
-            app:enterAnim="@android:anim/fade_in" />
-    </fragment>
+    app:startDestination="@id/Songs">
 
     <fragment
         android:id="@+id/Songs"

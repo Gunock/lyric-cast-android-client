@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 2:59 PM
+ * Last modified 3/13/21 4:01 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -76,12 +76,13 @@ class SongEditorActivity : AppCompatActivity() {
             selectedTab = songSectionTabLayout.getTabAt(0)!!
 
             val songMetadata = SongsContext.getSongMetadata(intentSongId)!!
-            categorySpinner.setSelection(
-                CategoriesContext.getCategoryItems()
-                    .map { categoryItem -> categoryItem.id }
-                    .indexOf(songMetadata.categoryId)
-            )
+            val categoryIndex = CategoriesContext.getCategoryItems()
+                .map { categoryItem -> categoryItem.id }
+                .indexOf(songMetadata.categoryId)
+
+            categorySpinner.setSelection(categoryIndex + 1)
         } else {
+            songTitleInput.setText("")
             selectedTab = songSectionTabLayout.getTabAt(0)!!
             sectionLyrics[selectedTab.text.toString()] = ""
             tabCountMap[selectedTab.text.toString()] = 1
@@ -248,6 +249,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         val sectionLyricsInput = findViewById<EditText>(R.id.tin_section_lyrics)
         sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
+        sectionNameInput.setText(songMetadata.presentation.first())
     }
 
     private fun addTab(tab: TabLayout.Tab, tabText: String = "") {
