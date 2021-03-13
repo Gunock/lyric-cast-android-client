@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 4:08 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:19 PM
+ * Last modified 3/13/21 4:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -74,13 +74,7 @@ class SetlistEditorSongsFragment : Fragment() {
         setupSongs(view)
         setupCategorySpinner()
         setupListeners()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        KeyboardHelper.showKeyboard(requireView())
-        songTitleInput.requestFocus()
+        KeyboardHelper.hideKeyboard(view)
     }
 
     override fun onPause() {
