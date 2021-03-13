@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:27 PM
+ * Last modified 3/13/21 3:21 PM
  */
 
-package pl.gunock.lyriccast.adapters
+package pl.gunock.lyriccast.adapters.spinner
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -40,14 +40,14 @@ class ColorSpinnerAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View = convertView ?: inflater.inflate(R.layout.spinner_item_color, parent, false)
 
-        val vh = CategoryViewHolder(view)
+        val vh = ViewHolder(view)
         val item = colors[position]
         vh.bind(item)
 
         return view
     }
 
-    private inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
         private val colorCard: CardView = itemView.findViewById(R.id.cdv_spinner_category_color)
 

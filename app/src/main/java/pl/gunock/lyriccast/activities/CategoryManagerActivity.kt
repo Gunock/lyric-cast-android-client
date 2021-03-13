@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 2:00 PM
+ * Last modified 3/13/21 2:57 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -44,6 +44,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_category_manager))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        // TODO: Possible leak
         viewModel = ViewModelProvider(this).get(EditCategoryViewModel::class.java)
         viewModel.category.observe(this, this::observeViewModelCategory)
 
@@ -78,14 +79,14 @@ class CategoryManagerActivity : AppCompatActivity() {
 
 
         val onLongClickListener =
-            LongClickAdapterItemListener { holder: CategoryItemsAdapter.CategoryViewHolder, position: Int, _ ->
+            LongClickAdapterItemListener { holder: CategoryItemsAdapter.ViewHolder, position: Int, _ ->
                 val item = categoryItemsAdapter.categoryItems[position]
                 selectCategory(item, holder)
                 return@LongClickAdapterItemListener true
             }
 
         val onClickListener =
-            ClickAdapterItemListener { holder: CategoryItemsAdapter.CategoryViewHolder, position: Int, _ ->
+            ClickAdapterItemListener { holder: CategoryItemsAdapter.ViewHolder, position: Int, _ ->
                 val item = categoryItemsAdapter.categoryItems[position]
                 if (selectionCount != 0) {
                     categoryItemsRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -150,7 +151,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun selectCategory(
         item: CategoryItem,
-        holder: CategoryItemsAdapter.CategoryViewHolder
+        holder: CategoryItemsAdapter.ViewHolder
     ) {
         if (!item.isSelected) {
             selectionCount++

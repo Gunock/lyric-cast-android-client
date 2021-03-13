@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 12:03 AM
+ * Last modified 3/13/21 3:16 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,7 +19,7 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.SongItemsAdapter
+import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
@@ -34,7 +34,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private var castContext: CastContext? = null
     private var sessionCreatedListener: SessionCreatedListener? = null
-    private lateinit var songItemsAdapter: SongItemsAdapter
+    private lateinit var songItemsAdapter: ControlsSongItemsAdapter
 
     private lateinit var setlistLyrics: List<String>
     private var songTitles: MutableMap<Int, String> = mutableMapOf()
@@ -64,19 +64,21 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val songsMetadata = SongsContext.getSongMap()
         var setlistLyricsIndex = 0
-        setlistLyrics = setlist.songIds.flatMap { songId ->
+
+        setlistLyrics = setlist.songIds.flatMapIndexed { index: Int, songId: Long ->
             val songTitle = SongsContext.getSongTitle(songId)
             val songLyrics = SongsContext.getSongLyrics(songId)!!.lyrics
             val lyrics = songsMetadata[songId]!!.presentation
                 .map { sectionName -> songLyrics[sectionName]!! }
 
-            songTitles[setlistLyricsIndex] = songTitle
-            songTitles[setlistLyricsIndex + lyrics.size - 1] = songTitle
-            songStartPoints[songTitle] = setlistLyricsIndex
+            val indexedTitle = "[$index] $songTitle"
+            songTitles[setlistLyricsIndex] = indexedTitle
+            songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
+            songStartPoints[indexedTitle] = setlistLyricsIndex
 
             setlistLyricsIndex += lyrics.size
 
-            return@flatMap lyrics
+            return@flatMapIndexed lyrics
         }
 
         setupRecyclerView()
@@ -108,38 +110,34 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        val songTitles: List<String> = setlist.songIds.map { songId ->
-            SongsContext.getSongTitle(songId)
+        val songRecyclerView: RecyclerView = findViewById(R.id.rcv_songs)
+        songRecyclerView.setHasFixedSize(true)
+        songRecyclerView.layoutManager = LinearLayoutManager(baseContext)
+
+        val onLongClickListener =
+            LongClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
+                songRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                selectSong(position)
+            }
+
+        val onClickListener =
+            ClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
+                songRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                selectSong(position)
+            }
+
+        val songMap = SongsContext.getSongMap()
+        val songItemList: List<SongItem> = setlist.songIds.map { songId ->
+            SongItem(songMap[songId]!!)
         }
 
-        val songItemList: List<SongItem> = SongsContext.getSongItems()
-            .filter { songItem -> songTitles.contains(songItem.title) }
+        songItemsAdapter = ControlsSongItemsAdapter(
+            songItemList.toMutableList(),
+            onItemLongClickListener = onLongClickListener,
+            onItemClickListener = onClickListener
+        )
 
-        with(findViewById<RecyclerView>(R.id.rcv_songs)) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
-
-            val onLongClickListener =
-                LongClickAdapterItemListener { _: SongItemsAdapter.SongViewHolder, position: Int, _ ->
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(position)
-                }
-
-            val onClickListener =
-                ClickAdapterItemListener { _: SongItemsAdapter.SongViewHolder, position: Int, _ ->
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(position)
-                }
-
-            songItemsAdapter = SongItemsAdapter(
-                songItemList.toMutableList(),
-                showRowNumber = true,
-                onItemClickListener = onClickListener,
-                onItemLongClickListener = onLongClickListener
-            )
-
-            adapter = songItemsAdapter
-        }
+        songRecyclerView.adapter = songItemsAdapter
     }
 
     private fun setupListeners() {
@@ -181,7 +179,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private fun sendSlide() {
         if (songTitles.containsKey(currentLyricsPosition)) {
             val songTitle = songTitles[currentLyricsPosition]!!
-            songTitleView.text = songTitle
+            songTitleView.text = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
             highlightSong(songTitle)
         }
 
@@ -193,8 +191,9 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun selectSong(position: Int): Boolean {
-        val item: SongItem = songItemsAdapter.songItems[position]
-        currentLyricsPosition = songStartPoints[item.title]!!
+        val title = songItemsAdapter.songItems[position].title
+        val indexedTitle = "[$position] $title"
+        currentLyricsPosition = songStartPoints[indexedTitle]!!
         sendSlide()
         return true
     }

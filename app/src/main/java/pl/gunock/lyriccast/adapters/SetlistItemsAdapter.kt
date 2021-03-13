@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 4:03 PM
+ * Last modified 3/13/21 3:19 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -33,19 +33,6 @@ class SetlistItemsAdapter(
 
     override fun onBindViewHolder(holder: SetlistViewHolder, position: Int) {
         val item = setlistItems[position]
-
-        if (onItemLongClickListener != null) {
-            holder.itemView.setOnLongClickListener { view ->
-                onItemLongClickListener.execute(holder, position, view)
-            }
-        }
-
-        if (onItemClickListener != null) {
-            holder.itemView.setOnClickListener { view ->
-                onItemClickListener.execute(holder, position, view)
-            }
-        }
-
         holder.bind(item)
     }
 
@@ -56,7 +43,8 @@ class SetlistItemsAdapter(
         private val nameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
 
         fun bind(item: SetlistItem) {
-            nameTextView.text = setlistItems[layoutPosition].name
+            setupListeners()
+            nameTextView.text = setlistItems[adapterPosition].name
 
             if (!showCheckBox) {
                 checkBox.visibility = View.GONE
@@ -67,6 +55,20 @@ class SetlistItemsAdapter(
                 }
 
                 checkBox.isChecked = item.isSelected
+            }
+        }
+
+        fun setupListeners() {
+            if (onItemLongClickListener != null) {
+                itemView.setOnLongClickListener { view ->
+                    onItemLongClickListener.execute(this, adapterPosition, view)
+                }
+            }
+
+            if (onItemClickListener != null) {
+                itemView.setOnClickListener { view ->
+                    onItemClickListener.execute(this, adapterPosition, view)
+                }
             }
         }
     }

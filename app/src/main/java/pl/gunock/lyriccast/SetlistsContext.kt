@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 12:30 AM
+ * Last modified 3/13/21 2:40 PM
  */
 
 package pl.gunock.lyriccast
@@ -53,17 +53,18 @@ object SetlistsContext {
         File(setlistsDirectory).mkdirs()
         setlistFile.writeText(json.toString())
 
+        setlists.remove(setlist)
         setlists.add(setlist)
     }
 
-    fun deleteSetlists(setlistNames: Collection<String>) {
-        for (setlistName in setlistNames) {
-            val setlistFile = File("$setlistsDirectory/${setlistName}.json")
+    fun deleteSetlists(setlistIds: Collection<Long>) {
+        for (setlistId in setlistIds) {
+            val setlistFile = File("$setlistsDirectory/${setlistId}.json")
             setlistFile.delete()
         }
 
         setlists = setlists.filter { setlist ->
-            !setlistNames.contains(setlist.name)
+            !setlistIds.contains(setlist.id)
         }.toSortedSet()
     }
 
@@ -83,7 +84,7 @@ object SetlistsContext {
 
         for (setlist in modifiedSetlists) {
             if (setlist.songIds.isEmpty()) {
-                deleteSetlists(listOf(setlist.name))
+                deleteSetlists(listOf(setlist.id))
             } else {
                 saveSetlist(setlist.name, setlist.songIds, setlist.id)
             }

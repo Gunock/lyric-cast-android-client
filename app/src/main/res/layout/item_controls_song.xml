@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 9:21 PM
+  ~ Last modified 3/13/21 2:57 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,7 +16,7 @@
     android:clickable="true"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:descendantFocusability="blocksDescendants"
+    android:descendantFocusability="afterDescendants"
     android:elevation="@dimen/dimen_card_elevation_small"
     android:focusable="true"
     android:hapticFeedbackEnabled="true"
@@ -31,30 +31,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:animateLayoutChanges="true"
+        android:clickable="false"
         android:clipChildren="false"
-        android:clipToPadding="false">
-
-        <CheckBox
-            android:id="@+id/chk_item_song"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:contextClickable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:linksClickable="false"
-            android:longClickable="false"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_item_song_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_item_song_title" />
+        android:clipToPadding="false"
+        android:contextClickable="false"
+        android:descendantFocusability="afterDescendants"
+        android:longClickable="false">
 
         <TextView
             android:id="@+id/tv_item_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:clickable="false"
+            android:contextClickable="false"
             android:gravity="center_vertical"
+            android:linksClickable="false"
+            android:longClickable="false"
             android:maxLines="1"
             android:minHeight="?android:attr/listPreferredItemHeightSmall"
             android:paddingStart="?attr/listPreferredItemPaddingStart"
@@ -63,32 +57,9 @@
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/chk_item_song"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cdv_category_color"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            app:cardBackgroundColor="@color/colorPrimaryDark"
-            app:cardCornerRadius="@dimen/dimen_card_radius_big"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_item_song_title">
-
-            <TextView
-                android:id="@+id/tv_song_category"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:text="@string/placeholder_category"
-                android:textAlignment="gravity"
-                android:textColor="@color/common_google_signin_btn_text_dark_default" />
-        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

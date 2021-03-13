@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 1:40 PM
+ * Last modified 3/13/21 2:33 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -209,12 +209,12 @@ class SetlistsFragment : Fragment() {
     private fun deleteSelectedSetlists(): Boolean {
         val selectedSetlists = setlistItemsAdapter.setlistItems
             .filter { setlist -> setlist.isSelected }
-            .map { setlist -> setlist.name }
+            .map { setlist -> setlist.id }
 
         SetlistsContext.deleteSetlists(selectedSetlists)
 
         val remainingSetlists = setlistItemsAdapter.setlistItems
-            .filter { setlistItem -> !selectedSetlists.contains(setlistItem.name) }
+            .filter { setlistItem -> !selectedSetlists.contains(setlistItem.id) }
         setlistItemsAdapter.showCheckBox = false
 
         setlistItemsAdapter.setlistItems.clear()

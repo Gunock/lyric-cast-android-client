@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 2:21 AM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 1:09 AM
+ * Last modified 3/13/21 2:59 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,7 +20,7 @@ import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
+import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.extensions.moveTabLeft
 import pl.gunock.lyriccast.extensions.moveTabRight

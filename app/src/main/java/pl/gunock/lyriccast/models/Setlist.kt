@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 1:24 PM
+ * Last modified 3/13/21 2:44 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -38,6 +38,10 @@ open class Setlist(
     }
 
     override fun compareTo(other: Setlist): Int {
+        if (id == other.id) {
+            return 0
+        }
+
         return name.compareTo(other.name)
     }
 }

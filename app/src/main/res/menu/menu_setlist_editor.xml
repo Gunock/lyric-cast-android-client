@@ -1,0 +1,25 @@
+<!--
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/13/21 3:20 PM
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/menu_duplicate"
+        android:icon="@drawable/baseline_library_add_white_24dp"
+        android:title="@string/menu_duplicate"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_delete"
+        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:title="@string/button_delete"
+        app:showAsAction="always" />
+
+</menu>
