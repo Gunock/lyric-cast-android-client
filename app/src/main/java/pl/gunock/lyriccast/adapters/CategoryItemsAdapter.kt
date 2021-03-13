@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/8/21 10:21 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/8/21 10:21 PM
+ * Last modified 3/13/21 2:57 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -23,43 +23,33 @@ class CategoryItemsAdapter(
     val context: Context,
     var categoryItems: MutableList<CategoryItem>,
     var showCheckBox: Boolean = false,
-    val onItemLongClickListener: LongClickAdapterItemListener<CategoryViewHolder>? = null,
-    val onItemClickListener: ClickAdapterItemListener<CategoryViewHolder>? = null
-) : RecyclerView.Adapter<CategoryItemsAdapter.CategoryViewHolder>() {
+    val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
+    val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null
+) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val textView: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_category, parent, false)
 
-        return CategoryViewHolder(textView)
+        return ViewHolder(textView)
     }
 
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = categoryItems[position]
         holder.bind(item)
-
-        if (onItemLongClickListener != null) {
-            holder.itemView.setOnLongClickListener { view ->
-                onItemLongClickListener.execute(holder, position, view)
-            }
-        }
-
-        if (onItemClickListener != null) {
-            holder.itemView.setOnClickListener { view ->
-                onItemClickListener.execute(holder, position, view)
-            }
-        }
     }
 
     override fun getItemCount() = categoryItems.size
 
-    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
         private val name: TextView = itemView.findViewById(R.id.tv_category_name)
         private val colorCard: CardView = itemView.findViewById(R.id.cdv_category_color)
 
         fun bind(item: CategoryItem) = with(itemView) {
-            name.text = categoryItems[layoutPosition].name
+            setupListeners()
+
+            name.text = categoryItems[adapterPosition].name
 
             if (!showCheckBox) {
                 checkBox.visibility = View.GONE
@@ -74,6 +64,20 @@ class CategoryItemsAdapter(
 
             if (item.color != null) {
                 colorCard.setCardBackgroundColor(item.color)
+            }
+        }
+
+        fun setupListeners() {
+            if (onItemLongClickListener != null) {
+                itemView.setOnLongClickListener { view ->
+                    onItemLongClickListener.execute(this, adapterPosition, view)
+                }
+            }
+
+            if (onItemClickListener != null) {
+                itemView.setOnClickListener { view ->
+                    onItemClickListener.execute(this, adapterPosition, view)
+                }
             }
         }
     }

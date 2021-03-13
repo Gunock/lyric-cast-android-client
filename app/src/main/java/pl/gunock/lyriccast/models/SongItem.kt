@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 12:03 AM
+ * Last modified 3/12/21 9:28 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -12,7 +12,6 @@ class SongItem(songMetadata: SongMetadata) {
 
     val id: Long = songMetadata.id
     val title: String = songMetadata.title
-    val author: String = songMetadata.author
     val category: Category? = CategoriesContext.getCategory(songMetadata.categoryId)
 
     var highlight: Boolean = false
@@ -20,8 +19,7 @@ class SongItem(songMetadata: SongMetadata) {
 
     override fun toString(): String {
         return StringBuilder().apply {
-            append("(title: $title, ")
-            append("author: $author)")
+            append("(title: $title)")
         }.toString()
     }
 

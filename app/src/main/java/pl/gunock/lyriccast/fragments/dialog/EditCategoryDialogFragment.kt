@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 3:06 PM
+ * Last modified 3/13/21 2:59 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.adapters.ColorSpinnerAdapter
+import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.models.CategoryItem
 import pl.gunock.lyriccast.models.ColorItem

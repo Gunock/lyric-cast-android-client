@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 2:00 PM
+ * Last modified 3/13/21 3:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,19 +17,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SetlistsContext
@@ -71,11 +65,6 @@ class MainActivity : AppCompatActivity() {
         SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            loadData()
-            goToSongs()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -122,15 +111,15 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 SongsContext.loadSongsMetadata()
-                finish()
-                val intent = Intent(baseContext, this.javaClass)
+                val intent = Intent(baseContext, MainActivity::class.java)
                 startActivity(intent)
+                finish()
             }
             EXPORT_RESULT_CODE -> {
                 FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
-                finish()
-                val intent = Intent(baseContext, this.javaClass)
+                val intent = Intent(baseContext, MainActivity::class.java)
                 startActivity(intent)
+                finish()
             }
         }
     }
@@ -178,35 +167,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadData() {
-        val areSongsNotEmpty = SongsContext.getSongMap().isNotEmpty()
-        val areSetlistsNotEmpty = SetlistsContext.getSetlistItems().isNotEmpty()
-        val areCategoriesNotEmpty = CategoriesContext.getCategoryItems().isNotEmpty()
-        if (areSongsNotEmpty || areSetlistsNotEmpty || areCategoriesNotEmpty) {
-            return
-        }
-
-        // TODO: Potential leak (verify)
-        val alertDialog: AlertDialog = AlertDialog.Builder(this)
-            .setMessage("Loading...")
-            .create()
-        alertDialog.show()
-
-        if (!areCategoriesNotEmpty) {
-            CategoriesContext.loadCategories()
-        }
-
-        if (!areSongsNotEmpty) {
-            SongsContext.loadSongsMetadata()
-        }
-
-        if (!areCategoriesNotEmpty) {
-            SetlistsContext.loadSetlists()
-        }
-
-        alertDialog.hide()
-    }
-
     private fun export(): Boolean {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
@@ -237,14 +197,5 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(baseContext, CategoryManagerActivity::class.java)
         startActivity(intent)
         return true
-    }
-
-    private suspend fun goToSongs() {
-        while (findViewById<FragmentContainerView>(R.id.navh_main) == null) {
-            delay(100)
-        }
-
-        val navController = findNavController(R.id.navh_main)
-        navController.navigate(R.id.action_Start_to_Songs)
     }
 }

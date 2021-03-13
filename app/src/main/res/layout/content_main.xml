@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 11:43 PM
+  ~ Last modified 3/13/21 10:59 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -161,7 +161,7 @@
         android:focusable="true"
         android:scaleType="center"
         android:tint="@color/design_default_color_on_primary"
-        app:backgroundTint="@color/colorPrimaryDark"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"

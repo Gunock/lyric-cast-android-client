@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/13/21 2:57 PM
  */
 
 package pl.gunock.lyriccast.tests.setlist_editor
@@ -62,7 +62,7 @@ class AddSetlistTest {
 
         onView(withId(R.id.rcv_songs))
             .perform(
-                RecyclerViewActions.scrollTo<SongItemsAdapter.SongViewHolder>(
+                RecyclerViewActions.scrollTo<SongItemsAdapter.ViewHolder>(
                     hasDescendant(withText(songTitle3))
                 )
             )

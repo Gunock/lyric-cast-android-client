@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 10:59 PM
+  ~ Last modified 3/13/21 4:05 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,17 +14,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.LyricCast.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.LyricCast.Dark.ActionBar"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_setlist_editor"
+            android:id="@+id/toolbar_launch"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             app:popupTheme="@style/ThemeOverlay.LyricCast.Light" />
 
     </com.google.android.material.appbar.AppBarLayout>
-
-    <include layout="@layout/content_setlist_editor" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 11:33 PM
+  ~ Last modified 3/12/21 11:00 PM
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,15 +32,6 @@
             app:key="fontSize"
             app:title="Font size"
             app:defaultValue="20"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="Application">
-        <CheckBoxPreference
-            android:id="@+id/pref_showAuthor"
-            app:key="showAuthor"
-            app:title="Show author"
-            app:defaultValue="true"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

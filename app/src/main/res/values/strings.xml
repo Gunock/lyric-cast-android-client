@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 3:20 PM
+  ~ Last modified 3/13/21 3:21 PM
   -->
 
 <resources>
@@ -61,4 +61,6 @@
     <string name="placeholder_name">Name</string>
     <string name="placeholder_author">Author</string>
     <string name="placeholder_category">Category</string>
+    <string name="menu_duplicate">Duplicate</string>
+    <string name="img_drag_song">Drag song</string>
 </resources>

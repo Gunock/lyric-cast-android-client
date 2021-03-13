@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 4:08 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 4:00 PM
+ * Last modified 3/13/21 4:07 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -21,8 +21,8 @@ import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
+import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
@@ -46,9 +46,7 @@ class SetlistEditorSongsFragment : Fragment() {
     private lateinit var selectedSongsSwitch: SwitchCompat
 
     private lateinit var songItemsAdapter: SongItemsAdapter
-
-    private lateinit var selectedSongTitles: MutableSet<String>
-
+    private lateinit var selectedSongs: MutableSet<Long>
     private var songItems: Set<SongItem> = setOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +64,7 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectedSongTitles = args.selectedSongs.toMutableSet()
+        selectedSongs = args.selectedSongs.toMutableSet()
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
         songTitleInput = searchView.editText!!
@@ -76,13 +74,7 @@ class SetlistEditorSongsFragment : Fragment() {
         setupSongs(view)
         setupCategorySpinner()
         setupListeners()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        KeyboardHelper.showKeyboard(requireView())
-        songTitleInput.requestFocus()
+        KeyboardHelper.hideKeyboard(view)
     }
 
     override fun onPause() {
@@ -95,9 +87,18 @@ class SetlistEditorSongsFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
+                val selectedSongsPrev = args.selectedSongs.toMutableList()
+                val removedSongs =
+                    selectedSongsPrev.filter { songId -> !selectedSongs.contains(songId) }
+                val addedSongs =
+                    selectedSongs.filter { songId -> !selectedSongsPrev.contains(songId) }
+
+                selectedSongsPrev.removeAll(removedSongs)
+                selectedSongsPrev.addAll(addedSongs)
+
                 val action = SetlistEditorSongsFragmentDirections
                     .actionSetlistEditorSongsToSetlistEditor(
-                        selectedSongs = selectedSongTitles.toTypedArray(),
+                        selectedSongs = selectedSongsPrev.toLongArray(),
                         setlistName = args.setlistName
                     )
 
@@ -144,18 +145,18 @@ class SetlistEditorSongsFragment : Fragment() {
     private fun setupSongs(view: View) {
         songItems = SongsContext.getSongItems()
         songItems.forEach { songItem ->
-            songItem.isSelected = selectedSongTitles.contains(songItem.title)
+            songItem.isSelected = selectedSongs.contains(songItem.id)
         }
 
         val onClickListener =
-            ClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+            ClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
                 requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val item: SongItem = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
             }
 
         val onLongClickListener =
-            LongClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+            LongClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
                 val item = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
                 return@LongClickAdapterItemListener true
@@ -164,18 +165,19 @@ class SetlistEditorSongsFragment : Fragment() {
         songItemsAdapter = SongItemsAdapter(
             songItems.toMutableList(),
             showCheckBox = true,
-            onItemClickListener = onClickListener,
-            onItemLongClickListener = onLongClickListener
+            onItemLongClickListener = onLongClickListener,
+            onItemClickListener = onClickListener
         )
 
-        with(view.findViewById<RecyclerView>(R.id.rcv_songs)) {
+        val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
+        with(songsRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = songItemsAdapter
         }
     }
 
-    private fun selectSong(item: SongItem, holder: SongItemsAdapter.SongViewHolder) {
+    private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
         item.isSelected = !item.isSelected
         holder.checkBox.isChecked = item.isSelected
     }
@@ -218,9 +220,9 @@ class SetlistEditorSongsFragment : Fragment() {
     private fun updateSelectedSongs() {
         for (songItem in songItemsAdapter.songItems) {
             if (songItem.isSelected) {
-                selectedSongTitles.add(songItem.title)
+                selectedSongs.add(songItem.id)
             } else {
-                selectedSongTitles.remove(songItem.title)
+                selectedSongs.remove(songItem.id)
             }
         }
     }

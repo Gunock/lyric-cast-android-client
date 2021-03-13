@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/6/21 11:16 PM
+  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/6/21 9:42 PM
+  ~ Last modified 3/13/21 3:19 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,7 +21,7 @@
             app:destination="@id/SetlistEditor" />
         <argument
             android:name="selectedSongs"
-            app:argType="string[]" />
+            app:argType="long[]" />
         <argument
             android:name="setlistName"
             app:argType="string" />
@@ -38,7 +38,7 @@
         <argument
             android:name="selectedSongs"
             android:defaultValue="@null"
-            app:argType="string[]"
+            app:argType="long[]"
             app:nullable="true" />
         <argument
             android:name="setlistName"

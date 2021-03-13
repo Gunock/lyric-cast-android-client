@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 4:03 PM
+ * Last modified 3/13/21 3:19 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
@@ -24,8 +23,8 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
-import pl.gunock.lyriccast.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
+import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
@@ -140,18 +139,15 @@ class SongsFragment : Fragment() {
     private fun setupSongs() {
         songItems = SongsContext.getSongItems()
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val showAuthor = prefs.getBoolean("showAuthor", true)
-
         val onLongClickListener =
-            LongClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+            LongClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
                 val item = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
                 return@LongClickAdapterItemListener true
             }
 
         val onClickListener =
-            ClickAdapterItemListener { holder: SongItemsAdapter.SongViewHolder, position: Int, _ ->
+            ClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
                 val item: SongItem = songItemsAdapter.songItems[position]
                 if (selectionCount == 0) {
                     pickSong(item)
@@ -164,7 +160,6 @@ class SongsFragment : Fragment() {
         songItemsAdapter = SongItemsAdapter(
             songItems.toMutableList(),
             showCheckBox = false,
-            showAuthor = showAuthor,
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )
@@ -210,7 +205,7 @@ class SongsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSong(item: SongItem, holder: SongItemsAdapter.SongViewHolder) {
+    private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
         if (!item.isSelected) {
             selectionCount++
         } else {
@@ -277,10 +272,6 @@ class SongsFragment : Fragment() {
         songItemsAdapter.showCheckBox = false
         songItemsAdapter.notifyDataSetChanged()
         selectionCount = 0
-
-        if (!this::menu.isInitialized) {
-            return
-        }
 
         showMenuActions(showDelete = false, showEdit = false)
     }
