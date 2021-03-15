@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 3:34 PM
+  ~ Last modified 3/15/21 1:08 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,9 +26,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_song_title"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             app:counterEnabled="true"
-            app:counterMaxLength="50"
+            app:counterMaxLength="30"
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:counterEnabled="true"
-            app:counterMaxLength="50"
+            app:counterMaxLength="30"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category">

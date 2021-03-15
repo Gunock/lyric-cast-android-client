@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 4:08 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 4:07 PM
+ * Last modified 3/15/21 1:20 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -163,8 +164,9 @@ class SetlistEditorSongsFragment : Fragment() {
             }
 
         songItemsAdapter = SongItemsAdapter(
+            requireContext(),
             songItems.toMutableList(),
-            showCheckBox = true,
+            showCheckBox = MutableLiveData(true),
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )

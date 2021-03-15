@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:19 PM
+ * Last modified 3/15/21 1:22 AM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.*
 import android.widget.Button
@@ -49,9 +50,6 @@ class SetlistEditorFragment : Fragment() {
     private var selectionCount: Int = 0
 
     private val itemTouchHelper by lazy {
-        // 1. Note that I am specifying all 4 directions.
-        //    Specifying START and END also allows
-        //    more organic dragging than just specifying UP and DOWN.
         val simpleItemTouchCallback =
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
 
@@ -90,6 +88,8 @@ class SetlistEditorFragment : Fragment() {
 
         setlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
         setlistNameInput = view.findViewById(R.id.tin_setlist_name)
+
+        setlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
 
         if (args.selectedSongs != null) {
             val songMap = SongsContext.getSongMap()
@@ -238,6 +238,9 @@ class SetlistEditorFragment : Fragment() {
             selectionCount--
         }
 
+        item.isSelected = !item.isSelected
+        holder.checkBox.isChecked = item.isSelected
+
         if (selectionCount <= 0) {
             resetSelection()
             return
@@ -248,13 +251,14 @@ class SetlistEditorFragment : Fragment() {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
                 }
+                if (songItemsAdapter.showHandle.value!!) {
+                    songItemsAdapter.showHandle.value = false
+                }
                 showMenuActions()
             }
             2 -> showMenuActions(showDuplicate = false)
         }
 
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {
@@ -279,6 +283,9 @@ class SetlistEditorFragment : Fragment() {
     private fun resetSelection() {
         if (songItemsAdapter.showCheckBox.value!!) {
             songItemsAdapter.showCheckBox.value = false
+        }
+        if (!songItemsAdapter.showHandle.value!!) {
+            songItemsAdapter.showHandle.value = true
         }
         selectionCount = 0
 

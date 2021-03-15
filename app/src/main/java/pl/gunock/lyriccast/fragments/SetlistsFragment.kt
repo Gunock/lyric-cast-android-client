@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 2:33 PM
+ * Last modified 3/13/21 4:37 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -117,6 +117,7 @@ class SetlistsFragment : Fragment() {
             }
 
         setlistItemsAdapter = SetlistItemsAdapter(
+            requireContext(),
             setlistItems = setlistItems.toMutableList(),
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
@@ -150,11 +151,11 @@ class SetlistsFragment : Fragment() {
             selectionCount--
         }
 
-        var datasetChanged = false
         when (selectionCount) {
             0 -> {
-                datasetChanged = true
-                setlistItemsAdapter.showCheckBox = false
+                if (setlistItemsAdapter.showCheckBox.value!!) {
+                    setlistItemsAdapter.showCheckBox.value = false
+                }
 
                 val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = false
@@ -163,8 +164,9 @@ class SetlistsFragment : Fragment() {
                 editActionItem.isVisible = false
             }
             1 -> {
-                datasetChanged = true
-                setlistItemsAdapter.showCheckBox = true
+                if (!setlistItemsAdapter.showCheckBox.value!!) {
+                    setlistItemsAdapter.showCheckBox.value = true
+                }
 
                 val deleteActionItem = menu.findItem(R.id.menu_delete)
                 deleteActionItem.isVisible = true
@@ -182,12 +184,7 @@ class SetlistsFragment : Fragment() {
         }
 
         item.isSelected = !item.isSelected
-
-        if (datasetChanged) {
-            setlistItemsAdapter.notifyDataSetChanged()
-        } else {
-            holder.checkBox.isChecked = item.isSelected
-        }
+        holder.checkBox.isChecked = item.isSelected
 
     }
 
@@ -199,8 +196,7 @@ class SetlistsFragment : Fragment() {
         intent.putExtra("setlistName", selectedSetlist.name)
         startActivity(intent)
 
-        setlistItemsAdapter.showCheckBox = false
-        setlistItemsAdapter.notifyDataSetChanged()
+        setlistItemsAdapter.showCheckBox.value = false
         selectionCount = 0
 
         return true
@@ -215,7 +211,7 @@ class SetlistsFragment : Fragment() {
 
         val remainingSetlists = setlistItemsAdapter.setlistItems
             .filter { setlistItem -> !selectedSetlists.contains(setlistItem.id) }
-        setlistItemsAdapter.showCheckBox = false
+        setlistItemsAdapter.showCheckBox.value = false
 
         setlistItemsAdapter.setlistItems.clear()
         setlistItemsAdapter.setlistItems.addAll(remainingSetlists)

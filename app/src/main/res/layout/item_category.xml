@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 3:45 PM
+  ~ Last modified 3/13/21 4:46 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,6 +29,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="8dp">

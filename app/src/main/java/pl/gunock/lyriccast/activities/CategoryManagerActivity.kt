@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 2:57 PM
+ * Last modified 3/13/21 4:46 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -97,7 +97,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         categoryItems = CategoriesContext.getCategoryItems()
 
         categoryItemsAdapter = CategoryItemsAdapter(
-            baseContext,
+            categoryItemsRecyclerView.context,
             categoryItems = categoryItems.toMutableList(),
             onItemClickListener = onClickListener,
             onItemLongClickListener = onLongClickListener
@@ -159,18 +159,16 @@ class CategoryManagerActivity : AppCompatActivity() {
             selectionCount--
         }
 
-        var datasetChanged = false
-
         when (selectionCount) {
             0 -> {
-                datasetChanged = true
-                categoryItemsAdapter.showCheckBox = false
+                if (categoryItemsAdapter.showCheckBox.value!!) {
+                    categoryItemsAdapter.showCheckBox.value = false
+                }
                 showMenuActions(showDelete = false, showEdit = false)
             }
             1 -> {
-                if (!categoryItemsAdapter.showCheckBox) {
-                    datasetChanged = true
-                    categoryItemsAdapter.showCheckBox = true
+                if (!categoryItemsAdapter.showCheckBox.value!!) {
+                    categoryItemsAdapter.showCheckBox.value = true
                 }
 
                 showMenuActions(showAdd = false)
@@ -181,17 +179,11 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
 
         item.isSelected = !item.isSelected
-
-        if (datasetChanged) {
-            categoryItemsAdapter.notifyDataSetChanged()
-        } else {
-            holder.checkBox.isChecked = item.isSelected
-        }
+        holder.checkBox.isChecked = item.isSelected
     }
 
     private fun resetSelection() {
-        categoryItemsAdapter.showCheckBox = false
-        categoryItemsAdapter.notifyDataSetChanged()
+        categoryItemsAdapter.showCheckBox.value = false
         selectionCount = 0
 
         showMenuActions(showDelete = false, showEdit = false)

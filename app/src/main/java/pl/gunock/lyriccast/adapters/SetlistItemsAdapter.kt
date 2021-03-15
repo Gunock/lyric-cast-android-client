@@ -1,25 +1,29 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:19 PM
+ * Last modified 3/15/21 1:20 AM
  */
 
 package pl.gunock.lyriccast.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.models.SetlistItem
 
 class SetlistItemsAdapter(
+    val context: Context,
     var setlistItems: MutableList<SetlistItem>,
-    var showCheckBox: Boolean = false,
+    var showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val onItemLongClickListener: LongClickAdapterItemListener<SetlistViewHolder>? = null,
     val onItemClickListener: ClickAdapterItemListener<SetlistViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistItemsAdapter.SetlistViewHolder>() {
@@ -44,9 +48,10 @@ class SetlistItemsAdapter(
 
         fun bind(item: SetlistItem) {
             setupListeners()
+            showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
             nameTextView.text = setlistItems[adapterPosition].name
 
-            if (!showCheckBox) {
+            if (!showCheckBox.value!!) {
                 checkBox.visibility = View.GONE
             } else {
                 checkBox.visibility = View.VISIBLE
@@ -58,7 +63,15 @@ class SetlistItemsAdapter(
             }
         }
 
-        fun setupListeners() {
+        private fun observeShowCheckbox(value: Boolean) {
+            if (value) {
+                checkBox.visibility = View.VISIBLE
+            } else {
+                checkBox.visibility = View.GONE
+            }
+        }
+
+        private fun setupListeners() {
             if (onItemLongClickListener != null) {
                 itemView.setOnLongClickListener { view ->
                     onItemLongClickListener.execute(this, adapterPosition, view)
