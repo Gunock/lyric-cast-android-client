@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:45 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:20 AM
+ * Last modified 3/15/21 1:40 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -18,6 +18,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SetlistItem
 
 class SetlistItemsAdapter(
@@ -36,8 +37,7 @@ class SetlistItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: SetlistViewHolder, position: Int) {
-        val item = setlistItems[position]
-        holder.bind(item)
+        holder.bind()
     }
 
     override fun getItemCount() = setlistItems.size
@@ -46,29 +46,10 @@ class SetlistItemsAdapter(
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
         private val nameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
 
-        fun bind(item: SetlistItem) {
+        fun bind() {
             setupListeners()
-            showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
             nameTextView.text = setlistItems[adapterPosition].name
-
-            if (!showCheckBox.value!!) {
-                checkBox.visibility = View.GONE
-            } else {
-                checkBox.visibility = View.VISIBLE
-                checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    item.isSelected = isChecked
-                }
-
-                checkBox.isChecked = item.isSelected
-            }
-        }
-
-        private fun observeShowCheckbox(value: Boolean) {
-            if (value) {
-                checkBox.visibility = View.VISIBLE
-            } else {
-                checkBox.visibility = View.GONE
-            }
         }
 
         private fun setupListeners() {

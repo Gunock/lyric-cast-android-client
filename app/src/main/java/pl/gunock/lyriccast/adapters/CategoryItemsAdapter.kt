@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:45 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:20 AM
+ * Last modified 3/15/21 1:33 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -19,6 +19,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryItemsAdapter(
@@ -50,7 +51,7 @@ class CategoryItemsAdapter(
 
         fun bind(item: CategoryItem) {
             setupListeners()
-            showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
 
             name.text = categoryItems[adapterPosition].name
 
@@ -69,14 +70,6 @@ class CategoryItemsAdapter(
                 colorCard.setCardBackgroundColor(item.color)
             }
 
-        }
-
-        private fun observeShowCheckbox(value: Boolean) {
-            if (value) {
-                checkBox.visibility = View.VISIBLE
-            } else {
-                checkBox.visibility = View.GONE
-            }
         }
 
         private fun setupListeners() {
