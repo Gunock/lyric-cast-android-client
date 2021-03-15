@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 4:01 PM
+ * Last modified 3/15/21 1:08 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast.activities
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
-import android.text.InputFilter.AllCaps
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
@@ -64,7 +63,8 @@ class SongEditorActivity : AppCompatActivity() {
         songSectionTabLayout = findViewById(R.id.tbl_song_section)
         categorySpinner = findViewById(R.id.spn_song_editor_category)
 
-        sectionNameInput.filters = arrayOf<InputFilter>(AllCaps())
+        songTitleInput.filters = arrayOf(InputFilter.LengthFilter(30))
+        sectionNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
         categories = setOf(Category("No category")) + CategoriesContext.getCategoryItems()
 
         setupCategorySpinner()

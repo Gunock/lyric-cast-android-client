@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:19 PM
+ * Last modified 3/15/21 1:20 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -26,8 +26,8 @@ import pl.gunock.lyriccast.models.SongItem
 class SetlistSongItemsAdapter(
     val context: Context,
     var songItems: MutableList<SongItem>,
-    val showRowNumber: Boolean = false,
-    val showCheckBox: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false),
+    val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
+    val showHandle: MutableLiveData<Boolean> = MutableLiveData(true),
     val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
     val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null,
     val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
@@ -100,21 +100,12 @@ class SetlistSongItemsAdapter(
         private val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
         fun bind(item: SongItem) {
-            if (!showRowNumber) {
-                titleTextView.text = item.title
-            } else {
-                val titleText = itemView.context.resources.getString(
-                    R.string.item_song_item_title_template,
-                    adapterPosition + 1,
-                    item.title
-                )
-                titleTextView.text = titleText
-            }
+            titleTextView.text = item.title
 
             setupListeners()
 
-            titleTextView.text = item.title
             showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
+            showHandle.observe(context.getLifecycleOwner()!!, this::observeShowHandle)
         }
 
         private fun observeShowCheckbox(value: Boolean) {
@@ -122,7 +113,14 @@ class SetlistSongItemsAdapter(
                 checkBox.visibility = View.VISIBLE
             } else {
                 checkBox.visibility = View.GONE
-                checkBox.isChecked = false
+            }
+        }
+
+        private fun observeShowHandle(value: Boolean) {
+            if (value) {
+                handleView.visibility = View.VISIBLE
+            } else {
+                handleView.visibility = View.GONE
             }
         }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 3:02 PM
+  ~ Last modified 3/15/21 1:09 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +31,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
-        android:id="@+id/spn_category_color2"
+        android:id="@+id/spn_category_color"
         style="@style/Widget.LyricCast.Spinner.Underlined"
         android:layout_width="0dp"
         android:layout_height="50dp"
@@ -52,7 +52,7 @@
         android:text="@android:string/cancel"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toStartOf="@+id/btn_save_category"
-        app:layout_constraintTop_toBottomOf="@+id/spn_category_color2" />
+        app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
 
     <Button
         android:id="@+id/btn_save_category"
@@ -63,6 +63,6 @@
         android:text="@string/button_save"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spn_category_color2" />
+        app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

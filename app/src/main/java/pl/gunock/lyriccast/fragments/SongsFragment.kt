@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:19 PM
+ * Last modified 3/15/21 1:22 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -158,12 +158,11 @@ class SongsFragment : Fragment() {
             }
 
         songItemsAdapter = SongItemsAdapter(
+            requireContext(),
             songItems.toMutableList(),
-            showCheckBox = false,
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )
-
         songItemsRecyclerView.adapter = songItemsAdapter
     }
 
@@ -212,29 +211,22 @@ class SongsFragment : Fragment() {
             selectionCount--
         }
 
-        var datasetChanged = false
+        item.isSelected = !item.isSelected
+        holder.checkBox.isChecked = item.isSelected
+
+        if (selectionCount <= 0) {
+            resetSelection()
+            return
+        }
+
         when (selectionCount) {
-            0 -> {
-                datasetChanged = true
-                songItemsAdapter.showCheckBox = false
-
-                showMenuActions(showDelete = false, showEdit = false)
-            }
             1 -> {
-                datasetChanged = true
-                songItemsAdapter.showCheckBox = true
-
+                if (!songItemsAdapter.showCheckBox.value!!) {
+                    songItemsAdapter.showCheckBox.value = true
+                }
                 showMenuActions()
             }
             2 -> showMenuActions(showEdit = false)
-        }
-
-        item.isSelected = !item.isSelected
-
-        if (datasetChanged) {
-            songItemsAdapter.notifyDataSetChanged()
-        } else {
-            holder.checkBox.isChecked = item.isSelected
         }
     }
 
@@ -269,8 +261,9 @@ class SongsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        songItemsAdapter.showCheckBox = false
-        songItemsAdapter.notifyDataSetChanged()
+        if (songItemsAdapter.showCheckBox.value!!) {
+            songItemsAdapter.showCheckBox.value = false
+        }
         selectionCount = 0
 
         showMenuActions(showDelete = false, showEdit = false)
