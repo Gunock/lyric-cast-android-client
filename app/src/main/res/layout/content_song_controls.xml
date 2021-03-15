@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/9/21 2:36 AM
+  ~ Created by Tomasz Kiljańczyk on 3/15/21 12:09 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/9/21 2:34 AM
+  ~ Last modified 3/15/21 12:03 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,7 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
+            android:backgroundTint="@color/colorButton"
             android:text="@string/button_previous"
+            android:textColor="@color/colorButtonText"
             app:layout_constraintEnd_toStartOf="@+id/btn_song_blank"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,7 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:backgroundTint="@color/colorButton"
             android:text="@string/button_blank"
+            android:textColor="@color/colorButtonText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +53,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
+            android:backgroundTint="@color/colorButton"
             android:text="@string/button_next"
+            android:textColor="@color/colorButtonText"
             app:layout_constraintStart_toEndOf="@+id/btn_song_blank"
             app:layout_constraintTop_toTopOf="parent" />
 
