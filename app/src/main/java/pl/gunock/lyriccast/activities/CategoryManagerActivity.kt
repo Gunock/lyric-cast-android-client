@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:26 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 2:57 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:26 AM
+ * Last modified 3/15/21 2:50 AM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
-import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -19,11 +18,9 @@ import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.misc.EditCategoryViewModel
+import pl.gunock.lyriccast.misc.RecyclerViewSelectionTracker
 import pl.gunock.lyriccast.models.CategoryItem
-import java.util.*
 
 class CategoryManagerActivity : AppCompatActivity() {
 
@@ -34,8 +31,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private var categoryItems: Set<CategoryItem> = setOf()
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
-
-    private var selectionCount: Int = 0
+    private lateinit var selectionTracker: RecyclerViewSelectionTracker<CategoryItemsAdapter.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,33 +72,29 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun setupCategories() {
-
-
-        val onLongClickListener =
-            LongClickAdapterItemListener { holder: CategoryItemsAdapter.ViewHolder, position: Int, _ ->
-                val item = categoryItemsAdapter.categoryItems[position]
-                selectCategory(item, holder)
-                return@LongClickAdapterItemListener true
-            }
-
-        val onClickListener =
-            ClickAdapterItemListener { holder: CategoryItemsAdapter.ViewHolder, position: Int, _ ->
-                val item = categoryItemsAdapter.categoryItems[position]
-                if (selectionCount != 0) {
-                    categoryItemsRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectCategory(item, holder)
-                }
-            }
-
         categoryItems = CategoriesContext.getCategoryItems()
+
+        selectionTracker =
+            RecyclerViewSelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
 
         categoryItemsAdapter = CategoryItemsAdapter(
             categoryItemsRecyclerView.context,
             categoryItems = categoryItems.toMutableList(),
-            onItemClickListener = onClickListener,
-            onItemLongClickListener = onLongClickListener
+            selectionTracker = selectionTracker
         )
         categoryItemsRecyclerView.adapter = categoryItemsAdapter
+    }
+
+    private fun onCategoryClick(
+        holder: CategoryItemsAdapter.ViewHolder,
+        position: Int,
+        isLongClick: Boolean
+    ): Boolean {
+        val item = categoryItemsAdapter.categoryItems[position]
+        if (isLongClick || selectionTracker.countBefore != 0) {
+            selectCategory(item, holder)
+        }
+        return true
     }
 
     private fun deleteSelectedCategories(): Boolean {
@@ -153,13 +145,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         item: CategoryItem,
         holder: CategoryItemsAdapter.ViewHolder
     ) {
-        if (!item.isSelected) {
-            selectionCount++
-        } else {
-            selectionCount--
-        }
-
-        when (selectionCount) {
+        when (selectionTracker.count) {
             0 -> {
                 if (categoryItemsAdapter.showCheckBox.value!!) {
                     categoryItemsAdapter.showCheckBox.value = false
@@ -184,7 +170,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun resetSelection() {
         categoryItemsAdapter.showCheckBox.value = false
-        selectionCount = 0
+        selectionTracker.reset()
 
         showMenuActions(showDelete = false, showEdit = false)
     }

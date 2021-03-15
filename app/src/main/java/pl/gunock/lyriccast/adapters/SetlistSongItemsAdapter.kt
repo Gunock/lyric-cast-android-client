@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:45 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 2:57 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:40 AM
+ * Last modified 3/15/21 2:52 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,14 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
+import pl.gunock.lyriccast.misc.RecyclerViewSelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
@@ -29,10 +27,13 @@ class SetlistSongItemsAdapter(
     var songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val showHandle: MutableLiveData<Boolean> = MutableLiveData(true),
-    val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
-    val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null,
+    val selectionTracker: RecyclerViewSelectionTracker<ViewHolder>?,
     val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -43,6 +44,10 @@ class SetlistSongItemsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind()
+    }
+
+    override fun getItemId(position: Int): Long {
+        return songItems[position].id
     }
 
     override fun getItemCount() = songItems.size
@@ -81,11 +86,11 @@ class SetlistSongItemsAdapter(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
-        val handleView: View = itemView.findViewById(R.id.imv_handle)
+        private val handleView: View = itemView.findViewById(R.id.imv_handle)
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
-        private val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
         fun bind() {
+            selectionTracker?.attach(this)
             setupListeners()
 
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
@@ -96,18 +101,6 @@ class SetlistSongItemsAdapter(
         }
 
         private fun setupListeners() {
-            if (onItemLongClickListener != null) {
-                itemCardView.setOnLongClickListener { view ->
-                    onItemLongClickListener.execute(this, adapterPosition, view)
-                }
-            }
-
-            if (onItemClickListener != null) {
-                itemCardView.setOnClickListener { view ->
-                    onItemClickListener.execute(this, adapterPosition, view)
-                }
-            }
-
             @SuppressLint("ClickableViewAccessibility")
             if (onHandleTouchListener != null) {
                 handleView.setOnTouchListener { view, event ->
