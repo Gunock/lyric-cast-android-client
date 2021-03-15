@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 12:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:50 AM
+ * Last modified 3/15/21 12:57 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -53,12 +53,16 @@ class SetlistEditorFragment : Fragment() {
         val simpleItemTouchCallback =
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
 
+                override fun isLongPressDragEnabled(): Boolean {
+                    return false
+                }
+
                 override fun onMove(
                     recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
+                    holder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder
                 ): Boolean {
-                    val from = viewHolder.adapterPosition
+                    val from = holder.adapterPosition
                     val to = target.adapterPosition
                     songItemsAdapter.moveItem(from, to)
                     songItemsAdapter.notifyItemMoved(from, to)
@@ -66,7 +70,7 @@ class SetlistEditorFragment : Fragment() {
                     return true
                 }
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+                override fun onSwiped(holder: RecyclerView.ViewHolder, direction: Int) {}
             }
         ItemTouchHelper(simpleItemTouchCallback)
     }
@@ -109,8 +113,6 @@ class SetlistEditorFragment : Fragment() {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
-        itemTouchHelper.attachToRecyclerView(songsRecyclerView)
-
 
         setupListeners(view)
     }
@@ -157,7 +159,6 @@ class SetlistEditorFragment : Fragment() {
     private fun setupSongList() {
         val onHandleTouchListener =
             TouchAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, _, event ->
-
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                     itemTouchHelper.startDrag(holder)
                 }
@@ -173,6 +174,7 @@ class SetlistEditorFragment : Fragment() {
             onHandleTouchListener = onHandleTouchListener
         )
         songsRecyclerView.adapter = songItemsAdapter
+        itemTouchHelper.attachToRecyclerView(songsRecyclerView)
     }
 
     private fun onSetlistClick(
