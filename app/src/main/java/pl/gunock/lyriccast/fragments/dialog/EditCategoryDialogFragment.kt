@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:26 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:09 AM
+ * Last modified 3/15/21 1:26 AM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
@@ -23,9 +23,9 @@ import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
+import pl.gunock.lyriccast.misc.EditCategoryViewModel
 import pl.gunock.lyriccast.models.CategoryItem
 import pl.gunock.lyriccast.models.ColorItem
-import pl.gunock.lyriccast.viewmodels.EditCategoryViewModel
 import java.util.*
 
 

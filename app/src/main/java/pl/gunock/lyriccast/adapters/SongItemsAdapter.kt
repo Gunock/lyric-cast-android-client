@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:20 AM
+ * Last modified 3/15/21 3:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -17,17 +17,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
+import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
 class SongItemsAdapter(
     val context: Context,
     var songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
-    val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null
+    val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -37,9 +40,11 @@ class SongItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = songItems[position]
+        holder.bind()
+    }
 
-        holder.bind(item)
+    override fun getItemId(position: Int): Long {
+        return songItems[position].id
     }
 
     override fun getItemCount() = songItems.size
@@ -49,12 +54,12 @@ class SongItemsAdapter(
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
         private val categoryCardView: CardView = itemView.findViewById(R.id.cdv_category_color)
-        private val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
-        fun bind(item: SongItem) {
-            setupListeners()
-            showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
+        fun bind() {
+            selectionTracker?.attach(this)
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
 
+            val item = songItems[adapterPosition]
             titleTextView.text = item.title
 
             if (item.category != null) {
@@ -64,38 +69,7 @@ class SongItemsAdapter(
                 categoryCardView.visibility = View.INVISIBLE
             }
 
-            if (!showCheckBox.value!!) {
-                checkBox.visibility = View.GONE
-            } else {
-                checkBox.visibility = View.VISIBLE
-                checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    item.isSelected = isChecked
-                }
-
-                checkBox.isChecked = item.isSelected
-            }
-        }
-
-        private fun observeShowCheckbox(value: Boolean) {
-            if (value) {
-                checkBox.visibility = View.VISIBLE
-            } else {
-                checkBox.visibility = View.GONE
-            }
-        }
-
-        private fun setupListeners() {
-            if (onItemLongClickListener != null) {
-                itemCardView.setOnLongClickListener { view ->
-                    onItemLongClickListener.execute(this, adapterPosition, view)
-                }
-            }
-
-            if (onItemClickListener != null) {
-                itemCardView.setOnClickListener { view ->
-                    onItemClickListener.execute(this, adapterPosition, view)
-                }
-            }
+            checkBox.isChecked = item.isSelected
         }
     }
 }

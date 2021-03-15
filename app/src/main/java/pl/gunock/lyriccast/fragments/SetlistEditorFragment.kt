@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:22 AM
+ * Last modified 3/15/21 3:50 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,9 +26,8 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SongItem
 
 
@@ -40,14 +39,15 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var songsRecyclerView: RecyclerView
     private lateinit var setlistNameInputLayout: TextInputLayout
     private lateinit var setlistNameInput: TextView
-    private lateinit var songItemsAdapter: SetlistSongItemsAdapter
+
     private var setlistSongs: List<SongItem> = listOf()
+    private lateinit var songItemsAdapter: SetlistSongItemsAdapter
+    private lateinit var selectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
     private var intentSetlistName: String? = null
     private var setlistNames: Collection<String> = listOf()
 
     private lateinit var menu: Menu
-    private var selectionCount: Int = 0
 
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback =
@@ -165,30 +165,27 @@ class SetlistEditorFragment : Fragment() {
                 return@TouchAdapterItemListener true
             }
 
-        val onLongClickListener =
-            LongClickAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, position: Int, _ ->
-                val item = songItemsAdapter.songItems[position]
-                selectSong(item, holder)
-                return@LongClickAdapterItemListener true
-            }
-
-        val onClickListener =
-            ClickAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, position: Int, _ ->
-                if (selectionCount != 0) {
-                    val item: SongItem = songItemsAdapter.songItems[position]
-                    requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(item, holder)
-                }
-            }
-
+        selectionTracker = SelectionTracker(songsRecyclerView, this::onSetlistClick)
         songItemsAdapter = SetlistSongItemsAdapter(
             requireContext(),
             setlistSongs.toMutableList(),
-            onItemClickListener = onClickListener,
-            onItemLongClickListener = onLongClickListener,
+            selectionTracker = selectionTracker,
             onHandleTouchListener = onHandleTouchListener
         )
         songsRecyclerView.adapter = songItemsAdapter
+    }
+
+    private fun onSetlistClick(
+        holder: SetlistSongItemsAdapter.ViewHolder,
+        position: Int,
+        isLongClick: Boolean
+    ): Boolean {
+        if (isLongClick || selectionTracker.count != 0) {
+            val item: SongItem = songItemsAdapter.songItems[position]
+            selectSong(item, holder)
+            return true
+        }
+        return false
     }
 
     private fun validateSetlistName(songTitle: String): NameValidationState {
@@ -232,21 +229,19 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun selectSong(item: SongItem, holder: SetlistSongItemsAdapter.ViewHolder) {
-        if (!item.isSelected) {
-            selectionCount++
-        } else {
-            selectionCount--
-        }
-
         item.isSelected = !item.isSelected
         holder.checkBox.isChecked = item.isSelected
 
-        if (selectionCount <= 0) {
-            resetSelection()
-            return
-        }
-
-        when (selectionCount) {
+        when (selectionTracker.countAfter) {
+            0 -> {
+                if (songItemsAdapter.showCheckBox.value!!) {
+                    songItemsAdapter.showCheckBox.value = false
+                }
+                if (!songItemsAdapter.showHandle.value!!) {
+                    songItemsAdapter.showHandle.value = true
+                }
+                showMenuActions(showDelete = false, showDuplicate = false)
+            }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
@@ -287,7 +282,7 @@ class SetlistEditorFragment : Fragment() {
         if (!songItemsAdapter.showHandle.value!!) {
             songItemsAdapter.showHandle.value = true
         }
-        selectionCount = 0
+        selectionTracker.reset()
 
         showMenuActions(showDelete = false, showDuplicate = false)
     }

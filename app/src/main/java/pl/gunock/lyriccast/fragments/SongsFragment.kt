@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:22 AM
+ * Last modified 3/15/21 3:50 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,10 +26,9 @@ import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
@@ -49,7 +48,7 @@ class SongsFragment : Fragment() {
 
     private var songItems: Set<SongItem> = setOf()
     private lateinit var songItemsAdapter: SongItemsAdapter
-    private var selectionCount: Int = 0
+    private lateinit var selectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,31 +138,27 @@ class SongsFragment : Fragment() {
     private fun setupSongs() {
         songItems = SongsContext.getSongItems()
 
-        val onLongClickListener =
-            LongClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
-                val item = songItemsAdapter.songItems[position]
-                selectSong(item, holder)
-                return@LongClickAdapterItemListener true
-            }
-
-        val onClickListener =
-            ClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
-                val item: SongItem = songItemsAdapter.songItems[position]
-                if (selectionCount == 0) {
-                    pickSong(item)
-                } else {
-                    requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    selectSong(item, holder)
-                }
-            }
-
+        selectionTracker = SelectionTracker(songItemsRecyclerView, this::onSongClick)
         songItemsAdapter = SongItemsAdapter(
             requireContext(),
             songItems.toMutableList(),
-            onItemLongClickListener = onLongClickListener,
-            onItemClickListener = onClickListener
+            selectionTracker = selectionTracker
         )
         songItemsRecyclerView.adapter = songItemsAdapter
+    }
+
+    private fun onSongClick(
+        holder: SongItemsAdapter.ViewHolder,
+        position: Int,
+        isLongClick: Boolean
+    ): Boolean {
+        val item = songItemsAdapter.songItems[position]
+        if (!isLongClick && selectionTracker.count == 0) {
+            pickSong(item)
+        } else {
+            selectSong(item, holder)
+        }
+        return true
     }
 
     private fun filterSongs(title: String, category: Category = Category("All")) {
@@ -205,21 +200,16 @@ class SongsFragment : Fragment() {
     }
 
     private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
-        if (!item.isSelected) {
-            selectionCount++
-        } else {
-            selectionCount--
-        }
-
         item.isSelected = !item.isSelected
         holder.checkBox.isChecked = item.isSelected
 
-        if (selectionCount <= 0) {
-            resetSelection()
-            return
-        }
-
-        when (selectionCount) {
+        when (selectionTracker.countAfter) {
+            0 -> {
+                if (songItemsAdapter.showCheckBox.value!!) {
+                    songItemsAdapter.showCheckBox.value = false
+                }
+                showMenuActions(showDelete = false, showEdit = false)
+            }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
@@ -264,7 +254,6 @@ class SongsFragment : Fragment() {
         if (songItemsAdapter.showCheckBox.value!!) {
             songItemsAdapter.showCheckBox.value = false
         }
-        selectionCount = 0
 
         showMenuActions(showDelete = false, showEdit = false)
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 4:37 PM
+ * Last modified 3/15/21 3:19 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -21,11 +21,9 @@ import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SetlistItem
-import java.util.*
 import kotlin.system.measureTimeMillis
 
 
@@ -39,9 +37,9 @@ class SetlistsFragment : Fragment() {
     private lateinit var setlistRecyclerView: RecyclerView
 
     private var setlistItems: Set<SetlistItem> = setOf()
-    private var selectionCount: Int = 0
 
     private lateinit var setlistItemsAdapter: SetlistItemsAdapter
+    private lateinit var selectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,32 +97,29 @@ class SetlistsFragment : Fragment() {
     private fun setupSetlists() {
         setlistItems = SetlistsContext.getSetlistItems()
 
-        val onLongClickListener =
-            LongClickAdapterItemListener { holder: SetlistItemsAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistItemsAdapter.setlistItems[position]
-                selectSetlist(item, holder)
-                return@LongClickAdapterItemListener true
-            }
-
-        val onClickListener =
-            ClickAdapterItemListener { holder: SetlistItemsAdapter.SetlistViewHolder, position: Int, _ ->
-                val item = setlistItemsAdapter.setlistItems[position]
-                if (selectionCount == 0) {
-                    pickSetlist(item)
-                } else {
-                    selectSetlist(item, holder)
-                }
-            }
-
+        val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
+        selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
         setlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
             setlistItems = setlistItems.toMutableList(),
-            onItemLongClickListener = onLongClickListener,
-            onItemClickListener = onClickListener
+            selectionTracker = selectionTracker
         )
 
-        requireView()
-            .findViewById<RecyclerView>(R.id.rcv_setlists)!!.adapter = setlistItemsAdapter
+        setlistRecyclerView.adapter = setlistItemsAdapter
+    }
+
+    private fun onSetlistClick(
+        holder: SetlistItemsAdapter.ViewHolder,
+        position: Int,
+        isLongClick: Boolean
+    ): Boolean {
+        val item = setlistItemsAdapter.setlistItems[position]
+        if (!isLongClick && selectionTracker.count == 0) {
+            pickSetlist(item)
+        } else {
+            selectSetlist(item, holder)
+        }
+        return true
     }
 
     private fun setupListeners() {
@@ -143,15 +138,9 @@ class SetlistsFragment : Fragment() {
 
     private fun selectSetlist(
         item: SetlistItem,
-        holder: SetlistItemsAdapter.SetlistViewHolder
+        holder: SetlistItemsAdapter.ViewHolder
     ) {
-        if (!item.isSelected) {
-            selectionCount++
-        } else {
-            selectionCount--
-        }
-
-        when (selectionCount) {
+        when (selectionTracker.countAfter) {
             0 -> {
                 if (setlistItemsAdapter.showCheckBox.value!!) {
                     setlistItemsAdapter.showCheckBox.value = false
@@ -197,7 +186,7 @@ class SetlistsFragment : Fragment() {
         startActivity(intent)
 
         setlistItemsAdapter.showCheckBox.value = false
-        selectionCount = 0
+        selectionTracker.reset()
 
         return true
     }
@@ -217,7 +206,7 @@ class SetlistsFragment : Fragment() {
         setlistItemsAdapter.setlistItems.addAll(remainingSetlists)
         setlistItemsAdapter.notifyDataSetChanged()
 
-        selectionCount = 0
+        selectionTracker.reset()
 
         return true
     }

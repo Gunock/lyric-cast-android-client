@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:20 AM
+ * Last modified 3/15/21 3:05 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,10 +26,9 @@ import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
@@ -149,29 +148,21 @@ class SetlistEditorSongsFragment : Fragment() {
             songItem.isSelected = selectedSongs.contains(songItem.id)
         }
 
-        val onClickListener =
-            ClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
-                requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
+        val selectionTracker =
+            SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
-            }
-
-        val onLongClickListener =
-            LongClickAdapterItemListener { holder: SongItemsAdapter.ViewHolder, position: Int, _ ->
-                val item = songItemsAdapter.songItems[position]
-                selectSong(item, holder)
-                return@LongClickAdapterItemListener true
+                return@SelectionTracker true
             }
 
         songItemsAdapter = SongItemsAdapter(
             requireContext(),
             songItems.toMutableList(),
             showCheckBox = MutableLiveData(true),
-            onItemLongClickListener = onLongClickListener,
-            onItemClickListener = onClickListener
+            selectionTracker = selectionTracker
         )
 
-        val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
         with(songsRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())

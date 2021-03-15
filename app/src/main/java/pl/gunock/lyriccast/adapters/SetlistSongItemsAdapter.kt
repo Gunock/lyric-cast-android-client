@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:20 AM
+ * Last modified 3/15/21 3:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,14 +13,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
+import pl.gunock.lyriccast.misc.SelectionTracker
+import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistSongItemsAdapter(
@@ -28,35 +27,27 @@ class SetlistSongItemsAdapter(
     var songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val showHandle: MutableLiveData<Boolean> = MutableLiveData(true),
-    val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
-    val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null,
+    val selectionTracker: SelectionTracker<ViewHolder>?,
     val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_setlist_song, parent, false)
 
-        showCheckBox.observe(context.getLifecycleOwner()!!) {
-            if (!it) {
-                songItems.forEach { item -> item.isSelected = false }
-            }
-        }
-
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = songItems[position]
+        holder.bind()
+    }
 
-        @SuppressLint("ClickableViewAccessibility")
-        if (onHandleTouchListener != null) {
-            holder.handleView.setOnTouchListener { view, event ->
-                onHandleTouchListener.execute(holder, view, event)
-            }
-        }
-
-        holder.bind(item)
+    override fun getItemId(position: Int): Long {
+        return songItems[position].id
     }
 
     override fun getItemCount() = songItems.size
@@ -95,45 +86,25 @@ class SetlistSongItemsAdapter(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
-        val handleView: View = itemView.findViewById(R.id.imv_handle)
+        private val handleView: View = itemView.findViewById(R.id.imv_handle)
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
-        private val itemCardView: CardView = itemView.findViewById(R.id.item_song)
 
-        fun bind(item: SongItem) {
-            titleTextView.text = item.title
-
+        fun bind() {
+            selectionTracker?.attach(this)
             setupListeners()
 
-            showCheckBox.observe(context.getLifecycleOwner()!!, this::observeShowCheckbox)
-            showHandle.observe(context.getLifecycleOwner()!!, this::observeShowHandle)
-        }
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+            showHandle.observe(context.getLifecycleOwner()!!, VisibilityObserver(handleView))
 
-        private fun observeShowCheckbox(value: Boolean) {
-            if (value) {
-                checkBox.visibility = View.VISIBLE
-            } else {
-                checkBox.visibility = View.GONE
-            }
-        }
-
-        private fun observeShowHandle(value: Boolean) {
-            if (value) {
-                handleView.visibility = View.VISIBLE
-            } else {
-                handleView.visibility = View.GONE
-            }
+            val item = songItems[adapterPosition]
+            titleTextView.text = item.title
         }
 
         private fun setupListeners() {
-            if (onItemLongClickListener != null) {
-                itemCardView.setOnLongClickListener { view ->
-                    onItemLongClickListener.execute(this, adapterPosition, view)
-                }
-            }
-
-            if (onItemClickListener != null) {
-                itemCardView.setOnClickListener { view ->
-                    onItemClickListener.execute(this, adapterPosition, view)
+            @SuppressLint("ClickableViewAccessibility")
+            if (onHandleTouchListener != null) {
+                handleView.setOnTouchListener { view, event ->
+                    onHandleTouchListener.execute(this, view, event)
                 }
             }
         }
