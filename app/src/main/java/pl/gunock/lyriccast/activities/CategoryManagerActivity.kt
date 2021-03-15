@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 2:57 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 2:50 AM
+ * Last modified 3/15/21 3:52 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,7 +19,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
 import pl.gunock.lyriccast.misc.EditCategoryViewModel
-import pl.gunock.lyriccast.misc.RecyclerViewSelectionTracker
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryManagerActivity : AppCompatActivity() {
@@ -31,7 +31,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private var categoryItems: Set<CategoryItem> = setOf()
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
-    private lateinit var selectionTracker: RecyclerViewSelectionTracker<CategoryItemsAdapter.ViewHolder>
+    private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,8 +74,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     private fun setupCategories() {
         categoryItems = CategoriesContext.getCategoryItems()
 
-        selectionTracker =
-            RecyclerViewSelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
+        selectionTracker = SelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
 
         categoryItemsAdapter = CategoryItemsAdapter(
             categoryItemsRecyclerView.context,
@@ -91,10 +90,11 @@ class CategoryManagerActivity : AppCompatActivity() {
         isLongClick: Boolean
     ): Boolean {
         val item = categoryItemsAdapter.categoryItems[position]
-        if (isLongClick || selectionTracker.countBefore != 0) {
+        if (isLongClick || selectionTracker.count != 0) {
             selectCategory(item, holder)
+            return true
         }
-        return true
+        return false
     }
 
     private fun deleteSelectedCategories(): Boolean {
@@ -145,7 +145,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         item: CategoryItem,
         holder: CategoryItemsAdapter.ViewHolder
     ) {
-        when (selectionTracker.count) {
+        when (selectionTracker.countAfter) {
             0 -> {
                 if (categoryItemsAdapter.showCheckBox.value!!) {
                     categoryItemsAdapter.showCheckBox.value = false
@@ -170,6 +170,9 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun resetSelection() {
         categoryItemsAdapter.showCheckBox.value = false
+        categoryItemsAdapter.categoryItems.forEach { categoryItem ->
+            categoryItem.isSelected = false
+        }
         selectionTracker.reset()
 
         showMenuActions(showDelete = false, showEdit = false)

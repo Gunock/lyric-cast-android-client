@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 2:57 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 2:46 AM
+ * Last modified 3/15/21 3:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -17,7 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.misc.RecyclerViewSelectionTracker
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
@@ -25,7 +25,7 @@ class SongItemsAdapter(
     val context: Context,
     var songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val selectionTracker: RecyclerViewSelectionTracker<ViewHolder>?
+    val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
     init {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 2:57 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 2:28 AM
+ * Last modified 3/15/21 3:05 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -28,7 +28,7 @@ import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
-import pl.gunock.lyriccast.misc.RecyclerViewSelectionTracker
+import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
@@ -150,10 +150,10 @@ class SetlistEditorSongsFragment : Fragment() {
 
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
         val selectionTracker =
-            RecyclerViewSelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
+            SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
                 selectSong(item, holder)
-                return@RecyclerViewSelectionTracker true
+                return@SelectionTracker true
             }
 
         songItemsAdapter = SongItemsAdapter(
