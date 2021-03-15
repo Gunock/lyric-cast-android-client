@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:26 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 4:46 PM
+ * Last modified 3/15/21 1:26 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -21,8 +21,8 @@ import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
+import pl.gunock.lyriccast.misc.EditCategoryViewModel
 import pl.gunock.lyriccast.models.CategoryItem
-import pl.gunock.lyriccast.viewmodels.EditCategoryViewModel
 import java.util.*
 
 class CategoryManagerActivity : AppCompatActivity() {

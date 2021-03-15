@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 1:26 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/7/21 10:37 PM
+ * Last modified 3/15/21 1:26 AM
  */
 
-package pl.gunock.lyriccast.viewmodels
+package pl.gunock.lyriccast.misc
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
