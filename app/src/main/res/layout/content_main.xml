@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 10:59 AM
+  ~ Last modified 3/16/21 4:17 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tbl_song_section"
+        android:id="@+id/tbl_main_fragments"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -53,102 +54,109 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tbl_song_section"
+        app:layout_constraintTop_toBottomOf="@+id/tbl_main_fragments"
         app:navGraph="@navigation/nav_graph_main">
 
     </androidx.fragment.app.FragmentContainerView>
 
-    <LinearLayout
-        android:id="@+id/lns_fab_add_setlist"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cstl_fab_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:clickable="true"
+        android:animateLayoutChanges="true"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="horizontal"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingBottom="8dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/lns_fab_add_song"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:clickable="false"
-            app:contentPadding="2dp">
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="2dp"
-                android:layout_weight="1"
-                android:text="@string/button_add_setlist" />
-        </androidx.cardview.widget.CardView>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_setlist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:contentDescription="@string/button_add_setlist"
-            android:visibility="visible"
-            app:fabCustomSize="40dp"
-            app:maxImageSize="24dp"
-            app:srcCompat="@drawable/baseline_playlist_add_white_24dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/lns_fab_add_song"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:clickable="true"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
-        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/fab_add"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp">
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:text="@string/button_add_song" />
-        </androidx.cardview.widget.CardView>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_song"
+        <LinearLayout
+            android:id="@+id/LinearLayout1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:contentDescription="@string/button_add_song"
-            android:cropToPadding="false"
-            android:scaleType="center"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"
             android:visibility="visible"
-            app:fabCustomSize="40dp"
-            app:srcCompat="@drawable/baseline_music_note_white_24dp"
-            app:useCompatPadding="false" />
-    </LinearLayout>
+            app:layout_constraintBottom_toTopOf="@+id/LinearLayout2"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp"
+                    android:text="@string/button_add_setlist" />
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_setlist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:contentDescription="@string/button_add_setlist"
+                android:visibility="visible"
+                app:fabCustomSize="40dp"
+                app:maxImageSize="24dp"
+                app:srcCompat="@drawable/baseline_playlist_add_white_24dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/LinearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp"
+                    android:text="@string/button_add_song" />
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:contentDescription="@string/button_add_song"
+                android:cropToPadding="false"
+                android:scaleType="center"
+                android:visibility="visible"
+                app:fabCustomSize="40dp"
+                app:srcCompat="@drawable/baseline_music_note_white_24dp"
+                app:useCompatPadding="false" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
@@ -159,6 +167,7 @@
         android:clickable="true"
         android:contentDescription="@string/button_add_song"
         android:focusable="true"
+        android:focusableInTouchMode="true"
         android:scaleType="center"
         android:tint="@color/design_default_color_on_primary"
         app:backgroundTint="@color/colorPrimary"

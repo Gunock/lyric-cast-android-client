@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:19 AM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -21,6 +21,7 @@ import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SetlistItem
@@ -128,6 +129,12 @@ class SetlistsFragment : Fragment() {
                 newText
             )
         })
+
+        searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                KeyboardHelper.hideKeyboard(view)
+            }
+        }
     }
 
     private fun pickSetlist(item: SetlistItem) {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+ * Created by Tomasz Kiljańczyk on 3/15/21 11:49 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:26 PM
+ * Last modified 3/15/21 11:45 AM
  */
 
 package pl.gunock.lyriccast.utils
@@ -19,7 +19,7 @@ import pl.gunock.lyriccast.R
 fun addSong(title: String) {
     onView(withId(R.id.fab_add))
         .perform(click())
-    onView(withId(R.id.lns_fab_add_song))
+    onView(withId(R.id.LinearLayout2))
         .check(matches(isDisplayed()))
 
     onView(withId(R.id.fab_add_song))
@@ -36,7 +36,7 @@ fun addSong(title: String) {
 fun addSetlist(name: String) {
     onView(withId(R.id.fab_add))
         .perform(click())
-    onView(withId(R.id.lns_fab_add_setlist))
+    onView(withId(R.id.LinearLayout1))
         .check(matches(isDisplayed()))
 
     onView(withId(R.id.fab_add_setlist))

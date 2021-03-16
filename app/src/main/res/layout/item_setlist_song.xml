@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 3:21 PM
+  ~ Last modified 3/16/21 4:17 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,6 +19,7 @@
     android:descendantFocusability="afterDescendants"
     android:elevation="@dimen/dimen_card_elevation_small"
     android:focusable="true"
+    android:focusableInTouchMode="true"
     android:hapticFeedbackEnabled="true"
     android:longClickable="true"
     android:outlineProvider="background"
@@ -37,6 +38,8 @@
         android:clipToPadding="false"
         android:contextClickable="false"
         android:descendantFocusability="afterDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:longClickable="false">
 
         <CheckBox
@@ -80,6 +83,8 @@
             android:layout_width="64dp"
             android:layout_height="0dp"
             android:contentDescription="@string/img_drag_song"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

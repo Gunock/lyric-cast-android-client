@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 4:05 PM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:51 PM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
@@ -49,8 +48,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
-        findViewById<LinearLayout>(R.id.lns_fab_add_song).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.lns_fab_add_setlist).visibility = View.GONE
+        findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
 
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
@@ -125,7 +123,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
-        findViewById<TabLayout>(R.id.tbl_song_section).addOnTabSelectedListener(
+        val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
+        mainTabLayout.addOnTabSelectedListener(
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
@@ -140,30 +139,33 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-        val addSongFab = findViewById<LinearLayout>(R.id.lns_fab_add_song)
-        val addSetlistFab = findViewById<LinearLayout>(R.id.lns_fab_add_setlist)
-        findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
-            if (addSongFab.isVisible) {
-                addSongFab.visibility = View.GONE
-                addSetlistFab.visibility = View.GONE
+        val fabContainer = findViewById<View>(R.id.cstl_fab_container)
+        val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
+        fabAdd.setOnClickListener {
+            if (fabContainer.isVisible) {
+                fabContainer.visibility = View.GONE
+                fabAdd.clearFocus()
             } else {
-                addSongFab.visibility = View.VISIBLE
-                addSetlistFab.visibility = View.VISIBLE
+                fabContainer.visibility = View.VISIBLE
+                fabAdd.requestFocus()
+            }
+        }
+        fabAdd.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                fabContainer.visibility = View.VISIBLE
+            } else {
+                fabContainer.visibility = View.GONE
             }
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
             val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
-            addSongFab.visibility = View.GONE
-            addSetlistFab.visibility = View.GONE
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
             val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
-            addSongFab.visibility = View.GONE
-            addSetlistFab.visibility = View.GONE
         }
     }
 
