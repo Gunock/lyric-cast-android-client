@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/8/21 12:43 AM
+  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/8/21 12:43 AM
+  ~ Last modified 3/16/21 4:58 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,7 @@
         android:theme="@style/ThemeOverlay.LyricCast.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_main"
+            android:id="@+id/toolbar_controls"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginStart="0dp"

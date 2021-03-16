@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/15/21 12:09 PM
+  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/15/21 12:03 PM
+  ~ Last modified 3/16/21 4:58 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -100,7 +100,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_setlist_slide_preview"
-        tools:listitem="@layout/item_song">
+        tools:listitem="@layout/item_controls_song">
 
     </androidx.recyclerview.widget.RecyclerView>
 

@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/17/21 12:00 AM
  */
 
 package pl.gunock.lyriccast.misc
 
 import android.view.HapticFeedbackConstants
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class SelectionTracker<T : RecyclerView.ViewHolder>(
@@ -39,6 +40,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
 
     fun attach(holder: T) {
         holder.itemView.setOnLongClickListener { view ->
+            focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, true)) {
                 view.requestFocus()
@@ -49,6 +51,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         }
 
         holder.itemView.setOnClickListener { view ->
+            focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, false)) {
                 view.requestFocus()
@@ -73,4 +76,9 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         }
     }
 
+    private fun focus(view: View) {
+        view.isFocusableInTouchMode = true
+        view.requestFocus()
+        view.isFocusableInTouchMode = false
+    }
 }

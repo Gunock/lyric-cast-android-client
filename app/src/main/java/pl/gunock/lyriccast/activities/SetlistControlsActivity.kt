@@ -1,19 +1,23 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:16 PM
+ * Last modified 3/17/21 12:00 AM
  */
 
 package pl.gunock.lyriccast.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
@@ -47,7 +51,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_setlist_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_main))
+        setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         val setlistName = intent.getStringExtra("setlistName")!!
@@ -55,6 +59,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {
+            sendConfigure()
             sendSlide()
         }
         castContext?.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
@@ -89,24 +94,27 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val fontSize = prefs.getString("fontSize", "40")
-        val backgroundColor = prefs.getString("backgroundColor", "Black")
-        val fontColor = prefs.getString("fontColor", "White")
-        val configurationJson = JSONObject()
-
-        with(configurationJson) {
-            put("fontSize", "${fontSize}px")
-            put("backgroundColor", backgroundColor)
-            put("fontColor", fontColor)
-        }
-
-        MessageHelper.sendControlMessage(
-            castContext!!,
-            ControlAction.CONFIGURE,
-            configurationJson
-        )
+        sendConfigure()
         sendSlide()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_controls, menu)
+
+        CastButtonFactory.setUpMediaRouteButton(
+            baseContext,
+            menu,
+            R.id.menu_cast
+        )
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_settings -> goToSettings()
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -132,7 +140,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
 
         songItemsAdapter = ControlsSongItemsAdapter(
-            songItemList.toMutableList(),
+            this,
+            songItemList,
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )
@@ -163,12 +172,12 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun highlightSong(title: String) {
-        val songItemPosition: Int = songItemsAdapter.songItems
-            .indexOfFirst { songItem -> songItem.title == title }
-        songItemsAdapter.songItems.forEach { songItem ->
-            songItem.highlight = songItem.title == title
+        val songItemPosition: Int = songStartPoints.keys
+            .indexOfFirst { songTitle -> songTitle == title }
+
+        songItemsAdapter.songItems.forEachIndexed { index, songItem ->
+            songItem.highlight.value = index == songItemPosition
         }
-        songItemsAdapter.notifyDataSetChanged()
 
         findViewById<RecyclerView>(R.id.rcv_songs).run {
             scrollToPosition(songItemPosition)
@@ -195,6 +204,36 @@ class SetlistControlsActivity : AppCompatActivity() {
         val indexedTitle = "[$position] $title"
         currentLyricsPosition = songStartPoints[indexedTitle]!!
         sendSlide()
+        return true
+    }
+
+    private fun sendConfigure() {
+        if (castContext == null) {
+            return
+        }
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
+        val fontSize = prefs.getString("fontSize", "40")
+        val backgroundColor = prefs.getString("backgroundColor", "Black")
+        val fontColor = prefs.getString("fontColor", "White")
+
+        val configurationJson = JSONObject().apply {
+            put("fontSize", "${fontSize}px")
+            put("backgroundColor", backgroundColor)
+            put("fontColor", fontColor)
+        }
+
+        MessageHelper.sendControlMessage(
+            castContext!!,
+            ControlAction.CONFIGURE,
+            configurationJson
+        )
+    }
+
+    private fun goToSettings(): Boolean {
+        val intent = Intent(baseContext, SettingsActivity::class.java)
+        startActivity(intent)
+        sendConfigure()
         return true
     }
 }
