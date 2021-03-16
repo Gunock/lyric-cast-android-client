@@ -1,17 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:50 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/16/21 4:26 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -49,13 +46,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
-
-        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        if (!wifiManager.isWifiEnabled) {
-            val turnWifiOn = Intent(Settings.ACTION_WIFI_SETTINGS)
-            startActivity(turnWifiOn)
-        }
-
         setUpListeners()
 
         SongsContext.songsDirectory = "${filesDir.path}/songs/"
