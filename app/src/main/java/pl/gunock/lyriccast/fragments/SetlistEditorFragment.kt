@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 12:57 PM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 12:57 PM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,6 +26,7 @@ import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
 import pl.gunock.lyriccast.enums.NameValidationState
+import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SongItem
@@ -139,6 +140,12 @@ class SetlistEditorFragment : Fragment() {
     private fun setupListeners(view: View) {
         setlistNameInput.addTextChangedListener(setlistNameTextWatcher)
 
+        setlistNameInput.setOnFocusChangeListener { view_, hasFocus ->
+            if (!hasFocus) {
+                KeyboardHelper.hideKeyboard(view_)
+            }
+        }
+
         view.findViewById<Button>(R.id.btn_pick_setlist_songs).setOnClickListener {
             val songItems = songItemsAdapter.songItems.map { songItem -> songItem.id }.toLongArray()
             val action = SetlistEditorFragmentDirections.actionSetlistEditorToSetlistEditorSongs(
@@ -158,7 +165,8 @@ class SetlistEditorFragment : Fragment() {
 
     private fun setupSongList() {
         val onHandleTouchListener =
-            TouchAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, _, event ->
+            TouchAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, view, event ->
+                view.requestFocus()
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                     itemTouchHelper.startDrag(holder)
                 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 11:49 AM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 11:19 AM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -38,18 +38,20 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
     }
 
     fun attach(holder: T) {
-        holder.itemView.setOnLongClickListener {
+        holder.itemView.setOnLongClickListener { view ->
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, true)) {
+                view.requestFocus()
                 count = countItems(holder, modifySelectedItems = true)
             }
             countAfter = count
             return@setOnLongClickListener true
         }
 
-        holder.itemView.setOnClickListener {
+        holder.itemView.setOnClickListener { view ->
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, false)) {
+                view.requestFocus()
                 recyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 count = countItems(holder, modifySelectedItems = true)
             }

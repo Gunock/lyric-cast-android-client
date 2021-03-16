@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:05 AM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -113,6 +113,12 @@ class SetlistEditorSongsFragment : Fragment() {
         songTitleInput.addTextChangedListener(InputTextChangedListener { newText ->
             filterSongs(newText, categorySpinner.selectedItem as Category)
         })
+
+        songTitleInput.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                KeyboardHelper.hideKeyboard(view)
+            }
+        }
 
         categorySpinner.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->

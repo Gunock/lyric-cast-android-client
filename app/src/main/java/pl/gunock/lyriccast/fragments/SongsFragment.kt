@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:50 AM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,6 +26,7 @@ import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.misc.SelectionTracker
@@ -117,12 +118,19 @@ class SongsFragment : Fragment() {
             )
         })
 
+        searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                KeyboardHelper.hideKeyboard(view)
+            }
+        }
+
         categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
                 category = categorySpinner.selectedItem as Category
             )
         }
+
     }
 
     private fun setupCategorySpinner() {

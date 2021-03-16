@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 11:49 AM
+ * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 11:40 AM
+ * Last modified 3/16/21 4:17 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
-        findViewById<View>(R.id.cstl_fabs_container).visibility = View.GONE
+        findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
 
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
@@ -123,7 +123,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
-        findViewById<TabLayout>(R.id.tbl_song_section).addOnTabSelectedListener(
+        val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
+        mainTabLayout.addOnTabSelectedListener(
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
@@ -138,25 +139,33 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-        val fabsContainer = findViewById<View>(R.id.cstl_fabs_container)
-        findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
-            if (fabsContainer.isVisible) {
-                fabsContainer.visibility = View.GONE
+        val fabContainer = findViewById<View>(R.id.cstl_fab_container)
+        val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
+        fabAdd.setOnClickListener {
+            if (fabContainer.isVisible) {
+                fabContainer.visibility = View.GONE
+                fabAdd.clearFocus()
             } else {
-                fabsContainer.visibility = View.VISIBLE
+                fabContainer.visibility = View.VISIBLE
+                fabAdd.requestFocus()
+            }
+        }
+        fabAdd.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                fabContainer.visibility = View.VISIBLE
+            } else {
+                fabContainer.visibility = View.GONE
             }
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
             val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
-            fabsContainer.visibility = View.GONE
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
             val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
-            fabsContainer.visibility = View.GONE
         }
     }
 
