@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/28/21 3:18 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -18,19 +18,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.textfield.TextInputLayout
-import pl.gunock.lyriccast.CategoriesContext
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.misc.SelectionTracker
-import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
@@ -41,6 +42,7 @@ class SongsFragment : Fragment() {
     }
 
     private var castContext: CastContext? = null
+    private lateinit var repository: LyricCastRepository
 
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
@@ -54,6 +56,7 @@ class SongsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        repository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -134,17 +137,19 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupCategorySpinner() {
-        val categories = CategoriesContext.getCategories()
+        val categories = runBlocking { repository.getCategories() }.toSet()
 
         val categorySpinnerAdapter = CategorySpinnerAdapter(
             requireContext(),
-            setOf(Category("All")) + categories
+            setOf(Category(categoryId = Long.MIN_VALUE, name = "All")) + categories
         )
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupSongs() {
-        songItems = SongsContext.getSongItems()
+        songItems = runBlocking { repository.getSongs() }
+            .map { song -> SongItem(song) }
+            .toSet()
 
         selectionTracker = SelectionTracker(songItemsRecyclerView, this::onSongClick)
         songItemsAdapter = SongItemsAdapter(
@@ -169,7 +174,10 @@ class SongsFragment : Fragment() {
         return true
     }
 
-    private fun filterSongs(title: String, category: Category = Category("All")) {
+    private fun filterSongs(
+        title: String,
+        category: Category = Category(categoryId = Long.MIN_VALUE, "All")
+    ) {
         Log.v(TAG, "filterSongs invoked")
 
         resetSelection()
@@ -179,11 +187,11 @@ class SongsFragment : Fragment() {
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
         if (category.name != "All") {
-            predicates.add { songItem -> songItem.category?.id == category.id }
+            predicates.add { songItem -> songItem.category?.categoryId == category.categoryId }
         }
 
         predicates.add { songItem ->
-            songItem.title.normalize().contains(normalizedTitle, ignoreCase = true)
+            songItem.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
         }
 
         val duration = measureTimeMillis {
@@ -197,12 +205,14 @@ class SongsFragment : Fragment() {
     }
 
     private fun pickSong(item: SongItem) {
-        val songSections = SongsContext.getSongLyrics(item.id)!!.lyrics
-        val songMetadata = SongsContext.getSongMetadata(item.id)!!
-        val lyrics = songMetadata.presentation.map { sectionName -> songSections[sectionName]!! }
+        val songWithLyrics = runBlocking { repository.getSongWithLyrics(item.song.id) }!!
+
+        val lyricsTextMap = songWithLyrics.lyricsSectionsToTextMap()
+        val lyrics: List<String> = songWithLyrics.crossRef
+            .sorted()
+            .map { lyricsTextMap[it.id]!! }
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
-        intent.putExtra("songTitle", item.title)
         intent.putExtra("lyrics", lyrics.toTypedArray())
         startActivity(intent)
     }
@@ -229,10 +239,10 @@ class SongsFragment : Fragment() {
     }
 
     private fun editSelectedSong(): Boolean {
-        val selectedSong = songItemsAdapter.songItems.first { songItem -> songItem.isSelected }
+        val selectedItem = songItemsAdapter.songItems.first { songItem -> songItem.isSelected }
 
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
-        intent.putExtra("songId", selectedSong.id)
+        intent.putExtra("song", selectedItem.song)
         startActivity(intent)
 
         resetSelection()
@@ -242,13 +252,15 @@ class SongsFragment : Fragment() {
 
     private fun deleteSelectedSongs(): Boolean {
         val selectedSongs = songItemsAdapter.songItems
-            .filter { song -> song.isSelected }
-            .map { song -> song.id }
+            .filter { item -> item.isSelected }
+            .map { item -> item.song.id }
 
-        SongsContext.deleteSongs(selectedSongs)
+        runBlocking {
+            repository.deleteSongs(selectedSongs)
+        }
 
         val remainingSongs = songItemsAdapter.songItems
-            .filter { songItem -> !selectedSongs.contains(songItem.id) }
+            .filter { item -> !selectedSongs.contains(item.song.songId) }
 
         songItemsAdapter.songItems.clear()
         songItemsAdapter.songItems.addAll(remainingSongs)

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:50 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:26 PM
+ * Last modified 3/28/21 3:19 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,14 +20,9 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
-import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SetlistsContext
-import pl.gunock.lyriccast.SongsContext
-import pl.gunock.lyriccast.helpers.FileHelper
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private companion object {
@@ -47,10 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
-
-        SongsContext.songsDirectory = "${filesDir.path}/songs/"
-        CategoriesContext.categoriesDirectory = "${filesDir.path}/categories/"
-        SetlistsContext.setlistsDirectory = "${filesDir.path}/setlists/"
 
         castContext = CastContext.getSharedInstance(this)
     }
@@ -84,30 +75,31 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val uri = data?.data!!
+        // TODO: Reimplement import and export
+//        val uri = data?.data!!
         when (requestCode) {
             IMPORT_RESULT_CODE -> {
-                Log.d(TAG, "Selected file URI: $uri")
-                Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
-
-                File(SongsContext.songsDirectory).deleteRecursively()
-
-                FileHelper.unzip(
-                    contentResolver,
-                    contentResolver.openInputStream(uri)!!,
-                    filesDir.path
-                )
-
-                SongsContext.loadSongsMetadata()
-                val intent = Intent(baseContext, MainActivity::class.java)
-                startActivity(intent)
-                finish()
+//                Log.d(TAG, "Selected file URI: $uri")
+//                Log.d(TAG, "Target path: ${SongsContext.songsDirectory}")
+//
+//                File(SongsContext.songsDirectory).deleteRecursively()
+//
+//                FileHelper.unzip(
+//                    contentResolver,
+//                    contentResolver.openInputStream(uri)!!,
+//                    filesDir.path
+//                )
+//
+//                SongsContext.loadSongsMetadata()
+//                val intent = Intent(baseContext, MainActivity::class.java)
+//                startActivity(intent)
+//                finish()
             }
             EXPORT_RESULT_CODE -> {
-                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
-                val intent = Intent(baseContext, MainActivity::class.java)
-                startActivity(intent)
-                finish()
+//                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
+//                val intent = Intent(baseContext, MainActivity::class.java)
+//                startActivity(intent)
+//                finish()
             }
         }
     }

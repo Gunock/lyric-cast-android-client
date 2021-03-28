@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/17/21 12:00 AM
+ * Last modified 3/27/21 11:36 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -63,17 +63,19 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
     }
 
     private fun countItems(holder: T, modifySelectedItems: Boolean = true): Int {
+        var updatedCount: Int = count
         if (selectedItems.contains(holder.itemId)) {
             if (modifySelectedItems) {
                 selectedItems.remove(holder.itemId)
             }
-            return count - 1
+            updatedCount--
         } else {
             if (modifySelectedItems) {
                 selectedItems.add(holder.itemId)
             }
-            return count + 1
+            updatedCount++
         }
+        return updatedCount
     }
 
     private fun focus(view: View) {

@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:26 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:26 AM
+ * Last modified 3/27/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -19,9 +20,9 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
-import pl.gunock.lyriccast.CategoriesContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
+import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.misc.EditCategoryViewModel
 import pl.gunock.lyriccast.models.CategoryItem
@@ -30,7 +31,7 @@ import java.util.*
 
 
 class EditCategoryDialogFragment(
-    private val category: CategoryItem? = null
+    private val categoryItem: CategoryItem? = null
 ) : DialogFragment() {
 
     companion object {
@@ -45,16 +46,25 @@ class EditCategoryDialogFragment(
 
     private lateinit var viewModel: EditCategoryViewModel
 
+    private lateinit var categoryNames: Set<String>
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        viewModel = ViewModelProvider(requireActivity()).get(EditCategoryViewModel::class.java)
+        return super.onCreateDialog(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (category == null) {
+        if (categoryItem == null) {
             dialog?.setTitle("Add category")
         } else {
             dialog?.setTitle("Edit category")
         }
+
+        categoryNames = viewModel.categoryNames.value ?: setOf()
 
         return inflater.inflate(R.layout.dialog_fragment_edit_category, container, false)
     }
@@ -62,7 +72,7 @@ class EditCategoryDialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity()).get(EditCategoryViewModel::class.java)
+        viewModel
 
         nameInputLayout = view.findViewById(R.id.tv_category_name)
         nameInput = view.findViewById(R.id.tin_category_name)
@@ -87,9 +97,9 @@ class EditCategoryDialogFragment(
         )
         colorSpinner.adapter = colorSpinnerAdapter
 
-        if (category?.color != null) {
-            nameInput.text = category.name.toUpperCase(Locale.ROOT)
-            colorSpinner.setSelection(colorValues.indexOf(category.color))
+        if (categoryItem?.category?.color != null) {
+            nameInput.text = categoryItem.category.name.toUpperCase(Locale.ROOT)
+            colorSpinner.setSelection(colorValues.indexOf(categoryItem.category.color!!))
         }
     }
 
@@ -105,12 +115,14 @@ class EditCategoryDialogFragment(
             }
 
             val selectedColor = colorSpinner.selectedItem as ColorItem
-            val newCategory = CategoryItem(
-                nameInput.text.toString(),
-                selectedColor.value
-            )
 
-            viewModel.category.value = EditCategoryViewModel.CategoryDto(newCategory, category)
+            val category: Category = if (viewModel.category.value != null) {
+                viewModel.category.value!!
+            } else {
+                Category(null, nameInput.text.toString(), selectedColor.value)
+            }
+
+            viewModel.category.value = category
             dismiss()
         }
 
@@ -124,11 +136,11 @@ class EditCategoryDialogFragment(
             return NameValidationState.EMPTY
         }
 
-        if (category != null && category.name == name) {
+        if (categoryItem != null && categoryItem.category.name == name) {
             return NameValidationState.VALID
         }
 
-        if (CategoriesContext.containsCategory(name)) {
+        if (categoryNames.contains(name)) {
             return NameValidationState.ALREADY_IN_USE
         }
 

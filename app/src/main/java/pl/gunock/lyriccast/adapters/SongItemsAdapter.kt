@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:05 AM
+ * Last modified 3/27/21 10:03 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -44,7 +44,7 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return songItems[position].id
+        return songItems[position].song.id
     }
 
     override fun getItemCount() = songItems.size
@@ -60,7 +60,7 @@ class SongItemsAdapter(
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
 
             val item = songItems[adapterPosition]
-            titleTextView.text = item.title
+            titleTextView.text = item.song.title
 
             if (item.category != null) {
                 categoryTextView.text = item.category.name

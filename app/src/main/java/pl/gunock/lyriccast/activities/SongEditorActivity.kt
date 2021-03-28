@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 1:08 AM
+ * Last modified 3/28/21 1:57 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,21 +16,27 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
-import pl.gunock.lyriccast.CategoriesContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.LyricsSection
+import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.extensions.moveTabLeft
 import pl.gunock.lyriccast.extensions.moveTabRight
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
-import pl.gunock.lyriccast.models.Category
-import pl.gunock.lyriccast.models.SongLyrics
 
 class SongEditorActivity : AppCompatActivity() {
-    private var intentSongId: Long = Long.MIN_VALUE
-    private var intentSongTitle: String? = null
+    private var intentSong: Song? = null
+    private lateinit var repository: LyricCastRepository
 
     private lateinit var sectionNameInput: EditText
     private lateinit var songTitleInputLayout: TextInputLayout
@@ -43,6 +49,7 @@ class SongEditorActivity : AppCompatActivity() {
     private val sectionNameTextWatcher: SectionNameTextWatcher = SectionNameTextWatcher()
     private val songTitleTextWatcher: SongTitleTextWatcher = SongTitleTextWatcher()
 
+    private lateinit var songTitles: Set<String>
     private lateinit var categories: Set<Category>
     private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
     private val tabCountMap: MutableMap<String, Int> = mutableMapOf()
@@ -56,6 +63,8 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        repository = (application as LyricCastApplication).repository
+
         songTitleInputLayout = findViewById(R.id.tv_song_title)
         songTitleInput = findViewById(R.id.tin_song_title)
         sectionNameInput = findViewById(R.id.tin_section_name)
@@ -65,22 +74,31 @@ class SongEditorActivity : AppCompatActivity() {
 
         songTitleInput.filters = arrayOf(InputFilter.LengthFilter(30))
         sectionNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
-        categories = setOf(Category("No category")) + CategoriesContext.getCategoryItems()
+
+        runBlocking {
+            categories = setOf(Category(name = "No category")) + repository.getCategories().toSet()
+        }
+
+        runBlocking {
+            songTitles = repository.getSongs()
+                .map { songAndCategory -> songAndCategory.song.title }
+                .toSet()
+        }
 
         setupCategorySpinner()
 
-        intentSongId = intent.getLongExtra("songId", Long.MIN_VALUE)
-        if (intentSongId != Long.MIN_VALUE) {
-            loadSongData(intentSongId)
+        intentSong = intent.getParcelableExtra("song")
+        if (intentSong != null) {
+            loadSongData(intentSong!!)
 
             selectedTab = songSectionTabLayout.getTabAt(0)!!
 
-            val songMetadata = SongsContext.getSongMetadata(intentSongId)!!
-            val categoryIndex = CategoriesContext.getCategoryItems()
-                .map { categoryItem -> categoryItem.id }
-                .indexOf(songMetadata.categoryId)
+            val songWithLyrics = runBlocking { repository.getSongWithLyrics(intentSong!!.id)!! }
+            val categoryIndex = (categorySpinner.adapter as CategorySpinnerAdapter).categories
+                .map { category -> category.categoryId }
+                .indexOf(songWithLyrics.song.categoryId)
 
-            categorySpinner.setSelection(categoryIndex + 1)
+            categorySpinner.setSelection(categoryIndex)
         } else {
             songTitleInput.setText("")
             selectedTab = songSectionTabLayout.getTabAt(0)!!
@@ -100,8 +118,10 @@ class SongEditorActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_save -> {
-                if (saveSong()) {
-                    finish()
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (saveSong()) {
+                        finish()
+                    }
                 }
                 return true
             }
@@ -181,16 +201,20 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun validateSongTitle(songTitle: String): NameValidationState {
-        return if (songTitle.isBlank()) {
-            NameValidationState.EMPTY
-        } else if (intentSongTitle != songTitle && SongsContext.containsSong(songTitle)) {
+        if (songTitle.isBlank()) {
+            return NameValidationState.EMPTY
+        }
+
+        val alreadyInUse = intentSong?.title != songTitle && songTitles.contains(songTitle)
+
+        return if (alreadyInUse) {
             NameValidationState.ALREADY_IN_USE
         } else {
             NameValidationState.VALID
         }
     }
 
-    private fun saveSong(): Boolean {
+    private suspend fun saveSong(): Boolean {
         val title = songTitleInput.text.toString()
 
         if (validateSongTitle(title) != NameValidationState.VALID) {
@@ -211,36 +235,45 @@ class SongEditorActivity : AppCompatActivity() {
         }
 
         val selectedCategory = categorySpinner.selectedItem as Category
-        val categoryId = selectedCategory.id
+        val categoryId = selectedCategory.categoryId
 
-        val songLyrics = SongLyrics()
-        songLyrics.lyrics = sectionLyrics.filter { lyricsMapEntry -> lyricsMapEntry.key != addText }
+        val song = Song(intentSong?.songId, title, categoryId)
+        val lyricsSections = sectionLyrics.filter { mapEntry -> mapEntry.key != addText }
+            .map { LyricsSection(null, song.id, it.key, it.value) }
 
-        if (intentSongId != Long.MIN_VALUE) {
-            SongsContext.saveSong(title, categoryId, presentation, songLyrics, intentSongId)
-        } else {
-            SongsContext.saveSong(title, categoryId, presentation, songLyrics)
-        }
+        val order = presentation.mapIndexed { index, sectionName -> sectionName to index }
+
+        val songWithLyricsSections = SongWithLyricsSections(song, lyricsSections)
+        repository.upsertSong(songWithLyricsSections, order)
+
         return true
     }
 
-    private fun loadSongData(songId: Long) {
-        val songMetadata = SongsContext.getSongMetadata(songId)!!
-        val songLyrics = SongsContext.getSongLyrics(songId)!!.lyrics
-        intentSongTitle = songMetadata.title
+    private fun loadSongData(song: Song) {
+        val songWithLyrics: SongWithLyricsSections = runBlocking {
+            repository.getSongWithLyrics(song.id)!!
+        }
+
 
         val songTitleInput: TextInputLayout = findViewById(R.id.tv_song_title)
-        songTitleInput.editText!!.setText(songMetadata.title)
+        songTitleInput.editText!!.setText(song.title)
+
+        val presentation = songWithLyrics.crossRef
+            .sorted()
+            .map { it.id }
 
         songSectionTabLayout.removeAllTabs()
 
-        for (sectionName in songMetadata.presentation) {
+        val lyricsTextMap = songWithLyrics.lyricsSectionsToTextMap()
+        val sectionNameMap = songWithLyrics.lyricsSectionsToNameMap()
+        for (sectionId in presentation) {
+            val sectionName = sectionNameMap[sectionId]!!
             val newTab = songSectionTabLayout.newTab()
             addTab(newTab, sectionName)
 
             sectionLyricsInput.setText(sectionName)
-            sectionLyrics[sectionName] = songLyrics[sectionName]!!
             newTab.text = sectionName
+            sectionLyrics[sectionName] = lyricsTextMap[sectionId]!!
         }
 
         val newAddTab = songSectionTabLayout.newTab()
@@ -248,8 +281,8 @@ class SongEditorActivity : AppCompatActivity() {
         newAddTab.text = getString(R.string.button_add)
 
         val sectionLyricsInput = findViewById<EditText>(R.id.tin_section_lyrics)
-        sectionLyricsInput.setText(songLyrics[songMetadata.presentation.first()]!!)
-        sectionNameInput.setText(songMetadata.presentation.first())
+        sectionLyricsInput.setText(lyricsTextMap[presentation.first()]!!)
+        sectionNameInput.setText(sectionNameMap[presentation.first()]!!)
     }
 
     private fun addTab(tab: TabLayout.Tab, tabText: String = "") {

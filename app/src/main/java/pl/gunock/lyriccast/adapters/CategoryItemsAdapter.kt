@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:05 AM
+ * Last modified 3/27/21 9:59 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -45,7 +45,7 @@ class CategoryItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return categoryItems[position].id
+        return categoryItems[position].category.id
     }
 
     override fun getItemCount() = categoryItems.size
@@ -59,7 +59,7 @@ class CategoryItemsAdapter(
             selectionTracker?.attach(this)
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
 
-            name.text = categoryItems[adapterPosition].name
+            name.text = categoryItems[adapterPosition].category.name
 
             if (!showCheckBox.value!!) {
                 checkBox.visibility = View.GONE
@@ -72,8 +72,8 @@ class CategoryItemsAdapter(
                 checkBox.isChecked = item.isSelected
             }
 
-            if (item.color != null) {
-                colorCard.setCardBackgroundColor(item.color)
+            if (item.category.color != null) {
+                colorCard.setCardBackgroundColor(item.category.color!!)
             }
 
         }

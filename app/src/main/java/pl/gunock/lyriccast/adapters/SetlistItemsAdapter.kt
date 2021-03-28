@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:05 AM
+ * Last modified 3/28/21 1:29 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -43,7 +43,7 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return setlistItems[position].id
+        return setlistItems[position].setlist.id
     }
 
     override fun getItemCount() = setlistItems.size
@@ -56,7 +56,7 @@ class SetlistItemsAdapter(
             selectionTracker?.attach(this)
 
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
-            nameTextView.text = setlistItems[adapterPosition].name
+            nameTextView.text = setlistItems[adapterPosition].setlist.name
         }
     }
 

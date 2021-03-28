@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:21 PM
+ * Last modified 3/27/21 5:31 PM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -15,11 +15,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.models.Category
+import pl.gunock.lyriccast.datamodel.entities.Category
 
 class CategorySpinnerAdapter(
     context: Context,
-    private val categories: List<Category>
+    val categories: List<Category>
 ) : BaseAdapter() {
 
     constructor(context: Context, categories: Set<Category>) : this(
@@ -58,7 +58,7 @@ class CategorySpinnerAdapter(
         fun bind(item: Category) {
             name.text = item.name
             if (item.color != null) {
-                colorCard.setCardBackgroundColor(item.color)
+                colorCard.setCardBackgroundColor(item.color!!)
             } else {
                 colorCard.visibility = View.GONE
             }

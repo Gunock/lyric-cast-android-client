@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/28/21 3:18 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -19,17 +19,21 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import pl.gunock.lyriccast.CategoriesContext
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
+import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.misc.SelectionTracker
-import pl.gunock.lyriccast.models.Category
 import pl.gunock.lyriccast.models.SongItem
 import kotlin.system.measureTimeMillis
 
@@ -40,18 +44,20 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private val args: SetlistEditorSongsFragmentArgs by navArgs()
+    private lateinit var repository: LyricCastRepository
 
     private lateinit var songTitleInput: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var selectedSongsSwitch: SwitchCompat
 
     private lateinit var songItemsAdapter: SongItemsAdapter
-    private lateinit var selectedSongs: MutableSet<Long>
+    private lateinit var selectedSongs: MutableSet<Song>
     private var songItems: Set<SongItem> = setOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        repository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -64,7 +70,7 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectedSongs = args.selectedSongs.toMutableSet()
+        selectedSongs = args.setlistWithSongs.songs.toMutableSet()
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
         songTitleInput = searchView.editText!!
@@ -87,20 +93,34 @@ class SetlistEditorSongsFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
-                val selectedSongsPrev = args.selectedSongs.toMutableList()
+                val setlistSongs = args.setlistWithSongs.songs
+                    .toMutableList()
+
                 val removedSongs =
-                    selectedSongsPrev.filter { songId -> !selectedSongs.contains(songId) }
+                    setlistSongs.filter { song -> !this.selectedSongs.contains(song) }
                 val addedSongs =
-                    selectedSongs.filter { songId -> !selectedSongsPrev.contains(songId) }
+                    this.selectedSongs.filter { song -> !setlistSongs.contains(song) }
 
-                selectedSongsPrev.removeAll(removedSongs)
-                selectedSongsPrev.addAll(addedSongs)
+                setlistSongs.removeAll(removedSongs)
+                setlistSongs.addAll(addedSongs)
 
+                val removedSongIds = removedSongs.map { song -> song.id }
+                var setlistSongCrossRefs = args.setlistWithSongs.setlistSongCrossRefs
+                    .toMutableList()
+
+                setlistSongCrossRefs = setlistSongCrossRefs.filter { crossRef ->
+                    !removedSongIds.contains(crossRef.songId)
+                }.toMutableList()
+
+                val setlist = args.setlistWithSongs.setlist
+                addedSongs.forEachIndexed { index, song ->
+                    val setlistSongCrossRef = SetlistSongCrossRef(setlist.id, song.id, index)
+                    setlistSongCrossRefs.add(setlistSongCrossRef)
+                }
+
+                val setlistWithSongs = SetlistWithSongs(setlist, setlistSongs, setlistSongCrossRefs)
                 val action = SetlistEditorSongsFragmentDirections
-                    .actionSetlistEditorSongsToSetlistEditor(
-                        selectedSongs = selectedSongsPrev.toLongArray(),
-                        setlistName = args.setlistName
-                    )
+                    .actionSetlistEditorSongsToSetlistEditor(setlistWithSongs = setlistWithSongs)
 
                 findNavController().navigate(action)
                 return true
@@ -138,20 +158,23 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupCategorySpinner() {
-        val categories = CategoriesContext.getCategories()
+        val categories = runBlocking { repository.getCategories() }
 
         val categorySpinnerAdapter = CategorySpinnerAdapter(
             requireContext(),
-            listOf(Category("All")) + categories
+            listOf(Category(categoryId = Long.MIN_VALUE, name = "All")) + categories
         )
 
         categorySpinner.adapter = categorySpinnerAdapter
     }
 
     private fun setupSongs(view: View) {
-        songItems = SongsContext.getSongItems()
-        songItems.forEach { songItem ->
-            songItem.isSelected = selectedSongs.contains(songItem.id)
+        songItems = runBlocking { repository.getSongs() }
+            .map { song -> SongItem(song) }
+            .toSet()
+
+        songItems.forEach { item ->
+            item.isSelected = selectedSongs.contains(item.song)
         }
 
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
@@ -183,7 +206,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun filterSongs(
         title: String,
-        category: Category = Category("All"),
+        category: Category = Category(categoryId = Long.MIN_VALUE, name = "All"),
         isSelected: Boolean? = null
     ) {
         Log.d(TAG, "filterSongs invoked")
@@ -199,11 +222,11 @@ class SetlistEditorSongsFragment : Fragment() {
         }
 
         if (category.name != "All") {
-            predicates.add { songItem -> songItem.category?.id == category.id }
+            predicates.add { songItem -> songItem.category?.categoryId == category.categoryId }
         }
 
-        predicates.add { songItem ->
-            songItem.title.normalize().contains(normalizedTitle, ignoreCase = true)
+        predicates.add { item ->
+            item.song.title.normalize().contains(normalizedTitle, ignoreCase = true)
         }
 
         val duration = measureTimeMillis {
@@ -217,11 +240,11 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun updateSelectedSongs() {
-        for (songItem in songItemsAdapter.songItems) {
-            if (songItem.isSelected) {
-                selectedSongs.add(songItem.id)
+        for (item in songItemsAdapter.songItems) {
+            if (item.isSelected) {
+                selectedSongs.add(item.song)
             } else {
-                selectedSongs.remove(songItem.id)
+                selectedSongs.remove(item.song)
             }
         }
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/28/21 12:22 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -15,11 +15,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.extensions.normalize
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
@@ -33,6 +35,8 @@ class SetlistsFragment : Fragment() {
         const val TAG = "SetlistsFragment"
     }
 
+    private lateinit var repository: LyricCastRepository
+
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var setlistRecyclerView: RecyclerView
@@ -45,6 +49,7 @@ class SetlistsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        repository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -96,7 +101,9 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupSetlists() {
-        setlistItems = SetlistsContext.getSetlistItems()
+        setlistItems = runBlocking { repository.getSetlists() }
+            .map { setlist -> SetlistItem(setlist) }
+            .toSet()
 
         val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
         selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
@@ -139,7 +146,7 @@ class SetlistsFragment : Fragment() {
 
     private fun pickSetlist(item: SetlistItem) {
         val intent = Intent(context, SetlistControlsActivity::class.java)
-        intent.putExtra("setlistName", item.name)
+        intent.putExtra("setlist", item.setlist)
         startActivity(intent)
     }
 
@@ -185,11 +192,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedSetlist = setlistItemsAdapter.setlistItems
+        val selectedItem = setlistItemsAdapter.setlistItems
             .first { setlistItem -> setlistItem.isSelected }
 
         val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
-        intent.putExtra("setlistName", selectedSetlist.name)
+        intent.putExtra("setlist", selectedItem.setlist)
         startActivity(intent)
 
         setlistItemsAdapter.showCheckBox.value = false
@@ -200,13 +207,13 @@ class SetlistsFragment : Fragment() {
 
     private fun deleteSelectedSetlists(): Boolean {
         val selectedSetlists = setlistItemsAdapter.setlistItems
-            .filter { setlist -> setlist.isSelected }
-            .map { setlist -> setlist.id }
+            .filter { item -> item.isSelected }
+            .map { item -> item.setlist.id }
 
-        SetlistsContext.deleteSetlists(selectedSetlists)
+        runBlocking { repository.deleteSetlists(selectedSetlists) }
 
         val remainingSetlists = setlistItemsAdapter.setlistItems
-            .filter { setlistItem -> !selectedSetlists.contains(setlistItem.id) }
+            .filter { item -> !selectedSetlists.contains(item.setlist.id) }
         setlistItemsAdapter.showCheckBox.value = false
 
         setlistItemsAdapter.setlistItems.clear()
@@ -224,8 +231,8 @@ class SetlistsFragment : Fragment() {
         val normalizedName = name.normalize()
 
         val duration = measureTimeMillis {
-            setlistItemsAdapter.setlistItems = setlistItems.filter { setlistItem ->
-                setlistItem.name.normalize().contains(normalizedName, ignoreCase = true)
+            setlistItemsAdapter.setlistItems = setlistItems.filter { item ->
+                item.normalizedName.contains(normalizedName, ignoreCase = true)
             }.toMutableList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")

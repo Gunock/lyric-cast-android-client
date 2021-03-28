@@ -1,27 +1,28 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 11:01 PM
+ * Last modified 3/28/21 12:22 AM
  */
 
 package pl.gunock.lyriccast.models
 
 import androidx.lifecycle.MutableLiveData
-import pl.gunock.lyriccast.CategoriesContext
+import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
+import pl.gunock.lyriccast.extensions.normalize
 
-class SongItem(songMetadata: SongMetadata) {
+data class SongItem(
+    val song: Song,
+    val category: Category? = null
+) {
 
-    val id: Long = songMetadata.id
-    val title: String = songMetadata.title
-    val category: Category? = CategoriesContext.getCategory(songMetadata.categoryId)
-
+    val normalizedTitle by lazy { song.title.normalize() }
     val highlight: MutableLiveData<Boolean> = MutableLiveData(false)
     var isSelected: Boolean = false
 
-    override fun toString(): String {
-        return StringBuilder().apply {
-            append("(title: $title)")
-        }.toString()
-    }
-
+    constructor(songAndCategory: SongAndCategory) : this(
+        songAndCategory.song,
+        songAndCategory.category
+    )
 }

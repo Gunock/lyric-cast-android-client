@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 11:29 PM
+ * Last modified 3/28/21 1:35 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -43,7 +43,7 @@ class SongControlsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_song_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_main))
+        setSupportActionBar(findViewById(R.id.toolbar_controls))
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 

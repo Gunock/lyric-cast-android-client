@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 11:56 PM
+ * Last modified 3/27/21 5:44 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -62,7 +62,7 @@ class ControlsSongItemsAdapter(
             val titleText = itemView.context.resources.getString(
                 R.string.item_song_item_title_template,
                 adapterPosition + 1,
-                item.title
+                item.song.title
             )
             titleTextView.text = titleText
 
