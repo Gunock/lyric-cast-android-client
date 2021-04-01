@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 7:07 PM
+ * Last modified 4/1/21 11:05 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -254,7 +254,7 @@ class SongEditorActivity : AppCompatActivity() {
         val order = presentation.mapIndexed { index, sectionName -> sectionName to index }
 
         val songWithLyricsSections = SongWithLyricsSections(song, lyricsSections)
-        lyricCastViewModel.upsertSong(songWithLyricsSections, order)
+        runBlocking { lyricCastViewModel.upsertSong(songWithLyricsSections, order) }
 
         return true
     }

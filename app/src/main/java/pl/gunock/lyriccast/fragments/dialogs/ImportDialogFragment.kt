@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:35 PM
+ * Last modified 4/1/21 11:00 PM
  */
 
-package pl.gunock.lyriccast.fragments.dialog
+package pl.gunock.lyriccast.fragments.dialogs
 
 import android.app.Dialog
 import android.os.Bundle

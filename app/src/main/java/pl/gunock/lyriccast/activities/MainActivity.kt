@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:46 PM
+ * Last modified 4/1/21 11:55 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -39,7 +39,8 @@ import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
-import pl.gunock.lyriccast.fragments.dialog.ImportDialogFragment
+import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
+import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
@@ -109,8 +110,18 @@ class MainActivity : AppCompatActivity() {
         val uri = data?.data!!
         when (requestCode) {
             IMPORT_RESULT_CODE -> {
+                Log.d(TAG, "Handling import result")
+                Log.d(TAG, "Import parameters $importDialogViewModel")
                 Log.d(TAG, "Selected file URI: $uri")
+
+
                 val inputStream = contentResolver.openInputStream(uri) ?: return
+                val dialogFragment = ProgressDialogFragment("Loading file ...")
+                dialogFragment.setStyle(
+                    DialogFragment.STYLE_NORMAL,
+                    R.style.Theme_LyricCast_Light_Dialog
+                )
+                dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
                 CoroutineScope(Dispatchers.IO).launch {
                     val importSongXmlParser =
                         ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
@@ -119,7 +130,8 @@ class MainActivity : AppCompatActivity() {
                     @Suppress("BlockingMethodInNonBlockingContext")
                     inputStream.close()
 
-                    loadSongsToDatabase(importedSongs)
+                    loadSongsToDatabase(importedSongs, dialogFragment)
+                    dialogFragment.dismiss()
                 }
             }
             // TODO: Reimplement export
@@ -214,11 +226,28 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private suspend fun loadSongsToDatabase(importSongs: Set<ImportSong>) {
+    private suspend fun loadSongsToDatabase(
+        importSongs: Set<ImportSong>,
+        dialogFragment: ProgressDialogFragment
+    ) {
+        dialogFragment.setMessage("Importing categories ...")
         val colors = resources.getIntArray(R.array.category_color_values)
 
+        var processedImportSongs = importSongs.toMutableSet()
+        if (!importDialogViewModel.deleteAll && !importDialogViewModel.replaceOnConflict) {
+            lyricCastViewModel.getAllSongs().forEach { song ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    processedImportSongs.removeIf { it.title == song.title }
+                } else {
+                    processedImportSongs = processedImportSongs
+                        .filter { it.title != song.title }
+                        .toMutableSet()
+                }
+            }
+        }
+
         val categoryMap: MutableMap<String, Category> =
-            importSongs.map { importSong -> importSong.category }
+            processedImportSongs.map { importSong -> importSong.category }
                 .distinct()
                 .mapIndexed { index, categoryName ->
                     categoryName to Category(
@@ -234,22 +263,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         val allCategories = lyricCastViewModel.getAllCategories()
-        var processedImportSongs = importSongs.toMutableSet()
         if (!importDialogViewModel.deleteAll && !importDialogViewModel.replaceOnConflict) {
             allCategories.forEach { categoryMap.remove(it.name) }
-            lyricCastViewModel.allSongs.value!!.forEach { songAndCategory ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    processedImportSongs.removeIf { it.title == songAndCategory.song.title }
-                } else {
-                    processedImportSongs = processedImportSongs
-                        .filter { it.title != songAndCategory.song.title }
-                        .toMutableSet()
-                }
-            }
         }
 
         lyricCastViewModel.upsertCategories(categoryMap.values)
 
+        dialogFragment.setMessage("Importing songs ...")
         val categoryIdMap = lyricCastViewModel.getAllCategories()
             .map { it.name to it.categoryId }
             .toMap()
@@ -274,10 +294,9 @@ class MainActivity : AppCompatActivity() {
                 return@map SongWithLyricsSections(song, lyricsSections)
             }
 
-        for (songWithLyricsSections in songsWithLyricsSections) {
-            val songTitle = songWithLyricsSections.song.title
-            lyricCastViewModel.upsertSong(songWithLyricsSections, orderMap[songTitle]!!)
-        }
+        lyricCastViewModel.upsertSongs(songsWithLyricsSections, orderMap)
+
+        dialogFragment.setMessage("Finishing import ...")
         Log.d(TAG, "Finished import")
     }
 

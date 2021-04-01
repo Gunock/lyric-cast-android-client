@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:40 PM
+ * Last modified 4/1/21 11:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -23,8 +23,16 @@ class LyricCastViewModel(
     val allSetlists: LiveData<List<Setlist>> = repository.allSetlists.asLiveData()
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
 
-    fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
-        viewModelScope.launch { repository.upsertSong(song, order) }
+    suspend fun getAllSongs() =
+        repository.getAllSongs()
+
+    suspend fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
+        repository.upsertSong(song, order)
+
+    suspend fun upsertSongs(
+        songsWithLyricsSections: List<SongWithLyricsSections>,
+        orderMap: Map<String, List<Pair<String, Int>>>
+    ) = repository.upsertSongs(songsWithLyricsSections, orderMap)
 
     fun deleteSongs(songIds: List<Long>) =
         viewModelScope.launch { repository.deleteSongs(songIds) }
@@ -46,6 +54,8 @@ class LyricCastViewModel(
 
     fun deleteCategories(categoryIds: Collection<Long>) =
         viewModelScope.launch { repository.deleteCategories(categoryIds) }
+
+
 }
 
 class LyricCastViewModelFactory(

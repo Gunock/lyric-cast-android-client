@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 2:55 PM
+ * Last modified 4/1/21 11:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -17,7 +17,11 @@ interface SongDao {
 
     @Transaction
     @Query("SELECT * FROM Song")
-    fun getAll(): Flow<List<SongAndCategory>>
+    fun getAllAsFlow(): Flow<List<SongAndCategory>>
+
+    @Transaction
+    @Query("SELECT * FROM Song")
+    suspend fun getAll(): List<Song>
 
     @Transaction
     @Query("SELECT * FROM Song WHERE songId IN (:songIds)")
@@ -36,6 +40,9 @@ interface SongDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(song: Song): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(songs: Collection<Song>): List<Long>
 
     @Query("DELETE FROM Song WHERE songId IN (:songIds)")
     suspend fun delete(songIds: Collection<Long>)

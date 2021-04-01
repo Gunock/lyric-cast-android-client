@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:51 PM
+ * Last modified 4/1/21 11:04 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -22,7 +22,7 @@ import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
-import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
+import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.CategoryItem

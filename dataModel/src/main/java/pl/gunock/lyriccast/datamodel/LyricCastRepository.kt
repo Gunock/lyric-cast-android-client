@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:41 PM
+ * Last modified 4/1/21 11:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -28,7 +28,7 @@ class LyricCastRepository(
         const val TAG = "LyricCastRepository"
     }
 
-    val allSongs: Flow<List<SongAndCategory>> = songDao.getAll()
+    val allSongs: Flow<List<SongAndCategory>> = songDao.getAllAsFlow()
     val allSetlists: Flow<List<Setlist>> = setlistDao.getAll()
     val allCategories: Flow<List<Category>> = categoryDao.getAllAsFlow()
 
@@ -38,6 +38,11 @@ class LyricCastRepository(
         lyricsSectionDao.deleteAll()
         setlistDao.deleteAll()
         categoryDao.deleteAll()
+    }
+
+    @WorkerThread
+    suspend fun getAllSongs(): List<Song> {
+        return songDao.getAll()
     }
 
     @WorkerThread
@@ -85,6 +90,37 @@ class LyricCastRepository(
             songDao.delete(listOf(song.id))
             throw e
         }
+    }
+
+    @WorkerThread
+    internal suspend fun upsertSongs(
+        songsWithLyricsSections: List<SongWithLyricsSections>,
+        orderMap: Map<String, List<Pair<String, Int>>>
+    ) {
+        val songs = songsWithLyricsSections.map { it.song }
+        val songIds = songDao.upsert(songs)
+        val lyricsSections: List<LyricsSection> =
+            songsWithLyricsSections.flatMapIndexed { index, songWithLyricsSections ->
+                songWithLyricsSections.lyricsSections.map { LyricsSection(songIds[index], it) }
+            }
+
+        val sectionIds = lyricsSectionDao.upsert(lyricsSections)
+        val sectionIdMap: Map<String, Map<String, Long>> = songs.map { song ->
+            song.title to sectionIds.zip(lyricsSections).map { it.second.name to it.first }.toMap()
+        }.toMap()
+
+        val songIdMap: Map<String, Long> = songs.zip(songIds)
+            .map { it.first.title to it.second }
+            .toMap()
+
+        val crossRefs = orderMap.flatMap { orderMapEntry ->
+            val songId = songIdMap[orderMapEntry.key]!!
+            val songSectionIdMap = sectionIdMap[orderMapEntry.key]!!
+            orderMapEntry.value.map {
+                SongLyricsSectionCrossRef(null, songId, songSectionIdMap[it.first]!!, it.second)
+            }
+        }
+        lyricsSectionDao.upsertRelations(crossRefs)
     }
 
     @WorkerThread
