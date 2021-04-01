@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:04 PM
+ * Last modified 4/1/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -31,23 +31,27 @@ class SetlistItemsAdapter(
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
 
-    private var _items: SortedSet<SetlistItem> = sortedSetOf()
-    private var _visibleItems: Set<SetlistItem> = setOf()
-    val setlistItems: List<SetlistItem> get() = _items.toList()
-
     companion object {
         const val TAG = "SetlistItemsAdapter"
     }
+
+    private val lock = Any()
+    private var _items: SortedSet<SetlistItem> = sortedSetOf()
+    private var _visibleItems: Set<SetlistItem> = setOf()
+    val setlistItems: List<SetlistItem> get() = _items.toList()
 
     init {
         setHasStableIds(true)
     }
 
+
     fun submitCollection(setlistWithSongs: Collection<Setlist>) {
-        _items.clear()
-        _items.addAll(setlistWithSongs.map { SetlistItem(it) })
-        _visibleItems = _items
-        notifyDataSetChanged()
+        synchronized(lock) {
+            _items.clear()
+            _items.addAll(setlistWithSongs.map { SetlistItem(it) })
+            _visibleItems = _items
+            notifyDataSetChanged()
+        }
     }
 
     fun filterItems(setlistName: String) {

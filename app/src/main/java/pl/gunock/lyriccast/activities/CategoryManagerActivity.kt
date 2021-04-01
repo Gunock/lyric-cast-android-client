@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:20 PM
+ * Last modified 4/1/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,18 +19,16 @@ import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
-import pl.gunock.lyriccast.misc.EditCategoryViewModel
+import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryManagerActivity : AppCompatActivity() {
 
-    private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
         LyricCastViewModelFactory((application as LyricCastApplication).repository)
     }
@@ -38,7 +36,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     private lateinit var menu: Menu
     private lateinit var categoryItemsRecyclerView: RecyclerView
 
-    private lateinit var viewModel: EditCategoryViewModel
+    private lateinit var editCategoryDialogViewModel: EditCategoryDialogViewModel
 
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
@@ -50,13 +48,13 @@ class CategoryManagerActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_category_manager))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        repository = (application as LyricCastApplication).repository
-
         // TODO: Possible leak
-        viewModel = ViewModelProvider(this).get(EditCategoryViewModel::class.java)
+        editCategoryDialogViewModel =
+            ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
 
         lyricCastViewModel.allCategories.observe(this) { categories ->
-            viewModel.categoryNames.value = categories.map { category -> category.name }.toSet()
+            editCategoryDialogViewModel.categoryNames.value =
+                categories.map { category -> category.name }.toSet()
         }
 
 
@@ -127,7 +125,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun showAddCategoryDialog(): Boolean {
-        viewModel.category.observe(this, this::observeViewModelCategory)
+        editCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
         val dialogFragment = EditCategoryDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
@@ -142,7 +140,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val categoryItem = categoryItemsAdapter.categoryItems
             .first { category -> category.isSelected }
 
-        viewModel.category.observe(this, this::observeViewModelCategory)
+        editCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
 
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(
@@ -208,9 +206,9 @@ class CategoryManagerActivity : AppCompatActivity() {
             return
         }
 
-        runBlocking { repository.upsertCategory(viewModel.category.value!!) }
+        lyricCastViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
 
-        viewModel.category.removeObservers(this)
-        viewModel.category.value = null
+        editCategoryDialogViewModel.category.removeObservers(this)
+        editCategoryDialogViewModel.category.value = null
     }
 }

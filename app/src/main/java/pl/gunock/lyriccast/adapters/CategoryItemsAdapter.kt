@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:52 PM
+ * Last modified 4/1/21 8:58 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -29,17 +29,20 @@ class CategoryItemsAdapter(
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
+    private val lock = Any()
+    private var _items: SortedSet<CategoryItem> = sortedSetOf()
+    val categoryItems: List<CategoryItem> get() = _items.toList()
+
     init {
         setHasStableIds(true)
     }
 
-    private var _items: SortedSet<CategoryItem> = sortedSetOf()
-    val categoryItems: List<CategoryItem> get() = _items.toList()
-
     fun submitCollection(songs: Collection<Category>) {
-        _items.clear()
-        _items.addAll(songs.map { CategoryItem(it) })
-        notifyDataSetChanged()
+        synchronized(lock) {
+            _items.clear()
+            _items.addAll(songs.map { CategoryItem(it) })
+            notifyDataSetChanged()
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

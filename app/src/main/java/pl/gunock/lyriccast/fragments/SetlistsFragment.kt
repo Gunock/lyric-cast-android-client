@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 2:25 PM
+ * Last modified 4/1/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -20,7 +20,6 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.helpers.KeyboardHelper
@@ -34,7 +33,6 @@ class SetlistsFragment : Fragment() {
         const val TAG = "SetlistsFragment"
     }
 
-    private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
         LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
     }
@@ -49,7 +47,6 @@ class SetlistsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        repository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(

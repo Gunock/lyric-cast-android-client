@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:45 PM
+ * Last modified 4/1/21 10:40 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -35,8 +35,14 @@ class LyricCastViewModel(
     fun deleteSetlists(setlistIds: List<Long>) =
         viewModelScope.launch { repository.deleteSetlists(setlistIds) }
 
-    fun upsertCategories(categories: Collection<Category>): List<Long> =
+    suspend fun getAllCategories() =
+        repository.getAllCategories()
+
+    fun upsertCategories(categories: Collection<Category>) =
         runBlocking { repository.upsertCategories(categories) }
+
+    fun upsertCategory(category: Category) =
+        runBlocking { repository.upsertCategory(category) }
 
     fun deleteCategories(categoryIds: Collection<Long>) =
         viewModelScope.launch { repository.deleteCategories(categoryIds) }

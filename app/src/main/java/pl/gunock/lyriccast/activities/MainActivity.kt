@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:54 PM
+ * Last modified 4/1/21 10:46 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -16,6 +17,8 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
@@ -36,12 +39,14 @@ import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
+import pl.gunock.lyriccast.fragments.dialog.ImportDialogFragment
+import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 
 class MainActivity : AppCompatActivity() {
-    private companion object {
-        const val TAG = "MainActivity"
+    companion object {
+        private const val TAG = "MainActivity"
         const val EXPORT_RESULT_CODE = 1
         const val IMPORT_RESULT_CODE = 2
     }
@@ -49,10 +54,11 @@ class MainActivity : AppCompatActivity() {
     private var castContext: CastContext? = null
 
     private lateinit var repository: LyricCastRepository
-
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
         LyricCastViewModelFactory((application as LyricCastApplication).repository)
     }
+
+    private lateinit var importDialogViewModel: ImportDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +66,9 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
+
+        // TODO: Possible leak
+        importDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
@@ -84,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_category_manager -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
-            R.id.menu_import_songs -> import()
+            R.id.menu_import_songs -> showImportDialog()
             R.id.menu_export_all -> export()
             else -> super.onOptionsItemSelected(item)
         }
@@ -97,7 +106,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // TODO: Reimplement import and export
         val uri = data?.data!!
         when (requestCode) {
             IMPORT_RESULT_CODE -> {
@@ -114,6 +122,7 @@ class MainActivity : AppCompatActivity() {
                     loadSongsToDatabase(importedSongs)
                 }
             }
+            // TODO: Reimplement export
             EXPORT_RESULT_CODE -> {
 //                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
 //                val intent = Intent(baseContext, MainActivity::class.java)
@@ -180,7 +189,22 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun showImportDialog(): Boolean {
+        val dialogFragment = ImportDialogFragment()
+        dialogFragment.setStyle(
+            DialogFragment.STYLE_NORMAL,
+            R.style.Theme_LyricCast_Light_Dialog
+        )
+
+        importDialogViewModel.accepted.value = false
+        importDialogViewModel.accepted.observe(this) { if (it) import() }
+        dialogFragment.show(supportFragmentManager, ImportDialogFragment.TAG)
+        return true
+    }
+
     private fun import(): Boolean {
+        importDialogViewModel.accepted.removeObservers(this)
+
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "application/zip"
@@ -205,15 +229,34 @@ class MainActivity : AppCompatActivity() {
                 .toMutableMap()
         categoryMap.remove("")
 
-        repository.clear()
-        val categoryIds = lyricCastViewModel.upsertCategories(categoryMap.values)
-        val categoryIdMap = categoryMap.keys
-            .mapIndexed { index, key -> key to categoryIds[index] }
+        if (importDialogViewModel.deleteAll) {
+            repository.clear()
+        }
+
+        val allCategories = lyricCastViewModel.getAllCategories()
+        var processedImportSongs = importSongs.toMutableSet()
+        if (!importDialogViewModel.deleteAll && !importDialogViewModel.replaceOnConflict) {
+            allCategories.forEach { categoryMap.remove(it.name) }
+            lyricCastViewModel.allSongs.value!!.forEach { songAndCategory ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    processedImportSongs.removeIf { it.title == songAndCategory.song.title }
+                } else {
+                    processedImportSongs = processedImportSongs
+                        .filter { it.title != songAndCategory.song.title }
+                        .toMutableSet()
+                }
+            }
+        }
+
+        lyricCastViewModel.upsertCategories(categoryMap.values)
+
+        val categoryIdMap = lyricCastViewModel.getAllCategories()
+            .map { it.name to it.categoryId }
             .toMap()
 
         val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
         val songsWithLyricsSections: List<SongWithLyricsSections> =
-            importSongs.map { importSong ->
+            processedImportSongs.map { importSong ->
                 val song =
                     Song(title = importSong.title, categoryId = categoryIdMap[importSong.category])
                 val lyricsSections: List<LyricsSection> =

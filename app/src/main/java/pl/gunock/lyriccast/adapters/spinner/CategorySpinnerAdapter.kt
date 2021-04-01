@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 6:21 PM
+ * Last modified 4/1/21 8:58 PM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -19,15 +19,17 @@ import pl.gunock.lyriccast.datamodel.entities.Category
 class CategorySpinnerAdapter(
     context: Context
 ) : BaseAdapter() {
+    private val lock = Any()
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-
     private var _items: MutableList<Category> = mutableListOf()
     val categories: List<Category> get() = _items
 
     fun submitCollection(categories: Collection<Category>) {
-        _items.clear()
-        _items.addAll(listOf(Category.ALL_CATEGORY) + categories.toSortedSet())
-        notifyDataSetChanged()
+        synchronized(lock) {
+            _items.clear()
+            _items.addAll(listOf(Category.ALL_CATEGORY) + categories.toSortedSet())
+            notifyDataSetChanged()
+        }
     }
 
     override fun getItem(position: Int): Any {

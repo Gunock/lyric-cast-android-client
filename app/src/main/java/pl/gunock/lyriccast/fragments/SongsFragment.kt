@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 2:42 AM
+ * Last modified 4/1/21 10:52 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -85,6 +85,7 @@ class SongsFragment : Fragment() {
         songItemsRecyclerView.setHasFixedSize(true)
         songItemsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        setupSongs()
         setupListeners()
     }
 
@@ -92,9 +93,7 @@ class SongsFragment : Fragment() {
         super.onResume()
 
         setupCategorySpinner()
-        setupSongs()
         resetSelection()
-
         searchViewEditText.setText("")
     }
 
@@ -154,7 +153,7 @@ class SongsFragment : Fragment() {
         )
         songItemsRecyclerView.adapter = songItemsAdapter
 
-        lyricCastViewModel.allSongs.observe(this, { songs ->
+        lyricCastViewModel.allSongs.observe(requireActivity(), { songs ->
             songItemsAdapter.submitCollection(songs ?: return@observe)
         })
     }

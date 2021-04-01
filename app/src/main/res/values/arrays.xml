@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/9/21 1:24 PM
+  ~ Last modified 4/1/21 9:16 PM
   -->
 
 <resources>
@@ -19,6 +19,11 @@
         <item>Blue</item>
         <item>Red</item>
         <item>DeepPink</item>
+    </string-array>
+
+    <!-- Import/Export -->
+    <string-array name="import_formats">
+        <item>OpenSong</item>
     </string-array>
 
     <!-- Category colors -->

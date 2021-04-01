@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 11:33 PM
+ * Last modified 4/1/21 10:51 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
@@ -24,7 +24,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.enums.NameValidationState
-import pl.gunock.lyriccast.misc.EditCategoryViewModel
+import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.models.CategoryItem
 import pl.gunock.lyriccast.models.ColorItem
 import java.util.*
@@ -44,12 +44,13 @@ class EditCategoryDialogFragment(
     private lateinit var nameInput: TextView
     private lateinit var colorSpinner: Spinner
 
-    private lateinit var viewModel: EditCategoryViewModel
+    private lateinit var dialogViewModel: EditCategoryDialogViewModel
 
     private lateinit var categoryNames: Set<String>
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewModel = ViewModelProvider(requireActivity()).get(EditCategoryViewModel::class.java)
+        dialogViewModel =
+            ViewModelProvider(requireActivity()).get(EditCategoryDialogViewModel::class.java)
         return super.onCreateDialog(savedInstanceState)
     }
 
@@ -64,15 +65,13 @@ class EditCategoryDialogFragment(
             dialog?.setTitle("Edit category")
         }
 
-        categoryNames = viewModel.categoryNames.value ?: setOf()
+        categoryNames = dialogViewModel.categoryNames.value ?: setOf()
 
         return inflater.inflate(R.layout.dialog_fragment_edit_category, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel
 
         nameInputLayout = view.findViewById(R.id.tv_category_name)
         nameInput = view.findViewById(R.id.tin_category_name)
@@ -81,7 +80,7 @@ class EditCategoryDialogFragment(
         nameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
         setupColorSpinner()
-        setupListeners()
+        setupListeners(view)
     }
 
     private fun setupColorSpinner() {
@@ -103,10 +102,10 @@ class EditCategoryDialogFragment(
         }
     }
 
-    private fun setupListeners() {
+    private fun setupListeners(view: View) {
         nameInput.addTextChangedListener(categoryNameTextWatcher)
 
-        requireView().findViewById<Button>(R.id.btn_save_category).setOnClickListener {
+        view.findViewById<Button>(R.id.btn_save_category).setOnClickListener {
             val categoryName = nameInput.text.toString()
             if (validateCategoryName(categoryName) != NameValidationState.VALID) {
                 nameInput.text = categoryName
@@ -116,17 +115,17 @@ class EditCategoryDialogFragment(
 
             val selectedColor = colorSpinner.selectedItem as ColorItem
 
-            val category: Category = if (viewModel.category.value != null) {
-                viewModel.category.value!!
+            val category: Category = if (dialogViewModel.category.value != null) {
+                dialogViewModel.category.value!!
             } else {
                 Category(null, nameInput.text.toString(), selectedColor.value)
             }
 
-            viewModel.category.value = category
+            dialogViewModel.category.value = category
             dismiss()
         }
 
-        requireView().findViewById<Button>(R.id.btn_cancel).setOnClickListener {
+        view.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
             dismiss()
         }
     }

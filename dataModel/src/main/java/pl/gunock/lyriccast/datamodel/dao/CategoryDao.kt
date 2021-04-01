@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:14 PM
+ * Last modified 4/1/21 10:41 PM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -14,14 +14,17 @@ import pl.gunock.lyriccast.datamodel.entities.Category
 interface CategoryDao {
 
     @Query("SELECT * FROM Category")
-    fun getAll(): Flow<List<Category>>
+    fun getAllAsFlow(): Flow<List<Category>>
+
+    @Query("SELECT * FROM Category")
+    suspend fun getAll(): List<Category>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(category: Category): Long
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(category: Collection<Category>): List<Long>
+    suspend fun upsert(category: Collection<Category>)
 
     @Query("DELETE FROM Category WHERE categoryId IN (:categoryIds)")
     suspend fun delete(categoryIds: Collection<Long>)

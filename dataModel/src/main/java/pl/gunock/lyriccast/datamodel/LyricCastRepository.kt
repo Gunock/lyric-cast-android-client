@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:52 PM
+ * Last modified 4/1/21 10:41 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -30,7 +30,7 @@ class LyricCastRepository(
 
     val allSongs: Flow<List<SongAndCategory>> = songDao.getAll()
     val allSetlists: Flow<List<Setlist>> = setlistDao.getAll()
-    val allCategories: Flow<List<Category>> = categoryDao.getAll()
+    val allCategories: Flow<List<Category>> = categoryDao.getAllAsFlow()
 
     @WorkerThread
     suspend fun clear() {
@@ -137,6 +137,11 @@ class LyricCastRepository(
     }
 
     @WorkerThread
+    suspend fun getAllCategories(): List<Category> {
+        return categoryDao.getAll()
+    }
+
+    @WorkerThread
     suspend fun upsertCategory(category: Category) {
         if (category.name.isBlank()) {
             throw IllegalArgumentException("Blank category name $category")
@@ -146,7 +151,7 @@ class LyricCastRepository(
     }
 
     @WorkerThread
-    internal suspend fun upsertCategories(categories: Collection<Category>): List<Long> {
+    internal suspend fun upsertCategories(categories: Collection<Category>) {
         return categoryDao.upsert(categories)
     }
 
@@ -154,4 +159,5 @@ class LyricCastRepository(
     internal suspend fun deleteCategories(categoryIds: Collection<Long>) {
         categoryDao.delete(categoryIds)
     }
+
 }
