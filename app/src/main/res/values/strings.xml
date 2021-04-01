@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 3:21 PM
+  ~ Last modified 4/1/21 10:52 PM
   -->
 
 <resources>
@@ -63,4 +63,6 @@
     <string name="placeholder_category">Category</string>
     <string name="menu_duplicate">Duplicate</string>
     <string name="img_drag_song">Drag song</string>
+    <string name="delete_all_before_import">Delete all before import</string>
+    <string name="replace_on_conflict">Replace on conflict</string>
 </resources>
