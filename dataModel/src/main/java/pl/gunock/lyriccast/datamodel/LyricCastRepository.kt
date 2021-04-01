@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:55 PM
+ * Last modified 4/2/21 12:38 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -97,21 +97,29 @@ class LyricCastRepository(
         songsWithLyricsSections: List<SongWithLyricsSections>,
         orderMap: Map<String, List<Pair<String, Int>>>
     ) {
-        val songs = songsWithLyricsSections.map { it.song }
-        val songIds = songDao.upsert(songs)
+        val songs: List<Song> = songsWithLyricsSections.map { it.song }
+        songDao.upsert(songs)
+        val songIdMap: Map<String, Long> = songDao.getAll()
+            .map { it.title to it.songId!! }
+            .toMap()
+
         val lyricsSections: List<LyricsSection> =
-            songsWithLyricsSections.flatMapIndexed { index, songWithLyricsSections ->
-                songWithLyricsSections.lyricsSections.map { LyricsSection(songIds[index], it) }
+            songsWithLyricsSections.flatMap { songWithLyricsSections ->
+                val songId = songIdMap[songWithLyricsSections.song.title]!!
+                songWithLyricsSections.lyricsSections.map { LyricsSection(songId, it) }
             }
 
-        val sectionIds = lyricsSectionDao.upsert(lyricsSections)
-        val sectionIdMap: Map<String, Map<String, Long>> = songs.map { song ->
-            song.title to sectionIds.zip(lyricsSections).map { it.second.name to it.first }.toMap()
-        }.toMap()
-
-        val songIdMap: Map<String, Long> = songs.zip(songIds)
-            .map { it.first.title to it.second }
+        lyricsSectionDao.upsert(lyricsSections)
+        val sectionsMap: Map<Long, List<LyricsSection>> = lyricsSectionDao.getAll()
+            .groupBy { it.songId }
             .toMap()
+
+        val sectionIdMap: Map<String, Map<String, Long>> = songs.map { song ->
+            val songId = songIdMap[song.title]!!
+            val sections = sectionsMap[songId]!!
+            song.title to sections.map { it.name to it.lyricsSectionId!! }
+                .toMap()
+        }.toMap()
 
         val crossRefs = orderMap.flatMap { orderMapEntry ->
             val songId = songIdMap[orderMapEntry.key]!!

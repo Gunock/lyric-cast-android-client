@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:39 PM
+ * Last modified 4/2/21 12:14 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -33,14 +33,21 @@ class SongItemsAdapter(
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
+    private companion object {
+        val CHECKBOX_STATES = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
+    }
+
     init {
         setHasStableIds(true)
     }
 
     private val lock = Any()
-    private val checkBoxHighlightColor = context.getColor(R.color.colorAccent)
+    private val checkBoxColor = context.getColor(R.color.checkBox)
+    private val checkBoxHighlightColor = context.getColor(R.color.checkBoxHighlight)
     private val brightColor = context.getColor(R.color.white)
     private val darkColor = context.getColor(R.color.black)
+    val checkBoxColors = intArrayOf(checkBoxHighlightColor, checkBoxColor)
+
 
     private var _items: SortedSet<SongItem> = sortedSetOf()
     private var _visibleItems: Set<SongItem> = setOf()
@@ -125,7 +132,9 @@ class SongItemsAdapter(
                 (itemView as CardView).setCardBackgroundColor(item.category.color!!)
             } else {
                 categoryTextView.text = ""
-                checkBox.buttonTintList = ColorStateList.valueOf(checkBoxHighlightColor)
+
+                checkBox.buttonTintList = ColorStateList(CHECKBOX_STATES, checkBoxColors)
+
                 titleTextView.setTextColor(darkColor)
                 (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.brightColor)
             }

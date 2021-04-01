@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:52 PM
+ * Last modified 4/2/21 12:39 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -126,13 +126,12 @@ class SongsFragment : Fragment() {
             }
         }
 
-        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
+        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { view, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
                 getSelectedCategoryId()
             )
         }
-
     }
 
     private fun setupCategorySpinner() {
@@ -178,8 +177,8 @@ class SongsFragment : Fragment() {
     ) {
         Log.v(TAG, "filterSongs invoked")
 
-        resetSelection()
         songItemsAdapter.filterItems(title, categoryId = categoryId)
+        resetSelection()
     }
 
     private fun pickSong(item: SongItem) {

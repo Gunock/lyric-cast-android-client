@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:05 PM
+ * Last modified 4/2/21 12:33 AM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -15,6 +15,9 @@ import pl.gunock.lyriccast.datamodel.entities.SongLyricsSectionCrossRef
 
 @Dao
 interface LyricsSectionDao {
+    @Query("SELECT * FROM LyricsSection")
+    suspend fun getAll(): List<LyricsSection>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(lyricsSection: LyricsSection)
 

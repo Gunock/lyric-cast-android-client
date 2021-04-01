@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:51 PM
+ * Last modified 4/2/21 12:43 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -74,11 +74,7 @@ class SetlistsFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
-
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
+        showMenuActions(showDelete = false, showEdit = false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -129,6 +125,7 @@ class SetlistsFragment : Fragment() {
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
             setlistItemsAdapter.filterItems(newText)
+            resetSelection()
         })
 
         searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -154,30 +151,16 @@ class SetlistsFragment : Fragment() {
                     setlistItemsAdapter.showCheckBox.value = false
                 }
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = false
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
+                showMenuActions(showDelete = false, showEdit = false)
             }
             1 -> {
                 if (!setlistItemsAdapter.showCheckBox.value!!) {
                     setlistItemsAdapter.showCheckBox.value = true
                 }
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = true
+                showMenuActions()
             }
-            2 -> {
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
-            }
+            2 -> showMenuActions(showEdit = false)
         }
 
         item.isSelected = !item.isSelected
@@ -208,6 +191,23 @@ class SetlistsFragment : Fragment() {
         selectionTracker.reset()
 
         return true
+    }
+
+    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
+        if (!this::menu.isInitialized) {
+            return
+        }
+
+        menu.findItem(R.id.menu_delete).isVisible = showDelete
+        menu.findItem(R.id.menu_edit).isVisible = showEdit
+    }
+
+    private fun resetSelection() {
+        if (setlistItemsAdapter.showCheckBox.value!!) {
+            setlistItemsAdapter.showCheckBox.value = false
+        }
+
+        showMenuActions(showDelete = false, showEdit = false)
     }
 
 }
