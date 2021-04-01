@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 9:59 PM
+ * Last modified 4/1/21 8:52 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -16,20 +16,30 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.extensions.getLifecycleOwner
+import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
+import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.CategoryItem
+import java.util.*
 
 class CategoryItemsAdapter(
     val context: Context,
-    var categoryItems: MutableList<CategoryItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
     init {
         setHasStableIds(true)
+    }
+
+    private var _items: SortedSet<CategoryItem> = sortedSetOf()
+    val categoryItems: List<CategoryItem> get() = _items.toList()
+
+    fun submitCollection(songs: Collection<Category>) {
+        _items.clear()
+        _items.addAll(songs.map { CategoryItem(it) })
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,7 +58,7 @@ class CategoryItemsAdapter(
         return categoryItems[position].category.id
     }
 
-    override fun getItemCount() = categoryItems.size
+    override fun getItemCount() = _items.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
@@ -58,6 +68,7 @@ class CategoryItemsAdapter(
         fun bind(item: CategoryItem) {
             selectionTracker?.attach(this)
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(colorCard, true))
 
             name.text = categoryItems[adapterPosition].category.name
 

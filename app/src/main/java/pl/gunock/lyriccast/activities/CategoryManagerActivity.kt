@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 11:11 PM
+ * Last modified 3/31/21 3:20 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.activities
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,8 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
 import pl.gunock.lyriccast.misc.EditCategoryViewModel
@@ -28,13 +31,15 @@ import pl.gunock.lyriccast.models.CategoryItem
 class CategoryManagerActivity : AppCompatActivity() {
 
     private lateinit var repository: LyricCastRepository
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+    }
 
     private lateinit var menu: Menu
     private lateinit var categoryItemsRecyclerView: RecyclerView
 
     private lateinit var viewModel: EditCategoryViewModel
 
-    private var categoryItems: Set<CategoryItem> = setOf()
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
 
@@ -49,9 +54,11 @@ class CategoryManagerActivity : AppCompatActivity() {
 
         // TODO: Possible leak
         viewModel = ViewModelProvider(this).get(EditCategoryViewModel::class.java)
-        viewModel.categoryNames.value = runBlocking { repository.getCategories() }
-            .map { category -> category.name }
-            .toSet()
+
+        lyricCastViewModel.allCategories.observe(this) { categories ->
+            viewModel.categoryNames.value = categories.map { category -> category.name }.toSet()
+        }
+
 
         categoryItemsRecyclerView = findViewById(R.id.rcv_categories)
 
@@ -81,20 +88,17 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun setupCategories() {
-        runBlocking {
-            categoryItems = repository.getCategories()
-                .map { category -> CategoryItem(category) }
-                .toSet()
-        }
-
         selectionTracker = SelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
 
         categoryItemsAdapter = CategoryItemsAdapter(
             categoryItemsRecyclerView.context,
-            categoryItems = categoryItems.toMutableList(),
             selectionTracker = selectionTracker
         )
         categoryItemsRecyclerView.adapter = categoryItemsAdapter
+
+        lyricCastViewModel.allCategories.observe(this) { categories ->
+            categoryItemsAdapter.submitCollection(categories)
+        }
     }
 
     private fun onCategoryClick(
@@ -115,15 +119,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             .filter { item -> item.isSelected }
             .map { items -> items.category.id }
 
-        runBlocking {
-            repository.deleteCategories(selectedCategories)
-        }
-
-        val remainingCategories = categoryItemsAdapter.categoryItems
-            .filter { category -> !category.isSelected }
-
-        categoryItemsAdapter.categoryItems.clear()
-        categoryItemsAdapter.categoryItems.addAll(remainingCategories)
+        runBlocking { lyricCastViewModel.deleteCategories(selectedCategories) }
 
         resetSelection()
 
@@ -207,23 +203,12 @@ class CategoryManagerActivity : AppCompatActivity() {
         menu.findItem(R.id.menu_edit).isVisible = showEdit
     }
 
-    private fun observeViewModelCategory(category: Category?) {
-        if (category == null) {
+    private fun observeViewModelCategory(viewModelCategory: Category?) {
+        if (viewModelCategory == null) {
             return
         }
 
-        runBlocking {
-            repository.upsertCategory(viewModel.category.value!!)
-        }
-
-        runBlocking {
-            categoryItems = repository.getCategories()
-                .map { category -> CategoryItem(category) }
-                .toSet()
-        }
-        categoryItemsAdapter.categoryItems.clear()
-        categoryItemsAdapter.categoryItems.addAll(categoryItems)
-        categoryItemsAdapter.notifyDataSetChanged()
+        runBlocking { repository.upsertCategory(viewModel.category.value!!) }
 
         viewModel.category.removeObservers(this)
         viewModel.category.value = null

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:54 AM
+ * Last modified 3/31/21 3:37 PM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -17,6 +17,14 @@ data class Category(
     val categoryId: Long? = null,
     val name: String = "",
     val color: Int? = null
-) {
+) : Comparable<Category> {
+    companion object {
+        val ALL_CATEGORY = Category(Long.MIN_VALUE, "All")
+    }
+
     val id: Long get() = categoryId.toNonNullable()
+
+    override fun compareTo(other: Category): Int {
+        return name.compareTo(other.name)
+    }
 }

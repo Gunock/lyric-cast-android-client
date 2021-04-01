@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 11:45 PM
+ * Last modified 3/31/21 1:06 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -41,7 +41,7 @@ abstract class LyricCastRoomDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     LyricCastRoomDatabase::class.java,
-                    "word_database"
+                    "lyric_cast_database"
                 ).build()
 
                 INSTANCE = instance

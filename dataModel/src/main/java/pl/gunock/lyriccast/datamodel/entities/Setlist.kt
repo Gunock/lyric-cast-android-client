@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:28 AM
+ * Last modified 4/1/21 2:24 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -12,7 +12,6 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
-import pl.gunock.lyriccast.datamodel.extensions.toNullable
 
 @Entity(indices = [Index(value = ["name"], unique = true)])
 data class Setlist(
@@ -23,12 +22,12 @@ data class Setlist(
     val id: Long get() = setlistId.toNonNullable()
 
     constructor(parcel: Parcel) : this(
-        parcel.readLong().toNullable(),
+        parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString()!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(setlistId.toNonNullable())
+        parcel.writeValue(setlistId)
         parcel.writeString(name)
     }
 
@@ -45,4 +44,6 @@ data class Setlist(
             return arrayOfNulls(size)
         }
     }
+
+
 }

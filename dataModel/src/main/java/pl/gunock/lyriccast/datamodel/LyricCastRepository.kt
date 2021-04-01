@@ -1,12 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:18 AM
+ * Last modified 4/1/21 8:52 PM
  */
 
 package pl.gunock.lyriccast.datamodel
 
+import android.util.Log
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.flow.Flow
 import pl.gunock.lyriccast.datamodel.dao.CategoryDao
 import pl.gunock.lyriccast.datamodel.dao.LyricsSectionDao
 import pl.gunock.lyriccast.datamodel.dao.SetlistDao
@@ -22,9 +24,20 @@ class LyricCastRepository(
     private val setlistDao: SetlistDao,
     private val categoryDao: CategoryDao
 ) {
+    private companion object {
+        const val TAG = "LyricCastRepository"
+    }
+
+    val allSongs: Flow<List<SongAndCategory>> = songDao.getAll()
+    val allSetlists: Flow<List<Setlist>> = setlistDao.getAll()
+    val allCategories: Flow<List<Category>> = categoryDao.getAll()
+
     @WorkerThread
-    suspend fun getSongs(): List<SongAndCategory> {
-        return songDao.getAll()
+    suspend fun clear() {
+        songDao.deleteAll()
+        lyricsSectionDao.deleteAll()
+        setlistDao.deleteAll()
+        categoryDao.deleteAll()
     }
 
     @WorkerThread
@@ -33,12 +46,22 @@ class LyricCastRepository(
     }
 
     @WorkerThread
-    suspend fun upsertSong(
+    internal suspend fun upsertSong(
         songWithLyricsSections: SongWithLyricsSections,
         order: List<Pair<String, Int>>
     ) {
         val song = songWithLyricsSections.song
         val lyricsSections = songWithLyricsSections.lyricsSections
+
+        if (song.title.isBlank()) {
+            throw IllegalArgumentException("Blank song title $song")
+        }
+
+        if (lyricsSections.isEmpty()) {
+            throw IllegalArgumentException("Empty lyrics sections $lyricsSections")
+        }
+
+
         try {
             val songId = songDao.upsert(song)
             val sectionIds =
@@ -47,11 +70,17 @@ class LyricCastRepository(
             val sectionIdMap = sectionIds.zip(lyricsSections)
                 .map { it.second.name to it.first }
                 .toMap()
-
-            val crossRefs = order.map {
-                SongLyricsSectionCrossRef(null, songId, sectionIdMap[it.first]!!, it.second)
+            try {
+                val crossRefs = order.map {
+                    SongLyricsSectionCrossRef(null, songId, sectionIdMap[it.first]!!, it.second)
+                }
+                lyricsSectionDao.upsertRelations(crossRefs)
+            } catch (exception: NullPointerException) {
+                Log.wtf(TAG, song.title)
+                Log.wtf(TAG, sectionIdMap.toString())
+                Log.wtf(TAG, order.toString())
+                Log.wtf(TAG, exception)
             }
-            lyricsSectionDao.upsertRelations(crossRefs)
         } catch (e: Exception) {
             songDao.delete(listOf(song.id))
             throw e
@@ -59,7 +88,7 @@ class LyricCastRepository(
     }
 
     @WorkerThread
-    suspend fun deleteSongs(songIds: List<Long>) {
+    internal suspend fun deleteSongs(songIds: List<Long>) {
         songDao.delete(songIds)
     }
 
@@ -79,12 +108,15 @@ class LyricCastRepository(
     }
 
     @WorkerThread
-    suspend fun getSetlists(): List<Setlist> {
-        return setlistDao.getAll()
-    }
+    internal suspend fun upsertSetlist(setlistWithSongs: SetlistWithSongs) {
+        if (setlistWithSongs.setlist.name.isBlank()) {
+            throw IllegalArgumentException("Blank setlist name $setlistWithSongs")
+        }
 
-    @WorkerThread
-    suspend fun upsertSetlist(setlistWithSongs: SetlistWithSongs) {
+        if (setlistWithSongs.songs.isEmpty()) {
+            throw IllegalArgumentException("Empty setlist songs $setlistWithSongs")
+        }
+
         val setlist = setlistWithSongs.setlist
         try {
             val setlistId = setlistDao.upsert(setlist)
@@ -95,29 +127,31 @@ class LyricCastRepository(
             setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
         } catch (e: Exception) {
             setlistDao.delete(listOf(setlist.id))
-            setlistDao.deleteSongsCrossRefs(setlist.id)
             throw e
         }
     }
 
-
     @WorkerThread
-    suspend fun deleteSetlists(setlistIds: Collection<Long>) {
+    internal suspend fun deleteSetlists(setlistIds: Collection<Long>) {
         return setlistDao.delete(setlistIds)
     }
 
     @WorkerThread
-    suspend fun getCategories(): List<Category> {
-        return categoryDao.getAll()
-    }
-
-    @WorkerThread
     suspend fun upsertCategory(category: Category) {
-        categoryDao.upsertCategory(category)
+        if (category.name.isBlank()) {
+            throw IllegalArgumentException("Blank category name $category")
+        }
+
+        categoryDao.upsert(category)
     }
 
     @WorkerThread
-    suspend fun deleteCategories(categoryIds: Collection<Long>) {
-        categoryDao.deleteCategories(categoryIds)
+    internal suspend fun upsertCategories(categories: Collection<Category>): List<Long> {
+        return categoryDao.upsert(categories)
+    }
+
+    @WorkerThread
+    internal suspend fun deleteCategories(categoryIds: Collection<Long>) {
+        categoryDao.delete(categoryIds)
     }
 }

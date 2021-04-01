@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:57 AM
+ * Last modified 3/31/21 7:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -10,9 +10,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
@@ -23,20 +25,29 @@ import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.common.extensions.moveTabLeft
+import pl.gunock.lyriccast.common.extensions.moveTabRight
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
 import pl.gunock.lyriccast.enums.NameValidationState
-import pl.gunock.lyriccast.extensions.moveTabLeft
-import pl.gunock.lyriccast.extensions.moveTabRight
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 
 class SongEditorActivity : AppCompatActivity() {
+    private companion object {
+        const val TAG = "SongEditorActivity"
+    }
+
     private var intentSong: Song? = null
     private lateinit var repository: LyricCastRepository
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+    }
 
     private lateinit var sectionNameInput: EditText
     private lateinit var songTitleInputLayout: TextInputLayout
@@ -50,7 +61,6 @@ class SongEditorActivity : AppCompatActivity() {
     private val songTitleTextWatcher: SongTitleTextWatcher = SongTitleTextWatcher()
 
     private lateinit var songTitles: Set<String>
-    private lateinit var categories: Set<Category>
     private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
     private val tabCountMap: MutableMap<String, Int> = mutableMapOf()
 
@@ -75,35 +85,23 @@ class SongEditorActivity : AppCompatActivity() {
         songTitleInput.filters = arrayOf(InputFilter.LengthFilter(30))
         sectionNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
-        runBlocking {
-            categories = setOf(Category(name = "No category")) + repository.getCategories().toSet()
+        lyricCastViewModel.allSongs.observe(this) { songs ->
+            songTitles = songs.map { songAndCategory -> songAndCategory.song.title }.toSet()
         }
-
-        runBlocking {
-            songTitles = repository.getSongs()
-                .map { songAndCategory -> songAndCategory.song.title }
-                .toSet()
-        }
-
         setupCategorySpinner()
 
         intentSong = intent.getParcelableExtra("song")
+        Log.v(TAG, "Received song : $intentSong")
         if (intentSong != null) {
             loadSongData(intentSong!!)
 
             selectedTab = songSectionTabLayout.getTabAt(0)!!
-
-            val songWithLyrics = runBlocking { repository.getSongWithLyrics(intentSong!!.id)!! }
-            val categoryIndex = (categorySpinner.adapter as CategorySpinnerAdapter).categories
-                .map { category -> category.categoryId }
-                .indexOf(songWithLyrics.song.categoryId)
-
-            categorySpinner.setSelection(categoryIndex)
         } else {
             songTitleInput.setText("")
             selectedTab = songSectionTabLayout.getTabAt(0)!!
-            sectionLyrics[selectedTab.text.toString()] = ""
-            tabCountMap[selectedTab.text.toString()] = 1
+            val sectionName = selectedTab.text.toString().trim()
+            sectionLyrics[sectionName] = ""
+            tabCountMap[sectionName] = 1
         }
 
         setupListeners()
@@ -130,8 +128,20 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext, categories)
+        val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
         categorySpinner.adapter = categorySpinnerAdapter
+
+        lyricCastViewModel.allCategories.observe(this) { categories ->
+            categorySpinnerAdapter.submitCollection(categories)
+
+            if (intentSong != null) {
+                val categoryIndex = (categorySpinner.adapter as CategorySpinnerAdapter).categories
+                    .map { category -> category.categoryId }
+                    .indexOf(intentSong!!.categoryId)
+
+                categorySpinner.setSelection(categoryIndex)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -141,7 +151,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         sectionLyricsInput.addTextChangedListener(
             InputTextChangedListener { newText ->
-                sectionLyrics[selectedTab.text.toString()] = newText
+                sectionLyrics[selectedTab.text.toString().trim()] = newText
             })
 
         songSectionTabLayout.addOnTabSelectedListener(
@@ -150,7 +160,7 @@ class SongEditorActivity : AppCompatActivity() {
 
                 sectionNameTextWatcher.ignoreBeforeTextChanged = true
 
-                when (val tabText = tab.text.toString()) {
+                when (val tabText = tab.text.toString().trim()) {
                     getString(R.string.button_add) -> {
                         if (songSectionTabLayout.tabCount <= 1) {
                             return@ItemSelectedTabListener
@@ -214,8 +224,8 @@ class SongEditorActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun saveSong(): Boolean {
-        val title = songTitleInput.text.toString()
+    private fun saveSong(): Boolean {
+        val title = songTitleInput.text.toString().trim()
 
         if (validateSongTitle(title) != NameValidationState.VALID) {
             songTitleInput.setText(title)
@@ -244,7 +254,7 @@ class SongEditorActivity : AppCompatActivity() {
         val order = presentation.mapIndexed { index, sectionName -> sectionName to index }
 
         val songWithLyricsSections = SongWithLyricsSections(song, lyricsSections)
-        repository.upsertSong(songWithLyricsSections, order)
+        lyricCastViewModel.upsertSong(songWithLyricsSections, order)
 
         return true
     }
@@ -260,7 +270,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         val presentation = songWithLyrics.crossRef
             .sorted()
-            .map { it.id }
+            .map { crossRef -> crossRef.lyricsSectionId }
 
         songSectionTabLayout.removeAllTabs()
 
@@ -334,7 +344,7 @@ class SongEditorActivity : AppCompatActivity() {
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
+            val newText = s.toString().trim()
 
             when (validateSongTitle(newText)) {
                 NameValidationState.EMPTY -> {
@@ -363,7 +373,7 @@ class SongEditorActivity : AppCompatActivity() {
                 return
             }
 
-            val oldText = s.toString()
+            val oldText = s.toString().trim()
             val oldTabCount = tabCountMap[oldText]!!
             if (oldTabCount <= 1) {
                 sectionLyrics.remove(oldText)
@@ -379,7 +389,7 @@ class SongEditorActivity : AppCompatActivity() {
                 return
             }
 
-            val newText = s.toString()
+            val newText = s.toString().trim()
             selectedTab.text = newText
 
             tabCountMap[newText] =

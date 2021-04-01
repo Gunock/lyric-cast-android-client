@@ -1,15 +1,17 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/26/21 3:44 PM
+ * Last modified 4/1/21 8:52 PM
  */
 
 package pl.gunock.lyriccast.activities
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
@@ -21,6 +23,8 @@ class LaunchActivity : AppCompatActivity() {
 
     companion object {
         const val TURN_ON_WIFI_RESULT_CODE = 1
+        const val PERMISSIONS_REQUEST_CODE = 1
+        val PERMISSIONS = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +37,22 @@ class LaunchActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE)
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
+        if (requestCode != PERMISSIONS_REQUEST_CODE) {
+            return
+        }
+
+        if (grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
+            return
+        }
 
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {

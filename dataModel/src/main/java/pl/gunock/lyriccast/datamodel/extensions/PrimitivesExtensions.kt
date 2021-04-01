@@ -1,14 +1,10 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 9:57 PM
+ * Last modified 4/1/21 2:24 AM
  */
 
 package pl.gunock.lyriccast.datamodel.extensions
-
-fun Long.toNullable(): Long? {
-    return if (this != Long.MIN_VALUE) this else null
-}
 
 fun Long?.toNonNullable(): Long {
     return this ?: Long.MIN_VALUE

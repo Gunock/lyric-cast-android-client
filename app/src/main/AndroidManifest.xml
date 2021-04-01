@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/25/21 11:53 PM
+  ~ Last modified 3/30/21 8:51 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,15 +14,14 @@
 
     <!--  File permissions  -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
 
     <application
         android:name=".LyricCastApplication"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:hardwareAccelerated="true"
         android:theme="@style/Theme.LyricCast.Light.DarkActionBar">
 
         <activity

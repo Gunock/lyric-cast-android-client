@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:06 AM
+ * Last modified 4/1/21 8:48 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,11 +10,13 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,6 +28,8 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
@@ -38,8 +42,15 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistEditorFragment : Fragment() {
 
+    private companion object {
+        const val TAG = "SetlistEditorFragment"
+    }
+
     private val args: SetlistEditorFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+    }
 
     private val setlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
 
@@ -106,9 +117,9 @@ class SetlistEditorFragment : Fragment() {
 
         setlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
 
-        setlistNames = runBlocking { repository.getSetlists() }
-            .map { setlist -> setlist.name }
-            .toSet()
+        lyricCastViewModel.allSetlists.observe(requireActivity()) { setlists ->
+            setlistNames = setlists.map { setlist -> setlist.name }.toSet()
+        }
 
         if (args.setlistWithSongs != null) {
             setlistSongs =
@@ -215,7 +226,7 @@ class SetlistEditorFragment : Fragment() {
     private fun createSetlistWithSongs(): SetlistWithSongs {
         val setlistName = setlistNameInput.text.toString()
         val setlist = if (args.setlistWithSongs != null) {
-            args.setlistWithSongs!!.setlist
+            Setlist(args.setlistWithSongs!!.setlist.setlistId, setlistName)
         } else {
             Setlist(null, setlistName)
         }
@@ -246,7 +257,7 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun saveSetlist(): Boolean {
-        val setlistName = setlistNameInput.text.toString()
+        val setlistName = setlistNameInput.text.toString().trim()
 
         if (validateSetlistName(setlistName) != NameValidationState.VALID) {
             setlistNameInput.text = setlistName
@@ -265,7 +276,8 @@ class SetlistEditorFragment : Fragment() {
         }
 
         val setlistWithSongs = createSetlistWithSongs()
-        runBlocking { repository.upsertSetlist(setlistWithSongs) }
+        lyricCastViewModel.upsertSetlist(setlistWithSongs)
+        Log.i(TAG, "Created setlist: $setlistWithSongs")
         return true
     }
 
@@ -278,17 +290,11 @@ class SetlistEditorFragment : Fragment() {
                 if (songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = false
                 }
-                if (!songItemsAdapter.showHandle.value!!) {
-                    songItemsAdapter.showHandle.value = true
-                }
                 showMenuActions(showDelete = false, showDuplicate = false)
             }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
-                }
-                if (songItemsAdapter.showHandle.value!!) {
-                    songItemsAdapter.showHandle.value = false
                 }
                 showMenuActions()
             }
@@ -320,9 +326,6 @@ class SetlistEditorFragment : Fragment() {
         if (songItemsAdapter.showCheckBox.value!!) {
             songItemsAdapter.showCheckBox.value = false
         }
-        if (!songItemsAdapter.showHandle.value!!) {
-            songItemsAdapter.showHandle.value = true
-        }
         selectionTracker.reset()
 
         showMenuActions(showDelete = false, showDuplicate = false)
@@ -336,7 +339,7 @@ class SetlistEditorFragment : Fragment() {
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
+            val newText = s.toString().trim()
 
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {

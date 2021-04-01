@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:48 AM
+ * Last modified 3/31/21 3:05 PM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -26,4 +26,7 @@ interface LyricsSectionDao {
 
     @Query("DELETE FROM LyricsSection WHERE lyricsSectionId IN (:lyricsSectionIds)")
     suspend fun delete(lyricsSectionIds: Collection<Long>)
+
+    @Query("DELETE FROM LyricsSection")
+    suspend fun deleteAll()
 }

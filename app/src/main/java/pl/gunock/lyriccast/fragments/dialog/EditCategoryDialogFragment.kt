@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 11:08 PM
+ * Last modified 3/30/21 11:33 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialog
@@ -78,7 +78,7 @@ class EditCategoryDialogFragment(
         nameInput = view.findViewById(R.id.tin_category_name)
         colorSpinner = view.findViewById(R.id.spn_category_color)
 
-        nameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(20))
+        nameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
         setupColorSpinner()
         setupListeners()

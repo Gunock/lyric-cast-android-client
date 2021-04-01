@@ -1,33 +1,32 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 12:22 AM
+ * Last modified 3/31/21 2:25 PM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SetlistItem
-import kotlin.system.measureTimeMillis
 
 
 class SetlistsFragment : Fragment() {
@@ -36,12 +35,13 @@ class SetlistsFragment : Fragment() {
     }
 
     private lateinit var repository: LyricCastRepository
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+    }
 
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var setlistRecyclerView: RecyclerView
-
-    private var setlistItems: Set<SetlistItem> = setOf()
 
     private lateinit var setlistItemsAdapter: SetlistItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
@@ -101,19 +101,18 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupSetlists() {
-        setlistItems = runBlocking { repository.getSetlists() }
-            .map { setlist -> SetlistItem(setlist) }
-            .toSet()
-
         val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
         selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
         setlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
-            setlistItems = setlistItems.toMutableList(),
             selectionTracker = selectionTracker
         )
 
         setlistRecyclerView.adapter = setlistItemsAdapter
+
+        lyricCastViewModel.allSetlists.observe(requireActivity()) { setlist ->
+            setlistItemsAdapter.submitCollection(setlist ?: return@observe)
+        }
     }
 
     private fun onSetlistClick(
@@ -132,9 +131,7 @@ class SetlistsFragment : Fragment() {
 
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSetlists(
-                newText
-            )
+            setlistItemsAdapter.filterItems(newText)
         })
 
         searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -210,33 +207,10 @@ class SetlistsFragment : Fragment() {
             .filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
 
-        runBlocking { repository.deleteSetlists(selectedSetlists) }
-
-        val remainingSetlists = setlistItemsAdapter.setlistItems
-            .filter { item -> !selectedSetlists.contains(item.setlist.id) }
-        setlistItemsAdapter.showCheckBox.value = false
-
-        setlistItemsAdapter.setlistItems.clear()
-        setlistItemsAdapter.setlistItems.addAll(remainingSetlists)
-        setlistItemsAdapter.notifyDataSetChanged()
-
+        lyricCastViewModel.deleteSetlists(selectedSetlists)
         selectionTracker.reset()
 
         return true
     }
 
-    private fun filterSetlists(name: String) {
-        Log.v(TAG, "filterSetlists invoked")
-
-        val normalizedName = name.normalize()
-
-        val duration = measureTimeMillis {
-            setlistItemsAdapter.setlistItems = setlistItems.filter { item ->
-                item.normalizedName.contains(normalizedName, ignoreCase = true)
-            }.toMutableList()
-        }
-        Log.v(TAG, "Filtering took : ${duration}ms")
-
-        setlistItemsAdapter.notifyDataSetChanged()
-    }
 }

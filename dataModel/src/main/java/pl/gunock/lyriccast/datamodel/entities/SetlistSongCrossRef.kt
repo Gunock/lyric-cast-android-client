@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:05 AM
+ * Last modified 4/1/21 2:24 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -13,7 +13,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
-import pl.gunock.lyriccast.datamodel.extensions.toNullable
 
 @Entity(
     indices = [Index(value = ["setlistId"]), Index(value = ["songId"])]
@@ -39,6 +38,13 @@ data class SetlistSongCrossRef(
 ) : Parcelable, Comparable<SetlistSongCrossRef> {
     val id: Long get() = setlistSongCrossRefId.toNonNullable()
 
+    constructor(parcel: Parcel) : this(
+        parcel.readLong(),
+        parcel.readLong(),
+        parcel.readInt(),
+        parcel.readValue(Long::class.java.classLoader) as? Long
+    )
+
     constructor(setlistId: Long, setlistSongCrossRef: SetlistSongCrossRef) : this(
         setlistId,
         setlistSongCrossRef.songId,
@@ -46,18 +52,16 @@ data class SetlistSongCrossRef(
         setlistSongCrossRef.setlistSongCrossRefId
     )
 
-    constructor(parcel: Parcel) : this(
-        parcel.readLong(),
-        parcel.readLong(),
-        parcel.readInt(),
-        parcel.readLong().toNullable()
-    )
+
+    override fun compareTo(other: SetlistSongCrossRef): Int {
+        return order.compareTo(other.order)
+    }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(setlistSongCrossRefId.toNonNullable())
         parcel.writeLong(setlistId)
         parcel.writeLong(songId)
         parcel.writeInt(order)
+        parcel.writeValue(setlistSongCrossRefId)
     }
 
     override fun describeContents(): Int {
@@ -72,9 +76,5 @@ data class SetlistSongCrossRef(
         override fun newArray(size: Int): Array<SetlistSongCrossRef?> {
             return arrayOfNulls(size)
         }
-    }
-
-    override fun compareTo(other: SetlistSongCrossRef): Int {
-        return order.compareTo(other.order)
     }
 }

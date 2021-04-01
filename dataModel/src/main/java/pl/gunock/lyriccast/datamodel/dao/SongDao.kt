@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:18 AM
+ * Last modified 3/31/21 2:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
@@ -16,7 +17,7 @@ interface SongDao {
 
     @Transaction
     @Query("SELECT * FROM Song")
-    suspend fun getAll(): List<SongAndCategory>
+    fun getAll(): Flow<List<SongAndCategory>>
 
     @Transaction
     @Query("SELECT * FROM Song WHERE songId IN (:songIds)")
@@ -39,4 +40,6 @@ interface SongDao {
     @Query("DELETE FROM Song WHERE songId IN (:songIds)")
     suspend fun delete(songIds: Collection<Long>)
 
+    @Query("DELETE FROM Song")
+    suspend fun deleteAll()
 }

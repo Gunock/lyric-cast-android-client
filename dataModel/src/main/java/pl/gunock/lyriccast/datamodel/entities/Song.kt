@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:54 AM
+ * Last modified 4/1/21 2:24 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -13,7 +13,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
-import pl.gunock.lyriccast.datamodel.extensions.toNullable
 
 @Entity(indices = [Index(value = ["title"], unique = true)])
 data class Song(
@@ -31,13 +30,13 @@ data class Song(
     val id: Long get() = songId.toNonNullable()
 
     constructor(parcel: Parcel) : this(
-        parcel.readLong().toNullable(),
+        parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString()!!,
-        parcel.readLong().toNullable()
+        parcel.readValue(Long::class.java.classLoader) as? Long
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(songId.toNonNullable())
+        parcel.writeValue(songId)
         parcel.writeString(title)
         parcel.writeValue(categoryId)
     }
@@ -55,4 +54,5 @@ data class Song(
             return arrayOfNulls(size)
         }
     }
+
 }
