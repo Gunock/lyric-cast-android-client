@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 9:05 PM
+ * Last modified 4/2/21 1:16 AM
  */
 
 apply plugin: 'com.android.application'
@@ -48,6 +48,7 @@ android {
             includeAndroidResources = true
         }
     }
+
 }
 
 dependencies {
@@ -74,8 +75,8 @@ dependencies {
 
     implementation "androidx.room:room-ktx:$room_version"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'

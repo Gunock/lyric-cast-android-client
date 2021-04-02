@@ -1,14 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:55 PM
+ * Last modified 4/2/21 11:49 AM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -31,14 +30,10 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.dataimport.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.dataimport.enums.SongXmlParserType
-import pl.gunock.lyriccast.dataimport.models.ImportSong
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
-import pl.gunock.lyriccast.datamodel.entities.Category
-import pl.gunock.lyriccast.datamodel.entities.LyricsSection
-import pl.gunock.lyriccast.datamodel.entities.Song
-import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
+import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
@@ -130,7 +125,18 @@ class MainActivity : AppCompatActivity() {
                     @Suppress("BlockingMethodInNonBlockingContext")
                     inputStream.close()
 
-                    loadSongsToDatabase(importedSongs, dialogFragment)
+                    val colors: IntArray = resources.getIntArray(R.array.category_color_values)
+                    val importSongsOptions = ImportSongsOptions(
+                        importDialogViewModel.importFormat,
+                        importDialogViewModel.deleteAll,
+                        importDialogViewModel.replaceOnConflict,
+                        colors
+                    )
+                    lyricCastViewModel.importSongs(
+                        importedSongs,
+                        dialogFragment.message,
+                        importSongsOptions
+                    )
                     dialogFragment.dismiss()
                 }
             }
@@ -224,80 +230,6 @@ class MainActivity : AppCompatActivity() {
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
         startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
         return true
-    }
-
-    private suspend fun loadSongsToDatabase(
-        importSongs: Set<ImportSong>,
-        dialogFragment: ProgressDialogFragment
-    ) {
-        dialogFragment.setMessage("Importing categories ...")
-        val colors = resources.getIntArray(R.array.category_color_values)
-
-        var processedImportSongs = importSongs.toMutableSet()
-        if (!importDialogViewModel.deleteAll && !importDialogViewModel.replaceOnConflict) {
-            lyricCastViewModel.getAllSongs().forEach { song ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    processedImportSongs.removeIf { it.title == song.title }
-                } else {
-                    processedImportSongs = processedImportSongs
-                        .filter { it.title != song.title }
-                        .toMutableSet()
-                }
-            }
-        }
-
-        val categoryMap: MutableMap<String, Category> =
-            processedImportSongs.map { importSong -> importSong.category }
-                .distinct()
-                .mapIndexed { index, categoryName ->
-                    categoryName to Category(
-                        name = categoryName.take(30),
-                        color = colors[index % colors.size]
-                    )
-                }.toMap()
-                .toMutableMap()
-        categoryMap.remove("")
-
-        if (importDialogViewModel.deleteAll) {
-            repository.clear()
-        }
-
-        val allCategories = lyricCastViewModel.getAllCategories()
-        if (!importDialogViewModel.deleteAll && !importDialogViewModel.replaceOnConflict) {
-            allCategories.forEach { categoryMap.remove(it.name) }
-        }
-
-        lyricCastViewModel.upsertCategories(categoryMap.values)
-
-        dialogFragment.setMessage("Importing songs ...")
-        val categoryIdMap = lyricCastViewModel.getAllCategories()
-            .map { it.name to it.categoryId }
-            .toMap()
-
-        val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
-        val songsWithLyricsSections: List<SongWithLyricsSections> =
-            processedImportSongs.map { importSong ->
-                val song =
-                    Song(title = importSong.title, categoryId = categoryIdMap[importSong.category])
-                val lyricsSections: List<LyricsSection> =
-                    importSong.lyrics.map {
-                        LyricsSection(
-                            songId = 0,
-                            name = it.key,
-                            text = it.value
-                        )
-                    }
-                val order: List<Pair<String, Int>> = importSong.presentation
-                    .mapIndexed { index, sectionName -> sectionName to index }
-
-                orderMap[importSong.title] = order
-                return@map SongWithLyricsSections(song, lyricsSections)
-            }
-
-        lyricCastViewModel.upsertSongs(songsWithLyricsSections, orderMap)
-
-        dialogFragment.setMessage("Finishing import ...")
-        Log.d(TAG, "Finished import")
     }
 
     private fun goToSettings(): Boolean {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:17 PM
+ * Last modified 4/2/21 3:35 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -13,14 +13,17 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.R
 
 
-class ProgressDialogFragment(private val message: String) : DialogFragment() {
+class ProgressDialogFragment(messageText: String) : DialogFragment() {
 
     companion object {
         const val TAG = "ProgressDialogFragment"
     }
+
+    val message = MutableLiveData(messageText)
 
     lateinit var messageTextView: TextView
 
@@ -38,11 +41,9 @@ class ProgressDialogFragment(private val message: String) : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         messageTextView = view.findViewById(R.id.tv_progress_message)
-        messageTextView.text = message
-    }
+        messageTextView.text = message.value
 
-    fun setMessage(newMessage: String) {
-        messageTextView.text = newMessage
+        message.observe(this) { messageTextView.text = it }
     }
 
 }

@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:09 PM
+ * Last modified 4/2/21 3:39 PM
  */
 
-package pl.gunock.lyriccast.enums
+package pl.gunock.lyriccast.dataimport.enums
 
 enum class ImportFormat(private val textName: String) {
     NONE("NONE"),
