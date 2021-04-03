@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/15/21 12:09 PM
+  ~ Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/15/21 12:03 PM
+  ~ Last modified 4/2/21 12:12 AM
   -->
 
 <resources>
@@ -10,8 +10,11 @@
     <color name="colorButton">@color/colorPrimary</color>
     <color name="colorButtonText">@android:color/white</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="checkBox">#FF757575</color>
+    <color name="checkBoxHighlight">@color/colorAccent</color>
 
     <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
     <!--    Value source: https://www.rapidtables.com/web/color/RGB_Color.html -->
     <color name="maroon">#800000</color>

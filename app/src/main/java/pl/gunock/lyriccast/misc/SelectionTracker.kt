@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 3/27/21 11:36 PM
  */
 
 package pl.gunock.lyriccast.misc
 
 import android.view.HapticFeedbackConstants
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class SelectionTracker<T : RecyclerView.ViewHolder>(
@@ -39,6 +40,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
 
     fun attach(holder: T) {
         holder.itemView.setOnLongClickListener { view ->
+            focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, true)) {
                 view.requestFocus()
@@ -49,6 +51,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         }
 
         holder.itemView.setOnClickListener { view ->
+            focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
             if (onSelect(holder, holder.adapterPosition, false)) {
                 view.requestFocus()
@@ -60,17 +63,24 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
     }
 
     private fun countItems(holder: T, modifySelectedItems: Boolean = true): Int {
+        var updatedCount: Int = count
         if (selectedItems.contains(holder.itemId)) {
             if (modifySelectedItems) {
                 selectedItems.remove(holder.itemId)
             }
-            return count - 1
+            updatedCount--
         } else {
             if (modifySelectedItems) {
                 selectedItems.add(holder.itemId)
             }
-            return count + 1
+            updatedCount++
         }
+        return updatedCount
     }
 
+    private fun focus(view: View) {
+        view.isFocusableInTouchMode = true
+        view.requestFocus()
+        view.isFocusableInTouchMode = false
+    }
 }

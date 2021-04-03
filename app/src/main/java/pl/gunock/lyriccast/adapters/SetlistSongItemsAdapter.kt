@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:05 AM
+ * Last modified 3/30/21 11:31 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -16,7 +16,7 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.extensions.getLifecycleOwner
+import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
@@ -26,7 +26,6 @@ class SetlistSongItemsAdapter(
     val context: Context,
     var songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val showHandle: MutableLiveData<Boolean> = MutableLiveData(true),
     val selectionTracker: SelectionTracker<ViewHolder>?,
     val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
@@ -47,7 +46,7 @@ class SetlistSongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return songItems[position].id
+        return songItems[position].song.id
     }
 
     override fun getItemCount() = songItems.size
@@ -94,10 +93,11 @@ class SetlistSongItemsAdapter(
             setupListeners()
 
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
-            showHandle.observe(context.getLifecycleOwner()!!, VisibilityObserver(handleView))
+            showCheckBox
+                .observe(context.getLifecycleOwner()!!, VisibilityObserver(handleView, true))
 
             val item = songItems[adapterPosition]
-            titleTextView.text = item.title
+            titleTextView.text = item.song.title
         }
 
         private fun setupListeners() {

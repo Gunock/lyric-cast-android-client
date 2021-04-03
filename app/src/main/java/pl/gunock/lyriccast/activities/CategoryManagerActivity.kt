@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 3:53 AM
+ * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 3:52 AM
+ * Last modified 4/1/21 11:04 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -9,27 +9,35 @@ package pl.gunock.lyriccast.activities
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import pl.gunock.lyriccast.CategoriesContext
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
-import pl.gunock.lyriccast.fragments.dialog.EditCategoryDialogFragment
-import pl.gunock.lyriccast.misc.EditCategoryViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
+import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
+import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryManagerActivity : AppCompatActivity() {
 
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+    }
+
     private lateinit var menu: Menu
     private lateinit var categoryItemsRecyclerView: RecyclerView
 
-    private lateinit var viewModel: EditCategoryViewModel
+    private lateinit var editCategoryDialogViewModel: EditCategoryDialogViewModel
 
-    private var categoryItems: Set<CategoryItem> = setOf()
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
 
@@ -41,8 +49,14 @@ class CategoryManagerActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // TODO: Possible leak
-        viewModel = ViewModelProvider(this).get(EditCategoryViewModel::class.java)
-        viewModel.category.observe(this, this::observeViewModelCategory)
+        editCategoryDialogViewModel =
+            ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
+
+        lyricCastViewModel.allCategories.observe(this) { categories ->
+            editCategoryDialogViewModel.categoryNames.value =
+                categories.map { category -> category.name }.toSet()
+        }
+
 
         categoryItemsRecyclerView = findViewById(R.id.rcv_categories)
 
@@ -72,16 +86,17 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun setupCategories() {
-        categoryItems = CategoriesContext.getCategoryItems()
-
         selectionTracker = SelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
 
         categoryItemsAdapter = CategoryItemsAdapter(
             categoryItemsRecyclerView.context,
-            categoryItems = categoryItems.toMutableList(),
             selectionTracker = selectionTracker
         )
         categoryItemsRecyclerView.adapter = categoryItemsAdapter
+
+        lyricCastViewModel.allCategories.observe(this) { categories ->
+            categoryItemsAdapter.submitCollection(categories)
+        }
     }
 
     private fun onCategoryClick(
@@ -99,15 +114,10 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun deleteSelectedCategories(): Boolean {
         val selectedCategories = categoryItemsAdapter.categoryItems
-            .filter { category -> category.isSelected }
-            .map { category -> category.id }
-        CategoriesContext.deleteCategories(selectedCategories)
+            .filter { item -> item.isSelected }
+            .map { items -> items.category.id }
 
-        val remainingCategories = categoryItemsAdapter.categoryItems
-            .filter { category -> !category.isSelected }
-
-        categoryItemsAdapter.categoryItems.clear()
-        categoryItemsAdapter.categoryItems.addAll(remainingCategories)
+        runBlocking { lyricCastViewModel.deleteCategories(selectedCategories) }
 
         resetSelection()
 
@@ -115,6 +125,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun showAddCategoryDialog(): Boolean {
+        editCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
         val dialogFragment = EditCategoryDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
@@ -128,6 +139,8 @@ class CategoryManagerActivity : AppCompatActivity() {
     private fun editSelectedCategory(): Boolean {
         val categoryItem = categoryItemsAdapter.categoryItems
             .first { category -> category.isSelected }
+
+        editCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
 
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(
@@ -188,23 +201,14 @@ class CategoryManagerActivity : AppCompatActivity() {
         menu.findItem(R.id.menu_edit).isVisible = showEdit
     }
 
-    private fun observeViewModelCategory(categoryDto: EditCategoryViewModel.CategoryDto?) {
-        if (categoryDto == null) {
+    private fun observeViewModelCategory(viewModelCategory: Category?) {
+        if (viewModelCategory == null) {
             return
         }
 
-        viewModel.category.value = null
+        lyricCastViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
 
-        if (categoryDto.oldCategory == null) {
-            CategoriesContext.saveCategory(categoryDto.category)
-        } else {
-            CategoriesContext.replaceCategory(categoryDto.category, categoryDto.oldCategory)
-        }
-
-        categoryItems = CategoriesContext.getCategoryItems()
-
-        categoryItemsAdapter.categoryItems.clear()
-        categoryItemsAdapter.categoryItems.addAll(categoryItems)
-        categoryItemsAdapter.notifyDataSetChanged()
+        editCategoryDialogViewModel.category.removeObservers(this)
+        editCategoryDialogViewModel.category.value = null
     }
 }

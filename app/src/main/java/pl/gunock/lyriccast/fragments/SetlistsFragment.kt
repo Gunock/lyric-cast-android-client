@@ -1,31 +1,31 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 4/2/21 12:43 AM
  */
 
 package pl.gunock.lyriccast.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SetlistsContext
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
-import pl.gunock.lyriccast.extensions.normalize
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SetlistItem
-import kotlin.system.measureTimeMillis
 
 
 class SetlistsFragment : Fragment() {
@@ -33,11 +33,13 @@ class SetlistsFragment : Fragment() {
         const val TAG = "SetlistsFragment"
     }
 
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+    }
+
     private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var setlistRecyclerView: RecyclerView
-
-    private var setlistItems: Set<SetlistItem> = setOf()
 
     private lateinit var setlistItemsAdapter: SetlistItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
@@ -72,11 +74,7 @@ class SetlistsFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        val deleteActionItem = menu.findItem(R.id.menu_delete)
-        deleteActionItem.isVisible = false
-
-        val editActionItem = menu.findItem(R.id.menu_edit)
-        editActionItem.isVisible = false
+        showMenuActions(showDelete = false, showEdit = false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,17 +94,18 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupSetlists() {
-        setlistItems = SetlistsContext.getSetlistItems()
-
         val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
         selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
         setlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
-            setlistItems = setlistItems.toMutableList(),
             selectionTracker = selectionTracker
         )
 
         setlistRecyclerView.adapter = setlistItemsAdapter
+
+        lyricCastViewModel.allSetlists.observe(requireActivity()) { setlist ->
+            setlistItemsAdapter.submitCollection(setlist ?: return@observe)
+        }
     }
 
     private fun onSetlistClick(
@@ -125,9 +124,8 @@ class SetlistsFragment : Fragment() {
 
     private fun setupListeners() {
         searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSetlists(
-                newText
-            )
+            setlistItemsAdapter.filterItems(newText)
+            resetSelection()
         })
 
         searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -139,7 +137,7 @@ class SetlistsFragment : Fragment() {
 
     private fun pickSetlist(item: SetlistItem) {
         val intent = Intent(context, SetlistControlsActivity::class.java)
-        intent.putExtra("setlistName", item.name)
+        intent.putExtra("setlist", item.setlist)
         startActivity(intent)
     }
 
@@ -153,30 +151,16 @@ class SetlistsFragment : Fragment() {
                     setlistItemsAdapter.showCheckBox.value = false
                 }
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = false
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
+                showMenuActions(showDelete = false, showEdit = false)
             }
             1 -> {
                 if (!setlistItemsAdapter.showCheckBox.value!!) {
                     setlistItemsAdapter.showCheckBox.value = true
                 }
 
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = true
+                showMenuActions()
             }
-            2 -> {
-                val deleteActionItem = menu.findItem(R.id.menu_delete)
-                deleteActionItem.isVisible = true
-
-                val editActionItem = menu.findItem(R.id.menu_edit)
-                editActionItem.isVisible = false
-            }
+            2 -> showMenuActions(showEdit = false)
         }
 
         item.isSelected = !item.isSelected
@@ -185,11 +169,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedSetlist = setlistItemsAdapter.setlistItems
+        val selectedItem = setlistItemsAdapter.setlistItems
             .first { setlistItem -> setlistItem.isSelected }
 
         val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
-        intent.putExtra("setlistName", selectedSetlist.name)
+        intent.putExtra("setlist", selectedItem.setlist)
         startActivity(intent)
 
         setlistItemsAdapter.showCheckBox.value = false
@@ -200,36 +184,30 @@ class SetlistsFragment : Fragment() {
 
     private fun deleteSelectedSetlists(): Boolean {
         val selectedSetlists = setlistItemsAdapter.setlistItems
-            .filter { setlist -> setlist.isSelected }
-            .map { setlist -> setlist.id }
+            .filter { item -> item.isSelected }
+            .map { item -> item.setlist.id }
 
-        SetlistsContext.deleteSetlists(selectedSetlists)
-
-        val remainingSetlists = setlistItemsAdapter.setlistItems
-            .filter { setlistItem -> !selectedSetlists.contains(setlistItem.id) }
-        setlistItemsAdapter.showCheckBox.value = false
-
-        setlistItemsAdapter.setlistItems.clear()
-        setlistItemsAdapter.setlistItems.addAll(remainingSetlists)
-        setlistItemsAdapter.notifyDataSetChanged()
-
+        lyricCastViewModel.deleteSetlists(selectedSetlists)
         selectionTracker.reset()
 
         return true
     }
 
-    private fun filterSetlists(name: String) {
-        Log.v(TAG, "filterSetlists invoked")
-
-        val normalizedName = name.normalize()
-
-        val duration = measureTimeMillis {
-            setlistItemsAdapter.setlistItems = setlistItems.filter { setlistItem ->
-                setlistItem.name.normalize().contains(normalizedName, ignoreCase = true)
-            }.toMutableList()
+    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
+        if (!this::menu.isInitialized) {
+            return
         }
-        Log.v(TAG, "Filtering took : ${duration}ms")
 
-        setlistItemsAdapter.notifyDataSetChanged()
+        menu.findItem(R.id.menu_delete).isVisible = showDelete
+        menu.findItem(R.id.menu_edit).isVisible = showEdit
     }
+
+    private fun resetSelection() {
+        if (setlistItemsAdapter.showCheckBox.value!!) {
+            setlistItemsAdapter.showCheckBox.value = false
+        }
+
+        showMenuActions(showDelete = false, showEdit = false)
+    }
+
 }

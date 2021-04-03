@@ -1,0 +1,24 @@
+<!--
+  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 3/16/21 4:55 PM
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/menu_cast"
+        android:title="@string/option_cast"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always"
+        tools:icon="@drawable/mr_button_dark" />
+
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/label_settings" />
+
+</menu>

@@ -2,13 +2,16 @@
   <dictionary name="aszcz">
     <words>
       <w>chromecast</w>
+      <w>datamodel</w>
       <w>dataset</w>
       <w>gunock</w>
+      <w>kiljanczyk</w>
       <w>kiljańczyk</w>
       <w>lyriccast</w>
       <w>setlist</w>
       <w>setlists</w>
       <w>tomasz</w>
+      <w>upsert</w>
     </words>
   </dictionary>
 </component>

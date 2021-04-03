@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/15/21 1:22 AM
+  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 4:46 PM
+  ~ Last modified 3/31/21 3:38 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -67,7 +67,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cdv_category_color"
-            android:layout_width="120dp"
+            android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@color/colorPrimaryDark"
             android:clipChildren="false"

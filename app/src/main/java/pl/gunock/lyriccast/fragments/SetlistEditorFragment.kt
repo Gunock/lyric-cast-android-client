@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/16/21 4:17 PM
+ * Last modified 4/1/21 8:48 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,21 +10,29 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.runBlocking
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SetlistsContext
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.LyricCastViewModel
+import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
+import pl.gunock.lyriccast.datamodel.entities.Setlist
+import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
+import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.TouchAdapterItemListener
@@ -34,7 +42,16 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistEditorFragment : Fragment() {
 
+    private companion object {
+        const val TAG = "SetlistEditorFragment"
+    }
+
     private val args: SetlistEditorFragmentArgs by navArgs()
+    private lateinit var repository: LyricCastRepository
+    private val lyricCastViewModel: LyricCastViewModel by viewModels {
+        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+    }
+
     private val setlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
 
     private lateinit var songsRecyclerView: RecyclerView
@@ -45,8 +62,8 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var songItemsAdapter: SetlistSongItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
-    private var intentSetlistName: String? = null
-    private var setlistNames: Collection<String> = listOf()
+    private var intentSetlist: Setlist? = null
+    private lateinit var setlistNames: Set<String>
 
     private lateinit var menu: Menu
 
@@ -76,6 +93,11 @@ class SetlistEditorFragment : Fragment() {
         ItemTouchHelper(simpleItemTouchCallback)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        repository = (requireActivity().application as LyricCastApplication).repository
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -88,26 +110,31 @@ class SetlistEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        intentSetlistName = requireActivity().intent.getStringExtra("setlistName")
-        setlistNames = SetlistsContext.getSetlistItems().map { setlistItem -> setlistItem.name }
+        intentSetlist = requireActivity().intent.getParcelableExtra("setlist")
 
         setlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
         setlistNameInput = view.findViewById(R.id.tin_setlist_name)
 
         setlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
 
-        if (args.selectedSongs != null) {
-            val songMap = SongsContext.getSongMap()
-            setlistSongs = args.selectedSongs!!.map { songId -> SongItem(songMap[songId]!!) }
+        lyricCastViewModel.allSetlists.observe(requireActivity()) { setlists ->
+            setlistNames = setlists.map { setlist -> setlist.name }.toSet()
+        }
 
-            setlistNameInput.text = args.setlistName
-        } else if (intentSetlistName != null) {
-            setlistNameInput.text = intentSetlistName
+        if (args.setlistWithSongs != null) {
+            setlistSongs =
+                runBlocking { repository.getSongsAndCategories(args.setlistWithSongs!!.songs) }
+                    .map { song -> SongItem(song) }
 
-            val setlist = SetlistsContext.getSetlist(intentSetlistName!!)
+            setlistNameInput.text = args.setlistWithSongs!!.setlist.name
+        } else if (intentSetlist != null) {
+            val setlistWithSongs =
+                runBlocking { repository.getSetlistWithSongs(intentSetlist!!.id)!! }
 
-            val songMap = SongsContext.getSongMap()
-            setlistSongs = setlist.songIds.map { songId -> SongItem(songMap[songId]!!) }
+            setlistNameInput.text = intentSetlist!!.name
+
+            setlistSongs = runBlocking { repository.getSongsAndCategories(setlistWithSongs.songs) }
+                .map { song -> SongItem(song) }
         }
 
         songsRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_songs).apply {
@@ -147,10 +174,8 @@ class SetlistEditorFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.btn_pick_setlist_songs).setOnClickListener {
-            val songItems = songItemsAdapter.songItems.map { songItem -> songItem.id }.toLongArray()
             val action = SetlistEditorFragmentDirections.actionSetlistEditorToSetlistEditorSongs(
-                selectedSongs = songItems,
-                setlistName = setlistNameInput.text.toString()
+                setlistWithSongs = createSetlistWithSongs()
             )
 
             findNavController().navigate(action)
@@ -198,10 +223,33 @@ class SetlistEditorFragment : Fragment() {
         return false
     }
 
-    private fun validateSetlistName(songTitle: String): NameValidationState {
-        return if (songTitle.isBlank()) {
-            NameValidationState.EMPTY
-        } else if (intentSetlistName != songTitle && setlistNames.contains(songTitle)) {
+    private fun createSetlistWithSongs(): SetlistWithSongs {
+        val setlistName = setlistNameInput.text.toString()
+        val setlist = if (args.setlistWithSongs != null) {
+            Setlist(args.setlistWithSongs!!.setlist.setlistId, setlistName)
+        } else {
+            Setlist(null, setlistName)
+        }
+
+        val songs = songItemsAdapter.songItems
+            .map { item -> item.song }
+            .distinct()
+
+        val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
+            .mapIndexed { index, item ->
+                SetlistSongCrossRef(setlist.id, item.song.id, index)
+            }
+
+        return SetlistWithSongs(setlist, songs, crossRef)
+    }
+
+    private fun validateSetlistName(name: String): NameValidationState {
+        if (name.isBlank()) {
+            return NameValidationState.EMPTY
+        }
+
+        val isAlreadyInUse = intentSetlist?.name != name && setlistNames.contains(name)
+        return if (isAlreadyInUse) {
             NameValidationState.ALREADY_IN_USE
         } else {
             NameValidationState.VALID
@@ -209,7 +257,7 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun saveSetlist(): Boolean {
-        val setlistName = setlistNameInput.text.toString()
+        val setlistName = setlistNameInput.text.toString().trim()
 
         if (validateSetlistName(setlistName) != NameValidationState.VALID) {
             setlistNameInput.text = setlistName
@@ -227,14 +275,9 @@ class SetlistEditorFragment : Fragment() {
             return false
         }
 
-        val songIds = songItemsAdapter.songItems.map { songItem -> songItem.id }
-        if (intentSetlistName == null) {
-            SetlistsContext.saveSetlist(setlistName, songIds)
-        } else {
-            val setlist = SetlistsContext.getSetlist(intentSetlistName!!)
-            SetlistsContext.saveSetlist(setlistName, songIds, setlist.id)
-        }
-
+        val setlistWithSongs = createSetlistWithSongs()
+        lyricCastViewModel.upsertSetlist(setlistWithSongs)
+        Log.i(TAG, "Created setlist: $setlistWithSongs")
         return true
     }
 
@@ -247,17 +290,11 @@ class SetlistEditorFragment : Fragment() {
                 if (songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = false
                 }
-                if (!songItemsAdapter.showHandle.value!!) {
-                    songItemsAdapter.showHandle.value = true
-                }
                 showMenuActions(showDelete = false, showDuplicate = false)
             }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
-                }
-                if (songItemsAdapter.showHandle.value!!) {
-                    songItemsAdapter.showHandle.value = false
                 }
                 showMenuActions()
             }
@@ -289,9 +326,6 @@ class SetlistEditorFragment : Fragment() {
         if (songItemsAdapter.showCheckBox.value!!) {
             songItemsAdapter.showCheckBox.value = false
         }
-        if (!songItemsAdapter.showHandle.value!!) {
-            songItemsAdapter.showHandle.value = true
-        }
         selectionTracker.reset()
 
         showMenuActions(showDelete = false, showDuplicate = false)
@@ -305,7 +339,7 @@ class SetlistEditorFragment : Fragment() {
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
+            val newText = s.toString().trim()
 
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {

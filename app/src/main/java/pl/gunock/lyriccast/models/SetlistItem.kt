@@ -1,20 +1,22 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 2:33 PM
+ * Last modified 4/1/21 8:52 PM
  */
 
 package pl.gunock.lyriccast.models
 
-class SetlistItem(setlist: Setlist) {
-    val id: Long = setlist.id
-    val name: String = setlist.name
+import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.datamodel.entities.Setlist
 
+data class SetlistItem(
+    val setlist: Setlist
+) : Comparable<SetlistItem> {
+
+    val normalizedName by lazy { setlist.name.normalize() }
     var isSelected: Boolean = false
 
-    override fun toString(): String {
-        return StringBuilder().apply {
-            append("(name: $name)")
-        }.toString()
+    override fun compareTo(other: SetlistItem): Int {
+        return setlist.name.compareTo(other.setlist.name)
     }
 }

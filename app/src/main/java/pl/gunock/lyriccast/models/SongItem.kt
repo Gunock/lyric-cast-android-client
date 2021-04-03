@@ -1,26 +1,32 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 9:28 PM
+ * Last modified 4/1/21 8:52 PM
  */
 
 package pl.gunock.lyriccast.models
 
-import pl.gunock.lyriccast.CategoriesContext
+import androidx.lifecycle.MutableLiveData
+import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 
-class SongItem(songMetadata: SongMetadata) {
+data class SongItem(
+    val song: Song,
+    val category: Category? = null
+) : Comparable<SongItem> {
 
-    val id: Long = songMetadata.id
-    val title: String = songMetadata.title
-    val category: Category? = CategoriesContext.getCategory(songMetadata.categoryId)
-
-    var highlight: Boolean = false
+    val normalizedTitle by lazy { song.title.normalize() }
+    val highlight: MutableLiveData<Boolean> = MutableLiveData(false)
     var isSelected: Boolean = false
 
-    override fun toString(): String {
-        return StringBuilder().apply {
-            append("(title: $title)")
-        }.toString()
-    }
+    constructor(songAndCategory: SongAndCategory) : this(
+        songAndCategory.song,
+        songAndCategory.category
+    )
 
+    override fun compareTo(other: SongItem): Int {
+        return song.title.compareTo(other.song.title)
+    }
 }

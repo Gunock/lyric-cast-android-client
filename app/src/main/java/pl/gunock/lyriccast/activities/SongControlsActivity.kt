@@ -1,18 +1,22 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/9/21 1:07 AM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/9/21 12:12 AM
+ * Last modified 3/28/21 1:35 AM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
@@ -30,7 +34,7 @@ class SongControlsActivity : AppCompatActivity() {
     private lateinit var slidePreviewView: TextView
 
     private var castContext: CastContext? = null
-    private var sessionCreatedListener: SessionCreatedListener? = null
+    private lateinit var sessionCreatedListener: SessionCreatedListener
 
     private var currentSlide = 0
     private lateinit var lyrics: Array<String>
@@ -39,7 +43,8 @@ class SongControlsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_song_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_main))
+        setSupportActionBar(findViewById(R.id.toolbar_controls))
+
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         songTitleView = findViewById(R.id.tv_controls_song_title)
@@ -50,6 +55,7 @@ class SongControlsActivity : AppCompatActivity() {
 
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {
+            sendConfigure()
             sendSlide()
         }
         castContext?.sessionManager?.addSessionManagerListener(sessionCreatedListener)
@@ -70,6 +76,25 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         castContext?.sessionManager?.removeSessionManagerListener(sessionCreatedListener)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_controls, menu)
+
+        CastButtonFactory.setUpMediaRouteButton(
+            baseContext,
+            menu,
+            R.id.menu_cast
+        )
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_settings -> goToSettings()
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupListeners() {
@@ -139,4 +164,12 @@ class SongControlsActivity : AppCompatActivity() {
             lyrics[currentSlide]
         )
     }
+
+    private fun goToSettings(): Boolean {
+        val intent = Intent(baseContext, SettingsActivity::class.java)
+        startActivity(intent)
+        sendConfigure()
+        return true
+    }
+
 }

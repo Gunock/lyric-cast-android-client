@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/16/21 4:17 PM
+  ~ Last modified 3/16/21 11:55 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,7 @@
     android:descendantFocusability="blocksDescendants"
     android:elevation="@dimen/dimen_card_elevation_small"
     android:focusable="true"
-    android:focusableInTouchMode="true"
+    android:focusableInTouchMode="false"
     android:hapticFeedbackEnabled="true"
     android:longClickable="true"
     android:outlineProvider="background"

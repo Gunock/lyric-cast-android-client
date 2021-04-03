@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+  ~ Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/16/21 4:17 PM
+  ~ Last modified 4/1/21 11:59 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -96,7 +96,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="2dp"
+                    android:padding="4dp"
                     android:text="@string/button_add_setlist" />
             </androidx.cardview.widget.CardView>
 
@@ -138,7 +138,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="2dp"
+                    android:padding="4dp"
                     android:text="@string/button_add_song" />
             </androidx.cardview.widget.CardView>
 
@@ -171,6 +171,7 @@
         android:scaleType="center"
         android:tint="@color/design_default_color_on_primary"
         app:backgroundTint="@color/colorPrimary"
+        app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"

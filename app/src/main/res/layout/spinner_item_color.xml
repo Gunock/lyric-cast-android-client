@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/12/21 3:20 PM
+  ~ Last modified 3/31/21 2:08 AM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,6 +37,8 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:text="@string/placeholder_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cdv_spinner_category_color"
         app:layout_constraintTop_toTopOf="parent" />
 

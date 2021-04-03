@@ -1,34 +1,45 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+ * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/13/21 3:16 PM
+ * Last modified 3/28/21 3:15 AM
  */
 
 package pl.gunock.lyriccast.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.SetlistsContext
-import pl.gunock.lyriccast.SongsContext
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.entities.Setlist
+import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
+import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
-import pl.gunock.lyriccast.models.Setlist
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
+
+    private lateinit var repository: LyricCastRepository
+
     private lateinit var slidePreviewView: TextView
     private lateinit var songTitleView: TextView
 
@@ -41,20 +52,17 @@ class SetlistControlsActivity : AppCompatActivity() {
     private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
     private var currentLyricsPosition: Int = 0
 
-    private lateinit var setlist: Setlist
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_setlist_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_main))
+        setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val setlistName = intent.getStringExtra("setlistName")!!
-        setlist = SetlistsContext.getSetlist(setlistName)
-
+        repository = (application as LyricCastApplication).repository
         castContext = CastContext.getSharedInstance()
         sessionCreatedListener = SessionCreatedListener {
+            sendConfigure()
             sendSlide()
         }
         castContext?.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
@@ -62,26 +70,48 @@ class SetlistControlsActivity : AppCompatActivity() {
         slidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
         songTitleView = findViewById(R.id.tv_current_song_title)
 
-        val songsMetadata = SongsContext.getSongMap()
+        val setlist: Setlist = intent.getParcelableExtra("setlist")!!
+        val setlistWithSongs = runBlocking { repository.getSetlistWithSongs(setlist.id)!! }
+        val songs = setlistWithSongs.songs
         var setlistLyricsIndex = 0
 
-        setlistLyrics = setlist.songIds.flatMapIndexed { index: Int, songId: Long ->
-            val songTitle = SongsContext.getSongTitle(songId)
-            val songLyrics = SongsContext.getSongLyrics(songId)!!.lyrics
-            val lyrics = songsMetadata[songId]!!.presentation
-                .map { sectionName -> songLyrics[sectionName]!! }
+        val songLyrics = runBlocking { repository.getSongsWithLyrics(songs) }
+            .map { songWithLyricsSections ->
+                val songId = songWithLyricsSections.song.id
+                val lyricsSectionsText = songWithLyricsSections.lyricsSections
+                    .zip(songWithLyricsSections.crossRef)
+                    .sortedBy { it.second }
+                    .map { it.first.text }
+                songId to lyricsSectionsText
+            }.toMap()
 
-            val indexedTitle = "[$index] $songTitle"
-            songTitles[setlistLyricsIndex] = indexedTitle
-            songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
-            songStartPoints[indexedTitle] = setlistLyricsIndex
+        setlistLyrics = setlistWithSongs.setlistSongCrossRefs
+            .zip(setlistWithSongs.songs)
+            .sortedBy { it.first }
+            .flatMapIndexed { index: Int, pair: Pair<SetlistSongCrossRef, Song> ->
+                val songId = pair.second.songId
+                val lyrics = songLyrics[songId]!!
 
-            setlistLyricsIndex += lyrics.size
+                val indexedTitle = "[$index] ${pair.second.title}"
+                songTitles[setlistLyricsIndex] = indexedTitle
+                songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
+                songStartPoints[indexedTitle] = setlistLyricsIndex
 
-            return@flatMapIndexed lyrics
-        }
+                setlistLyricsIndex += lyrics.size
 
-        setupRecyclerView()
+                return@flatMapIndexed lyrics
+            }
+
+
+        val songsAndCategories = runBlocking { repository.getSongsAndCategories(songs) }
+            .map { it.song.id to it }
+            .toMap()
+
+        val setlistPresentation = setlistWithSongs.setlistSongCrossRefs
+            .sorted()
+            .map { it.songId }
+
+        setupRecyclerView(setlistPresentation.map { songsAndCategories[it]!! })
 
         setupListeners()
     }
@@ -89,27 +119,30 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val fontSize = prefs.getString("fontSize", "40")
-        val backgroundColor = prefs.getString("backgroundColor", "Black")
-        val fontColor = prefs.getString("fontColor", "White")
-        val configurationJson = JSONObject()
-
-        with(configurationJson) {
-            put("fontSize", "${fontSize}px")
-            put("backgroundColor", backgroundColor)
-            put("fontColor", fontColor)
-        }
-
-        MessageHelper.sendControlMessage(
-            castContext!!,
-            ControlAction.CONFIGURE,
-            configurationJson
-        )
+        sendConfigure()
         sendSlide()
     }
 
-    private fun setupRecyclerView() {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_controls, menu)
+
+        CastButtonFactory.setUpMediaRouteButton(
+            baseContext,
+            menu,
+            R.id.menu_cast
+        )
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_settings -> goToSettings()
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setupRecyclerView(songs: List<SongAndCategory>) {
         val songRecyclerView: RecyclerView = findViewById(R.id.rcv_songs)
         songRecyclerView.setHasFixedSize(true)
         songRecyclerView.layoutManager = LinearLayoutManager(baseContext)
@@ -126,13 +159,11 @@ class SetlistControlsActivity : AppCompatActivity() {
                 selectSong(position)
             }
 
-        val songMap = SongsContext.getSongMap()
-        val songItemList: List<SongItem> = setlist.songIds.map { songId ->
-            SongItem(songMap[songId]!!)
-        }
+        val songItemList: List<SongItem> = songs.map { song -> SongItem(song) }
 
         songItemsAdapter = ControlsSongItemsAdapter(
-            songItemList.toMutableList(),
+            this,
+            songItemList,
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )
@@ -163,12 +194,12 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun highlightSong(title: String) {
-        val songItemPosition: Int = songItemsAdapter.songItems
-            .indexOfFirst { songItem -> songItem.title == title }
-        songItemsAdapter.songItems.forEach { songItem ->
-            songItem.highlight = songItem.title == title
+        val songItemPosition: Int = songStartPoints.keys
+            .indexOfFirst { songTitle -> songTitle == title }
+
+        songItemsAdapter.songItems.forEachIndexed { index, songItem ->
+            songItem.highlight.value = index == songItemPosition
         }
-        songItemsAdapter.notifyDataSetChanged()
 
         findViewById<RecyclerView>(R.id.rcv_songs).run {
             scrollToPosition(songItemPosition)
@@ -191,10 +222,40 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun selectSong(position: Int): Boolean {
-        val title = songItemsAdapter.songItems[position].title
+        val title = songItemsAdapter.songItems[position].song.title
         val indexedTitle = "[$position] $title"
         currentLyricsPosition = songStartPoints[indexedTitle]!!
         sendSlide()
+        return true
+    }
+
+    private fun sendConfigure() {
+        if (castContext == null) {
+            return
+        }
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
+        val fontSize = prefs.getString("fontSize", "40")
+        val backgroundColor = prefs.getString("backgroundColor", "Black")
+        val fontColor = prefs.getString("fontColor", "White")
+
+        val configurationJson = JSONObject().apply {
+            put("fontSize", "${fontSize}px")
+            put("backgroundColor", backgroundColor)
+            put("fontColor", fontColor)
+        }
+
+        MessageHelper.sendControlMessage(
+            castContext!!,
+            ControlAction.CONFIGURE,
+            configurationJson
+        )
+    }
+
+    private fun goToSettings(): Boolean {
+        val intent = Intent(baseContext, SettingsActivity::class.java)
+        startActivity(intent)
+        sendConfigure()
         return true
     }
 }

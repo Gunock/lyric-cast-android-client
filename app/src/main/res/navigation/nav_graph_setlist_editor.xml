@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 3:19 PM
+  ~ Last modified 3/28/21 3:18 AM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,11 +20,8 @@
             android:id="@+id/action_SetlistEditorSongs_to_SetlistEditor"
             app:destination="@id/SetlistEditor" />
         <argument
-            android:name="selectedSongs"
-            app:argType="long[]" />
-        <argument
-            android:name="setlistName"
-            app:argType="string" />
+            android:name="setlistWithSongs"
+            app:argType="pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs" />
     </fragment>
     <fragment
         android:id="@+id/SetlistEditor"
@@ -36,14 +33,9 @@
             android:id="@+id/action_SetlistEditor_to_SetlistEditorSongs"
             app:destination="@id/SetlistEditorSongs" />
         <argument
-            android:name="selectedSongs"
+            android:name="setlistWithSongs"
             android:defaultValue="@null"
-            app:argType="long[]"
-            app:nullable="true" />
-        <argument
-            android:name="setlistName"
-            android:defaultValue="@null"
-            app:argType="string"
+            app:argType="pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs"
             app:nullable="true" />
     </fragment>
 </navigation>
