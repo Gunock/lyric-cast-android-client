@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:05 PM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -46,7 +46,7 @@ class SongEditorActivity : AppCompatActivity() {
     private var intentSong: Song? = null
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var sectionNameInput: EditText
@@ -349,11 +349,11 @@ class SongEditorActivity : AppCompatActivity() {
             when (validateSongTitle(newText)) {
                 NameValidationState.EMPTY -> {
                     songTitleInputLayout.error = " "
-                    songTitleInput.error = "Please enter song title"
+                    songTitleInput.error = getString(R.string.enter_song_title)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     songTitleInputLayout.error = " "
-                    songTitleInput.error = "Song title already in use"
+                    songTitleInput.error = getString(R.string.song_title_already_used)
                 }
                 NameValidationState.VALID -> {
                     songTitleInputLayout.error = null

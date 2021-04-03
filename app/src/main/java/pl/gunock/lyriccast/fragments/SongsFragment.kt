@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:39 AM
+ * Last modified 4/3/21 6:27 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -45,7 +45,10 @@ class SongsFragment : Fragment() {
     private var castContext: CastContext? = null
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var menu: Menu
@@ -126,7 +129,7 @@ class SongsFragment : Fragment() {
             }
         }
 
-        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { view, _ ->
+        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSongs(
                 searchViewEditText.editableText.toString(),
                 getSelectedCategoryId()

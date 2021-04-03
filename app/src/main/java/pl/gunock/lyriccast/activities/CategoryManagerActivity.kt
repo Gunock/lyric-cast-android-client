@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:04 PM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -30,7 +30,7 @@ import pl.gunock.lyriccast.models.CategoryItem
 class CategoryManagerActivity : AppCompatActivity() {
 
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var menu: Menu

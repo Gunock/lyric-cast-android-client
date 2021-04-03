@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 11:49 AM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var importDialogViewModel: ImportDialogViewModel

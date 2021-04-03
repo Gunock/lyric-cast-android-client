@@ -1,11 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 11:51 AM
+ * Last modified 4/3/21 6:32 PM
  */
 
 package pl.gunock.lyriccast.datamodel
 
+import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.*
@@ -23,6 +25,7 @@ import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 
 
 class LyricCastViewModel(
+    private val resources: Resources,
     private val repository: LyricCastRepository
 ) : ViewModel() {
     private companion object {
@@ -71,7 +74,7 @@ class LyricCastViewModel(
         message: MutableLiveData<String>,
         options: ImportSongsOptions
     ) {
-        message.value = "Importing categories ..."
+        message.value = resources.getString(R.string.importing_categories)
         var processedImportSongs = importSongs.toMutableSet()
         if (!options.deleteAll && !options.replaceOnConflict) {
             getAllSongs().forEach { song ->
@@ -108,7 +111,7 @@ class LyricCastViewModel(
 
         upsertCategories(categoryMap.values)
 
-        message.value = "Importing songs ..."
+        message.value = resources.getString(R.string.importing_songs)
         val categoryIdMap = getAllCategories()
             .map { it.name to it.categoryId }
             .toMap()
@@ -142,12 +145,13 @@ class LyricCastViewModel(
 }
 
 class LyricCastViewModelFactory(
+    private val context: Context,
     private val repository: LyricCastRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LyricCastViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LyricCastViewModel(repository) as T
+            return LyricCastViewModel(context.resources, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

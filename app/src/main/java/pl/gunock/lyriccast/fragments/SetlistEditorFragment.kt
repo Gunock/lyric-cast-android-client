@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:48 PM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -49,7 +49,10 @@ class SetlistEditorFragment : Fragment() {
     private val args: SetlistEditorFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
     private val setlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
@@ -268,7 +271,7 @@ class SetlistEditorFragment : Fragment() {
         if (setlistSongs.isEmpty()) {
             val toast = Toast.makeText(
                 requireContext(),
-                "Empty setlists are not allowed!",
+                getString(R.string.empty_setlist_warning),
                 Toast.LENGTH_SHORT
             )
             toast.show()
@@ -344,11 +347,11 @@ class SetlistEditorFragment : Fragment() {
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {
                     setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Please enter setlist name"
+                    setlistNameInput.error = getString(R.string.enter_setlist_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Setlist name already in use"
+                    setlistNameInput.error = getString(R.string.setlist_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     setlistNameInputLayout.error = null

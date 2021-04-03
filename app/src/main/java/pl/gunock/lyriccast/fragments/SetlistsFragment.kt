@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:43 AM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -29,12 +29,11 @@ import pl.gunock.lyriccast.models.SetlistItem
 
 
 class SetlistsFragment : Fragment() {
-    private companion object {
-        const val TAG = "SetlistsFragment"
-    }
-
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var menu: Menu

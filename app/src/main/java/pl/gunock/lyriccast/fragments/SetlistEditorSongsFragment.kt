@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:31 PM
+ * Last modified 4/3/21 6:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -46,7 +46,10 @@ class SetlistEditorSongsFragment : Fragment() {
     private val args: SetlistEditorSongsFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
 
