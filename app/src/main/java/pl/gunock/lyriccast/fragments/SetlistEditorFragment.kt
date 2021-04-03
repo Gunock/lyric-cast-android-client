@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 7:02 PM
+ * Last modified 4/3/21 10:29 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -65,7 +65,7 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var songItemsAdapter: SetlistSongItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
-    private var intentSetlist: Setlist? = null
+    private var intentSetlistWithSongs: SetlistWithSongs? = null
     private lateinit var setlistNames: Set<String>
 
     private lateinit var menu: Menu
@@ -113,7 +113,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        intentSetlist = requireActivity().intent.getParcelableExtra("setlist")
+        intentSetlistWithSongs = requireActivity().intent.getParcelableExtra("setlistWithSongs")
 
         setlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
         setlistNameInput = view.findViewById(R.id.tin_setlist_name)
@@ -130,13 +130,9 @@ class SetlistEditorFragment : Fragment() {
                     .map { song -> SongItem(song) }
 
             setlistNameInput.text = args.setlistWithSongs!!.setlist.name
-        } else if (intentSetlist != null) {
-            val setlistWithSongs =
-                runBlocking { repository.getSetlistWithSongs(intentSetlist!!.id)!! }
-
-            setlistNameInput.text = intentSetlist!!.name
-
-            setlistSongs = runBlocking { repository.getSongsAndCategories(setlistWithSongs.songs) }
+        } else if (intentSetlistWithSongs != null) {
+            setlistNameInput.text = intentSetlistWithSongs!!.setlist.name
+            setlistSongs = intentSetlistWithSongs!!.songs
                 .map { song -> SongItem(song) }
         }
 
@@ -252,7 +248,9 @@ class SetlistEditorFragment : Fragment() {
             return NameValidationState.EMPTY
         }
 
-        val isAlreadyInUse = intentSetlist?.name != name && setlistNames.contains(name)
+        val isAlreadyInUse =
+            intentSetlistWithSongs?.setlist?.name != name && setlistNames.contains(name)
+
         return if (isAlreadyInUse) {
             NameValidationState.ALREADY_IN_USE
         } else {
@@ -303,7 +301,6 @@ class SetlistEditorFragment : Fragment() {
             }
             2 -> showMenuActions(showDuplicate = false)
         }
-
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {

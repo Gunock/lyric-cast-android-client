@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 7:05 PM
+ * Last modified 4/3/21 10:41 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
@@ -31,6 +32,9 @@ import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.Setlist
+import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
+import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
@@ -118,13 +122,14 @@ class SongsFragment : Fragment() {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
 
-        showMenuActions(showDelete = false, showEdit = false)
+        showMenuActions(showDelete = false, showEdit = false, showAddSetlist = false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_delete -> deleteSelectedSongs()
             R.id.menu_edit -> editSelectedSong()
+            R.id.menu_add_setlist -> addSetlist()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -245,6 +250,28 @@ class SongsFragment : Fragment() {
         return true
     }
 
+    private fun addSetlist(): Boolean {
+        val setlist = Setlist(null, "")
+        val songs = songItemsAdapter.songItems
+            .filter { it.isSelected.value == true }
+            .map { item -> item.song }
+
+        val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
+            .mapIndexed { index, item ->
+                SetlistSongCrossRef(setlist.id, item.song.id, index)
+            }
+
+        val setlistWithSongs = SetlistWithSongs(setlist, songs, crossRef)
+
+        val intent = Intent(context, SetlistEditorActivity::class.java)
+        intent.putExtra("setlistWithSongs", setlistWithSongs)
+        startActivity(intent)
+
+        resetSelection()
+
+        return true
+    }
+
     private fun deleteSelectedSongs(): Boolean {
         val selectedSongs = songItemsAdapter.songItems
             .filter { item -> item.isSelected.value!! }
@@ -262,16 +289,21 @@ class SongsFragment : Fragment() {
             songItemsAdapter.showCheckBox.value = false
         }
 
-        showMenuActions(showDelete = false, showEdit = false)
+        showMenuActions(showDelete = false, showEdit = false, showAddSetlist = false)
     }
 
-    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
+    private fun showMenuActions(
+        showDelete: Boolean = true,
+        showEdit: Boolean = true,
+        showAddSetlist: Boolean = true
+    ) {
         if (!this::menu.isInitialized) {
             return
         }
 
         menu.findItem(R.id.menu_delete).isVisible = showDelete
         menu.findItem(R.id.menu_edit).isVisible = showEdit
+        menu.findItem(R.id.menu_add_setlist).isVisible = showAddSetlist
     }
 
     private fun getSelectedCategoryId(): Long {

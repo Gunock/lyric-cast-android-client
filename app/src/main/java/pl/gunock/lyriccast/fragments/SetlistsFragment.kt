@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 9:09 PM
+ * Last modified 4/3/21 10:32 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -16,11 +16,13 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.helpers.KeyboardHelper
@@ -30,6 +32,7 @@ import pl.gunock.lyriccast.models.SetlistItem
 
 
 class SetlistsFragment : Fragment() {
+    private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
         LyricCastViewModelFactory(
             requireContext(),
@@ -48,6 +51,7 @@ class SetlistsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
+        repository = (requireActivity().application as LyricCastApplication).repository
         requireActivity().onBackPressedDispatcher
             .addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
@@ -86,6 +90,8 @@ class SetlistsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
+
+        menu.findItem(R.id.menu_add_setlist).isVisible = false
 
         showMenuActions(showDelete = false, showEdit = false)
     }
@@ -183,12 +189,14 @@ class SetlistsFragment : Fragment() {
         val selectedItem = setlistItemsAdapter.setlistItems
             .first { setlistItem -> setlistItem.isSelected.value!! }
 
-        val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
-        intent.putExtra("setlist", selectedItem.setlist)
+        val setlistWithSongs =
+            runBlocking { repository.getSetlistWithSongs(selectedItem.setlist.id) }
+
+        val intent = Intent(context, SetlistEditorActivity::class.java)
+        intent.putExtra("setlistWithSongs", setlistWithSongs)
         startActivity(intent)
 
-        setlistItemsAdapter.showCheckBox.value = false
-        selectionTracker.reset()
+        resetSelection()
 
         return true
     }
