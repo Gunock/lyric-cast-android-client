@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:14 AM
+ * Last modified 4/3/21 7:52 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -48,7 +48,6 @@ class SongItemsAdapter(
     private val darkColor = context.getColor(R.color.black)
     val checkBoxColors = intArrayOf(checkBoxHighlightColor, checkBoxColor)
 
-
     private var _items: SortedSet<SongItem> = sortedSetOf()
     private var _visibleItems: Set<SongItem> = setOf()
     val songItems: List<SongItem> get() = _visibleItems.toList()
@@ -70,7 +69,7 @@ class SongItemsAdapter(
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
         if (isSelected != null) {
-            predicates.add { songItem -> songItem.isSelected }
+            predicates.add { songItem -> songItem.isSelected.value!! }
         }
 
         if (categoryId != Long.MIN_VALUE) {
@@ -91,6 +90,11 @@ class SongItemsAdapter(
         notifyDataSetChanged()
     }
 
+    fun resetSelection() {
+        _visibleItems.forEach { it.isSelected.value = false }
+        selectionTracker?.reset()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_song, parent, false)
@@ -109,7 +113,7 @@ class SongItemsAdapter(
     override fun getItemCount() = _visibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
         private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
 
@@ -139,7 +143,10 @@ class SongItemsAdapter(
                 (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.brightColor)
             }
 
-            checkBox.isChecked = item.isSelected
+            item.isSelected.observe(context.getLifecycleOwner()!!) {
+                checkBox.isChecked = it
+            }
+
         }
     }
 }

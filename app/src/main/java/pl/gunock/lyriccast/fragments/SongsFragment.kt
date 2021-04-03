@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:27 PM
+ * Last modified 4/3/21 7:05 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -62,7 +63,20 @@ class SongsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
         repository = (requireActivity().application as LyricCastApplication).repository
+        requireActivity().onBackPressedDispatcher
+            .addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (selectionTracker.count > 0) {
+                        songItemsAdapter.resetSelection()
+                        resetSelection()
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                    }
+                }
+            })
     }
 
     override fun onCreateView(
@@ -161,6 +175,7 @@ class SongsFragment : Fragment() {
     }
 
     private fun onSongClick(
+        @Suppress("UNUSED_PARAMETER")
         holder: SongItemsAdapter.ViewHolder,
         position: Int,
         isLongClick: Boolean
@@ -169,7 +184,7 @@ class SongsFragment : Fragment() {
         if (!isLongClick && selectionTracker.count == 0) {
             pickSong(item)
         } else {
-            selectSong(item, holder)
+            selectSong(item)
         }
         return true
     }
@@ -197,9 +212,8 @@ class SongsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+    private fun selectSong(item: SongItem) {
+        item.isSelected.value = !item.isSelected.value!!
 
         when (selectionTracker.countAfter) {
             0 -> {
@@ -219,7 +233,8 @@ class SongsFragment : Fragment() {
     }
 
     private fun editSelectedSong(): Boolean {
-        val selectedItem = songItemsAdapter.songItems.first { songItem -> songItem.isSelected }
+        val selectedItem =
+            songItemsAdapter.songItems.first { songItem -> songItem.isSelected.value!! }
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("song", selectedItem.song)
@@ -232,7 +247,7 @@ class SongsFragment : Fragment() {
 
     private fun deleteSelectedSongs(): Boolean {
         val selectedSongs = songItemsAdapter.songItems
-            .filter { item -> item.isSelected }
+            .filter { item -> item.isSelected.value!! }
             .map { item -> item.song.id }
 
         lyricCastViewModel.deleteSongs(selectedSongs)

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:26 PM
+ * Last modified 4/3/21 7:02 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -214,13 +214,14 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun onSetlistClick(
+        @Suppress("UNUSED_PARAMETER")
         holder: SetlistSongItemsAdapter.ViewHolder,
         position: Int,
         isLongClick: Boolean
     ): Boolean {
         if (isLongClick || selectionTracker.count != 0) {
             val item: SongItem = songItemsAdapter.songItems[position]
-            selectSong(item, holder)
+            selectSong(item)
             return true
         }
         return false
@@ -284,9 +285,8 @@ class SetlistEditorFragment : Fragment() {
         return true
     }
 
-    private fun selectSong(item: SongItem, holder: SetlistSongItemsAdapter.ViewHolder) {
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+    private fun selectSong(item: SongItem) {
+        item.isSelected.value = !item.isSelected.value!!
 
         when (selectionTracker.countAfter) {
             0 -> {

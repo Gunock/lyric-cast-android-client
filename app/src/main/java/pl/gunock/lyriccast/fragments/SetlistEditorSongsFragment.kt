@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:26 PM
+ * Last modified 4/3/21 9:08 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -51,7 +51,6 @@ class SetlistEditorSongsFragment : Fragment() {
             (requireActivity().application as LyricCastApplication).repository
         )
     }
-
 
     private lateinit var songTitleInput: EditText
     private lateinit var categorySpinner: Spinner
@@ -177,7 +176,7 @@ class SetlistEditorSongsFragment : Fragment() {
         val selectionTracker =
             SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
-                selectSong(item, holder)
+                selectSong(item)
                 return@SelectionTracker true
             }
 
@@ -196,14 +195,13 @@ class SetlistEditorSongsFragment : Fragment() {
         lyricCastViewModel.allSongs.observe(requireActivity()) { songs ->
             songItemsAdapter.submitCollection(songs ?: return@observe)
             songItemsAdapter.songItems.forEach { item ->
-                item.isSelected = selectedSongs.contains(item.song)
+                item.isSelected.value = selectedSongs.contains(item.song)
             }
         }
     }
 
-    private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+    private fun selectSong(item: SongItem) {
+        item.isSelected.value = !item.isSelected.value!!
     }
 
     private fun filterSongs(
@@ -219,7 +217,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun updateSelectedSongs() {
         for (item in songItemsAdapter.songItems) {
-            if (item.isSelected) {
+            if (item.isSelected.value!!) {
                 selectedSongs.add(item.song)
             } else {
                 selectedSongs.remove(item.song)

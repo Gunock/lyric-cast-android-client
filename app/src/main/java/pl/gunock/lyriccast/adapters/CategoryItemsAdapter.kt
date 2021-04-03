@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:58 PM
+ * Last modified 4/3/21 9:02 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -45,6 +45,11 @@ class CategoryItemsAdapter(
         }
     }
 
+    fun resetSelection() {
+        _items.forEach { it.isSelected.value = false }
+        selectionTracker?.reset()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val textView: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_category, parent, false)
@@ -72,6 +77,9 @@ class CategoryItemsAdapter(
             selectionTracker?.attach(this)
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(colorCard, true))
+            item.isSelected.observe(context.getLifecycleOwner()!!) {
+                checkBox.isChecked = it
+            }
 
             name.text = categoryItems[adapterPosition].category.name
 
@@ -80,10 +88,8 @@ class CategoryItemsAdapter(
             } else {
                 checkBox.visibility = View.VISIBLE
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    item.isSelected = isChecked
+                    item.isSelected.value = isChecked
                 }
-
-                checkBox.isChecked = item.isSelected
             }
 
             if (item.category.color != null) {

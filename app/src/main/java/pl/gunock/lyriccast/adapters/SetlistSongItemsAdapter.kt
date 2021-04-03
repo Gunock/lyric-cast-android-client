@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 11:31 PM
+ * Last modified 4/3/21 7:46 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -57,9 +57,9 @@ class SetlistSongItemsAdapter(
     }
 
     fun duplicateSelectedItem() {
-        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected }
+        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected.value!! }
         val selectedItem = songItems[selectedItemIndex]
-        selectedItem.isSelected = false
+        selectedItem.isSelected.value = false
 
         songItems.add(selectedItemIndex + 1, selectedItem)
         notifyItemInserted(selectedItemIndex + 1)
@@ -72,7 +72,7 @@ class SetlistSongItemsAdapter(
     }
 
     private fun deleteSelectedItem(): Boolean {
-        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected }
+        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected.value!! }
         if (selectedItemIndex == -1) {
             return false
         }

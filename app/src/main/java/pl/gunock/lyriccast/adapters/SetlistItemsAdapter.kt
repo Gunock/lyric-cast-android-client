@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 10:51 PM
+ * Last modified 4/3/21 7:45 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -66,6 +66,11 @@ class SetlistItemsAdapter(
         notifyDataSetChanged()
     }
 
+    fun resetSelection() {
+        _visibleItems.forEach { it.isSelected.value = false }
+        selectionTracker?.reset()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val textView: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_setlist, parent, false)
@@ -92,6 +97,9 @@ class SetlistItemsAdapter(
             selectionTracker?.attach(this)
 
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+            item.isSelected.observe(context.getLifecycleOwner()!!) {
+                checkBox.isChecked = it
+            }
 
             nameTextView.text = item.setlist.name
         }
