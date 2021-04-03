@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 9:08 PM
+ * Last modified 4/4/21 12:25 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -173,6 +173,10 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupSongs(view: View) {
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
+        songsRecyclerView.setHasFixedSize(true)
+        songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        songsRecyclerView.adapter = songItemsAdapter
+
         val selectionTracker =
             SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
@@ -185,12 +189,6 @@ class SetlistEditorSongsFragment : Fragment() {
             showCheckBox = MutableLiveData(true),
             selectionTracker = selectionTracker
         )
-
-        with(songsRecyclerView) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = songItemsAdapter
-        }
 
         lyricCastViewModel.allSongs.observe(requireActivity()) { songs ->
             songItemsAdapter.submitCollection(songs ?: return@observe)

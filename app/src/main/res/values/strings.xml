@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/3/21 6:32 PM
+  ~ Last modified 4/4/21 12:28 AM
   -->
 
 <resources>
@@ -80,4 +80,9 @@
     <string name="previous">Previous</string>
     <string name="next_song">Next song</string>
     <string name="next">Next</string>
+    <string name="loading_file">Loading file …</string>
+    <string name="preparing_data">Preparing data …</string>
+    <string name="export_saving_json">Saving to temporary directory …</string>
+    <string name="export_saving_zip">Saving zip package …</string>
+    <string name="export_deleting_temp">Deleting temporary directory …</string>
 </resources>

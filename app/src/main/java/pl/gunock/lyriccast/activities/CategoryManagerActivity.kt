@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 9:00 PM
+ * Last modified 4/4/21 12:25 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -57,13 +57,9 @@ class CategoryManagerActivity : AppCompatActivity() {
                 categories.map { category -> category.name }.toSet()
         }
 
-
         categoryItemsRecyclerView = findViewById(R.id.rcv_categories)
-
-        with(categoryItemsRecyclerView) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(baseContext)
-        }
+        categoryItemsRecyclerView.setHasFixedSize(true)
+        categoryItemsRecyclerView.layoutManager = LinearLayoutManager(baseContext)
 
         setupCategories()
     }

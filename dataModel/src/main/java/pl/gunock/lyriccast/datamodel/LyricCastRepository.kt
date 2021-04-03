@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:38 AM
+ * Last modified 4/3/21 11:38 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -29,7 +29,7 @@ class LyricCastRepository(
     }
 
     val allSongs: Flow<List<SongAndCategory>> = songDao.getAllAsFlow()
-    val allSetlists: Flow<List<Setlist>> = setlistDao.getAll()
+    val allSetlists: Flow<List<Setlist>> = setlistDao.getAllAsFlow()
     val allCategories: Flow<List<Category>> = categoryDao.getAllAsFlow()
 
     @WorkerThread
@@ -43,6 +43,11 @@ class LyricCastRepository(
     @WorkerThread
     suspend fun getAllSongs(): List<Song> {
         return songDao.getAll()
+    }
+
+    @WorkerThread
+    internal suspend fun getAllSongsWithLyricsSections(): List<SongWithLyricsSections> {
+        return songDao.getAllWithLyricsSections()
     }
 
     @WorkerThread
@@ -144,6 +149,11 @@ class LyricCastRepository(
     @WorkerThread
     suspend fun getSongsWithLyrics(songs: Collection<Song>): List<SongWithLyricsSections> {
         return songDao.getAllWithLyrics(songs.map { song -> song.id })
+    }
+
+    @WorkerThread
+    internal suspend fun getAllSetlists(): List<SetlistWithSongs> {
+        return setlistDao.getAll()
     }
 
     @WorkerThread

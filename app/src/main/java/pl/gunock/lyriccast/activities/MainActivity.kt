@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:26 PM
+ * Last modified 4/4/21 12:28 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -26,8 +26,10 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.dataimport.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.dataimport.enums.SongXmlParserType
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
@@ -39,6 +41,7 @@ import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -111,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
 
                 val inputStream = contentResolver.openInputStream(uri) ?: return
-                val dialogFragment = ProgressDialogFragment("Loading file ...")
+                val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
                 dialogFragment.setStyle(
                     DialogFragment.STYLE_NORMAL,
                     R.style.Theme_LyricCast_Light_Dialog
@@ -140,12 +143,38 @@ class MainActivity : AppCompatActivity() {
                     dialogFragment.dismiss()
                 }
             }
-            // TODO: Reimplement export
             EXPORT_RESULT_CODE -> {
-//                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
-//                val intent = Intent(baseContext, MainActivity::class.java)
-//                startActivity(intent)
-//                finish()
+                val dialogFragment = ProgressDialogFragment(getString(R.string.preparing_data))
+                dialogFragment.setStyle(
+                    DialogFragment.STYLE_NORMAL,
+                    R.style.Theme_LyricCast_Light_Dialog
+                )
+                dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+
+                val message = dialogFragment.message
+                CoroutineScope(Dispatchers.IO).launch {
+                    val exportDir = File(filesDir.canonicalPath, ".export")
+                    exportDir.deleteRecursively()
+                    exportDir.mkdirs()
+
+                    val exportData = lyricCastViewModel.databaseToJson()
+
+                    message.postValue(getString(R.string.export_saving_json))
+                    val songsString = JSONArray(exportData.songsJson).toString()
+                    val categoriesString = JSONArray(exportData.categoriesJson).toString()
+                    val setlistsString = JSONArray(exportData.setlistsJson).toString()
+                    File(exportDir, "songs.json").writeText(songsString)
+                    File(exportDir, "categories.json").writeText(categoriesString)
+                    File(exportDir, "setlists.json").writeText(setlistsString)
+
+                    message.postValue(getString(R.string.export_saving_zip))
+                    @Suppress("BlockingMethodInNonBlockingContext")
+                    FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
+
+                    message.postValue(getString(R.string.export_deleting_temp))
+                    exportDir.deleteRecursively()
+                    dialogFragment.dismiss()
+                }
             }
         }
     }

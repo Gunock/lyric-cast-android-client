@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:32 PM
+ * Last modified 4/3/21 11:57 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import pl.gunock.lyriccast.dataimport.models.ImportSong
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
@@ -21,6 +22,7 @@ import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
+import pl.gunock.lyriccast.datamodel.models.ExportData
 import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 
 
@@ -36,16 +38,8 @@ class LyricCastViewModel(
     val allSetlists: LiveData<List<Setlist>> = repository.allSetlists.asLiveData()
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
 
-    suspend fun getAllSongs() =
-        repository.getAllSongs()
-
     suspend fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
         repository.upsertSong(song, order)
-
-    suspend fun upsertSongs(
-        songsWithLyricsSections: List<SongWithLyricsSections>,
-        orderMap: Map<String, List<Pair<String, Int>>>
-    ) = repository.upsertSongs(songsWithLyricsSections, orderMap)
 
     fun deleteSongs(songIds: List<Long>) =
         viewModelScope.launch { repository.deleteSongs(songIds) }
@@ -55,12 +49,6 @@ class LyricCastViewModel(
 
     fun deleteSetlists(setlistIds: List<Long>) =
         viewModelScope.launch { repository.deleteSetlists(setlistIds) }
-
-    suspend fun getAllCategories() =
-        repository.getAllCategories()
-
-    fun upsertCategories(categories: Collection<Category>) =
-        runBlocking { repository.upsertCategories(categories) }
 
     fun upsertCategory(category: Category) =
         runBlocking { repository.upsertCategory(category) }
@@ -74,10 +62,10 @@ class LyricCastViewModel(
         message: MutableLiveData<String>,
         options: ImportSongsOptions
     ) {
-        message.value = resources.getString(R.string.importing_categories)
+        message.postValue(resources.getString(R.string.importing_categories))
         var processedImportSongs = importSongs.toMutableSet()
         if (!options.deleteAll && !options.replaceOnConflict) {
-            getAllSongs().forEach { song ->
+            repository.getAllSongs().forEach { song ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     processedImportSongs.removeIf { it.title == song.title }
                 } else {
@@ -104,15 +92,15 @@ class LyricCastViewModel(
             repository.clear()
         }
 
-        val allCategories = getAllCategories()
+        val allCategories = repository.getAllCategories()
         if (!options.deleteAll && !options.replaceOnConflict) {
             allCategories.forEach { categoryMap.remove(it.name) }
         }
 
-        upsertCategories(categoryMap.values)
+        repository.upsertCategories(categoryMap.values)
 
-        message.value = resources.getString(R.string.importing_songs)
-        val categoryIdMap = getAllCategories()
+        message.postValue(resources.getString(R.string.importing_songs))
+        val categoryIdMap = repository.getAllCategories()
             .map { it.name to it.categoryId }
             .toMap()
 
@@ -136,10 +124,28 @@ class LyricCastViewModel(
                 return@map SongWithLyricsSections(song, lyricsSections)
             }
 
-        upsertSongs(songsWithLyricsSections, orderMap)
+        repository.upsertSongs(songsWithLyricsSections, orderMap)
 
-        message.value = "Finishing import ..."
+        message.postValue("Finishing import ...")
         Log.d(TAG, "Finished import")
+    }
+
+    suspend fun databaseToJson(): ExportData {
+        val categories: List<Category> = repository.getAllCategories()
+        val categoryMap: Map<Long?, String> = categories.map { it.categoryId to it.name }.toMap()
+
+        val songsJson: List<JSONObject> = repository.getAllSongsWithLyricsSections().map {
+            it.toJson()
+                .put("category", categoryMap[it.song.categoryId] ?: JSONObject.NULL)
+        }
+
+        val categoriesJson: List<JSONObject> = categories.map { it.toJson() }
+        val setlistsJson: List<JSONObject> = repository.getAllSetlists().map { it.toJson() }
+        return ExportData(
+            songsJson = songsJson,
+            categoriesJson = categoriesJson,
+            setlistsJson = setlistsJson
+        )
     }
 
 }
