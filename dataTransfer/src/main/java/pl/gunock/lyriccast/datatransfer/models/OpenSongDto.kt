@@ -1,14 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 6:21 PM
+ * Last modified 4/5/21 12:33 AM
  */
 
-package pl.gunock.lyriccast.dataimport.models
+package pl.gunock.lyriccast.datatransfer.models
 
 import java.util.*
 
-internal data class OpenSongImportSong(
+internal data class OpenSongDto(
     val title: String,
     val presentation: String,
     val lyrics: String

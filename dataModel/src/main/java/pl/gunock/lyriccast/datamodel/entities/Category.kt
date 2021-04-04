@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 1:02 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -9,8 +9,8 @@ package pl.gunock.lyriccast.datamodel.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
+import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 
 @Entity(indices = [Index(value = ["name"], unique = true)])
 data class Category(
@@ -26,17 +26,14 @@ data class Category(
 
     val id: Long get() = categoryId.toNonNullable()
 
-    constructor(json: JSONObject) : this(null, json.getString("name"), json.optInt("color"))
+    constructor(categoryDto: CategoryDto) : this(null, categoryDto.name, categoryDto.color)
 
     override fun compareTo(other: Category): Int {
         return name.compareTo(other.name)
     }
 
-    fun toJson(): JSONObject {
-        return JSONObject().apply {
-            put("name", name)
-            put("color", color ?: JSONObject.NULL)
-        }
+    fun toDto(): CategoryDto {
+        return CategoryDto(name, color)
     }
 
 }

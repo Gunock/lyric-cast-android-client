@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 1:59 AM
+ * Last modified 4/5/21 12:54 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -13,16 +13,15 @@ import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
-import pl.gunock.lyriccast.dataimport.models.ImportSong
 import pl.gunock.lyriccast.datamodel.entities.*
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
-import pl.gunock.lyriccast.datamodel.extensions.getStringList
-import pl.gunock.lyriccast.datamodel.extensions.toStringMap
-import pl.gunock.lyriccast.datamodel.models.DatabaseData
-import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
+import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
+import pl.gunock.lyriccast.datamodel.models.ImportOptions
+import pl.gunock.lyriccast.datatransfer.models.CategoryDto
+import pl.gunock.lyriccast.datatransfer.models.SetlistDto
+import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 
 class LyricCastViewModel(
@@ -57,9 +56,9 @@ class LyricCastViewModel(
 
 
     suspend fun importSongs(
-        data: DatabaseData,
+        data: DatabaseTransferData,
         message: MutableLiveData<String>,
-        options: ImportSongsOptions
+        options: ImportOptions
     ) {
         if (options.deleteAll) {
             repository.clear()
@@ -67,174 +66,123 @@ class LyricCastViewModel(
 
         val removeConflicts = !options.deleteAll && !options.replaceOnConflict
 
-        message.postValue(resources.getString(R.string.importing_categories))
-        var categories = data.categoriesJson.map { Category(it) }.toMutableList()
+        if (data.categoryDtos != null) {
+            message.postValue(resources.getString(R.string.importing_categories))
+            var categories = data.categoryDtos.map { Category(it) }.toMutableList()
 
-        if (removeConflicts) {
-            for (category in repository.getAllCategories()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    categories.removeIf { it.name == category.name }
-                } else {
-                    categories = categories.filter { it.name != category.name }
-                        .toMutableList()
+            if (removeConflicts) {
+                for (category in repository.getAllCategories()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        categories.removeIf { it.name == category.name }
+                    } else {
+                        categories = categories.filter { it.name != category.name }
+                            .toMutableList()
+                    }
                 }
             }
+
+            repository.upsertCategories(categories)
         }
 
-        repository.upsertCategories(categories)
+        if (data.songDtos != null) {
+            message.postValue(resources.getString(R.string.importing_songs))
 
-        message.postValue(resources.getString(R.string.importing_songs))
+            val categoryMap: Map<String, Category> = repository.getAllCategories()
+                .map { it.name to it }
+                .toMap()
 
-        val categoryMap: Map<String, Category> = repository.getAllCategories()
-            .map { it.name to it }
-            .toMap()
+            val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
+            val songsWithLyricsSections: List<SongWithLyricsSections> = data.songDtos
+                .map { songDto ->
+                    val song = Song(songDto, categoryMap[songDto.category]?.categoryId)
+                    val lyricsSections: List<LyricsSection> = songDto.lyrics
+                        .map { LyricsSection(songId = -1, name = it.key, text = it.value) }
 
-        val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
-        val songsWithLyricsSections: List<SongWithLyricsSections> = data.songsJson
-            .map { json ->
-                val song = Song(json, categoryMap[json.getString("category")]?.categoryId)
-                val lyricsSections: List<LyricsSection> = json.getJSONObject("lyrics")
-                    .toStringMap()
-                    .map { LyricsSection(songId = -1, name = it.key, text = it.value) }
+                    val order: List<Pair<String, Int>> = songDto.presentation
+                        .mapIndexed { index, sectionName -> sectionName to index }
 
-                val order: List<Pair<String, Int>> = json.getStringList("presentation")
-                    .mapIndexed { index, sectionName -> sectionName to index }
+                    orderMap[song.title] = order
+                    return@map SongWithLyricsSections(song, lyricsSections)
+                }
 
-                orderMap[song.title] = order
-                return@map SongWithLyricsSections(song, lyricsSections)
-            }
+            repository.upsertSongs(songsWithLyricsSections, orderMap)
+        }
 
-        repository.upsertSongs(songsWithLyricsSections, orderMap)
+        if (data.setlistDtos != null) {
+            message.postValue(resources.getString(R.string.importing_setlists))
 
-        message.postValue(resources.getString(R.string.importing_setlists))
+            val songTitleMap: Map<String, Song> = repository.getAllSongs()
+                .map { it.title to it }
+                .toMap()
 
-        val songTitleMap: Map<String, Song> = repository.getAllSongs()
-            .map { it.title to it }
-            .toMap()
+            var setlists: MutableList<Setlist> = data.setlistDtos
+                .map { Setlist(it) }
+                .toMutableList()
 
-        var setlists: MutableList<Setlist> = data.setlistsJson
-            .map { json -> Setlist(json) }
-            .toMutableList()
-
-        if (removeConflicts) {
-            for (setlistWithSongs in repository.getAllSetlists()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    setlists.removeIf { it.name == setlistWithSongs.setlist.name }
-                } else {
-                    setlists = setlists.filter { it.name != setlistWithSongs.setlist.name }
-                        .toMutableList()
+            if (removeConflicts) {
+                for (setlistWithSongs in repository.getAllSetlists()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        setlists.removeIf { it.name == setlistWithSongs.setlist.name }
+                    } else {
+                        setlists = setlists.filter { it.name != setlistWithSongs.setlist.name }
+                            .toMutableList()
+                    }
                 }
             }
+
+            val setlistNames = setlists.map { it.name }.toHashSet()
+            val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
+                data.setlistDtos
+                    .filter { it.name in setlistNames }
+                    .map { setlistDto ->
+                        val songList = setlistDto.songs
+
+                        val setlistSongCrossRefs: List<SetlistSongCrossRef> =
+                            songList.mapIndexed { index, songTitle ->
+                                SetlistSongCrossRef(null, -1, songTitleMap[songTitle]!!.id, index)
+                            }
+                        return@map setlistDto.name to setlistSongCrossRefs
+                    }.toMap()
+
+            repository.upsertSetlists(setlists, setlistCrossRefMap)
         }
-
-        val setlistNames = setlists.map { it.name }.toHashSet()
-        val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
-            data.setlistsJson
-                .filter { it.getString("name") in setlistNames }
-                .map { json ->
-                    val songList = json.getStringList("songs")
-
-                    val setlistSongCrossRefs: List<SetlistSongCrossRef> =
-                        songList.mapIndexed { index, songTitle ->
-                            SetlistSongCrossRef(null, -1, songTitleMap[songTitle]!!.id, index)
-                        }
-                    return@map json.getString("name") to setlistSongCrossRefs
-                }.toMap()
-
-        repository.upsertSetlists(setlists, setlistCrossRefMap)
 
         message.postValue(resources.getString(R.string.finishing_import))
         Log.d(TAG, "Finished import")
     }
 
     suspend fun importSongs(
-        importSongSet: Set<ImportSong>,
+        songDtoSet: Set<SongDto>,
         message: MutableLiveData<String>,
-        options: ImportSongsOptions
+        options: ImportOptions
     ) {
-        message.postValue(resources.getString(R.string.importing_categories))
-        var processedImportSongs = importSongSet.toMutableSet()
-        if (!options.deleteAll && !options.replaceOnConflict) {
-            for (song in repository.getAllSongs()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    processedImportSongs.removeIf { it.title == song.title }
-                } else {
-                    processedImportSongs = processedImportSongs
-                        .filter { it.title != song.title }
-                        .toMutableSet()
-                }
-            }
-        }
-
-        val categoryMap: MutableMap<String, Category> =
-            processedImportSongs.map { importSong -> importSong.category }
-                .distinct()
-                .mapIndexed { index, categoryName ->
-                    categoryName to Category(
-                        name = categoryName.take(30),
-                        color = options.colors[index % options.colors.size]
-                    )
-                }.toMap()
-                .toMutableMap()
-        categoryMap.remove("")
-
-        if (options.deleteAll) {
-            repository.clear()
-        }
-
-        val allCategories = repository.getAllCategories()
-        if (!options.deleteAll && !options.replaceOnConflict) {
-            allCategories.forEach { categoryMap.remove(it.name) }
-        }
-
-        repository.upsertCategories(categoryMap.values)
-
-        message.postValue(resources.getString(R.string.importing_songs))
-        val categoryIdMap = repository.getAllCategories()
-            .map { it.name to it.categoryId }
-            .toMap()
-
-        val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
-        val songsWithLyricsSections: List<SongWithLyricsSections> =
-            processedImportSongs.map { importSong ->
-                val song =
-                    Song(title = importSong.title, categoryId = categoryIdMap[importSong.category])
-                val lyricsSections: List<LyricsSection> =
-                    importSong.lyrics.map {
-                        LyricsSection(
-                            songId = -1,
-                            name = it.key,
-                            text = it.value
-                        )
-                    }
-                val order: List<Pair<String, Int>> = importSong.presentation
-                    .mapIndexed { index, sectionName -> sectionName to index }
-
-                orderMap[song.title] = order
-                return@map SongWithLyricsSections(song, lyricsSections)
+        val categoryDtos: List<CategoryDto> = songDtoSet.map { songDto -> songDto.category }
+            .distinct()
+            .mapIndexed { index, categoryName ->
+                CategoryDto(
+                    name = categoryName.take(30),
+                    color = options.colors[index % options.colors.size]
+                )
             }
 
-        repository.upsertSongs(songsWithLyricsSections, orderMap)
-
-        message.postValue(resources.getString(R.string.finishing_import))
-        Log.d(TAG, "Finished import")
+        val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
+        importSongs(data, message, options)
     }
 
-    suspend fun databaseToJson(): DatabaseData {
+    suspend fun getDatabaseTransferData(): DatabaseTransferData {
         val categories: List<Category> = repository.getAllCategories()
         val categoryMap: Map<Long?, String> = categories.map { it.categoryId to it.name }.toMap()
 
-        val songsJson: List<JSONObject> = repository.getAllSongsWithLyricsSections().map {
-            it.toJson()
-                .put("category", categoryMap[it.song.categoryId] ?: JSONObject.NULL)
+        val songDtos: List<SongDto> = repository.getAllSongsWithLyricsSections().map {
+            it.toDto(categoryMap[it.song.categoryId])
         }
 
-        val categoriesJson: List<JSONObject> = categories.map { it.toJson() }
-        val setlistsJson: List<JSONObject> = repository.getAllSetlists().map { it.toJson() }
-        return DatabaseData(
-            songsJson = songsJson,
-            categoriesJson = categoriesJson,
-            setlistsJson = setlistsJson
+        val categoryDtos: List<CategoryDto> = categories.map { it.toDto() }
+        val setlistDtos: List<SetlistDto> = repository.getAllSetlists().map { it.toDto() }
+        return DatabaseTransferData(
+            songDtos = songDtos,
+            categoryDtos = categoryDtos,
+            setlistDtos = setlistDtos
         )
     }
 

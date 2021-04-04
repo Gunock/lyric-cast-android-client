@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:12 AM
+ * Last modified 4/5/21 1:02 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities.relations
@@ -11,10 +11,10 @@ import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
-import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 
 data class SetlistWithSongs(
     @Embedded val setlist: Setlist,
@@ -46,15 +46,12 @@ data class SetlistWithSongs(
         return 0
     }
 
-    fun toJson(): JSONObject {
+    fun toDto(): SetlistDto {
         val songMap = songs.map { it.songId to it.title }.toMap()
 
         val songs: List<String> = setlistSongCrossRefs.sorted().map { songMap[it.songId]!! }
 
-        return JSONObject().apply {
-            put("name", setlist.name)
-            put("songs", JSONObject.wrap(songs))
-        }
+        return SetlistDto(setlist.name, songs)
     }
 
     companion object CREATOR : Parcelable.Creator<SetlistWithSongs> {

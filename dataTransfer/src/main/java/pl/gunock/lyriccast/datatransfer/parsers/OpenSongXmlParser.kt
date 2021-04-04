@@ -1,30 +1,30 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 5:35 PM
+ * Last modified 4/5/21 1:02 AM
  */
 
-package pl.gunock.lyriccast.dataimport.parsers
+package pl.gunock.lyriccast.datatransfer.parsers
 
 import android.content.ContentResolver
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
 import pl.gunock.lyriccast.common.helpers.FileHelper
-import pl.gunock.lyriccast.dataimport.models.ImportSong
-import pl.gunock.lyriccast.dataimport.models.OpenSongImportSong
+import pl.gunock.lyriccast.datatransfer.models.OpenSongDto
+import pl.gunock.lyriccast.datatransfer.models.SongDto
 import java.io.File
 import java.io.InputStream
 import java.util.*
 
 internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir) {
 
-    override fun parseZip(resolver: ContentResolver, inputStream: InputStream): Set<ImportSong> {
+    override fun parseZip(resolver: ContentResolver, inputStream: InputStream): Set<SongDto> {
         importDirectory.deleteRecursively()
         importDirectory.mkdirs()
         FileHelper.unzip(resolver, inputStream, importDirectory.canonicalPath)
 
         val fileList1 = importDirectory.listFiles() ?: arrayOf()
-        val result: MutableSet<ImportSong> = mutableSetOf()
+        val result: MutableSet<SongDto> = mutableSetOf()
         for (file1 in fileList1) {
             if (!file1.isDirectory) {
                 result.add(parse(file1.inputStream()))
@@ -47,7 +47,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
         return result
     }
 
-    override fun parse(inputStream: InputStream?, category: String): ImportSong {
+    override fun parse(inputStream: InputStream?, category: String): SongDto {
         val parser: XmlPullParser = Xml.newPullParser()
         parser.setInput(inputStream, null)
         parser.nextTag()
@@ -61,7 +61,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
             song.lyricsMap.keys.toList()
         }
 
-        return ImportSong(
+        return SongDto(
             title = song.title,
             presentation = presentationList,
             lyrics = song.lyricsMap,
@@ -69,7 +69,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
         )
     }
 
-    private fun readSong(parser: XmlPullParser): OpenSongImportSong {
+    private fun readSong(parser: XmlPullParser): OpenSongDto {
         var title = ""
         var presentation = ""
         var lyrics = ""
@@ -84,7 +84,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
                 else -> skip(parser)
             }
         }
-        return OpenSongImportSong(title, presentation, lyrics)
+        return OpenSongDto(title, presentation, lyrics)
     }
 
     private fun readTag(parser: XmlPullParser, tag: String): String {

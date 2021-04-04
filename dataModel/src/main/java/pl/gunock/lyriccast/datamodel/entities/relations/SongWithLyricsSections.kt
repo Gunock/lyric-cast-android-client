@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:28 AM
+ * Last modified 4/5/21 1:02 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.SongLyricsSectionCrossRef
+import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 data class SongWithLyricsSections(
     @Embedded val song: Song,
@@ -40,18 +40,15 @@ data class SongWithLyricsSections(
             .toMap()
     }
 
-    fun toJson(): JSONObject {
+    fun toDto(category: String?): SongDto {
         val lyricsMap = lyricsSections.map { it.name to it.text }.toMap()
 
         val lyricsSectionNameMap = lyricsSectionsToNameMap()
         val presentation = songLyricsSectionCrossRefs?.sorted()
             ?.map { lyricsSectionNameMap[it.lyricsSectionId]!! }
+            ?: listOf()
 
-        return JSONObject().apply {
-            put("title", song.title)
-            put("lyrics", JSONObject.wrap(lyricsMap))
-            put("presentation", JSONObject.wrap(presentation))
-        }
+        return SongDto(song.title, lyricsMap, presentation, category ?: "")
     }
 
 }
