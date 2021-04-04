@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 1:28 AM
+ * Last modified 4/5/21 1:02 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -11,8 +11,8 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
+import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 
 @Entity(indices = [Index(value = ["name"], unique = true)])
 data class Setlist(
@@ -22,7 +22,7 @@ data class Setlist(
 ) : Parcelable {
     val id: Long get() = setlistId.toNonNullable()
 
-    constructor(json: JSONObject) : this(null, json.getString("name"))
+    constructor(setlistDto: SetlistDto) : this(null, setlistDto.name)
 
     constructor(parcel: Parcel) : this(
         parcel.readValue(Long::class.java.classLoader) as? Long,

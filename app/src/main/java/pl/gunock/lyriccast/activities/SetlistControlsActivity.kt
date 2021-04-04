@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:50 PM
+ * Last modified 4/5/21 1:00 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -191,15 +191,20 @@ class SetlistControlsActivity : AppCompatActivity() {
                 it.key <= currentLyricsPosition
             }.value
 
-            val previousSongTitle: String = songTitles.entries.lastOrNull {
-                it.key < currentLyricsPosition && it.value != currentSongTitle
-            }?.value ?: return@setOnClickListener
+            if (songTitles.values.toList()[0] == currentSongTitle) {
+                currentLyricsPosition = 0
+            } else {
 
-            val previousSongStartIndex: Int = songTitles.entries.first {
-                it.value == previousSongTitle
-            }.key
+                val previousSongTitle: String = songTitles.entries.lastOrNull {
+                    it.key < currentLyricsPosition && it.value != currentSongTitle
+                }?.value ?: return@setOnClickListener
 
-            currentLyricsPosition = previousSongStartIndex
+                val previousSongStartIndex: Int = songTitles.entries.first {
+                    it.value == previousSongTitle
+                }.key
+                currentLyricsPosition = previousSongStartIndex
+            }
+
             sendSlide()
         }
 

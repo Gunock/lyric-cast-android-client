@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:50 PM
+ * Last modified 4/5/21 1:02 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -32,15 +32,18 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
-import pl.gunock.lyriccast.dataimport.ImportSongXmlParserFactory
-import pl.gunock.lyriccast.dataimport.enums.ImportFormat
-import pl.gunock.lyriccast.dataimport.enums.SongXmlParserType
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.extensions.toJSONObjectList
-import pl.gunock.lyriccast.datamodel.models.DatabaseData
-import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
+import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
+import pl.gunock.lyriccast.datamodel.models.ImportOptions
+import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
+import pl.gunock.lyriccast.datatransfer.enums.SongXmlParserType
+import pl.gunock.lyriccast.datatransfer.factories.ImportSongXmlParserFactory
+import pl.gunock.lyriccast.datatransfer.models.CategoryDto
+import pl.gunock.lyriccast.datatransfer.models.SetlistDto
+import pl.gunock.lyriccast.datatransfer.models.SongDto
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
@@ -120,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                     importLyricCast(uri)
                 }
             }
-            EXPORT_RESULT_CODE -> export(uri)
+            EXPORT_RESULT_CODE -> exportAll(uri)
         }
     }
 
@@ -181,7 +184,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun export(uri: Uri) {
+    private fun exportAll(uri: Uri) {
         val dialogFragment = ProgressDialogFragment(getString(R.string.preparing_data))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
@@ -195,12 +198,13 @@ class MainActivity : AppCompatActivity() {
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val exportData = lyricCastViewModel.databaseToJson()
+            val exportData = lyricCastViewModel.getDatabaseTransferData()
 
             message.postValue(getString(R.string.export_saving_json))
-            val songsString = JSONArray(exportData.songsJson).toString()
-            val categoriesString = JSONArray(exportData.categoriesJson).toString()
-            val setlistsString = JSONArray(exportData.setlistsJson).toString()
+            val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
+            val categoriesString =
+                JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
+            val setlistsString = JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
             File(exportDir, "songs.json").writeText(songsString)
             File(exportDir, "categories.json").writeText(categoriesString)
             File(exportDir, "setlists.json").writeText(setlistsString)
@@ -228,7 +232,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-
     private fun importLyricCast(uri: Uri) {
         val inputStream = contentResolver.openInputStream(uri) ?: return
         val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
@@ -249,22 +252,22 @@ class MainActivity : AppCompatActivity() {
             val songsJson = JSONArray(File(importDir, "songs.json").readText())
             val categoriesJson = JSONArray(File(importDir, "categories.json").readText())
             val setlistsJson = JSONArray(File(importDir, "setlists.json").readText())
-            val importData = DatabaseData(
-                songsJson = songsJson.toJSONObjectList(),
-                categoriesJson = categoriesJson.toJSONObjectList(),
-                setlistsJson = setlistsJson.toJSONObjectList()
+            val transferData = DatabaseTransferData(
+                songDtos = songsJson.toJSONObjectList().map { SongDto(it) },
+                categoryDtos = categoriesJson.toJSONObjectList().map { CategoryDto(it) },
+                setlistDtos = setlistsJson.toJSONObjectList().map { SetlistDto(it) }
             )
 
-            val importSongsOptions = ImportSongsOptions(
+            val importOptions = ImportOptions(
                 importDialogViewModel.importFormat,
                 importDialogViewModel.deleteAll,
                 importDialogViewModel.replaceOnConflict
             )
 
             lyricCastViewModel.importSongs(
-                importData,
+                transferData,
                 dialogFragment.message,
-                importSongsOptions
+                importOptions
             )
 
             importDir.deleteRecursively()
@@ -289,7 +292,7 @@ class MainActivity : AppCompatActivity() {
             inputStream.close()
 
             val colors: IntArray = resources.getIntArray(R.array.category_color_values)
-            val importSongsOptions = ImportSongsOptions(
+            val importOptions = ImportOptions(
                 importDialogViewModel.importFormat,
                 importDialogViewModel.deleteAll,
                 importDialogViewModel.replaceOnConflict,
@@ -298,7 +301,7 @@ class MainActivity : AppCompatActivity() {
             lyricCastViewModel.importSongs(
                 importedSongs,
                 dialogFragment.message,
-                importSongsOptions
+                importOptions
             )
             dialogFragment.dismiss()
         }
