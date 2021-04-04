@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:50 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -310,6 +310,6 @@ class SongsFragment : Fragment() {
     }
 
     private fun getSelectedCategoryId(): Long {
-        return ((categorySpinner.selectedItem ?: Category.ALL_CATEGORY) as Category).id
+        return ((categorySpinner.selectedItem ?: Category.ALL) as Category).id
     }
 }

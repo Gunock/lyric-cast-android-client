@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 10:35 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -42,7 +42,7 @@ class SetlistSongItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind()
+        holder.bind(position)
     }
 
     override fun getItemId(position: Int): Long {
@@ -84,15 +84,15 @@ class SetlistSongItemsAdapter(
     inner class ViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
         private val handleView: View = itemView.findViewById(R.id.imv_handle)
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
 
-        fun bind() {
+        fun bind(position: Int) {
             selectionTracker?.attach(this)
             setupListeners()
 
-            val item = songItems[adapterPosition]
+            val item = songItems[position]
             item.isSelected.observe(context.getLifecycleOwner()!!) {
                 checkBox.isChecked = it
             }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 9:02 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -58,8 +58,7 @@ class CategoryItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = categoryItems[position]
-        holder.bind(item)
+        holder.bind(position)
     }
 
     override fun getItemId(position: Int): Long {
@@ -69,11 +68,12 @@ class CategoryItemsAdapter(
     override fun getItemCount() = _items.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
         private val name: TextView = itemView.findViewById(R.id.tv_category_name)
         private val colorCard: CardView = itemView.findViewById(R.id.cdv_category_color)
 
-        fun bind(item: CategoryItem) {
+        fun bind(position: Int) {
+            val item: CategoryItem = categoryItems[position]
             selectionTracker?.attach(this)
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(colorCard, true))

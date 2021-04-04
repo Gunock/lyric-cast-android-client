@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 7:45 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -79,7 +79,7 @@ class SetlistItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind()
+        holder.bind(position)
     }
 
     override fun getItemId(position: Int): Long {
@@ -89,11 +89,11 @@ class SetlistItemsAdapter(
     override fun getItemCount() = _visibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
         private val nameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
 
-        fun bind() {
-            val item = _visibleItems.toList()[adapterPosition]
+        fun bind(position: Int) {
+            val item = _visibleItems.toList()[position]
             selectionTracker?.attach(this)
 
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))

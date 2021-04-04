@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 9:04 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -42,9 +42,7 @@ class ControlsSongItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = songItems[position]
-
-        holder.bind(item)
+        holder.bind(position)
     }
 
     override fun getItemCount() = songItems.size
@@ -58,7 +56,8 @@ class ControlsSongItemsAdapter(
         private val defaultFontColor = titleTextView.currentTextColor
         private var currentCardColor = defaultBackgroundColor
 
-        fun bind(item: SongItem) {
+        fun bind(position: Int) {
+            val item: SongItem = songItems[position]
             val titleText = itemView.context.resources.getString(
                 R.string.item_song_item_title_template,
                 adapterPosition + 1,

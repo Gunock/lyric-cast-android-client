@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:26 PM
+ * Last modified 4/5/21 12:07 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -132,7 +132,7 @@ class SongEditorActivity : AppCompatActivity() {
         categorySpinner.adapter = categorySpinnerAdapter
 
         lyricCastViewModel.allCategories.observe(this) { categories ->
-            categorySpinnerAdapter.submitCollection(categories)
+            categorySpinnerAdapter.submitCollection(categories, Category.NONE)
 
             if (intentSong != null) {
                 val categoryIndex = (categorySpinner.adapter as CategorySpinnerAdapter).categories
