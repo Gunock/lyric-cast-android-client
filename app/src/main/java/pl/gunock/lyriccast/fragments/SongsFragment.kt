@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 10:41 PM
+ * Last modified 4/4/21 1:53 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -225,7 +225,7 @@ class SongsFragment : Fragment() {
                 if (songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = false
                 }
-                showMenuActions(showDelete = false, showEdit = false)
+                showMenuActions(showDelete = false, showEdit = false, showAddSetlist = false)
             }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
@@ -258,7 +258,7 @@ class SongsFragment : Fragment() {
 
         val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
             .mapIndexed { index, item ->
-                SetlistSongCrossRef(setlist.id, item.song.id, index)
+                SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
 
         val setlistWithSongs = SetlistWithSongs(setlist, songs, crossRef)

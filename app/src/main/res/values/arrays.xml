@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/1/21 9:16 PM
+  ~ Last modified 4/4/21 12:30 AM
   -->
 
 <resources>
@@ -24,6 +24,7 @@
     <!-- Import/Export -->
     <string-array name="import_formats">
         <item>OpenSong</item>
+        <item>LyricCast</item>
     </string-array>
 
     <!-- Category colors -->

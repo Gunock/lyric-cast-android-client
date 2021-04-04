@@ -1,14 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 3:39 PM
+ * Last modified 4/4/21 12:30 AM
  */
 
 package pl.gunock.lyriccast.dataimport.enums
 
 enum class ImportFormat(private val textName: String) {
     NONE("NONE"),
-    OPEN_SONG("OpenSong");
+    OPEN_SONG("OpenSong"),
+    LYRIC_CAST("LyricCast");
 
     companion object {
         fun getByName(name: String): ImportFormat {

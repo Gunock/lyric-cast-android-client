@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:25 AM
+ * Last modified 4/4/21 2:00 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -119,7 +119,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
                 val setlist = args.setlistWithSongs.setlist
                 addedSongs.forEachIndexed { index, song ->
-                    val setlistSongCrossRef = SetlistSongCrossRef(setlist.id, song.id, index)
+                    val setlistSongCrossRef = SetlistSongCrossRef(null, setlist.id, song.id, index)
                     setlistSongCrossRefs.add(setlistSongCrossRef)
                 }
 
@@ -178,7 +178,7 @@ class SetlistEditorSongsFragment : Fragment() {
         songsRecyclerView.adapter = songItemsAdapter
 
         val selectionTracker =
-            SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
+            SelectionTracker(songsRecyclerView) { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
                 selectSong(item)
                 return@SelectionTracker true

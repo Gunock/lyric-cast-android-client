@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 11:38 PM
+ * Last modified 4/4/21 1:58 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -161,6 +161,26 @@ class LyricCastRepository(
         return setlistDao.getWithSongs(setlistId)
     }
 
+    internal suspend fun upsertSetlists(
+        setlists: List<Setlist>,
+        setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>>
+    ) {
+        setlistDao.upsert(setlists)
+
+        val setlistNames = setlists.map { it.name }.toHashSet()
+        val setlistIdMap: Map<String, Long> = setlistDao.getAll()
+            .filter { it.setlist.name in setlistNames }
+            .map { it.setlist.name to it.setlist.id }
+            .toMap()
+
+        val setlistCrossRefs = setlistCrossRefMap.flatMap { entry ->
+            val setlistId: Long = setlistIdMap[entry.key]!!
+            return@flatMap entry.value.map { SetlistSongCrossRef(setlistId, it) }
+        }
+
+        setlistDao.upsertSongsCrossRefs(setlistCrossRefs)
+    }
+
     @WorkerThread
     internal suspend fun upsertSetlist(setlistWithSongs: SetlistWithSongs) {
         if (setlistWithSongs.setlist.name.isBlank()) {
@@ -172,17 +192,12 @@ class LyricCastRepository(
         }
 
         val setlist = setlistWithSongs.setlist
-        try {
-            val setlistId = setlistDao.upsert(setlist)
+        val setlistId = setlistDao.upsert(setlist)
 
-            val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
-                .map { SetlistSongCrossRef(setlistId, it) }
+        val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
+            .map { SetlistSongCrossRef(setlistId, it) }
 
-            setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
-        } catch (e: Exception) {
-            setlistDao.delete(listOf(setlist.id))
-            throw e
-        }
+        setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
     }
 
     @WorkerThread

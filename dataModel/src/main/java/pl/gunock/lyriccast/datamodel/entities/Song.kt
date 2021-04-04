@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 2:24 AM
+ * Last modified 4/4/21 1:21 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -12,6 +12,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
 
 @Entity(indices = [Index(value = ["title"], unique = true)])
@@ -28,6 +29,12 @@ data class Song(
     var categoryId: Long? = null
 ) : Parcelable {
     val id: Long get() = songId.toNonNullable()
+
+    constructor(json: JSONObject, categoryId: Long?) : this(
+        null,
+        json.getString("title"),
+        categoryId
+    )
 
     constructor(parcel: Parcel) : this(
         parcel.readValue(Long::class.java.classLoader) as? Long,

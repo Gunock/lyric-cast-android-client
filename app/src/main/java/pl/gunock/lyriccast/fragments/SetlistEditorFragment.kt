@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 10:29 PM
+ * Last modified 4/4/21 1:35 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -237,7 +237,7 @@ class SetlistEditorFragment : Fragment() {
 
         val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
             .mapIndexed { index, item ->
-                SetlistSongCrossRef(setlist.id, item.song.id, index)
+                SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
 
         return SetlistWithSongs(setlist, songs, crossRef)

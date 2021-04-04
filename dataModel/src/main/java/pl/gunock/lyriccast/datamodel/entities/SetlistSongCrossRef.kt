@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 2:24 AM
+ * Last modified 4/4/21 1:32 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -18,6 +18,8 @@ import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
     indices = [Index(value = ["setlistId"]), Index(value = ["songId"])]
 )
 data class SetlistSongCrossRef(
+    @PrimaryKey(autoGenerate = true)
+    val setlistSongCrossRefId: Long? = null,
     @ForeignKey(
         entity = Setlist::class,
         parentColumns = ["setlistId"],
@@ -32,24 +34,22 @@ data class SetlistSongCrossRef(
         onDelete = ForeignKey.CASCADE
     )
     val songId: Long,
-    val order: Int,
-    @PrimaryKey(autoGenerate = true)
-    val setlistSongCrossRefId: Long? = null
+    val order: Int
 ) : Parcelable, Comparable<SetlistSongCrossRef> {
     val id: Long get() = setlistSongCrossRefId.toNonNullable()
 
     constructor(parcel: Parcel) : this(
+        parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readLong(),
         parcel.readLong(),
-        parcel.readInt(),
-        parcel.readValue(Long::class.java.classLoader) as? Long
+        parcel.readInt()
     )
 
     constructor(setlistId: Long, setlistSongCrossRef: SetlistSongCrossRef) : this(
+        setlistSongCrossRef.setlistSongCrossRefId,
         setlistId,
         setlistSongCrossRef.songId,
-        setlistSongCrossRef.order,
-        setlistSongCrossRef.setlistSongCrossRefId
+        setlistSongCrossRef.order
     )
 
 
