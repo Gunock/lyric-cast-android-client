@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 1:53 AM
+ * Last modified 4/4/21 11:50 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -212,6 +212,8 @@ class SongsFragment : Fragment() {
             .sorted()
             .map { lyricsTextMap[it.lyricsSectionId]!! }
 
+        resetSelection()
+
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
         intent.putExtra("lyrics", lyrics.toTypedArray())
         startActivity(intent)
@@ -289,6 +291,7 @@ class SongsFragment : Fragment() {
             songItemsAdapter.showCheckBox.value = false
         }
 
+        selectionTracker.reset()
         showMenuActions(showDelete = false, showEdit = false, showAddSetlist = false)
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:35 AM
+ * Last modified 4/4/21 11:50 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,12 +14,13 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
@@ -81,11 +82,11 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_controls, menu)
 
-        CastButtonFactory.setUpMediaRouteButton(
-            baseContext,
-            menu,
-            R.id.menu_cast
-        )
+        val castActionProvider =
+            MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
+        if (castContext != null) {
+            castActionProvider.routeSelector = castContext!!.mergedSelector
+        }
 
         return true
     }
@@ -133,12 +134,10 @@ class SongControlsActivity : AppCompatActivity() {
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
-        val fontSize = prefs.getString("fontSize", "40")
         val backgroundColor = prefs.getString("backgroundColor", "Black")
         val fontColor = prefs.getString("fontColor", "White")
 
         val configurationJson = JSONObject().apply {
-            put("fontSize", "${fontSize}px")
             put("backgroundColor", backgroundColor)
             put("fontColor", fontColor)
         }

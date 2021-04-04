@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 2:00 AM
+ * Last modified 4/4/21 11:50 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,11 +16,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.dataimport.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.dataimport.enums.ImportFormat
@@ -43,7 +44,6 @@ import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
-import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import java.io.File
 
@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MessageHelper.initialize(applicationContext)
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
@@ -83,11 +82,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        CastButtonFactory.setUpMediaRouteButton(
-            baseContext,
-            menu,
-            R.id.menu_cast
-        )
+        val castActionProvider =
+            MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
+        if (castContext != null) {
+            castActionProvider.routeSelector = castContext!!.mergedSelector
+        }
 
         return true
     }

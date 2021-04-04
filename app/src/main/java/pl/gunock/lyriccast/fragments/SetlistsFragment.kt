@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 10:32 PM
+ * Last modified 4/4/21 8:22 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -207,7 +207,7 @@ class SetlistsFragment : Fragment() {
             .map { item -> item.setlist.id }
 
         lyricCastViewModel.deleteSetlists(selectedSetlists)
-        selectionTracker.reset()
+        resetSelection()
 
         return true
     }
@@ -226,6 +226,7 @@ class SetlistsFragment : Fragment() {
             setlistItemsAdapter.showCheckBox.value = false
         }
 
+        selectionTracker.reset()
         showMenuActions(showDelete = false, showEdit = false)
     }
 

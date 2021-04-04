@@ -1,12 +1,12 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/3/21 11:07 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/3/21 11:03 PM
+ * Last modified 4/4/21 11:25 PM
  */
 
 package pl.gunock.lyriccast.helpers
 
-import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
@@ -21,11 +21,11 @@ object MessageHelper {
     private var CONTENT_MESSAGE_TEMPLATE: String = ""
     private var CONTROL_MESSAGE_TEMPLATE: String = ""
 
-    fun initialize(context: Context) {
-        CONTENT_NAMESPACE = context.getString(R.string.chromecast_content_namespace)
-        CONTROL_NAMESPACE = context.getString(R.string.chromecast_control_namespace)
-        CONTENT_MESSAGE_TEMPLATE = context.getString(R.string.chromecast_content_message_template)
-        CONTROL_MESSAGE_TEMPLATE = context.getString(R.string.chromecast_control_message_template)
+    fun initialize(resources: Resources) {
+        CONTENT_NAMESPACE = resources.getString(R.string.chromecast_content_namespace)
+        CONTROL_NAMESPACE = resources.getString(R.string.chromecast_control_namespace)
+        CONTENT_MESSAGE_TEMPLATE = resources.getString(R.string.chromecast_content_message_template)
+        CONTROL_MESSAGE_TEMPLATE = resources.getString(R.string.chromecast_control_message_template)
     }
 
     fun sendContentMessage(context: CastContext, message: String) {

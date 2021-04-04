@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/16/21 4:55 PM
+  ~ Last modified 4/4/21 11:13 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,7 +13,7 @@
     <item
         android:id="@+id/menu_cast"
         android:title="@string/option_cast"
-        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:actionProviderClass="pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider"
         app:showAsAction="always"
         tools:icon="@drawable/mr_button_dark" />
 

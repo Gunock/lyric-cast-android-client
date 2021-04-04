@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:14 PM
+ * Last modified 4/4/21 11:50 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -15,16 +15,17 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuItemCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
+import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
@@ -127,11 +128,11 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_controls, menu)
 
-        CastButtonFactory.setUpMediaRouteButton(
-            baseContext,
-            menu,
-            R.id.menu_cast
-        )
+        val castActionProvider =
+            MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
+        if (castContext != null) {
+            castActionProvider.routeSelector = castContext!!.mergedSelector
+        }
 
         return true
     }
@@ -266,12 +267,10 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
-        val fontSize = prefs.getString("fontSize", "40")
         val backgroundColor = prefs.getString("backgroundColor", "Black")
         val fontColor = prefs.getString("fontColor", "White")
 
         val configurationJson = JSONObject().apply {
-            put("fontSize", "${fontSize}px")
             put("backgroundColor", backgroundColor)
             put("fontColor", fontColor)
         }
