@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 11:55 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:50 PM
+ * Last modified 4/4/21 11:54 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
@@ -103,7 +104,7 @@ class SongControlsActivity : AppCompatActivity() {
             sendBlank()
         }
 
-        findViewById<Button>(R.id.btn_song_prev).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_song_prev).setOnClickListener {
             if (currentSlide <= 0) {
                 return@setOnClickListener
             }
@@ -111,7 +112,7 @@ class SongControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<Button>(R.id.btn_song_next).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_song_next).setOnClickListener {
             if (currentSlide >= lyrics.size - 1) {
                 return@setOnClickListener
             }

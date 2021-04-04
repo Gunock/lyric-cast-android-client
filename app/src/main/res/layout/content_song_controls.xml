@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/15/21 12:09 PM
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 11:55 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/15/21 12:03 PM
+  ~ Last modified 4/4/21 11:54 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,17 +23,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_song_prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:backgroundTint="@color/colorButton"
-            android:text="@string/button_previous"
-            android:textColor="@color/colorButtonText"
+            android:contentDescription="@string/previous"
+            android:rotation="180"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_song_blank"
             app:layout_constraintEnd_toStartOf="@+id/btn_song_blank"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/btn_song_blank"
+            app:srcCompat="@drawable/baseline_play_arrow_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/btn_song_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:backgroundTint="@color/colorButton"
+            android:contentDescription="@string/next"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_song_blank"
+            app:layout_constraintStart_toEndOf="@+id/btn_song_blank"
+            app:layout_constraintTop_toTopOf="@+id/btn_song_blank"
+            app:srcCompat="@drawable/baseline_play_arrow_black_24dp" />
 
         <Button
             android:id="@+id/btn_song_blank"
@@ -45,18 +60,6 @@
             android:textColor="@color/colorButtonText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_song_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/colorButton"
-            android:text="@string/button_next"
-            android:textColor="@color/colorButtonText"
-            app:layout_constraintStart_toEndOf="@+id/btn_song_blank"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -79,12 +82,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Test song"
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_song_slide_number"
             app:layout_constraintStart_toEndOf="@+id/tv_song_slide_number"
-            app:layout_constraintTop_toBottomOf="@+id/btn_song_blank"
+            app:layout_constraintTop_toTopOf="@+id/tv_song_slide_number"
             tools:ignore="HardcodedText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
