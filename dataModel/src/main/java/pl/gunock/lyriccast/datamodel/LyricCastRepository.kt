@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:38 AM
+ * Last modified 4/4/21 1:58 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -29,7 +29,7 @@ class LyricCastRepository(
     }
 
     val allSongs: Flow<List<SongAndCategory>> = songDao.getAllAsFlow()
-    val allSetlists: Flow<List<Setlist>> = setlistDao.getAll()
+    val allSetlists: Flow<List<Setlist>> = setlistDao.getAllAsFlow()
     val allCategories: Flow<List<Category>> = categoryDao.getAllAsFlow()
 
     @WorkerThread
@@ -43,6 +43,11 @@ class LyricCastRepository(
     @WorkerThread
     suspend fun getAllSongs(): List<Song> {
         return songDao.getAll()
+    }
+
+    @WorkerThread
+    internal suspend fun getAllSongsWithLyricsSections(): List<SongWithLyricsSections> {
+        return songDao.getAllWithLyricsSections()
     }
 
     @WorkerThread
@@ -147,8 +152,33 @@ class LyricCastRepository(
     }
 
     @WorkerThread
+    internal suspend fun getAllSetlists(): List<SetlistWithSongs> {
+        return setlistDao.getAll()
+    }
+
+    @WorkerThread
     suspend fun getSetlistWithSongs(setlistId: Long): SetlistWithSongs? {
         return setlistDao.getWithSongs(setlistId)
+    }
+
+    internal suspend fun upsertSetlists(
+        setlists: List<Setlist>,
+        setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>>
+    ) {
+        setlistDao.upsert(setlists)
+
+        val setlistNames = setlists.map { it.name }.toHashSet()
+        val setlistIdMap: Map<String, Long> = setlistDao.getAll()
+            .filter { it.setlist.name in setlistNames }
+            .map { it.setlist.name to it.setlist.id }
+            .toMap()
+
+        val setlistCrossRefs = setlistCrossRefMap.flatMap { entry ->
+            val setlistId: Long = setlistIdMap[entry.key]!!
+            return@flatMap entry.value.map { SetlistSongCrossRef(setlistId, it) }
+        }
+
+        setlistDao.upsertSongsCrossRefs(setlistCrossRefs)
     }
 
     @WorkerThread
@@ -162,17 +192,12 @@ class LyricCastRepository(
         }
 
         val setlist = setlistWithSongs.setlist
-        try {
-            val setlistId = setlistDao.upsert(setlist)
+        val setlistId = setlistDao.upsert(setlist)
 
-            val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
-                .map { SetlistSongCrossRef(setlistId, it) }
+        val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
+            .map { SetlistSongCrossRef(setlistId, it) }
 
-            setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
-        } catch (e: Exception) {
-            setlistDao.delete(listOf(setlist.id))
-            throw e
-        }
+        setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
     }
 
     @WorkerThread

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 11:49 AM
+ * Last modified 4/4/21 1:04 AM
  */
 
 package pl.gunock.lyriccast.datamodel.models
@@ -13,5 +13,5 @@ data class ImportSongsOptions(
     val deleteAll: Boolean = false,
     val replaceOnConflict: Boolean = false,
     @Suppress("ArrayInDataClass")
-    val colors: IntArray
+    val colors: IntArray = intArrayOf()
 )

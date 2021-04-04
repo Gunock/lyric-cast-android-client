@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:15 AM
+ * Last modified 4/3/21 6:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -12,6 +12,7 @@ import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
@@ -176,7 +177,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
         }
 
-        findViewById<Button>(R.id.btn_setlist_prev).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
             if (currentLyricsPosition <= 0) {
                 return@setOnClickListener
             }
@@ -184,11 +185,41 @@ class SetlistControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<Button>(R.id.btn_setlist_next).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_setlist_prev_song).setOnClickListener {
+            val currentSongTitle = songTitles.entries.last {
+                it.key <= currentLyricsPosition
+            }.value
+
+            val previousSongTitle: String = songTitles.entries.lastOrNull {
+                it.key < currentLyricsPosition && it.value != currentSongTitle
+            }?.value ?: return@setOnClickListener
+
+            val previousSongStartIndex: Int = songTitles.entries.first {
+                it.value == previousSongTitle
+            }.key
+
+            currentLyricsPosition = previousSongStartIndex
+            sendSlide()
+        }
+
+        findViewById<ImageButton>(R.id.btn_setlist_next).setOnClickListener {
             if (currentLyricsPosition >= setlistLyrics.size - 1) {
                 return@setOnClickListener
             }
             currentLyricsPosition++
+            sendSlide()
+        }
+
+        findViewById<ImageButton>(R.id.btn_setlist_next_song).setOnClickListener {
+            val currentSongTitle = songTitles.entries.last {
+                it.key <= currentLyricsPosition
+            }.value
+
+            val nextSongIndex: Int = songTitles.entries.firstOrNull {
+                it.key > currentLyricsPosition && it.value != currentSongTitle
+            }?.key ?: return@setOnClickListener
+
+            currentLyricsPosition = nextSongIndex
             sendSlide()
         }
     }

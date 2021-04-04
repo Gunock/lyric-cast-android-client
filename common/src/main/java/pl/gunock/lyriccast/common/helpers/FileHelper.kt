@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 12:33 AM
+ * Last modified 4/4/21 12:25 AM
  */
 
 package pl.gunock.lyriccast.common.helpers
@@ -58,18 +58,18 @@ object FileHelper {
 
         val fileList = File(sourceLocation).listFiles() ?: return
 
-        with(ZipOutputStream(outputStream)) {
-            for (file in fileList) {
-                if (file.isDirectory) {
-                    zipDirectory(this, file, file.name)
-                    continue
-                }
-
-                putNextEntry(ZipEntry(file.name))
-                write(file.readBytes())
-                closeEntry()
+        val zipOut = ZipOutputStream(outputStream)
+        for (file in fileList) {
+            if (file.isDirectory) {
+                zipDirectory(zipOut, file, file.name)
+                continue
             }
+
+            zipOut.putNextEntry(ZipEntry(file.name))
+            zipOut.write(file.readBytes())
+            zipOut.closeEntry()
         }
+        zipOut.close()
     }
 
     private fun zipDirectory(

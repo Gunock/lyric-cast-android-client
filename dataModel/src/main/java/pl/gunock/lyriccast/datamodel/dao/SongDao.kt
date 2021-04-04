@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:55 PM
+ * Last modified 4/3/21 11:38 PM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -22,6 +22,10 @@ interface SongDao {
     @Transaction
     @Query("SELECT * FROM Song")
     suspend fun getAll(): List<Song>
+
+    @Transaction
+    @Query("SELECT * FROM Song")
+    suspend fun getAllWithLyricsSections(): List<SongWithLyricsSections>
 
     @Transaction
     @Query("SELECT * FROM Song WHERE songId IN (:songIds)")

@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 11:49 AM
+ * Last modified 4/4/21 2:00 AM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -26,19 +27,25 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.dataimport.ImportSongXmlParserFactory
+import pl.gunock.lyriccast.dataimport.enums.ImportFormat
 import pl.gunock.lyriccast.dataimport.enums.SongXmlParserType
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
+import pl.gunock.lyriccast.datamodel.extensions.toJSONObjectList
+import pl.gunock.lyriccast.datamodel.models.DatabaseData
 import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -51,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var importDialogViewModel: ImportDialogViewModel
@@ -90,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_category_manager -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> showImportDialog()
-            R.id.menu_export_all -> export()
+            R.id.menu_export_all -> startExport()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -102,51 +109,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val uri = data?.data!!
+        val uri: Uri = data?.data!!
         when (requestCode) {
             IMPORT_RESULT_CODE -> {
                 Log.d(TAG, "Handling import result")
                 Log.d(TAG, "Import parameters $importDialogViewModel")
                 Log.d(TAG, "Selected file URI: $uri")
-
-
-                val inputStream = contentResolver.openInputStream(uri) ?: return
-                val dialogFragment = ProgressDialogFragment("Loading file ...")
-                dialogFragment.setStyle(
-                    DialogFragment.STYLE_NORMAL,
-                    R.style.Theme_LyricCast_Light_Dialog
-                )
-                dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
-                CoroutineScope(Dispatchers.IO).launch {
-                    val importSongXmlParser =
-                        ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
-
-                    val importedSongs = importSongXmlParser.parseZip(contentResolver, inputStream)
-                    @Suppress("BlockingMethodInNonBlockingContext")
-                    inputStream.close()
-
-                    val colors: IntArray = resources.getIntArray(R.array.category_color_values)
-                    val importSongsOptions = ImportSongsOptions(
-                        importDialogViewModel.importFormat,
-                        importDialogViewModel.deleteAll,
-                        importDialogViewModel.replaceOnConflict,
-                        colors
-                    )
-                    lyricCastViewModel.importSongs(
-                        importedSongs,
-                        dialogFragment.message,
-                        importSongsOptions
-                    )
-                    dialogFragment.dismiss()
+                if (importDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
+                    importOpenSong(uri)
+                } else if (importDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
+                    importLyricCast(uri)
                 }
             }
-            // TODO: Reimplement export
-            EXPORT_RESULT_CODE -> {
-//                FileHelper.zip(contentResolver.openOutputStream(uri)!!, filesDir.path)
-//                val intent = Intent(baseContext, MainActivity::class.java)
-//                startActivity(intent)
-//                finish()
-            }
+            EXPORT_RESULT_CODE -> export(uri)
         }
     }
 
@@ -197,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun export(): Boolean {
+    private fun startExport(): Boolean {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
@@ -205,6 +180,40 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
 
         return true
+    }
+
+    private fun export(uri: Uri) {
+        val dialogFragment = ProgressDialogFragment(getString(R.string.preparing_data))
+        dialogFragment.setStyle(
+            DialogFragment.STYLE_NORMAL,
+            R.style.Theme_LyricCast_Light_Dialog
+        )
+        dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+
+        val message = dialogFragment.message
+        CoroutineScope(Dispatchers.IO).launch {
+            val exportDir = File(filesDir.canonicalPath, ".export")
+            exportDir.deleteRecursively()
+            exportDir.mkdirs()
+
+            val exportData = lyricCastViewModel.databaseToJson()
+
+            message.postValue(getString(R.string.export_saving_json))
+            val songsString = JSONArray(exportData.songsJson).toString()
+            val categoriesString = JSONArray(exportData.categoriesJson).toString()
+            val setlistsString = JSONArray(exportData.setlistsJson).toString()
+            File(exportDir, "songs.json").writeText(songsString)
+            File(exportDir, "categories.json").writeText(categoriesString)
+            File(exportDir, "setlists.json").writeText(setlistsString)
+
+            message.postValue(getString(R.string.export_saving_zip))
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
+
+            message.postValue(getString(R.string.export_deleting_temp))
+            exportDir.deleteRecursively()
+            dialogFragment.dismiss()
+        }
     }
 
     private fun showImportDialog(): Boolean {
@@ -215,12 +224,88 @@ class MainActivity : AppCompatActivity() {
         )
 
         importDialogViewModel.accepted.value = false
-        importDialogViewModel.accepted.observe(this) { if (it) import() }
+        importDialogViewModel.accepted.observe(this) { if (it) startImport() }
         dialogFragment.show(supportFragmentManager, ImportDialogFragment.TAG)
         return true
     }
 
-    private fun import(): Boolean {
+
+    private fun importLyricCast(uri: Uri) {
+        val inputStream = contentResolver.openInputStream(uri) ?: return
+        val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
+        dialogFragment.setStyle(
+            DialogFragment.STYLE_NORMAL,
+            R.style.Theme_LyricCast_Light_Dialog
+        )
+        dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+        CoroutineScope(Dispatchers.IO).launch {
+            val importDir = File(filesDir.path, ".import")
+            importDir.deleteRecursively()
+            importDir.mkdirs()
+
+            FileHelper.unzip(contentResolver, inputStream, importDir.path)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            inputStream.close()
+
+            val songsJson = JSONArray(File(importDir, "songs.json").readText())
+            val categoriesJson = JSONArray(File(importDir, "categories.json").readText())
+            val setlistsJson = JSONArray(File(importDir, "setlists.json").readText())
+            val importData = DatabaseData(
+                songsJson = songsJson.toJSONObjectList(),
+                categoriesJson = categoriesJson.toJSONObjectList(),
+                setlistsJson = setlistsJson.toJSONObjectList()
+            )
+
+            val importSongsOptions = ImportSongsOptions(
+                importDialogViewModel.importFormat,
+                importDialogViewModel.deleteAll,
+                importDialogViewModel.replaceOnConflict
+            )
+
+            lyricCastViewModel.importSongs(
+                importData,
+                dialogFragment.message,
+                importSongsOptions
+            )
+
+            importDir.deleteRecursively()
+            dialogFragment.dismiss()
+        }
+    }
+
+    private fun importOpenSong(uri: Uri) {
+        val inputStream = contentResolver.openInputStream(uri) ?: return
+        val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
+        dialogFragment.setStyle(
+            DialogFragment.STYLE_NORMAL,
+            R.style.Theme_LyricCast_Light_Dialog
+        )
+        dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+        CoroutineScope(Dispatchers.IO).launch {
+            val importSongXmlParser =
+                ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
+
+            val importedSongs = importSongXmlParser.parseZip(contentResolver, inputStream)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            inputStream.close()
+
+            val colors: IntArray = resources.getIntArray(R.array.category_color_values)
+            val importSongsOptions = ImportSongsOptions(
+                importDialogViewModel.importFormat,
+                importDialogViewModel.deleteAll,
+                importDialogViewModel.replaceOnConflict,
+                colors
+            )
+            lyricCastViewModel.importSongs(
+                importedSongs,
+                dialogFragment.message,
+                importSongsOptions
+            )
+            dialogFragment.dismiss()
+        }
+    }
+
+    private fun startImport(): Boolean {
         importDialogViewModel.accepted.removeObservers(this)
 
         val intent = Intent(Intent.ACTION_GET_CONTENT)

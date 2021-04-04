@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 10:53 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 1:01 AM
+ * Last modified 4/3/21 11:16 PM
  */
 
 package pl.gunock.lyriccast.dataimport.parsers
@@ -12,7 +12,7 @@ import java.io.File
 import java.io.InputStream
 
 abstract class ImportSongXmlParser(filesDir: File) {
-    protected val importDirectory: File = File(filesDir.canonicalPath, "./.import")
+    protected val importDirectory: File = File(filesDir.canonicalPath, ".import")
 
     abstract fun parseZip(resolver: ContentResolver, inputStream: InputStream): Set<ImportSong>
 

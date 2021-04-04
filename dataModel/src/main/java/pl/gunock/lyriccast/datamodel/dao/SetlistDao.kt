@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 2:55 PM
+ * Last modified 4/4/21 1:49 AM
  */
 
 package pl.gunock.lyriccast.datamodel.dao
@@ -25,10 +25,17 @@ interface SetlistDao {
     suspend fun getWithSongs(setlistId: Long): SetlistWithSongs?
 
     @Query("SELECT * FROM Setlist")
-    fun getAll(): Flow<List<Setlist>>
+    fun getAllAsFlow(): Flow<List<Setlist>>
+
+    @Transaction
+    @Query("SELECT * FROM Setlist")
+    suspend fun getAll(): List<SetlistWithSongs>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(setlist: Setlist): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(setlists: Collection<Setlist>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertSongsCrossRefs(setlistSongCrossRefs: Collection<SetlistSongCrossRef>)

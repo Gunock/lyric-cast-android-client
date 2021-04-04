@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 3:39 PM
+ * Last modified 4/4/21 1:50 AM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -46,7 +46,7 @@ class ImportDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dialog?.setTitle("Import")
+        dialog?.setTitle(getString(R.string.import_dialog_title))
 
         return inflater.inflate(R.layout.dialog_fragment_import, container, false)
     }
@@ -68,7 +68,7 @@ class ImportDialogFragment : DialogFragment() {
         importFormatSpinner.adapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.import_formats,
-            android.R.layout.simple_spinner_item
+            android.R.layout.simple_list_item_1
         )
     }
 

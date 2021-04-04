@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:18 AM
+ * Last modified 4/4/21 12:28 AM
  */
 
 package pl.gunock.lyriccast.datamodel.entities.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.SongLyricsSectionCrossRef
@@ -37,6 +38,20 @@ data class SongWithLyricsSections(
         return lyricsSections.distinct()
             .map { section -> section.id to section.name }
             .toMap()
+    }
+
+    fun toJson(): JSONObject {
+        val lyricsMap = lyricsSections.map { it.name to it.text }.toMap()
+
+        val lyricsSectionNameMap = lyricsSectionsToNameMap()
+        val presentation = songLyricsSectionCrossRefs?.sorted()
+            ?.map { lyricsSectionNameMap[it.lyricsSectionId]!! }
+
+        return JSONObject().apply {
+            put("title", song.title)
+            put("lyrics", JSONObject.wrap(lyricsMap))
+            put("presentation", JSONObject.wrap(presentation))
+        }
     }
 
 }

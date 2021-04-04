@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 3:31 PM
+ * Last modified 4/4/21 2:00 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -46,9 +46,11 @@ class SetlistEditorSongsFragment : Fragment() {
     private val args: SetlistEditorSongsFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
-
 
     private lateinit var songTitleInput: EditText
     private lateinit var categorySpinner: Spinner
@@ -117,7 +119,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
                 val setlist = args.setlistWithSongs.setlist
                 addedSongs.forEachIndexed { index, song ->
-                    val setlistSongCrossRef = SetlistSongCrossRef(setlist.id, song.id, index)
+                    val setlistSongCrossRef = SetlistSongCrossRef(null, setlist.id, song.id, index)
                     setlistSongCrossRefs.add(setlistSongCrossRef)
                 }
 
@@ -171,10 +173,14 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupSongs(view: View) {
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
+        songsRecyclerView.setHasFixedSize(true)
+        songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        songsRecyclerView.adapter = songItemsAdapter
+
         val selectionTracker =
-            SelectionTracker(songsRecyclerView) { holder: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
+            SelectionTracker(songsRecyclerView) { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = songItemsAdapter.songItems[position]
-                selectSong(item, holder)
+                selectSong(item)
                 return@SelectionTracker true
             }
 
@@ -184,23 +190,16 @@ class SetlistEditorSongsFragment : Fragment() {
             selectionTracker = selectionTracker
         )
 
-        with(songsRecyclerView) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = songItemsAdapter
-        }
-
         lyricCastViewModel.allSongs.observe(requireActivity()) { songs ->
             songItemsAdapter.submitCollection(songs ?: return@observe)
             songItemsAdapter.songItems.forEach { item ->
-                item.isSelected = selectedSongs.contains(item.song)
+                item.isSelected.value = selectedSongs.contains(item.song)
             }
         }
     }
 
-    private fun selectSong(item: SongItem, holder: SongItemsAdapter.ViewHolder) {
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+    private fun selectSong(item: SongItem) {
+        item.isSelected.value = !item.isSelected.value!!
     }
 
     private fun filterSongs(
@@ -216,7 +215,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun updateSelectedSongs() {
         for (item in songItemsAdapter.songItems) {
-            if (item.isSelected) {
+            if (item.isSelected.value!!) {
                 selectedSongs.add(item.song)
             } else {
                 selectedSongs.remove(item.song)

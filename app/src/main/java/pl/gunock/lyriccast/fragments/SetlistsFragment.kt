@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+ * Created by Tomasz Kiljanczyk on 4/3/21 10:48 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 12:43 AM
+ * Last modified 4/3/21 10:32 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -10,16 +10,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
+import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastViewModel
 import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.helpers.KeyboardHelper
@@ -29,12 +32,12 @@ import pl.gunock.lyriccast.models.SetlistItem
 
 
 class SetlistsFragment : Fragment() {
-    private companion object {
-        const val TAG = "SetlistsFragment"
-    }
-
+    private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var menu: Menu
@@ -47,6 +50,20 @@ class SetlistsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        repository = (requireActivity().application as LyricCastApplication).repository
+        requireActivity().onBackPressedDispatcher
+            .addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (selectionTracker.count > 0) {
+                        setlistItemsAdapter.resetSelection()
+                        resetSelection()
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                    }
+                }
+            })
     }
 
     override fun onCreateView(
@@ -73,6 +90,8 @@ class SetlistsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
+
+        menu.findItem(R.id.menu_add_setlist).isVisible = false
 
         showMenuActions(showDelete = false, showEdit = false)
     }
@@ -109,6 +128,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun onSetlistClick(
+        @Suppress("UNUSED_PARAMETER")
         holder: SetlistItemsAdapter.ViewHolder,
         position: Int,
         isLongClick: Boolean
@@ -117,7 +137,7 @@ class SetlistsFragment : Fragment() {
         if (!isLongClick && selectionTracker.count == 0) {
             pickSetlist(item)
         } else {
-            selectSetlist(item, holder)
+            selectSetlist(item)
         }
         return true
     }
@@ -142,8 +162,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun selectSetlist(
-        item: SetlistItem,
-        holder: SetlistItemsAdapter.ViewHolder
+        item: SetlistItem
     ) {
         when (selectionTracker.countAfter) {
             0 -> {
@@ -163,28 +182,28 @@ class SetlistsFragment : Fragment() {
             2 -> showMenuActions(showEdit = false)
         }
 
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
-
+        item.isSelected.value = !item.isSelected.value!!
     }
 
     private fun editSelectedSetlist(): Boolean {
         val selectedItem = setlistItemsAdapter.setlistItems
-            .first { setlistItem -> setlistItem.isSelected }
+            .first { setlistItem -> setlistItem.isSelected.value!! }
 
-        val intent = Intent(requireContext(), SetlistEditorActivity::class.java)
-        intent.putExtra("setlist", selectedItem.setlist)
+        val setlistWithSongs =
+            runBlocking { repository.getSetlistWithSongs(selectedItem.setlist.id) }
+
+        val intent = Intent(context, SetlistEditorActivity::class.java)
+        intent.putExtra("setlistWithSongs", setlistWithSongs)
         startActivity(intent)
 
-        setlistItemsAdapter.showCheckBox.value = false
-        selectionTracker.reset()
+        resetSelection()
 
         return true
     }
 
     private fun deleteSelectedSetlists(): Boolean {
         val selectedSetlists = setlistItemsAdapter.setlistItems
-            .filter { item -> item.isSelected }
+            .filter { item -> item.isSelected.value!! }
             .map { item -> item.setlist.id }
 
         lyricCastViewModel.deleteSetlists(selectedSetlists)

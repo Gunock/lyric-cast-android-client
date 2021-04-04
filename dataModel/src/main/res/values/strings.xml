@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/4/21 1:48 AM
+  -->
+
+<resources>
+    <string name="importing_categories">Importing categories …</string>
+    <string name="importing_songs">Importing songs …</string>
+    <string name="finishing_import">Finishing import …</string>
+    <string name="importing_setlists">Importing setlists …</string>
+</resources>

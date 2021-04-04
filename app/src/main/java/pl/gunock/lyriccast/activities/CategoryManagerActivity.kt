@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 11:04 PM
+ * Last modified 4/4/21 12:25 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -30,7 +30,7 @@ import pl.gunock.lyriccast.models.CategoryItem
 class CategoryManagerActivity : AppCompatActivity() {
 
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var menu: Menu
@@ -57,13 +57,9 @@ class CategoryManagerActivity : AppCompatActivity() {
                 categories.map { category -> category.name }.toSet()
         }
 
-
         categoryItemsRecyclerView = findViewById(R.id.rcv_categories)
-
-        with(categoryItemsRecyclerView) {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(baseContext)
-        }
+        categoryItemsRecyclerView.setHasFixedSize(true)
+        categoryItemsRecyclerView.layoutManager = LinearLayoutManager(baseContext)
 
         setupCategories()
     }
@@ -85,6 +81,15 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (selectionTracker.count != 0) {
+            categoryItemsAdapter.resetSelection()
+            resetSelection()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     private fun setupCategories() {
         selectionTracker = SelectionTracker(categoryItemsRecyclerView, this::onCategoryClick)
 
@@ -100,13 +105,14 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun onCategoryClick(
+        @Suppress("UNUSED_PARAMETER")
         holder: CategoryItemsAdapter.ViewHolder,
         position: Int,
         isLongClick: Boolean
     ): Boolean {
         val item = categoryItemsAdapter.categoryItems[position]
         if (isLongClick || selectionTracker.count != 0) {
-            selectCategory(item, holder)
+            selectCategory(item)
             return true
         }
         return false
@@ -114,7 +120,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun deleteSelectedCategories(): Boolean {
         val selectedCategories = categoryItemsAdapter.categoryItems
-            .filter { item -> item.isSelected }
+            .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }
 
         runBlocking { lyricCastViewModel.deleteCategories(selectedCategories) }
@@ -138,7 +144,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun editSelectedCategory(): Boolean {
         val categoryItem = categoryItemsAdapter.categoryItems
-            .first { category -> category.isSelected }
+            .first { category -> category.isSelected.value!! }
 
         editCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
 
@@ -155,8 +161,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun selectCategory(
-        item: CategoryItem,
-        holder: CategoryItemsAdapter.ViewHolder
+        item: CategoryItem
     ) {
         when (selectionTracker.countAfter) {
             0 -> {
@@ -172,19 +177,16 @@ class CategoryManagerActivity : AppCompatActivity() {
 
                 showMenuActions(showAdd = false)
             }
-            2 -> {
-                showMenuActions(showAdd = false, showEdit = false)
-            }
+            2 -> showMenuActions(showAdd = false, showEdit = false)
         }
 
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+        item.isSelected.value = !item.isSelected.value!!
     }
 
     private fun resetSelection() {
         categoryItemsAdapter.showCheckBox.value = false
         categoryItemsAdapter.categoryItems.forEach { categoryItem ->
-            categoryItem.isSelected = false
+            categoryItem.isSelected.value = false
         }
         selectionTracker.reset()
 

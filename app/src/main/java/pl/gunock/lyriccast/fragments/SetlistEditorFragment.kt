@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/1/21 8:48 PM
+ * Last modified 4/4/21 1:35 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -49,7 +49,10 @@ class SetlistEditorFragment : Fragment() {
     private val args: SetlistEditorFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
     private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory((requireActivity().application as LyricCastApplication).repository)
+        LyricCastViewModelFactory(
+            requireContext(),
+            (requireActivity().application as LyricCastApplication).repository
+        )
     }
 
     private val setlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
@@ -62,7 +65,7 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var songItemsAdapter: SetlistSongItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
-    private var intentSetlist: Setlist? = null
+    private var intentSetlistWithSongs: SetlistWithSongs? = null
     private lateinit var setlistNames: Set<String>
 
     private lateinit var menu: Menu
@@ -110,7 +113,7 @@ class SetlistEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        intentSetlist = requireActivity().intent.getParcelableExtra("setlist")
+        intentSetlistWithSongs = requireActivity().intent.getParcelableExtra("setlistWithSongs")
 
         setlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
         setlistNameInput = view.findViewById(R.id.tin_setlist_name)
@@ -127,13 +130,9 @@ class SetlistEditorFragment : Fragment() {
                     .map { song -> SongItem(song) }
 
             setlistNameInput.text = args.setlistWithSongs!!.setlist.name
-        } else if (intentSetlist != null) {
-            val setlistWithSongs =
-                runBlocking { repository.getSetlistWithSongs(intentSetlist!!.id)!! }
-
-            setlistNameInput.text = intentSetlist!!.name
-
-            setlistSongs = runBlocking { repository.getSongsAndCategories(setlistWithSongs.songs) }
+        } else if (intentSetlistWithSongs != null) {
+            setlistNameInput.text = intentSetlistWithSongs!!.setlist.name
+            setlistSongs = intentSetlistWithSongs!!.songs
                 .map { song -> SongItem(song) }
         }
 
@@ -211,13 +210,14 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun onSetlistClick(
+        @Suppress("UNUSED_PARAMETER")
         holder: SetlistSongItemsAdapter.ViewHolder,
         position: Int,
         isLongClick: Boolean
     ): Boolean {
         if (isLongClick || selectionTracker.count != 0) {
             val item: SongItem = songItemsAdapter.songItems[position]
-            selectSong(item, holder)
+            selectSong(item)
             return true
         }
         return false
@@ -237,7 +237,7 @@ class SetlistEditorFragment : Fragment() {
 
         val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
             .mapIndexed { index, item ->
-                SetlistSongCrossRef(setlist.id, item.song.id, index)
+                SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
 
         return SetlistWithSongs(setlist, songs, crossRef)
@@ -248,7 +248,9 @@ class SetlistEditorFragment : Fragment() {
             return NameValidationState.EMPTY
         }
 
-        val isAlreadyInUse = intentSetlist?.name != name && setlistNames.contains(name)
+        val isAlreadyInUse =
+            intentSetlistWithSongs?.setlist?.name != name && setlistNames.contains(name)
+
         return if (isAlreadyInUse) {
             NameValidationState.ALREADY_IN_USE
         } else {
@@ -268,7 +270,7 @@ class SetlistEditorFragment : Fragment() {
         if (setlistSongs.isEmpty()) {
             val toast = Toast.makeText(
                 requireContext(),
-                "Empty setlists are not allowed!",
+                getString(R.string.empty_setlist_warning),
                 Toast.LENGTH_SHORT
             )
             toast.show()
@@ -281,9 +283,8 @@ class SetlistEditorFragment : Fragment() {
         return true
     }
 
-    private fun selectSong(item: SongItem, holder: SetlistSongItemsAdapter.ViewHolder) {
-        item.isSelected = !item.isSelected
-        holder.checkBox.isChecked = item.isSelected
+    private fun selectSong(item: SongItem) {
+        item.isSelected.value = !item.isSelected.value!!
 
         when (selectionTracker.countAfter) {
             0 -> {
@@ -300,7 +301,6 @@ class SetlistEditorFragment : Fragment() {
             }
             2 -> showMenuActions(showDuplicate = false)
         }
-
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {
@@ -344,11 +344,11 @@ class SetlistEditorFragment : Fragment() {
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {
                     setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Please enter setlist name"
+                    setlistNameInput.error = getString(R.string.enter_setlist_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     setlistNameInputLayout.error = " "
-                    setlistNameInput.error = "Setlist name already in use"
+                    setlistNameInput.error = getString(R.string.setlist_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     setlistNameInputLayout.error = null

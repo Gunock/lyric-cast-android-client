@@ -1,28 +1,32 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 11:51 AM
+ * Last modified 4/4/21 1:59 AM
  */
 
 package pl.gunock.lyriccast.datamodel
 
+import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import pl.gunock.lyriccast.dataimport.models.ImportSong
-import pl.gunock.lyriccast.datamodel.entities.Category
-import pl.gunock.lyriccast.datamodel.entities.LyricsSection
-import pl.gunock.lyriccast.datamodel.entities.Setlist
-import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.*
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
+import pl.gunock.lyriccast.datamodel.extensions.getStringList
+import pl.gunock.lyriccast.datamodel.extensions.toStringMap
+import pl.gunock.lyriccast.datamodel.models.DatabaseData
 import pl.gunock.lyriccast.datamodel.models.ImportSongsOptions
 
 
 class LyricCastViewModel(
+    private val resources: Resources,
     private val repository: LyricCastRepository
 ) : ViewModel() {
     private companion object {
@@ -33,16 +37,8 @@ class LyricCastViewModel(
     val allSetlists: LiveData<List<Setlist>> = repository.allSetlists.asLiveData()
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
 
-    suspend fun getAllSongs() =
-        repository.getAllSongs()
-
     suspend fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
         repository.upsertSong(song, order)
-
-    suspend fun upsertSongs(
-        songsWithLyricsSections: List<SongWithLyricsSections>,
-        orderMap: Map<String, List<Pair<String, Int>>>
-    ) = repository.upsertSongs(songsWithLyricsSections, orderMap)
 
     fun deleteSongs(songIds: List<Long>) =
         viewModelScope.launch { repository.deleteSongs(songIds) }
@@ -53,12 +49,6 @@ class LyricCastViewModel(
     fun deleteSetlists(setlistIds: List<Long>) =
         viewModelScope.launch { repository.deleteSetlists(setlistIds) }
 
-    suspend fun getAllCategories() =
-        repository.getAllCategories()
-
-    fun upsertCategories(categories: Collection<Category>) =
-        runBlocking { repository.upsertCategories(categories) }
-
     fun upsertCategory(category: Category) =
         runBlocking { repository.upsertCategory(category) }
 
@@ -67,14 +57,105 @@ class LyricCastViewModel(
 
 
     suspend fun importSongs(
-        importSongs: Set<ImportSong>,
+        data: DatabaseData,
         message: MutableLiveData<String>,
         options: ImportSongsOptions
     ) {
-        message.value = "Importing categories ..."
-        var processedImportSongs = importSongs.toMutableSet()
+        if (options.deleteAll) {
+            repository.clear()
+        }
+
+        val removeConflicts = !options.deleteAll && !options.replaceOnConflict
+
+        message.postValue(resources.getString(R.string.importing_categories))
+        var categories = data.categoriesJson.map { Category(it) }.toMutableList()
+
+        if (removeConflicts) {
+            for (category in repository.getAllCategories()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    categories.removeIf { it.name == category.name }
+                } else {
+                    categories = categories.filter { it.name != category.name }
+                        .toMutableList()
+                }
+            }
+        }
+
+        repository.upsertCategories(categories)
+
+        message.postValue(resources.getString(R.string.importing_songs))
+
+        val categoryMap: Map<String, Category> = repository.getAllCategories()
+            .map { it.name to it }
+            .toMap()
+
+        val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
+        val songsWithLyricsSections: List<SongWithLyricsSections> = data.songsJson
+            .map { json ->
+                val song = Song(json, categoryMap[json.getString("category")]?.categoryId)
+                val lyricsSections: List<LyricsSection> = json.getJSONObject("lyrics")
+                    .toStringMap()
+                    .map { LyricsSection(songId = -1, name = it.key, text = it.value) }
+
+                val order: List<Pair<String, Int>> = json.getStringList("presentation")
+                    .mapIndexed { index, sectionName -> sectionName to index }
+
+                orderMap[song.title] = order
+                return@map SongWithLyricsSections(song, lyricsSections)
+            }
+
+        repository.upsertSongs(songsWithLyricsSections, orderMap)
+
+        message.postValue(resources.getString(R.string.importing_setlists))
+
+        val songTitleMap: Map<String, Song> = repository.getAllSongs()
+            .map { it.title to it }
+            .toMap()
+
+        var setlists: MutableList<Setlist> = data.setlistsJson
+            .map { json -> Setlist(json) }
+            .toMutableList()
+
+        if (removeConflicts) {
+            for (setlistWithSongs in repository.getAllSetlists()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    setlists.removeIf { it.name == setlistWithSongs.setlist.name }
+                } else {
+                    setlists = setlists.filter { it.name != setlistWithSongs.setlist.name }
+                        .toMutableList()
+                }
+            }
+        }
+
+        val setlistNames = setlists.map { it.name }.toHashSet()
+        val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
+            data.setlistsJson
+                .filter { it.getString("name") in setlistNames }
+                .map { json ->
+                    val songList = json.getStringList("songs")
+
+                    val setlistSongCrossRefs: List<SetlistSongCrossRef> =
+                        songList.mapIndexed { index, songTitle ->
+                            SetlistSongCrossRef(null, -1, songTitleMap[songTitle]!!.id, index)
+                        }
+                    return@map json.getString("name") to setlistSongCrossRefs
+                }.toMap()
+
+        repository.upsertSetlists(setlists, setlistCrossRefMap)
+
+        message.postValue(resources.getString(R.string.finishing_import))
+        Log.d(TAG, "Finished import")
+    }
+
+    suspend fun importSongs(
+        importSongSet: Set<ImportSong>,
+        message: MutableLiveData<String>,
+        options: ImportSongsOptions
+    ) {
+        message.postValue(resources.getString(R.string.importing_categories))
+        var processedImportSongs = importSongSet.toMutableSet()
         if (!options.deleteAll && !options.replaceOnConflict) {
-            getAllSongs().forEach { song ->
+            for (song in repository.getAllSongs()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     processedImportSongs.removeIf { it.title == song.title }
                 } else {
@@ -101,15 +182,15 @@ class LyricCastViewModel(
             repository.clear()
         }
 
-        val allCategories = getAllCategories()
+        val allCategories = repository.getAllCategories()
         if (!options.deleteAll && !options.replaceOnConflict) {
             allCategories.forEach { categoryMap.remove(it.name) }
         }
 
-        upsertCategories(categoryMap.values)
+        repository.upsertCategories(categoryMap.values)
 
-        message.value = "Importing songs ..."
-        val categoryIdMap = getAllCategories()
+        message.postValue(resources.getString(R.string.importing_songs))
+        val categoryIdMap = repository.getAllCategories()
             .map { it.name to it.categoryId }
             .toMap()
 
@@ -121,7 +202,7 @@ class LyricCastViewModel(
                 val lyricsSections: List<LyricsSection> =
                     importSong.lyrics.map {
                         LyricsSection(
-                            songId = 0,
+                            songId = -1,
                             name = it.key,
                             text = it.value
                         )
@@ -129,25 +210,44 @@ class LyricCastViewModel(
                 val order: List<Pair<String, Int>> = importSong.presentation
                     .mapIndexed { index, sectionName -> sectionName to index }
 
-                orderMap[importSong.title] = order
+                orderMap[song.title] = order
                 return@map SongWithLyricsSections(song, lyricsSections)
             }
 
-        upsertSongs(songsWithLyricsSections, orderMap)
+        repository.upsertSongs(songsWithLyricsSections, orderMap)
 
-        message.value = "Finishing import ..."
+        message.postValue(resources.getString(R.string.finishing_import))
         Log.d(TAG, "Finished import")
+    }
+
+    suspend fun databaseToJson(): DatabaseData {
+        val categories: List<Category> = repository.getAllCategories()
+        val categoryMap: Map<Long?, String> = categories.map { it.categoryId to it.name }.toMap()
+
+        val songsJson: List<JSONObject> = repository.getAllSongsWithLyricsSections().map {
+            it.toJson()
+                .put("category", categoryMap[it.song.categoryId] ?: JSONObject.NULL)
+        }
+
+        val categoriesJson: List<JSONObject> = categories.map { it.toJson() }
+        val setlistsJson: List<JSONObject> = repository.getAllSetlists().map { it.toJson() }
+        return DatabaseData(
+            songsJson = songsJson,
+            categoriesJson = categoriesJson,
+            setlistsJson = setlistsJson
+        )
     }
 
 }
 
 class LyricCastViewModelFactory(
+    private val context: Context,
     private val repository: LyricCastRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LyricCastViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LyricCastViewModel(repository) as T
+            return LyricCastViewModel(context.resources, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

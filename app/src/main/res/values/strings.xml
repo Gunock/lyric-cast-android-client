@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/1/21 11:57 PM
+  ~ Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/1/21 11:56 PM
+  ~ Last modified 4/4/21 12:28 AM
   -->
 
 <resources>
@@ -66,4 +66,23 @@
     <string name="delete_all_before_import">Delete all before import</string>
     <string name="replace_on_conflict">Replace on conflict</string>
     <string name="placeholder_progress_message">Importing data …</string>
+    <string name="add_category">Add category</string>
+    <string name="edit_category">Edit category</string>
+    <string name="category_name_already_used">Category name already in use</string>
+    <string name="enter_category_name">Please enter category name</string>
+    <string name="import_dialog_title">Import</string>
+    <string name="enter_song_title">Please enter song title</string>
+    <string name="song_title_already_used">Song title already in use</string>
+    <string name="empty_setlist_warning">Empty setlists are not allowed!</string>
+    <string name="enter_setlist_name">Please enter setlist name</string>
+    <string name="setlist_name_already_used">Setlist name already in use</string>
+    <string name="previous_song">Previous song</string>
+    <string name="previous">Previous</string>
+    <string name="next_song">Next song</string>
+    <string name="next">Next</string>
+    <string name="loading_file">Loading file …</string>
+    <string name="preparing_data">Preparing data …</string>
+    <string name="export_saving_json">Saving to temporary directory …</string>
+    <string name="export_saving_zip">Saving zip package …</string>
+    <string name="export_deleting_temp">Deleting temporary directory …</string>
 </resources>
