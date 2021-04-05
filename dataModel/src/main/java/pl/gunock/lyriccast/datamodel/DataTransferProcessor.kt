@@ -1,16 +1,16 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:20 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:19 PM
+ * Last modified 4/5/21 11:18 PM
  */
 
 package pl.gunock.lyriccast.datamodel
 
 import android.content.res.Resources
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.datamodel.entities.*
+import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
@@ -39,17 +39,22 @@ internal class DataTransferProcessor(
 
         if (data.categoryDtos != null) {
             message.postValue(mResources.getString(R.string.importing_categories))
-            var categories = data.categoryDtos.map { Category(it) }.toMutableList()
-
+            val categories = data.categoryDtos.map { Category(it) }.toMutableList()
+            val allCategories = mRepository.getAllCategories()
+            val categoryNames = allCategories.map { it.name }.toSet()
             if (removeConflicts) {
-                for (category in mRepository.getAllCategories()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        categories.removeIf { it.name == category.name }
-                    } else {
-                        categories = categories.filter { it.name != category.name }
-                            .toMutableList()
+                categories.removeAll { it.name in categoryNames }
+            } else if (options.replaceOnConflict) {
+                val categoryNameMap = allCategories.map { it.name to it }.toMap()
+                val categoriesToAdd: MutableList<Category> = mutableListOf()
+                categories.removeAll {
+                    if (it.name in categoryNames) {
+                        categoriesToAdd.add(it.copy(categoryId = categoryNameMap[it.name]!!.categoryId))
+                        return@removeAll true
                     }
+                    return@removeAll false
                 }
+                categories.addAll(categoriesToAdd)
             }
 
             mRepository.upsertCategories(categories)
@@ -62,8 +67,8 @@ internal class DataTransferProcessor(
                 .map { it.name to it }
                 .toMap()
 
-            val orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
-            val songsWithLyricsSections: List<SongWithLyricsSections> = data.songDtos
+            var orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
+            val songsWithLyricsSections: MutableList<SongWithLyricsSections> = data.songDtos
                 .map { songDto ->
                     val song = Song(songDto, categoryMap[songDto.category]?.categoryId)
                     val lyricsSections: List<LyricsSection> = songDto.lyrics
@@ -74,7 +79,26 @@ internal class DataTransferProcessor(
 
                     orderMap[song.title] = order
                     return@map SongWithLyricsSections(song, lyricsSections)
+                }.toMutableList()
+
+            val allSongs = mRepository.getAllSongs()
+            val songTitles = allSongs.map { it.title }.toSet()
+            if (removeConflicts) {
+                orderMap = orderMap.filter { it.key !in songTitles }.toMutableMap()
+                songsWithLyricsSections.removeAll { it.song.title in songTitles }
+            } else if (options.replaceOnConflict) {
+                val songTitleMap = allSongs.map { it.title to it }.toMap()
+                val songsToAdd: MutableList<SongWithLyricsSections> = mutableListOf()
+                songsWithLyricsSections.removeAll {
+                    if (it.song.title in songTitles) {
+                        songsToAdd
+                            .add(it.copy(song = it.song.copy(songId = songTitleMap[it.song.title]!!.songId)))
+                        return@removeAll true
+                    }
+                    return@removeAll false
                 }
+                songsWithLyricsSections.addAll(songsToAdd)
+            }
 
             mRepository.upsertSongs(songsWithLyricsSections, orderMap)
         }
@@ -86,25 +110,32 @@ internal class DataTransferProcessor(
                 .map { it.title to it }
                 .toMap()
 
-            var setlists: MutableList<Setlist> = data.setlistDtos
+            val setlists: MutableList<Setlist> = data.setlistDtos
                 .map { Setlist(it) }
                 .toMutableList()
 
+            val allSetlists: List<SetlistWithSongs> = mRepository.getAllSetlists()
+            val setlistNames = allSetlists.map { it.setlist.name }.toSet()
             if (removeConflicts) {
-                for (setlistWithSongs in mRepository.getAllSetlists()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        setlists.removeIf { it.name == setlistWithSongs.setlist.name }
-                    } else {
-                        setlists = setlists.filter { it.name != setlistWithSongs.setlist.name }
-                            .toMutableList()
+
+                setlists.removeAll { it.name in setlistNames }
+            } else if (options.replaceOnConflict) {
+                val setlistNameMap = allSetlists.map { it.setlist.name to it.setlist }.toMap()
+                val setlistsToAdd: MutableList<Setlist> = mutableListOf()
+                setlists.removeAll {
+                    if (it.name in setlistNames) {
+                        setlistsToAdd.add(it.copy(setlistId = setlistNameMap[it.name]!!.setlistId))
+                        return@removeAll true
                     }
+                    return@removeAll false
                 }
+                setlists.addAll(setlistsToAdd)
             }
 
-            val setlistNames = setlists.map { it.name }.toSet()
+            val newSetlistNames = setlists.map { it.name }.toSet()
             val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
                 data.setlistDtos
-                    .filter { it.name in setlistNames }
+                    .filter { it.name in newSetlistNames }
                     .map { setlistDto ->
                         val songList = setlistDto.songs
 
