@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/12/21 4:03 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/12/21 3:56 PM
+ * Last modified 4/5/21 5:32 PM
  */
 
 package pl.gunock.lyriccast.helpers
@@ -16,16 +16,6 @@ object KeyboardHelper {
             ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
         inputMethodManager?.hideSoftInputFromWindow(
             view.applicationWindowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
-    }
-
-    fun showKeyboard(view: View) {
-        val inputMethodManager: InputMethodManager? =
-            ContextCompat.getSystemService(view.context, InputMethodManager::class.java)
-        inputMethodManager?.toggleSoftInputFromWindow(
-            view.applicationWindowToken,
-            InputMethodManager.SHOW_IMPLICIT,
             InputMethodManager.HIDE_NOT_ALWAYS
         )
     }

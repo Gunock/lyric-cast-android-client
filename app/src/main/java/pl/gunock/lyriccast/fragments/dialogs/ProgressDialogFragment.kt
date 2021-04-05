@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:03 PM
+ * Last modified 4/5/21 5:32 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -28,7 +28,7 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         get() = messageLiveData.value!!
         set(value) = messageLiveData.postValue(value)
 
-    lateinit var mMessageTextView: TextView
+    private lateinit var mMessageTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,

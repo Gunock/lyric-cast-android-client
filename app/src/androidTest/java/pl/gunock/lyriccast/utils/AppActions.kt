@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 11:49 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 11:45 AM
+ * Last modified 4/5/21 5:32 PM
  */
 
 package pl.gunock.lyriccast.utils
@@ -29,8 +29,9 @@ fun addSong(title: String) {
         .perform(replaceText(title))
     Espresso.closeSoftKeyboard()
 
-    onView(withId(R.id.btn_save_song))
-        .perform(click())
+    // Button moved to option menu
+//    onView(withId(R.id.btn_save_song))
+//        .perform(click())
 }
 
 fun addSetlist(name: String) {

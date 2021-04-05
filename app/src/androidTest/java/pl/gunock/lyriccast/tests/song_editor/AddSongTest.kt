@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/15/21 11:49 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/15/21 11:45 AM
+ * Last modified 4/5/21 5:32 PM
  */
 
 package pl.gunock.lyriccast.tests.song_editor
@@ -55,9 +55,9 @@ class AddSongTest {
 
         onView(withId(R.id.tin_section_lyrics))
             .perform(typeText(songText))
-
-        onView(withId(R.id.btn_save_song))
-            .perform(click())
+        // Button moved to option menu
+//        onView(withId(R.id.btn_save_song))
+//            .perform(click())
 
         onView(withId(R.id.rcv_songs))
             .perform(

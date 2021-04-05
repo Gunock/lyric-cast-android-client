@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:51 PM
+ * Last modified 4/5/21 5:32 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -191,6 +191,7 @@ class SetlistControlsActivity : AppCompatActivity() {
                 it.key <= mCurrentLyricsPosition
             }.value
 
+            @Suppress("LiftReturnOrAssignment")
             if (mSongTitles.values.toList()[0] == currentSongTitle) {
                 mCurrentLyricsPosition = 0
             } else {
