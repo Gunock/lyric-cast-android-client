@@ -1,13 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:45 AM
+ * Last modified 4/5/21 5:17 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.models
 
 import org.json.JSONObject
-import pl.gunock.lyriccast.datamodel.extensions.getStringList
+import pl.gunock.lyriccast.datatransfer.extensions.getStringList
 
 data class SetlistDto(val name: String, val songs: List<String>) {
     constructor(json: JSONObject) : this(json.getString("name"), json.getStringList("songs"))

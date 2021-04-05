@@ -1,14 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:12 PM
+ * Last modified 4/5/21 5:17 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.models
 
 import org.json.JSONObject
-import pl.gunock.lyriccast.datamodel.extensions.getStringList
-import pl.gunock.lyriccast.datamodel.extensions.toStringMap
+import pl.gunock.lyriccast.datatransfer.extensions.getStringList
+import pl.gunock.lyriccast.datatransfer.extensions.toStringMap
 
 
 data class SongDto(

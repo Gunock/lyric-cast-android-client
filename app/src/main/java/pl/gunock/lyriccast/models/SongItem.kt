@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:57 PM
+ * Last modified 4/5/21 5:13 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -19,7 +19,7 @@ data class SongItem(
 
     val normalizedTitle by lazy { song.title.normalize() }
     val highlight: MutableLiveData<Boolean> = MutableLiveData(false)
-    var isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
 
     constructor(songAndCategory: SongAndCategory) : this(
         songAndCategory.song,

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 11:28 PM
+ * Last modified 4/5/21 5:12 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -10,15 +10,15 @@ import android.view.View
 import androidx.lifecycle.Observer
 
 class VisibilityObserver(
-    private val view: View,
-    private val reversed: Boolean = false
+    private val mView: View,
+    private val mReversed: Boolean = false
 ) : Observer<Boolean> {
 
     override fun onChanged(value: Boolean) {
-        if (value.xor(reversed)) {
-            view.visibility = View.VISIBLE
+        if (value.xor(mReversed)) {
+            mView.visibility = View.VISIBLE
         } else {
-            view.visibility = View.GONE
+            mView.visibility = View.GONE
         }
     }
 

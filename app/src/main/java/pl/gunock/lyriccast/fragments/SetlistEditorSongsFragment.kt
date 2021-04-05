@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:26 PM
+ * Last modified 4/5/21 5:11 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -43,26 +43,26 @@ class SetlistEditorSongsFragment : Fragment() {
         const val TAG = "SetlistEditorSongsFg"
     }
 
-    private val args: SetlistEditorSongsFragmentArgs by navArgs()
-    private lateinit var repository: LyricCastRepository
-    private val databaseViewModel: DatabaseViewModel by viewModels {
+    private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
+    private lateinit var mRepository: LyricCastRepository
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
             requireContext(),
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
-    private lateinit var songTitleInput: EditText
-    private lateinit var categorySpinner: Spinner
-    private lateinit var selectedSongsSwitch: SwitchCompat
+    private lateinit var mSongTitleInput: EditText
+    private lateinit var mCategorySpinner: Spinner
+    private lateinit var mSelectedSongsSwitch: SwitchCompat
 
-    private lateinit var songItemsAdapter: SongItemsAdapter
-    private lateinit var selectedSongs: MutableSet<Song>
+    private lateinit var mSongItemsAdapter: SongItemsAdapter
+    private lateinit var mSelectedSongs: MutableSet<Song>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        repository = (requireActivity().application as LyricCastApplication).repository
+        mRepository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -75,12 +75,12 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectedSongs = args.setlistWithSongs.songs.toMutableSet()
+        mSelectedSongs = mArgs.setlistWithSongs.songs.toMutableSet()
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
-        songTitleInput = searchView.editText!!
-        categorySpinner = view.findViewById(R.id.spn_category)
-        selectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
+        mSongTitleInput = searchView.editText!!
+        mCategorySpinner = view.findViewById(R.id.spn_category)
+        mSelectedSongsSwitch = view.findViewById(R.id.swt_selected_songs)
 
         setupSongs(view)
         setupCategorySpinner()
@@ -98,26 +98,26 @@ class SetlistEditorSongsFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
-                val setlistSongs = args.setlistWithSongs.songs
+                val setlistSongs = mArgs.setlistWithSongs.songs
                     .toMutableList()
 
                 val removedSongs =
-                    setlistSongs.filter { song -> !this.selectedSongs.contains(song) }
+                    setlistSongs.filter { song -> !this.mSelectedSongs.contains(song) }
                 val addedSongs =
-                    this.selectedSongs.filter { song -> !setlistSongs.contains(song) }
+                    this.mSelectedSongs.filter { song -> !setlistSongs.contains(song) }
 
                 setlistSongs.removeAll(removedSongs)
                 setlistSongs.addAll(addedSongs)
 
                 val removedSongIds = removedSongs.map { song -> song.id }
-                var setlistSongCrossRefs = args.setlistWithSongs.setlistSongCrossRefs
+                var setlistSongCrossRefs = mArgs.setlistWithSongs.setlistSongCrossRefs
                     .toMutableList()
 
                 setlistSongCrossRefs = setlistSongCrossRefs.filter { crossRef ->
                     !removedSongIds.contains(crossRef.songId)
                 }.toMutableList()
 
-                val setlist = args.setlistWithSongs.setlist
+                val setlist = mArgs.setlistWithSongs.setlist
                 addedSongs.forEachIndexed { index, song ->
                     val setlistSongCrossRef = SetlistSongCrossRef(null, setlist.id, song.id, index)
                     setlistSongCrossRefs.add(setlistSongCrossRef)
@@ -135,28 +135,28 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        songTitleInput.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSongs(newText, (categorySpinner.selectedItem as Category).id)
+        mSongTitleInput.addTextChangedListener(InputTextChangedListener { newText ->
+            filterSongs(newText, (mCategorySpinner.selectedItem as Category).id)
         })
 
-        songTitleInput.setOnFocusChangeListener { view, hasFocus ->
+        mSongTitleInput.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
         }
 
-        categorySpinner.onItemSelectedListener =
+        mCategorySpinner.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->
                 filterSongs(
-                    songTitleInput.editableText.toString(),
-                    (categorySpinner.selectedItem as Category).id
+                    mSongTitleInput.editableText.toString(),
+                    (mCategorySpinner.selectedItem as Category).id
                 )
             }
 
-        selectedSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
+        mSelectedSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
             filterSongs(
-                songTitleInput.editableText.toString(),
-                (categorySpinner.selectedItem as Category).id,
+                mSongTitleInput.editableText.toString(),
+                (mCategorySpinner.selectedItem as Category).id,
                 isSelected = if (isChecked) true else null
             )
         }
@@ -164,9 +164,9 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
-        categorySpinner.adapter = categorySpinnerAdapter
+        mCategorySpinner.adapter = categorySpinnerAdapter
 
-        databaseViewModel.allCategories.observe(requireActivity()) { categories ->
+        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
             categorySpinnerAdapter.submitCollection(categories)
         }
     }
@@ -178,25 +178,25 @@ class SetlistEditorSongsFragment : Fragment() {
 
         val selectionTracker =
             SelectionTracker(songsRecyclerView) { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
-                val item: SongItem = songItemsAdapter.songItems[position]
+                val item: SongItem = mSongItemsAdapter.songItems[position]
                 selectSong(item)
                 return@SelectionTracker true
             }
 
-        songItemsAdapter = SongItemsAdapter(
+        mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
             showCheckBox = MutableLiveData(true),
-            selectionTracker = selectionTracker
+            mSelectionTracker = selectionTracker
         )
 
-        databaseViewModel.allSongs.observe(requireActivity()) { songs ->
-            songItemsAdapter.submitCollection(songs ?: return@observe)
-            songItemsAdapter.songItems.forEach { item ->
-                item.isSelected.value = selectedSongs.contains(item.song)
+        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
+            mSongItemsAdapter.submitCollection(songs ?: return@observe)
+            mSongItemsAdapter.songItems.forEach { item ->
+                item.isSelected.value = mSelectedSongs.contains(item.song)
             }
         }
 
-        songsRecyclerView.adapter = songItemsAdapter
+        songsRecyclerView.adapter = mSongItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {
@@ -211,15 +211,15 @@ class SetlistEditorSongsFragment : Fragment() {
         Log.d(TAG, "filterSongs invoked")
 
         updateSelectedSongs()
-        songItemsAdapter.filterItems(title, categoryId, isSelected)
+        mSongItemsAdapter.filterItems(title, categoryId, isSelected)
     }
 
     private fun updateSelectedSongs() {
-        for (item in songItemsAdapter.songItems) {
+        for (item in mSongItemsAdapter.songItems) {
             if (item.isSelected.value!!) {
-                selectedSongs.add(item.song)
+                mSelectedSongs.add(item.song)
             } else {
-                selectedSongs.remove(item.song)
+                mSelectedSongs.remove(item.song)
             }
         }
     }

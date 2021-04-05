@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:00 AM
+ * Last modified 4/5/21 4:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -40,19 +40,19 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
 
-    private lateinit var repository: LyricCastRepository
+    private lateinit var mRepository: LyricCastRepository
 
-    private lateinit var slidePreviewView: TextView
-    private lateinit var songTitleView: TextView
+    private lateinit var mSlidePreviewView: TextView
+    private lateinit var mSongTitleView: TextView
 
-    private var castContext: CastContext? = null
-    private var sessionCreatedListener: SessionCreatedListener? = null
-    private lateinit var songItemsAdapter: ControlsSongItemsAdapter
+    private var mCastContext: CastContext? = null
+    private var mSessionCreatedListener: SessionCreatedListener? = null
+    private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
 
-    private lateinit var setlistLyrics: List<String>
-    private var songTitles: MutableMap<Int, String> = mutableMapOf()
-    private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
-    private var currentLyricsPosition: Int = 0
+    private lateinit var mSetlistLyrics: List<String>
+    private var mSongTitles: MutableMap<Int, String> = mutableMapOf()
+    private var mSongStartPoints: MutableMap<String, Int> = mutableMapOf()
+    private var mCurrentLyricsPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,23 +61,23 @@ class SetlistControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        repository = (application as LyricCastApplication).repository
-        castContext = CastContext.getSharedInstance()
-        sessionCreatedListener = SessionCreatedListener {
+        mRepository = (application as LyricCastApplication).repository
+        mCastContext = CastContext.getSharedInstance()
+        mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        castContext?.sessionManager!!.addSessionManagerListener(sessionCreatedListener)
+        mCastContext?.sessionManager!!.addSessionManagerListener(mSessionCreatedListener)
 
-        slidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
-        songTitleView = findViewById(R.id.tv_current_song_title)
+        mSlidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
+        mSongTitleView = findViewById(R.id.tv_current_song_title)
 
         val setlist: Setlist = intent.getParcelableExtra("setlist")!!
-        val setlistWithSongs = runBlocking { repository.getSetlistWithSongs(setlist.id)!! }
+        val setlistWithSongs = runBlocking { mRepository.getSetlistWithSongs(setlist.id)!! }
         val songs = setlistWithSongs.songs
         var setlistLyricsIndex = 0
 
-        val songLyrics = runBlocking { repository.getSongsWithLyrics(songs) }
+        val songLyrics = runBlocking { mRepository.getSongsWithLyrics(songs) }
             .map { songWithLyricsSections ->
                 val songId = songWithLyricsSections.song.id
                 val lyricsSectionsText = songWithLyricsSections.lyricsSections
@@ -87,7 +87,7 @@ class SetlistControlsActivity : AppCompatActivity() {
                 songId to lyricsSectionsText
             }.toMap()
 
-        setlistLyrics = setlistWithSongs.setlistSongCrossRefs
+        mSetlistLyrics = setlistWithSongs.setlistSongCrossRefs
             .zip(setlistWithSongs.songs)
             .sortedBy { it.first }
             .flatMapIndexed { index: Int, pair: Pair<SetlistSongCrossRef, Song> ->
@@ -95,9 +95,9 @@ class SetlistControlsActivity : AppCompatActivity() {
                 val lyrics = songLyrics[songId]!!
 
                 val indexedTitle = "[$index] ${pair.second.title}"
-                songTitles[setlistLyricsIndex] = indexedTitle
-                songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
-                songStartPoints[indexedTitle] = setlistLyricsIndex
+                mSongTitles[setlistLyricsIndex] = indexedTitle
+                mSongTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
+                mSongStartPoints[indexedTitle] = setlistLyricsIndex
 
                 setlistLyricsIndex += lyrics.size
 
@@ -105,7 +105,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             }
 
 
-        val songsAndCategories = runBlocking { repository.getSongsAndCategories(songs) }
+        val songsAndCategories = runBlocking { mRepository.getSongsAndCategories(songs) }
             .map { it.song.id to it }
             .toMap()
 
@@ -130,8 +130,8 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (castContext != null) {
-            castActionProvider.routeSelector = castContext!!.mergedSelector
+        if (mCastContext != null) {
+            castActionProvider.routeSelector = mCastContext!!.mergedSelector
         }
 
         return true
@@ -163,78 +163,78 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val songItemList: List<SongItem> = songs.map { song -> SongItem(song) }
 
-        songItemsAdapter = ControlsSongItemsAdapter(
+        mSongItemsAdapter = ControlsSongItemsAdapter(
             this,
             songItemList,
             onItemLongClickListener = onLongClickListener,
             onItemClickListener = onClickListener
         )
 
-        songRecyclerView.adapter = songItemsAdapter
+        songRecyclerView.adapter = mSongItemsAdapter
     }
 
     private fun setupListeners() {
         findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
-            MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
+            MessageHelper.sendControlMessage(mCastContext!!, ControlAction.BLANK)
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
-            if (currentLyricsPosition <= 0) {
+            if (mCurrentLyricsPosition <= 0) {
                 return@setOnClickListener
             }
-            currentLyricsPosition--
+            mCurrentLyricsPosition--
             sendSlide()
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev_song).setOnClickListener {
-            val currentSongTitle = songTitles.entries.last {
-                it.key <= currentLyricsPosition
+            val currentSongTitle = mSongTitles.entries.last {
+                it.key <= mCurrentLyricsPosition
             }.value
 
-            if (songTitles.values.toList()[0] == currentSongTitle) {
-                currentLyricsPosition = 0
+            if (mSongTitles.values.toList()[0] == currentSongTitle) {
+                mCurrentLyricsPosition = 0
             } else {
 
-                val previousSongTitle: String = songTitles.entries.lastOrNull {
-                    it.key < currentLyricsPosition && it.value != currentSongTitle
+                val previousSongTitle: String = mSongTitles.entries.lastOrNull {
+                    it.key < mCurrentLyricsPosition && it.value != currentSongTitle
                 }?.value ?: return@setOnClickListener
 
-                val previousSongStartIndex: Int = songTitles.entries.first {
+                val previousSongStartIndex: Int = mSongTitles.entries.first {
                     it.value == previousSongTitle
                 }.key
-                currentLyricsPosition = previousSongStartIndex
+                mCurrentLyricsPosition = previousSongStartIndex
             }
 
             sendSlide()
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_next).setOnClickListener {
-            if (currentLyricsPosition >= setlistLyrics.size - 1) {
+            if (mCurrentLyricsPosition >= mSetlistLyrics.size - 1) {
                 return@setOnClickListener
             }
-            currentLyricsPosition++
+            mCurrentLyricsPosition++
             sendSlide()
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_next_song).setOnClickListener {
-            val currentSongTitle = songTitles.entries.last {
-                it.key <= currentLyricsPosition
+            val currentSongTitle = mSongTitles.entries.last {
+                it.key <= mCurrentLyricsPosition
             }.value
 
-            val nextSongIndex: Int = songTitles.entries.firstOrNull {
-                it.key > currentLyricsPosition && it.value != currentSongTitle
+            val nextSongIndex: Int = mSongTitles.entries.firstOrNull {
+                it.key > mCurrentLyricsPosition && it.value != currentSongTitle
             }?.key ?: return@setOnClickListener
 
-            currentLyricsPosition = nextSongIndex
+            mCurrentLyricsPosition = nextSongIndex
             sendSlide()
         }
     }
 
     private fun highlightSong(title: String) {
-        val songItemPosition: Int = songStartPoints.keys
+        val songItemPosition: Int = mSongStartPoints.keys
             .indexOfFirst { songTitle -> songTitle == title }
 
-        songItemsAdapter.songItems.forEachIndexed { index, songItem ->
+        mSongItemsAdapter.songItems.forEachIndexed { index, songItem ->
             songItem.highlight.value = index == songItemPosition
         }
 
@@ -245,29 +245,29 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun sendSlide() {
-        if (songTitles.containsKey(currentLyricsPosition)) {
-            val songTitle = songTitles[currentLyricsPosition]!!
-            songTitleView.text = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
+        if (mSongTitles.containsKey(mCurrentLyricsPosition)) {
+            val songTitle = mSongTitles[mCurrentLyricsPosition]!!
+            mSongTitleView.text = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
             highlightSong(songTitle)
         }
 
-        slidePreviewView.text = setlistLyrics[currentLyricsPosition]
+        mSlidePreviewView.text = mSetlistLyrics[mCurrentLyricsPosition]
         MessageHelper.sendContentMessage(
-            castContext!!,
-            setlistLyrics[currentLyricsPosition]
+            mCastContext!!,
+            mSetlistLyrics[mCurrentLyricsPosition]
         )
     }
 
     private fun selectSong(position: Int): Boolean {
-        val title = songItemsAdapter.songItems[position].song.title
+        val title = mSongItemsAdapter.songItems[position].song.title
         val indexedTitle = "[$position] $title"
-        currentLyricsPosition = songStartPoints[indexedTitle]!!
+        mCurrentLyricsPosition = mSongStartPoints[indexedTitle]!!
         sendSlide()
         return true
     }
 
     private fun sendConfigure() {
-        if (castContext == null) {
+        if (mCastContext == null) {
             return
         }
 
@@ -281,7 +281,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
 
         MessageHelper.sendControlMessage(
-            castContext!!,
+            mCastContext!!,
             ControlAction.CONFIGURE,
             configurationJson
         )

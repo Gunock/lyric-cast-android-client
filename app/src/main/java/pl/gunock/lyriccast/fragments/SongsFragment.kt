@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:34 PM
+ * Last modified 4/5/21 5:11 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -60,29 +60,29 @@ class SongsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 3
     }
 
-    private var castContext: CastContext? = null
-    private lateinit var repository: LyricCastRepository
-    private val databaseViewModel: DatabaseViewModel by viewModels {
+    private var mCastContext: CastContext? = null
+    private lateinit var mRepository: LyricCastRepository
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
             requireContext(),
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
-    private lateinit var searchViewEditText: EditText
-    private lateinit var categorySpinner: Spinner
-    private lateinit var songItemsRecyclerView: RecyclerView
+    private lateinit var mSearchViewEditText: EditText
+    private lateinit var mCategorySpinner: Spinner
+    private lateinit var mSongItemsRecyclerView: RecyclerView
 
-    private lateinit var songItemsAdapter: SongItemsAdapter
-    private lateinit var selectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
+    private lateinit var mSongItemsAdapter: SongItemsAdapter
+    private lateinit var mSelectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
 
-    private var actionMenu: Menu? = null
-    private var actionMode: ActionMode? = null
-    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+    private var mActionMenu: Menu? = null
+    private var mActionMode: ActionMode? = null
+    private val mActionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
             mode.title = ""
-            actionMenu = menu
+            mActionMenu = menu
             return true
         }
 
@@ -108,8 +108,8 @@ class SongsFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
-            actionMode = null
-            actionMenu = null
+            mActionMode = null
+            mActionMenu = null
             resetSelection()
         }
 
@@ -119,7 +119,7 @@ class SongsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository = (requireActivity().application as LyricCastApplication).repository
+        mRepository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -132,18 +132,18 @@ class SongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        castContext = CastContext.getSharedInstance()
+        mCastContext = CastContext.getSharedInstance()
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
-        searchViewEditText = searchView.editText!!
+        mSearchViewEditText = searchView.editText!!
 
-        categorySpinner = view.findViewById(R.id.spn_category)
-        songItemsRecyclerView = view.findViewById(R.id.rcv_songs)
+        mCategorySpinner = view.findViewById(R.id.spn_category)
+        mSongItemsRecyclerView = view.findViewById(R.id.rcv_songs)
 
         view.findViewById<SwitchCompat>(R.id.swt_selected_songs).visibility = View.GONE
 
-        songItemsRecyclerView.setHasFixedSize(true)
-        songItemsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        mSongItemsRecyclerView.setHasFixedSize(true)
+        mSongItemsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         setupCategorySpinner()
         setupSongs()
@@ -154,11 +154,11 @@ class SongsFragment : Fragment() {
         super.onResume()
 
         resetSelection()
-        searchViewEditText.setText("")
+        mSearchViewEditText.setText("")
     }
 
     override fun onStop() {
-        actionMode?.finish()
+        mActionMode?.finish()
         super.onStop()
     }
 
@@ -176,22 +176,22 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangedListener {
+        mSearchViewEditText.addTextChangedListener(InputTextChangedListener {
             filterSongs(
-                searchViewEditText.editableText.toString(),
+                mSearchViewEditText.editableText.toString(),
                 getSelectedCategoryId()
             )
         })
 
-        searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+        mSearchViewEditText.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
         }
 
-        categorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
+        mCategorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             filterSongs(
-                searchViewEditText.editableText.toString(),
+                mSearchViewEditText.editableText.toString(),
                 getSelectedCategoryId()
             )
         }
@@ -199,24 +199,24 @@ class SongsFragment : Fragment() {
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
-        categorySpinner.adapter = categorySpinnerAdapter
+        mCategorySpinner.adapter = categorySpinnerAdapter
 
-        databaseViewModel.allCategories.observe(requireActivity()) { categories ->
+        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
             categorySpinnerAdapter.submitCollection(categories)
-            categorySpinner.setSelection(0)
+            mCategorySpinner.setSelection(0)
         }
     }
 
     private fun setupSongs() {
-        selectionTracker = SelectionTracker(songItemsRecyclerView, this::onSongClick)
-        songItemsAdapter = SongItemsAdapter(
+        mSelectionTracker = SelectionTracker(mSongItemsRecyclerView, this::onSongClick)
+        mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
-            selectionTracker = selectionTracker
+            mSelectionTracker = mSelectionTracker
         )
-        songItemsRecyclerView.adapter = songItemsAdapter
+        mSongItemsRecyclerView.adapter = mSongItemsAdapter
 
-        databaseViewModel.allSongs.observe(requireActivity(), { songs ->
-            songItemsAdapter.submitCollection(songs ?: return@observe)
+        mDatabaseViewModel.allSongs.observe(requireActivity(), { songs ->
+            mSongItemsAdapter.submitCollection(songs ?: return@observe)
         })
     }
 
@@ -226,9 +226,9 @@ class SongsFragment : Fragment() {
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = songItemsAdapter.songItems[position]
+        val item = mSongItemsAdapter.songItems[position]
 
-        if (!isLongClick && selectionTracker.count == 0) {
+        if (!isLongClick && mSelectionTracker.count == 0) {
             pickSong(item)
         } else {
             return selectSong(item)
@@ -243,12 +243,12 @@ class SongsFragment : Fragment() {
     ) {
         Log.v(TAG, "filterSongs invoked")
 
-        songItemsAdapter.filterItems(title, categoryId = categoryId)
+        mSongItemsAdapter.filterItems(title, categoryId = categoryId)
         resetSelection()
     }
 
     private fun pickSong(item: SongItem) {
-        val songWithLyrics = runBlocking { repository.getSongWithLyrics(item.song.id) }!!
+        val songWithLyrics = runBlocking { mRepository.getSongWithLyrics(item.song.id) }!!
 
         val lyricsTextMap = songWithLyrics.lyricsSectionsToTextMap()
         val lyrics: List<String> = songWithLyrics.crossRef
@@ -265,19 +265,19 @@ class SongsFragment : Fragment() {
     private fun selectSong(item: SongItem): Boolean {
         item.isSelected.value = !item.isSelected.value!!
 
-        when (selectionTracker.countAfter) {
+        when (mSelectionTracker.countAfter) {
             0 -> {
-                actionMode?.finish()
+                mActionMode?.finish()
                 return false
             }
             1 -> {
-                if (!songItemsAdapter.showCheckBox.value!!) {
-                    songItemsAdapter.showCheckBox.value = true
+                if (!mSongItemsAdapter.showCheckBox.value!!) {
+                    mSongItemsAdapter.showCheckBox.value = true
                 }
 
-                if (actionMode == null) {
-                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                        actionModeCallback
+                if (mActionMode == null) {
+                    mActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                        mActionModeCallback
                     )
                 }
 
@@ -291,7 +291,7 @@ class SongsFragment : Fragment() {
 
     private fun editSelectedSong(): Boolean {
         val selectedItem =
-            songItemsAdapter.songItems.first { songItem -> songItem.isSelected.value!! }
+            mSongItemsAdapter.songItems.first { songItem -> songItem.isSelected.value!! }
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("song", selectedItem.song)
@@ -321,19 +321,18 @@ class SongsFragment : Fragment() {
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
-        val message = dialogFragment.message
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val selectedSongs = songItemsAdapter.songItems
+            val selectedSongs = mSongItemsAdapter.songItems
                 .filter { it.isSelected.value!! }
 
             val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
             val categoryNames: Set<String> = selectedSongs.mapNotNull { it.category?.name }.toSet()
 
-            val exportData = databaseViewModel.getDatabaseTransferData()
+            val exportData = mDatabaseViewModel.getDatabaseTransferData()
             val songJsons = exportData.songDtos!!
                 .filter { it.title in songTitles }
                 .map { it.toJson() }
@@ -342,17 +341,17 @@ class SongsFragment : Fragment() {
                 .filter { it.name in categoryNames }
                 .map { it.toJson() }
 
-            message.postValue(getString(R.string.export_saving_json))
+            dialogFragment.message = getString(R.string.export_saving_json)
             val songsString = JSONArray(songJsons).toString()
             val categoriesString = JSONArray(categoryJsons).toString()
             File(exportDir, "songs.json").writeText(songsString)
             File(exportDir, "categories.json").writeText(categoriesString)
 
-            message.postValue(getString(R.string.export_saving_zip))
+            dialogFragment.message = getString(R.string.export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            message.postValue(getString(R.string.export_deleting_temp))
+            dialogFragment.message = getString(R.string.export_deleting_temp)
             exportDir.deleteRecursively()
             dialogFragment.dismiss()
         }
@@ -364,11 +363,11 @@ class SongsFragment : Fragment() {
 
     private fun addSetlist(): Boolean {
         val setlist = Setlist(null, "")
-        val songs = songItemsAdapter.songItems
+        val songs = mSongItemsAdapter.songItems
             .filter { it.isSelected.value == true }
             .map { item -> item.song }
 
-        val crossRef: List<SetlistSongCrossRef> = songItemsAdapter.songItems
+        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter.songItems
             .mapIndexed { index, item ->
                 SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
@@ -385,11 +384,11 @@ class SongsFragment : Fragment() {
     }
 
     private fun deleteSelectedSongs(): Boolean {
-        val selectedSongs = songItemsAdapter.songItems
+        val selectedSongs = mSongItemsAdapter.songItems
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.song.id }
 
-        databaseViewModel.deleteSongs(selectedSongs)
+        mDatabaseViewModel.deleteSongs(selectedSongs)
 
         resetSelection()
 
@@ -397,25 +396,25 @@ class SongsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        if (songItemsAdapter.showCheckBox.value!!) {
-            songItemsAdapter.showCheckBox.value = false
+        if (mSongItemsAdapter.showCheckBox.value!!) {
+            mSongItemsAdapter.showCheckBox.value = false
         }
 
-        songItemsAdapter.resetSelection()
+        mSongItemsAdapter.resetSelection()
     }
 
     private fun showMenuActions(
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
     ) {
-        actionMenu ?: return
-        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_add_setlist).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
+        mActionMenu ?: return
+        mActionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
+        mActionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+        mActionMenu!!.findItem(R.id.action_menu_add_setlist).isVisible = showGroupActions
+        mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun getSelectedCategoryId(): Long {
-        return ((categorySpinner.selectedItem ?: Category.ALL) as Category).id
+        return ((mCategorySpinner.selectedItem ?: Category.ALL) as Category).id
     }
 }

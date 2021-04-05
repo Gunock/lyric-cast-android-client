@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 3:18 AM
+ * Last modified 4/5/21 5:13 PM
  */
 
 package pl.gunock.lyriccast
@@ -11,16 +11,16 @@ import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.LyricCastRoomDatabase
 
 class LyricCastApplication : Application() {
-    private val database by lazy {
+    private val mDatabase by lazy {
         LyricCastRoomDatabase.getDatabase(applicationContext)
     }
 
     val repository by lazy {
         LyricCastRepository(
-            database.songDao(),
-            database.lyricsSectionDao(),
-            database.setlistDao(),
-            database.categoryDao()
+            mDatabase.songDao(),
+            mDatabase.lyricsSectionDao(),
+            mDatabase.setlistDao(),
+            mDatabase.categoryDao()
         )
     }
 }

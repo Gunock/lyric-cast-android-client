@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:14 PM
+ * Last modified 4/5/21 5:19 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -24,31 +24,31 @@ import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 class DatabaseViewModel(
     resources: Resources,
-    private val repository: LyricCastRepository
+    private val mRepository: LyricCastRepository
 ) : ViewModel() {
-    val allSongs: LiveData<List<SongAndCategory>> = repository.allSongs.asLiveData()
-    val allSetlists: LiveData<List<Setlist>> = repository.allSetlists.asLiveData()
-    val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
+    val allSongs: LiveData<List<SongAndCategory>> = mRepository.allSongs.asLiveData()
+    val allSetlists: LiveData<List<Setlist>> = mRepository.allSetlists.asLiveData()
+    val allCategories: LiveData<List<Category>> = mRepository.allCategories.asLiveData()
 
-    private val dataTransferProcessor = DataTransferProcessor(resources, repository)
+    private val mDataTransferProcessor = DataTransferProcessor(resources, mRepository)
 
     suspend fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
-        repository.upsertSong(song, order)
+        mRepository.upsertSong(song, order)
 
     fun deleteSongs(songIds: List<Long>) =
-        viewModelScope.launch { repository.deleteSongs(songIds) }
+        viewModelScope.launch { mRepository.deleteSongs(songIds) }
 
     fun upsertSetlist(setlist: SetlistWithSongs) =
-        viewModelScope.launch { repository.upsertSetlist(setlist) }
+        viewModelScope.launch { mRepository.upsertSetlist(setlist) }
 
     fun deleteSetlists(setlistIds: List<Long>) =
-        viewModelScope.launch { repository.deleteSetlists(setlistIds) }
+        viewModelScope.launch { mRepository.deleteSetlists(setlistIds) }
 
     fun upsertCategory(category: Category) =
-        runBlocking { repository.upsertCategory(category) }
+        runBlocking { mRepository.upsertCategory(category) }
 
     fun deleteCategories(categoryIds: Collection<Long>) =
-        viewModelScope.launch { repository.deleteCategories(categoryIds) }
+        viewModelScope.launch { mRepository.deleteCategories(categoryIds) }
 
 
     suspend fun importSongs(
@@ -56,7 +56,7 @@ class DatabaseViewModel(
         message: MutableLiveData<String>,
         options: ImportOptions
     ) {
-        dataTransferProcessor.importSongs(data, message, options)
+        mDataTransferProcessor.importSongs(data, message, options)
     }
 
     suspend fun importSongs(
@@ -74,23 +74,23 @@ class DatabaseViewModel(
             }
 
         val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
-        dataTransferProcessor.importSongs(data, message, options)
+        mDataTransferProcessor.importSongs(data, message, options)
     }
 
     suspend fun getDatabaseTransferData(): DatabaseTransferData {
-        return dataTransferProcessor.getDatabaseTransferData()
+        return mDataTransferProcessor.getDatabaseTransferData()
     }
 
 }
 
 class DatabaseViewModelFactory(
-    private val context: Context,
-    private val repository: LyricCastRepository
+    private val mContext: Context,
+    private val mRepository: LyricCastRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DatabaseViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DatabaseViewModel(context.resources, repository) as T
+            return DatabaseViewModel(mContext.resources, mRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

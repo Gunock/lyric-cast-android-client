@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 5:14 PM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -19,15 +19,15 @@ import pl.gunock.lyriccast.datamodel.entities.Category
 class CategorySpinnerAdapter(
     context: Context
 ) : BaseAdapter() {
-    private val lock = Any()
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var _items: MutableList<Category> = mutableListOf()
-    val categories: List<Category> get() = _items
+    private val mLock = Any()
+    private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    private var mItems: MutableList<Category> = mutableListOf()
+    val categories: List<Category> get() = mItems
 
     fun submitCollection(categories: Collection<Category>, firstCategory: Category = Category.ALL) {
-        synchronized(lock) {
-            _items.clear()
-            _items.addAll(listOf(firstCategory) + categories.toSortedSet())
+        synchronized(mLock) {
+            mItems.clear()
+            mItems.addAll(listOf(firstCategory) + categories.toSortedSet())
             notifyDataSetChanged()
         }
     }
@@ -45,7 +45,8 @@ class CategorySpinnerAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View = convertView ?: inflater.inflate(R.layout.spinner_item_color, parent, false)
+        val view: View =
+            convertView ?: mInflater.inflate(R.layout.spinner_item_color, parent, false)
 
         val vh = ViewHolder(view)
         val item = this.categories[position]
@@ -55,16 +56,17 @@ class CategorySpinnerAdapter(
     }
 
     private inner class ViewHolder(itemView: View) {
-        private val name: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
-        private val colorCard: CardView = itemView.findViewById(R.id.cdv_spinner_category_color)
+        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
+        private val mColorCardView: CardView =
+            itemView.findViewById(R.id.cdv_spinner_category_color)
 
         fun bind(item: Category) {
-            name.text = item.name
+            mNameTextView.text = item.name
             if (item.color != null) {
-                colorCard.visibility = View.VISIBLE
-                colorCard.setCardBackgroundColor(item.color!!)
+                mColorCardView.visibility = View.VISIBLE
+                mColorCardView.setCardBackgroundColor(item.color!!)
             } else {
-                colorCard.visibility = View.GONE
+                mColorCardView.visibility = View.GONE
             }
         }
     }

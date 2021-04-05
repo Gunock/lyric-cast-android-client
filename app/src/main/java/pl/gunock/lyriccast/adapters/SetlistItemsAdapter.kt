@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 4:51 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -26,7 +26,7 @@ import java.util.*
 import kotlin.system.measureTimeMillis
 
 class SetlistItemsAdapter(
-    private val context: Context,
+    private val mContext: Context,
     var showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
@@ -35,10 +35,10 @@ class SetlistItemsAdapter(
         const val TAG = "SetlistItemsAdapter"
     }
 
-    private val lock = Any()
-    private var _items: SortedSet<SetlistItem> = sortedSetOf()
-    private var _visibleItems: Set<SetlistItem> = setOf()
-    val setlistItems: List<SetlistItem> get() = _items.toList()
+    private val mLock = Any()
+    private var mItems: SortedSet<SetlistItem> = sortedSetOf()
+    private var mVisibleItems: Set<SetlistItem> = setOf()
+    val mSetlistItems: List<SetlistItem> get() = mItems.toList()
 
     init {
         setHasStableIds(true)
@@ -46,10 +46,10 @@ class SetlistItemsAdapter(
 
 
     fun submitCollection(setlistWithSongs: Collection<Setlist>) {
-        synchronized(lock) {
-            _items.clear()
-            _items.addAll(setlistWithSongs.map { SetlistItem(it) })
-            _visibleItems = _items
+        synchronized(mLock) {
+            mItems.clear()
+            mItems.addAll(setlistWithSongs.map { SetlistItem(it) })
+            mVisibleItems = mItems
             notifyDataSetChanged()
         }
     }
@@ -58,7 +58,7 @@ class SetlistItemsAdapter(
         val normalizedName = setlistName.trim().normalize()
 
         val duration = measureTimeMillis {
-            _visibleItems = _items.filter { item ->
+            mVisibleItems = mItems.filter { item ->
                 item.normalizedName.contains(normalizedName, ignoreCase = true)
             }.toSortedSet()
         }
@@ -67,7 +67,7 @@ class SetlistItemsAdapter(
     }
 
     fun resetSelection() {
-        _visibleItems.forEach { it.isSelected.value = false }
+        mVisibleItems.forEach { it.isSelected.value = false }
         selectionTracker?.reset()
     }
 
@@ -83,25 +83,25 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return _visibleItems.toList()[position].setlist.id
+        return mVisibleItems.toList()[position].setlist.id
     }
 
-    override fun getItemCount() = _visibleItems.size
+    override fun getItemCount() = mVisibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
-        private val nameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
+        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
+        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
 
         fun bind(position: Int) {
-            val item = _visibleItems.toList()[position]
+            val item = mVisibleItems.toList()[position]
             selectionTracker?.attach(this)
 
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
-            item.isSelected.observe(context.getLifecycleOwner()!!) {
-                checkBox.isChecked = it
+            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
+            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+                mCheckBox.isChecked = it
             }
 
-            nameTextView.text = item.setlist.name
+            mNameTextView.text = item.setlist.name
         }
     }
 

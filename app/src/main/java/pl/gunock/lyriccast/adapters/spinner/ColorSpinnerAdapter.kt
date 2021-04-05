@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/31/21 1:57 AM
+ * Last modified 4/5/21 5:14 PM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -19,13 +19,13 @@ import pl.gunock.lyriccast.models.ColorItem
 
 class ColorSpinnerAdapter(
     context: Context,
-    private val colors: Array<ColorItem>
+    private val mColors: Array<ColorItem>
 ) : BaseAdapter() {
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
+    private val mInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getItem(position: Int): Any {
-        return colors[position]
+        return mColors[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -33,26 +33,28 @@ class ColorSpinnerAdapter(
     }
 
     override fun getCount(): Int {
-        return colors.size
+        return mColors.size
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View = convertView ?: inflater.inflate(R.layout.spinner_item_color, parent, false)
+        val view: View =
+            convertView ?: mInflater.inflate(R.layout.spinner_item_color, parent, false)
 
         val vh = ViewHolder(view)
-        val item = colors[position]
+        val item = mColors[position]
         vh.bind(item)
 
         return view
     }
 
     private inner class ViewHolder(itemView: View) {
-        private val name: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
-        private val colorCard: CardView = itemView.findViewById(R.id.cdv_spinner_category_color)
+        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
+        private val mColorCardView: CardView =
+            itemView.findViewById(R.id.cdv_spinner_category_color)
 
         fun bind(item: ColorItem) {
-            name.text = item.name
-            colorCard.setCardBackgroundColor(item.value)
+            mNameTextView.text = item.name
+            mColorCardView.setCardBackgroundColor(item.value)
         }
     }
 
