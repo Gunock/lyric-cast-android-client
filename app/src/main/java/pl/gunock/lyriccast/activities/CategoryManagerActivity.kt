@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:41 PM
+ * Last modified 4/5/21 4:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,13 +34,49 @@ class CategoryManagerActivity : AppCompatActivity() {
         DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
-    private lateinit var menu: Menu
     private lateinit var categoryItemsRecyclerView: RecyclerView
 
     private lateinit var editCategoryDialogViewModel: EditCategoryDialogViewModel
 
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
+
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_category_manager, menu)
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions(showDelete = false, showEdit = false)
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> deleteSelectedCategories()
+                R.id.action_menu_edit -> editSelectedCategory()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            resetSelection()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,18 +102,14 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        this.menu = menu
         menuInflater.inflate(R.menu.menu_category_manager, menu)
 
-        showMenuActions(showDelete = false, showEdit = false)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedCategories()
-            R.id.menu_edit -> editSelectedCategory()
-            R.id.menu_category_manager -> showAddCategoryDialog()
+            R.id.menu_add_category -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -111,10 +144,11 @@ class CategoryManagerActivity : AppCompatActivity() {
         isLongClick: Boolean
     ): Boolean {
         val item = categoryItemsAdapter.categoryItems[position]
+
         if (isLongClick || selectionTracker.count != 0) {
-            selectCategory(item)
-            return true
+            return selectCategory(item)
         }
+
         return false
     }
 
@@ -160,47 +194,45 @@ class CategoryManagerActivity : AppCompatActivity() {
         return true
     }
 
-    private fun selectCategory(
-        item: CategoryItem
-    ) {
+    private fun selectCategory(item: CategoryItem): Boolean {
+        item.isSelected.value = !item.isSelected.value!!
+
         when (selectionTracker.countAfter) {
             0 -> {
-                if (categoryItemsAdapter.showCheckBox.value!!) {
-                    categoryItemsAdapter.showCheckBox.value = false
-                }
-                showMenuActions(showDelete = false, showEdit = false)
+                actionMode?.finish()
+                return false
             }
             1 -> {
                 if (!categoryItemsAdapter.showCheckBox.value!!) {
                     categoryItemsAdapter.showCheckBox.value = true
                 }
 
-                showMenuActions(showAdd = false)
+                if (actionMode == null) {
+                    actionMode = startSupportActionMode(actionModeCallback)
+                }
+
+                showMenuActions()
             }
-            2 -> showMenuActions(showAdd = false, showEdit = false)
+            2 -> showMenuActions(showEdit = false)
         }
 
-        item.isSelected.value = !item.isSelected.value!!
+        return true
     }
 
     private fun resetSelection() {
-        categoryItemsAdapter.showCheckBox.value = false
-        categoryItemsAdapter.categoryItems.forEach { categoryItem ->
-            categoryItem.isSelected.value = false
+        if (categoryItemsAdapter.showCheckBox.value!!) {
+            categoryItemsAdapter.showCheckBox.value = false
         }
-        selectionTracker.reset()
-
-        showMenuActions(showDelete = false, showEdit = false)
+        categoryItemsAdapter.resetSelection()
     }
 
     private fun showMenuActions(
-        showAdd: Boolean = true,
         showDelete: Boolean = true,
         showEdit: Boolean = true
     ) {
-        menu.findItem(R.id.menu_category_manager).isVisible = showAdd
-        menu.findItem(R.id.menu_delete).isVisible = showDelete
-        menu.findItem(R.id.menu_edit).isVisible = showEdit
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showDelete
+        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun observeViewModelCategory(viewModelCategory: Category?) {

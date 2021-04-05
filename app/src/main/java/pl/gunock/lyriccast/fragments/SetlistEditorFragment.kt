@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:21 PM
+ * Last modified 4/5/21 4:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -15,6 +15,8 @@ import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -68,7 +70,42 @@ class SetlistEditorFragment : Fragment() {
     private var intentSetlistWithSongs: SetlistWithSongs? = null
     private lateinit var setlistNames: Set<String>
 
-    private lateinit var menu: Menu
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_setlist_editor, menu)
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions()
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> removeSelectedSongs()
+                R.id.menu_duplicate -> duplicateSong()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            resetSelection()
+        }
+
+    }
 
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback =
@@ -106,7 +143,6 @@ class SetlistEditorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_setlist_editor, container, false)
     }
 
@@ -144,19 +180,6 @@ class SetlistEditorFragment : Fragment() {
         setupListeners(view)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> removeSelectedSongs()
-            R.id.menu_duplicate -> duplicateSong()
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -173,6 +196,7 @@ class SetlistEditorFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.btn_pick_setlist_songs).setOnClickListener {
+            actionMode?.finish()
             val action = SetlistEditorFragmentDirections.actionSetlistEditorToSetlistEditorSongs(
                 setlistWithSongs = createSetlistWithSongs()
             )
@@ -217,8 +241,7 @@ class SetlistEditorFragment : Fragment() {
     ): Boolean {
         if (isLongClick || selectionTracker.count != 0) {
             val item: SongItem = songItemsAdapter.songItems[position]
-            selectSong(item)
-            return true
+            return selectSong(item)
         }
         return false
     }
@@ -283,7 +306,7 @@ class SetlistEditorFragment : Fragment() {
         return true
     }
 
-    private fun selectSong(item: SongItem) {
+    private fun selectSong(item: SongItem): Boolean {
         item.isSelected.value = !item.isSelected.value!!
 
         when (selectionTracker.countAfter) {
@@ -291,21 +314,31 @@ class SetlistEditorFragment : Fragment() {
                 if (songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = false
                 }
-                showMenuActions(showDelete = false, showDuplicate = false)
+                actionMode?.finish()
+                return false
             }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
                 }
+
+                if (actionMode == null) {
+                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
+                }
+
                 showMenuActions()
             }
             2 -> showMenuActions(showDuplicate = false)
         }
+        return true
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {
-        menu.findItem(R.id.menu_delete).isVisible = showDelete
-        menu.findItem(R.id.menu_duplicate).isVisible = showDuplicate
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showDelete
+        actionMenu!!.findItem(R.id.menu_duplicate).isVisible = showDuplicate
     }
 
     private fun removeSelectedSongs(): Boolean {
@@ -326,8 +359,7 @@ class SetlistEditorFragment : Fragment() {
         if (songItemsAdapter.showCheckBox.value!!) {
             songItemsAdapter.showCheckBox.value = false
         }
-        selectionTracker.reset()
-
+        songItemsAdapter.resetSelection()
         showMenuActions(showDelete = false, showDuplicate = false)
     }
 

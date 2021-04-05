@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/28/21 1:48 AM
+ * Last modified 4/5/21 4:31 PM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -26,11 +26,4 @@ data class LyricsSection(
     val text: String
 ) {
     val id: Long get() = lyricsSectionId.toNonNullable()
-
-    constructor(songId: Long, lyricsSection: LyricsSection) : this(
-        lyricsSection.lyricsSectionId,
-        songId,
-        lyricsSection.name,
-        lyricsSection.text
-    )
 }

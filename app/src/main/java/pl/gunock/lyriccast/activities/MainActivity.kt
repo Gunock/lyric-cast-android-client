@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:21 PM
+ * Last modified 4/5/21 3:52 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_category_manager -> goToCategoryManager()
+            R.id.menu_add_category -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> showImportDialog()
             R.id.menu_export_all -> startExport()

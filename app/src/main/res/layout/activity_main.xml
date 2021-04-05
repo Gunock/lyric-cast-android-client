@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 9:37 PM
+  ~ Last modified 4/5/21 2:03 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,6 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
+            app:menu="@menu/menu_main"
             app:popupTheme="@style/ThemeOverlay.LyricCast.Light" />
 
     </com.google.android.material.appbar.AppBarLayout>

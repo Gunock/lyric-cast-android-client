@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 4:33 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -24,7 +24,7 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistSongItemsAdapter(
     val context: Context,
-    var songItems: MutableList<SongItem>,
+    val songItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val selectionTracker: SelectionTracker<ViewHolder>?,
     val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
@@ -32,6 +32,11 @@ class SetlistSongItemsAdapter(
 
     init {
         setHasStableIds(true)
+    }
+
+    fun resetSelection() {
+        songItems.forEach { it.isSelected.value = false }
+        selectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,7 +51,8 @@ class SetlistSongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return songItems[position].song.id
+        val item = songItems[position]
+        return item.song.id + position
     }
 
     override fun getItemCount() = songItems.size
@@ -58,7 +64,7 @@ class SetlistSongItemsAdapter(
 
     fun duplicateSelectedItem() {
         val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected.value!! }
-        val selectedItem = songItems[selectedItemIndex]
+        val selectedItem = songItems[selectedItemIndex].copy()
         selectedItem.isSelected.value = false
 
         songItems.add(selectedItemIndex + 1, selectedItem)
@@ -89,17 +95,17 @@ class SetlistSongItemsAdapter(
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
 
         fun bind(position: Int) {
+            val item = songItems[position]
             selectionTracker?.attach(this)
             setupListeners()
 
-            val item = songItems[position]
             item.isSelected.observe(context.getLifecycleOwner()!!) {
                 checkBox.isChecked = it
             }
 
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
             showCheckBox
                 .observe(context.getLifecycleOwner()!!, VisibilityObserver(handleView, true))
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
 
             titleTextView.text = item.song.title
         }

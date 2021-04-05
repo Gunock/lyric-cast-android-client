@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:25 PM
+ * Last modified 4/5/21 4:31 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -75,7 +75,7 @@ class LyricCastRepository(
         try {
             val songId = songDao.upsert(song)
             val sectionIds =
-                lyricsSectionDao.upsert(lyricsSections.map { LyricsSection(songId, it) })
+                lyricsSectionDao.upsert(lyricsSections.map { it.copy(songId = songId) })
 
             val sectionIdMap = sectionIds.zip(lyricsSections)
                 .map { it.second.name to it.first }
@@ -111,7 +111,7 @@ class LyricCastRepository(
         val lyricsSections: List<LyricsSection> =
             songsWithLyricsSections.flatMap { songWithLyricsSections ->
                 val songId = songIdMap[songWithLyricsSections.song.title]!!
-                songWithLyricsSections.lyricsSections.map { LyricsSection(songId, it) }
+                songWithLyricsSections.lyricsSections.map { it.copy(songId = songId) }
             }
 
         lyricsSectionDao.upsert(lyricsSections)
@@ -175,7 +175,7 @@ class LyricCastRepository(
 
         val setlistCrossRefs = setlistCrossRefMap.flatMap { entry ->
             val setlistId: Long = setlistIdMap[entry.key]!!
-            return@flatMap entry.value.map { SetlistSongCrossRef(setlistId, it) }
+            return@flatMap entry.value.map { it.copy(setlistId = setlistId) }
         }
 
         setlistDao.upsertSongsCrossRefs(setlistCrossRefs)
@@ -195,7 +195,7 @@ class LyricCastRepository(
         val setlistId = setlistDao.upsert(setlist)
 
         val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
-            .map { SetlistSongCrossRef(setlistId, it) }
+            .map { it.copy(setlistId = setlistId) }
 
         setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
     }

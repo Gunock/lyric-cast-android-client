@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:21 PM
+ * Last modified 4/5/21 4:34 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -14,7 +14,8 @@ import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.Spinner
-import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -68,7 +69,6 @@ class SongsFragment : Fragment() {
         )
     }
 
-    private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var songItemsRecyclerView: RecyclerView
@@ -76,23 +76,50 @@ class SongsFragment : Fragment() {
     private lateinit var songItemsAdapter: SongItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
 
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_main, menu)
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions(showGroupActions = false, showEdit = false)
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> deleteSelectedSongs()
+                R.id.action_menu_export_selected -> startExport()
+                R.id.action_menu_edit -> editSelectedSong()
+                R.id.action_menu_add_setlist -> addSetlist()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            resetSelection()
+        }
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
 
         repository = (requireActivity().application as LyricCastApplication).repository
-        requireActivity().onBackPressedDispatcher
-            .addCallback(this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (selectionTracker.count > 0) {
-                        songItemsAdapter.resetSelection()
-                        resetSelection()
-                    } else {
-                        isEnabled = false
-                        requireActivity().onBackPressed()
-                    }
-                }
-            })
     }
 
     override fun onCreateView(
@@ -118,6 +145,7 @@ class SongsFragment : Fragment() {
         songItemsRecyclerView.setHasFixedSize(true)
         songItemsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        setupCategorySpinner()
         setupSongs()
         setupListeners()
     }
@@ -125,26 +153,13 @@ class SongsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        setupCategorySpinner()
         resetSelection()
         searchViewEditText.setText("")
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-
-        showMenuActions(showGroupActions = false, showEdit = false)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedSongs()
-            R.id.menu_export_selected -> startExport()
-            R.id.menu_edit -> editSelectedSong()
-            R.id.menu_add_setlist -> addSetlist()
-            else -> super.onOptionsItemSelected(item)
-        }
+    override fun onStop() {
+        actionMode?.finish()
+        super.onStop()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -212,11 +227,13 @@ class SongsFragment : Fragment() {
         isLongClick: Boolean
     ): Boolean {
         val item = songItemsAdapter.songItems[position]
+
         if (!isLongClick && selectionTracker.count == 0) {
             pickSong(item)
         } else {
-            selectSong(item)
+            return selectSong(item)
         }
+
         return true
     }
 
@@ -245,25 +262,32 @@ class SongsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSong(item: SongItem) {
+    private fun selectSong(item: SongItem): Boolean {
         item.isSelected.value = !item.isSelected.value!!
 
         when (selectionTracker.countAfter) {
             0 -> {
-                if (songItemsAdapter.showCheckBox.value!!) {
-                    songItemsAdapter.showCheckBox.value = false
-                }
-                showMenuActions(showGroupActions = false, showEdit = false)
+                actionMode?.finish()
+                return false
             }
             1 -> {
                 if (!songItemsAdapter.showCheckBox.value!!) {
                     songItemsAdapter.showCheckBox.value = true
                 }
+
+                if (actionMode == null) {
+                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
+                }
+
                 showMenuActions()
             }
             2 -> showMenuActions(showEdit = false)
         }
+        return true
     }
+
 
     private fun editSelectedSong(): Boolean {
         val selectedItem =
@@ -377,22 +401,18 @@ class SongsFragment : Fragment() {
             songItemsAdapter.showCheckBox.value = false
         }
 
-        selectionTracker.reset()
-        showMenuActions(showGroupActions = false, showEdit = false)
+        songItemsAdapter.resetSelection()
     }
 
     private fun showMenuActions(
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
     ) {
-        if (!this::menu.isInitialized) {
-            return
-        }
-
-        menu.findItem(R.id.menu_delete).isVisible = showGroupActions
-        menu.findItem(R.id.menu_export_selected).isVisible = showGroupActions
-        menu.findItem(R.id.menu_add_setlist).isVisible = showGroupActions
-        menu.findItem(R.id.menu_edit).isVisible = showEdit
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_add_setlist).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun getSelectedCategoryId(): Long {

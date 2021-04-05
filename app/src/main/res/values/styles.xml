@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/7/21 11:44 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/7/21 12:27 AM
+  ~ Last modified 4/5/21 3:18 PM
   -->
 
 <resources>
@@ -16,6 +16,8 @@
     <style name="Theme.LyricCast.Light.NoActionBar" parent="Theme.LyricCast.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/colorPrimary</item>
     </style>
 
     <style name="ThemeOverlay.LyricCast.Dark.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

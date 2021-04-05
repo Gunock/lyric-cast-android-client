@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:21 PM
+ * Last modified 4/5/21 4:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -175,7 +175,6 @@ class SetlistEditorSongsFragment : Fragment() {
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
         songsRecyclerView.setHasFixedSize(true)
         songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        songsRecyclerView.adapter = songItemsAdapter
 
         val selectionTracker =
             SelectionTracker(songsRecyclerView) { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
@@ -196,6 +195,8 @@ class SetlistEditorSongsFragment : Fragment() {
                 item.isSelected.value = selectedSongs.contains(item.song)
             }
         }
+
+        songsRecyclerView.adapter = songItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {

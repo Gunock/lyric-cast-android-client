@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljańczyk on 3/28/21 3:19 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/27/21 11:36 PM
+ * Last modified 4/5/21 3:46 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -15,27 +15,23 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
     private val onSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
 ) {
 
-    private var _count: Int = 0
-
-    var count: Int
-        get() = _count
+    var count: Int = 0
         private set(value) {
             if (value < 0) {
                 throw RuntimeException("Selection count below 0")
             }
-
-            _count = value
+            field = value
         }
 
     var countAfter: Int = 0
         private set
 
-    private val selectedItems: MutableSet<Long> = mutableSetOf()
+    private val selectedItemIds: MutableSet<Long> = mutableSetOf()
 
     fun reset() {
         countAfter = 0
         count = 0
-        selectedItems.clear()
+        selectedItemIds.clear()
     }
 
     fun attach(holder: T) {
@@ -64,14 +60,14 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
 
     private fun countItems(holder: T, modifySelectedItems: Boolean = true): Int {
         var updatedCount: Int = count
-        if (selectedItems.contains(holder.itemId)) {
+        if (selectedItemIds.contains(holder.itemId)) {
             if (modifySelectedItems) {
-                selectedItems.remove(holder.itemId)
+                selectedItemIds.remove(holder.itemId)
             }
             updatedCount--
         } else {
             if (modifySelectedItems) {
-                selectedItems.add(holder.itemId)
+                selectedItemIds.add(holder.itemId)
             }
             updatedCount++
         }

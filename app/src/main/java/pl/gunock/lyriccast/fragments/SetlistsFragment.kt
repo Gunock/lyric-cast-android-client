@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:21 PM
+ * Last modified 4/5/21 4:34 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -12,7 +12,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
-import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -55,30 +56,55 @@ class SetlistsFragment : Fragment() {
         )
     }
 
-    private lateinit var menu: Menu
     private lateinit var searchViewEditText: EditText
     private lateinit var setlistRecyclerView: RecyclerView
 
     private lateinit var setlistItemsAdapter: SetlistItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_main, menu)
+            menu.findItem(R.id.action_menu_add_setlist).isVisible = false
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions(showGroupActions = false, showEdit = false)
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> deleteSelectedSetlists()
+                R.id.action_menu_export_selected -> startExport()
+                R.id.action_menu_edit -> editSelectedSetlist()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            resetSelection()
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
 
         repository = (requireActivity().application as LyricCastApplication).repository
-        requireActivity().onBackPressedDispatcher
-            .addCallback(this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (selectionTracker.count > 0) {
-                        setlistItemsAdapter.resetSelection()
-                        resetSelection()
-                    } else {
-                        isEnabled = false
-                        requireActivity().onBackPressed()
-                    }
-                }
-            })
     }
 
     override fun onCreateView(
@@ -99,25 +125,8 @@ class SetlistsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
+        setupSetlists()
         setupListeners()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-
-        menu.findItem(R.id.menu_add_setlist).isVisible = false
-
-        showMenuActions(showDelete = false, showEdit = false)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedSetlists()
-            R.id.menu_export_selected -> startExport()
-            R.id.menu_edit -> editSelectedSetlist()
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -136,9 +145,13 @@ class SetlistsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        setupSetlists()
-
+        resetSelection()
         searchViewEditText.setText("")
+    }
+
+    override fun onStop() {
+        actionMode?.finish()
+        super.onStop()
     }
 
     private fun startExport(): Boolean {
@@ -216,7 +229,6 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-
     private fun setupSetlists() {
         val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
         selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
@@ -242,7 +254,7 @@ class SetlistsFragment : Fragment() {
         if (!isLongClick && selectionTracker.count == 0) {
             pickSetlist(item)
         } else {
-            selectSetlist(item)
+            return selectSetlist(item)
         }
         return true
     }
@@ -266,20 +278,22 @@ class SetlistsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSetlist(
-        item: SetlistItem
-    ) {
+    private fun selectSetlist(item: SetlistItem): Boolean {
+        item.isSelected.value = !item.isSelected.value!!
         when (selectionTracker.countAfter) {
             0 -> {
-                if (setlistItemsAdapter.showCheckBox.value!!) {
-                    setlistItemsAdapter.showCheckBox.value = false
-                }
-
-                showMenuActions(showDelete = false, showEdit = false)
+                actionMode?.finish()
+                return false
             }
             1 -> {
                 if (!setlistItemsAdapter.showCheckBox.value!!) {
                     setlistItemsAdapter.showCheckBox.value = true
+                }
+
+                if (actionMode == null) {
+                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
                 }
 
                 showMenuActions()
@@ -287,7 +301,7 @@ class SetlistsFragment : Fragment() {
             2 -> showMenuActions(showEdit = false)
         }
 
-        item.isSelected.value = !item.isSelected.value!!
+        return true
     }
 
     private fun editSelectedSetlist(): Boolean {
@@ -317,13 +331,14 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun showMenuActions(showDelete: Boolean = true, showEdit: Boolean = true) {
-        if (!this::menu.isInitialized) {
-            return
-        }
-
-        menu.findItem(R.id.menu_delete).isVisible = showDelete
-        menu.findItem(R.id.menu_edit).isVisible = showEdit
+    private fun showMenuActions(
+        showGroupActions: Boolean = true,
+        showEdit: Boolean = true
+    ) {
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun resetSelection() {
@@ -331,8 +346,7 @@ class SetlistsFragment : Fragment() {
             setlistItemsAdapter.showCheckBox.value = false
         }
 
-        selectionTracker.reset()
-        showMenuActions(showDelete = false, showEdit = false)
+        setlistItemsAdapter.resetSelection()
     }
 
 }

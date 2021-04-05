@@ -1,7 +1,7 @@
 <!--
   ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 3:52 PM
+  ~ Last modified 4/5/21 3:24 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,8 +11,15 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/menu_add_category"
-        android:title="@string/button_add"
+        android:id="@+id/menu_duplicate"
+        android:icon="@drawable/baseline_library_add_white_24dp"
+        android:title="@string/menu_duplicate"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_menu_delete"
+        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:title="@string/button_delete"
         app:showAsAction="always" />
 
 </menu>
