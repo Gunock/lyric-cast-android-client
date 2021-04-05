@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:02 AM
+ * Last modified 4/5/21 5:17 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -19,11 +19,11 @@ import java.util.*
 internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir) {
 
     override fun parseZip(resolver: ContentResolver, inputStream: InputStream): Set<SongDto> {
-        importDirectory.deleteRecursively()
-        importDirectory.mkdirs()
-        FileHelper.unzip(resolver, inputStream, importDirectory.canonicalPath)
+        mImportDirectory.deleteRecursively()
+        mImportDirectory.mkdirs()
+        FileHelper.unzip(resolver, inputStream, mImportDirectory.canonicalPath)
 
-        val fileList1 = importDirectory.listFiles() ?: arrayOf()
+        val fileList1 = mImportDirectory.listFiles() ?: arrayOf()
         val result: MutableSet<SongDto> = mutableSetOf()
         for (file1 in fileList1) {
             if (!file1.isDirectory) {
@@ -42,8 +42,8 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
             }
         }
 
-        importDirectory.deleteRecursively()
-        importDirectory.mkdirs()
+        mImportDirectory.deleteRecursively()
+        mImportDirectory.mkdirs()
         return result
     }
 

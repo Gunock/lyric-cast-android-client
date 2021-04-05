@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:25 PM
+ * Last modified 4/5/21 5:19 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -19,8 +19,8 @@ import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 internal class DataTransferProcessor(
-    private val resources: Resources,
-    private val repository: LyricCastRepository
+    private val mResources: Resources,
+    private val mRepository: LyricCastRepository
 ) {
     private companion object {
         const val TAG = "DataTransferProcessor"
@@ -32,17 +32,17 @@ internal class DataTransferProcessor(
         options: ImportOptions
     ) {
         if (options.deleteAll) {
-            repository.clear()
+            mRepository.clear()
         }
 
         val removeConflicts = !options.deleteAll && !options.replaceOnConflict
 
         if (data.categoryDtos != null) {
-            message.postValue(resources.getString(R.string.importing_categories))
+            message.postValue(mResources.getString(R.string.importing_categories))
             var categories = data.categoryDtos.map { Category(it) }.toMutableList()
 
             if (removeConflicts) {
-                for (category in repository.getAllCategories()) {
+                for (category in mRepository.getAllCategories()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         categories.removeIf { it.name == category.name }
                     } else {
@@ -52,13 +52,13 @@ internal class DataTransferProcessor(
                 }
             }
 
-            repository.upsertCategories(categories)
+            mRepository.upsertCategories(categories)
         }
 
         if (data.songDtos != null) {
-            message.postValue(resources.getString(R.string.importing_songs))
+            message.postValue(mResources.getString(R.string.importing_songs))
 
-            val categoryMap: Map<String, Category> = repository.getAllCategories()
+            val categoryMap: Map<String, Category> = mRepository.getAllCategories()
                 .map { it.name to it }
                 .toMap()
 
@@ -76,13 +76,13 @@ internal class DataTransferProcessor(
                     return@map SongWithLyricsSections(song, lyricsSections)
                 }
 
-            repository.upsertSongs(songsWithLyricsSections, orderMap)
+            mRepository.upsertSongs(songsWithLyricsSections, orderMap)
         }
 
         if (data.setlistDtos != null) {
-            message.postValue(resources.getString(R.string.importing_setlists))
+            message.postValue(mResources.getString(R.string.importing_setlists))
 
-            val songTitleMap: Map<String, Song> = repository.getAllSongs()
+            val songTitleMap: Map<String, Song> = mRepository.getAllSongs()
                 .map { it.title to it }
                 .toMap()
 
@@ -91,7 +91,7 @@ internal class DataTransferProcessor(
                 .toMutableList()
 
             if (removeConflicts) {
-                for (setlistWithSongs in repository.getAllSetlists()) {
+                for (setlistWithSongs in mRepository.getAllSetlists()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         setlists.removeIf { it.name == setlistWithSongs.setlist.name }
                     } else {
@@ -115,23 +115,23 @@ internal class DataTransferProcessor(
                         return@map setlistDto.name to setlistSongCrossRefs
                     }.toMap()
 
-            repository.upsertSetlists(setlists, setlistCrossRefMap)
+            mRepository.upsertSetlists(setlists, setlistCrossRefMap)
         }
 
-        message.postValue(resources.getString(R.string.finishing_import))
+        message.postValue(mResources.getString(R.string.finishing_import))
         Log.d(TAG, "Finished import")
     }
 
     suspend fun getDatabaseTransferData(): DatabaseTransferData {
-        val categories: List<Category> = repository.getAllCategories()
+        val categories: List<Category> = mRepository.getAllCategories()
         val categoryMap: Map<Long?, String> = categories.map { it.categoryId to it.name }.toMap()
 
-        val songDtos: List<SongDto> = repository.getAllSongsWithLyricsSections().map {
+        val songDtos: List<SongDto> = mRepository.getAllSongsWithLyricsSections().map {
             it.toDto(categoryMap[it.song.categoryId])
         }
 
         val categoryDtos: List<CategoryDto> = categories.map { it.toDto() }
-        val setlistDtos: List<SetlistDto> = repository.getAllSetlists().map { it.toDto() }
+        val setlistDtos: List<SetlistDto> = mRepository.getAllSetlists().map { it.toDto() }
         return DatabaseTransferData(
             songDtos = songDtos,
             categoryDtos = categoryDtos,

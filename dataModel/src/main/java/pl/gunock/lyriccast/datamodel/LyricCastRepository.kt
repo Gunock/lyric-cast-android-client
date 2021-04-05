@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:31 PM
+ * Last modified 4/5/21 5:19 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -19,40 +19,40 @@ import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
 
 class LyricCastRepository(
-    private val songDao: SongDao,
-    private val lyricsSectionDao: LyricsSectionDao,
-    private val setlistDao: SetlistDao,
-    private val categoryDao: CategoryDao
+    private val mSongDao: SongDao,
+    private val mLyricsSectionDao: LyricsSectionDao,
+    private val mSetlistDao: SetlistDao,
+    private val mCategoryDao: CategoryDao
 ) {
     private companion object {
         const val TAG = "LyricCastRepository"
     }
 
-    val allSongs: Flow<List<SongAndCategory>> = songDao.getAllAsFlow()
-    val allSetlists: Flow<List<Setlist>> = setlistDao.getAllAsFlow()
-    val allCategories: Flow<List<Category>> = categoryDao.getAllAsFlow()
+    val allSongs: Flow<List<SongAndCategory>> = mSongDao.getAllAsFlow()
+    val allSetlists: Flow<List<Setlist>> = mSetlistDao.getAllAsFlow()
+    val allCategories: Flow<List<Category>> = mCategoryDao.getAllAsFlow()
 
     @WorkerThread
     suspend fun clear() {
-        songDao.deleteAll()
-        lyricsSectionDao.deleteAll()
-        setlistDao.deleteAll()
-        categoryDao.deleteAll()
+        mSongDao.deleteAll()
+        mLyricsSectionDao.deleteAll()
+        mSetlistDao.deleteAll()
+        mCategoryDao.deleteAll()
     }
 
     @WorkerThread
     suspend fun getAllSongs(): List<Song> {
-        return songDao.getAll()
+        return mSongDao.getAll()
     }
 
     @WorkerThread
     internal suspend fun getAllSongsWithLyricsSections(): List<SongWithLyricsSections> {
-        return songDao.getAllWithLyricsSections()
+        return mSongDao.getAllWithLyricsSections()
     }
 
     @WorkerThread
     suspend fun getSongsAndCategories(songs: Collection<Song>): List<SongAndCategory> {
-        return songDao.get(songs.map { song -> song.id })
+        return mSongDao.get(songs.map { song -> song.id })
     }
 
     @WorkerThread
@@ -73,9 +73,9 @@ class LyricCastRepository(
 
 
         try {
-            val songId = songDao.upsert(song)
+            val songId = mSongDao.upsert(song)
             val sectionIds =
-                lyricsSectionDao.upsert(lyricsSections.map { it.copy(songId = songId) })
+                mLyricsSectionDao.upsert(lyricsSections.map { it.copy(songId = songId) })
 
             val sectionIdMap = sectionIds.zip(lyricsSections)
                 .map { it.second.name to it.first }
@@ -84,7 +84,7 @@ class LyricCastRepository(
                 val crossRefs = order.map {
                     SongLyricsSectionCrossRef(null, songId, sectionIdMap[it.first]!!, it.second)
                 }
-                lyricsSectionDao.upsertRelations(crossRefs)
+                mLyricsSectionDao.upsertRelations(crossRefs)
             } catch (exception: NullPointerException) {
                 Log.wtf(TAG, song.title)
                 Log.wtf(TAG, sectionIdMap.toString())
@@ -92,7 +92,7 @@ class LyricCastRepository(
                 Log.wtf(TAG, exception)
             }
         } catch (e: Exception) {
-            songDao.delete(listOf(song.id))
+            mSongDao.delete(listOf(song.id))
             throw e
         }
     }
@@ -103,8 +103,8 @@ class LyricCastRepository(
         orderMap: Map<String, List<Pair<String, Int>>>
     ) {
         val songs: List<Song> = songsWithLyricsSections.map { it.song }
-        songDao.upsert(songs)
-        val songIdMap: Map<String, Long> = songDao.getAll()
+        mSongDao.upsert(songs)
+        val songIdMap: Map<String, Long> = mSongDao.getAll()
             .map { it.title to it.songId!! }
             .toMap()
 
@@ -114,8 +114,8 @@ class LyricCastRepository(
                 songWithLyricsSections.lyricsSections.map { it.copy(songId = songId) }
             }
 
-        lyricsSectionDao.upsert(lyricsSections)
-        val sectionsMap: Map<Long, List<LyricsSection>> = lyricsSectionDao.getAll()
+        mLyricsSectionDao.upsert(lyricsSections)
+        val sectionsMap: Map<Long, List<LyricsSection>> = mLyricsSectionDao.getAll()
             .groupBy { it.songId }
             .toMap()
 
@@ -133,42 +133,42 @@ class LyricCastRepository(
                 SongLyricsSectionCrossRef(null, songId, songSectionIdMap[it.first]!!, it.second)
             }
         }
-        lyricsSectionDao.upsertRelations(crossRefs)
+        mLyricsSectionDao.upsertRelations(crossRefs)
     }
 
     @WorkerThread
     internal suspend fun deleteSongs(songIds: List<Long>) {
-        songDao.delete(songIds)
+        mSongDao.delete(songIds)
     }
 
     @WorkerThread
     suspend fun getSongWithLyrics(songId: Long): SongWithLyricsSections? {
-        return songDao.getWithLyricsSections(songId)
+        return mSongDao.getWithLyricsSections(songId)
     }
 
     @WorkerThread
     suspend fun getSongsWithLyrics(songs: Collection<Song>): List<SongWithLyricsSections> {
-        return songDao.getAllWithLyrics(songs.map { song -> song.id })
+        return mSongDao.getAllWithLyrics(songs.map { song -> song.id })
     }
 
     @WorkerThread
     internal suspend fun getAllSetlists(): List<SetlistWithSongs> {
-        return setlistDao.getAll()
+        return mSetlistDao.getAll()
     }
 
     @WorkerThread
     suspend fun getSetlistWithSongs(setlistId: Long): SetlistWithSongs? {
-        return setlistDao.getWithSongs(setlistId)
+        return mSetlistDao.getWithSongs(setlistId)
     }
 
     internal suspend fun upsertSetlists(
         setlists: List<Setlist>,
         setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>>
     ) {
-        setlistDao.upsert(setlists)
+        mSetlistDao.upsert(setlists)
 
         val setlistNames = setlists.map { it.name }.toSet()
-        val setlistIdMap: Map<String, Long> = setlistDao.getAll()
+        val setlistIdMap: Map<String, Long> = mSetlistDao.getAll()
             .filter { it.setlist.name in setlistNames }
             .map { it.setlist.name to it.setlist.id }
             .toMap()
@@ -178,7 +178,7 @@ class LyricCastRepository(
             return@flatMap entry.value.map { it.copy(setlistId = setlistId) }
         }
 
-        setlistDao.upsertSongsCrossRefs(setlistCrossRefs)
+        mSetlistDao.upsertSongsCrossRefs(setlistCrossRefs)
     }
 
     @WorkerThread
@@ -192,22 +192,22 @@ class LyricCastRepository(
         }
 
         val setlist = setlistWithSongs.setlist
-        val setlistId = setlistDao.upsert(setlist)
+        val setlistId = mSetlistDao.upsert(setlist)
 
         val setlistSongCrossRefs = setlistWithSongs.setlistSongCrossRefs
             .map { it.copy(setlistId = setlistId) }
 
-        setlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
+        mSetlistDao.upsertSongsCrossRefs(setlistSongCrossRefs)
     }
 
     @WorkerThread
     internal suspend fun deleteSetlists(setlistIds: Collection<Long>) {
-        return setlistDao.delete(setlistIds)
+        return mSetlistDao.delete(setlistIds)
     }
 
     @WorkerThread
     suspend fun getAllCategories(): List<Category> {
-        return categoryDao.getAll()
+        return mCategoryDao.getAll()
     }
 
     @WorkerThread
@@ -216,17 +216,17 @@ class LyricCastRepository(
             throw IllegalArgumentException("Blank category name $category")
         }
 
-        categoryDao.upsert(category)
+        mCategoryDao.upsert(category)
     }
 
     @WorkerThread
     internal suspend fun upsertCategories(categories: Collection<Category>) {
-        return categoryDao.upsert(categories)
+        return mCategoryDao.upsert(categories)
     }
 
     @WorkerThread
     internal suspend fun deleteCategories(categoryIds: Collection<Long>) {
-        categoryDao.delete(categoryIds)
+        mCategoryDao.delete(categoryIds)
     }
 
 }

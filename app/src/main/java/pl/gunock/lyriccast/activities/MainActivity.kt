@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:03 PM
+ * Last modified 4/5/21 5:19 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -35,11 +35,11 @@ import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.extensions.toJSONObjectList
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
 import pl.gunock.lyriccast.datatransfer.enums.SongXmlParserType
+import pl.gunock.lyriccast.datatransfer.extensions.toJSONObjectList
 import pl.gunock.lyriccast.datatransfer.factories.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
@@ -265,7 +265,6 @@ class MainActivity : AppCompatActivity() {
             )
 
             val importOptions = ImportOptions(
-                mImportDialogViewModel.importFormat,
                 mImportDialogViewModel.deleteAll,
                 mImportDialogViewModel.replaceOnConflict
             )
@@ -299,7 +298,6 @@ class MainActivity : AppCompatActivity() {
 
             val colors: IntArray = resources.getIntArray(R.array.category_color_values)
             val importOptions = ImportOptions(
-                mImportDialogViewModel.importFormat,
                 mImportDialogViewModel.deleteAll,
                 mImportDialogViewModel.replaceOnConflict,
                 colors
