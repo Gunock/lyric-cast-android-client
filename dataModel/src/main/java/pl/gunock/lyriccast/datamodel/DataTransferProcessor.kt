@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:20 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:18 PM
+ * Last modified 4/5/21 11:54 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -38,7 +38,7 @@ internal class DataTransferProcessor(
         val removeConflicts = !options.deleteAll && !options.replaceOnConflict
 
         if (data.categoryDtos != null) {
-            message.postValue(mResources.getString(R.string.importing_categories))
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_categories))
             val categories = data.categoryDtos.map { Category(it) }.toMutableList()
             val allCategories = mRepository.getAllCategories()
             val categoryNames = allCategories.map { it.name }.toSet()
@@ -61,7 +61,7 @@ internal class DataTransferProcessor(
         }
 
         if (data.songDtos != null) {
-            message.postValue(mResources.getString(R.string.importing_songs))
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_songs))
 
             val categoryMap: Map<String, Category> = mRepository.getAllCategories()
                 .map { it.name to it }
@@ -104,7 +104,7 @@ internal class DataTransferProcessor(
         }
 
         if (data.setlistDtos != null) {
-            message.postValue(mResources.getString(R.string.importing_setlists))
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_setlists))
 
             val songTitleMap: Map<String, Song> = mRepository.getAllSongs()
                 .map { it.title to it }
@@ -149,7 +149,7 @@ internal class DataTransferProcessor(
             mRepository.upsertSetlists(setlists, setlistCrossRefMap)
         }
 
-        message.postValue(mResources.getString(R.string.finishing_import))
+        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
         Log.d(TAG, "Finished import")
     }
 

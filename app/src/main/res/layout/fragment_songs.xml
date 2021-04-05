@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljańczyk on 3/16/21 4:17 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/16/21 4:17 PM
+  ~ Last modified 4/5/21 11:53 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="true"
-            android:text="@string/hint_selected"
+            android:text="@string/setlist_editor_hint_selected"
             app:layout_constraintBottom_toBottomOf="@+id/spn_category"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/spn_category" />

@@ -1,86 +1,100 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 5:32 PM
+  ~ Last modified 4/5/21 11:56 PM
   -->
 
 <resources>
     <string name="app_name">LyricCast</string>
 
-    <!--  Strings used for action bar -->
-    <string name="label_category_manager">Category manager</string>
-    <string name="label_categories">Categories</string>
-    <string name="label_settings">Settings</string>
-    <string name="label_song_editor">Song editor</string>
-    <string name="label_setlist_editor">Setlist editor</string>
-    <string name="label_controls">Controls</string>
-    <string name="label_setlists">Setlists</string>
-    <string name="label_songs">Songs</string>
-    <string name="option_cast">Cast</string>
-    <string name="option_export">Export</string>
-    <string name="option_menu_import">Import</string>
-
-    <string name="item_song_item_title_template">%d. %s</string>
-
-    <!--  Strings used for inputs  -->
-    <string name="hint_song_title">Song title</string>
-    <string name="hint_setlist_name">Setlist name</string>
-    <string name="hint_category_name">Category name</string>
-    <string name="hint_selected">Selected</string>
-    <string name="hint_enter_lyrics">Enter lyrics</string>
-    <string name="input_section_name">Section name</string>
-    <string name="input_new_song">New song</string>
-    <string name="input_new_section">NEW SECTION</string>
-    <string name="input_new_section_template">NEW SECTION %d</string>
-
-    <!--  Strings used for buttons  -->
-    <string name="button_save">Save</string>
-    <string name="button_pick_songs">Pick songs</string>
-    <string name="button_move_left">Move left</string>
-    <string name="button_move_right">Move right</string>
-    <string name="button_delete_section">Delete section</string>
-    <string name="button_blank">Blank</string>
-    <string name="button_add">Add</string>
-    <string name="button_edit">Edit</string>
-    <string name="button_delete">Delete</string>
-    <string name="button_add_song">Add song</string>
-    <string name="button_add_setlist">Add setlist</string>
-
-    <!-- Strings used in application logic -->
+    <!-- Chromecast -->
     <string name="chromecast_app_id">67E9729E</string>
     <string name="chromecast_content_namespace">urn:x-cast:lyric.cast.content</string>
     <string name="chromecast_control_namespace">urn:x-cast:lyric.cast.control</string>
     <string name="chromecast_content_message_template">{\"text\":\"%1$s\"}</string>
     <string name="chromecast_control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
 
-    <!--  Strings used as placeholders -->
+    <!-- Placeholders -->
     <string name="placeholder_text">Text</string>
     <string name="placeholder_title">Title</string>
     <string name="placeholder_name">Name</string>
     <string name="placeholder_category">Category</string>
-    <string name="menu_duplicate">Duplicate</string>
-    <string name="img_drag_song">Drag song</string>
-    <string name="delete_all_before_import">Delete all before import</string>
-    <string name="replace_on_conflict">Replace on conflict</string>
     <string name="placeholder_progress_message">Importing data …</string>
-    <string name="add_category">Add category</string>
-    <string name="edit_category">Edit category</string>
-    <string name="category_name_already_used">Category name already in use</string>
-    <string name="enter_category_name">Please enter category name</string>
-    <string name="import_dialog_title">Import</string>
-    <string name="enter_song_title">Please enter song title</string>
-    <string name="song_title_already_used">Song title already in use</string>
-    <string name="empty_setlist_warning">Empty setlists are not allowed!</string>
-    <string name="enter_setlist_name">Please enter setlist name</string>
-    <string name="setlist_name_already_used">Setlist name already in use</string>
-    <string name="previous_song">Previous song</string>
-    <string name="previous">Previous</string>
-    <string name="next_song">Next song</string>
-    <string name="next">Next</string>
-    <string name="loading_file">Loading file …</string>
-    <string name="preparing_data">Preparing data …</string>
-    <string name="export_saving_json">Saving to temporary directory …</string>
-    <string name="export_saving_zip">Saving zip package …</string>
-    <string name="export_deleting_temp">Deleting temporary directory …</string>
-    <string name="export_selected">Export selected</string>
+
+    <!-- Titles -->
+    <string name="title_category_manager">Category manager</string>
+    <string name="title_categories">Categories</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_song_editor">Song editor</string>
+    <string name="title_setlist_editor">Setlist editor</string>
+    <string name="title_controls">Controls</string>
+    <string name="title_setlists">Setlists</string>
+    <string name="title_songs">Songs</string>
+
+    <!-- Hints -->
+    <string name="hint_song_title">Song title</string>
+    <string name="hint_setlist_name">Setlist name</string>
+
+    <!-- Option/Action Menu -->
+    <string name="option_menu_cast">Cast</string>
+    <string name="action_menu_button_delete">Delete</string>
+
+    <!-- Main Activity -->
+    <string name="main_activity_import_delete_all_before_import">Delete all before import</string>
+    <string name="main_activity_import_replace_on_conflict">Replace on conflict</string>
+    <string name="main_activity_import_dialog_title">Import</string>
+    <string name="main_activity_export_preparing_data">Preparing data …</string>
+    <string name="main_activity_export_saving_json">Saving to temporary directory …</string>
+    <string name="main_activity_export_saving_zip">Saving zip package …</string>
+    <string name="main_activity_export_deleting_temp">Deleting temporary directory …</string>
+    <string name="main_activity_action_menu_export_selected">Export selected</string>
+    <string name="main_activity_menu_export">Export all</string>
+    <string name="main_activity_menu_import">Import</string>
+    <string name="main_activity_button_edit">Edit</string>
+    <string name="main_activity_button_add_song">Add song</string>
+    <string name="main_activity_button_add_setlist">Add setlist</string>
+    <string name="main_activity_loading_file">Loading file …</string>
+
+    <!-- Song/Setlist Controls -->
+    <string name="controls_button_blank">Blank</string>
+    <string name="controls_previous">Previous</string>
+    <string name="controls_next">Next</string>
+
+    <!-- Setlist Controls -->
+    <string name="setlist_controls_song_item_title_template">%d. %s</string>
+    <string name="setlist_controls_previous_song">Previous song</string>
+    <string name="setlist_controls_next_song">Next song</string>
+
+    <!-- Editors -->
+    <string name="editor_button_save">Save</string>
+    <string name="editor_button_add">Add</string>
+
+    <!-- Category Manager -->
+    <string name="category_manager_hint_category_name">Category name</string>
+    <string name="category_manager_add_category">Add category</string>
+    <string name="category_manager_edit_category">Edit category</string>
+    <string name="category_manager_name_already_used">Category name already in use</string>
+    <string name="category_manager_enter_name">Please enter category name</string>
+
+    <!-- Setlist Editor -->
+    <string name="setlist_editor_hint_selected">Selected</string>
+    <string name="setlist_editor_button_pick_songs">Pick songs</string>
+    <string name="setlist_editor_action_menu_duplicate">Duplicate</string>
+    <string name="setlist_editor_img_drag_song">Drag song</string>
+    <string name="setlist_editor_empty_warning">Empty setlists are not allowed!</string>
+    <string name="setlist_editor_enter_name">Please enter setlist name</string>
+    <string name="setlist_editor_name_already_used">Setlist name already in use</string>
+
+    <!-- Song Editor -->
+    <string name="song_editor_hint_enter_lyrics">Enter lyrics</string>
+    <string name="song_editor_input_section_name">Section name</string>
+    <string name="song_editor_input_new_song">New song</string>
+    <string name="song_editor_input_new_section">NEW SECTION</string>
+    <string name="song_editor_input_new_section_template">NEW SECTION %d</string>
+    <string name="song_editor_button_move_left">Move left</string>
+    <string name="song_editor_button_move_right">Move right</string>
+    <string name="song_editor_button_delete_section">Delete section</string>
+    <string name="song_editor_enter_title">Please enter song title</string>
+    <string name="song_editor_title_already_used">Song title already in use</string>
+
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/4/21 11:01 PM
+  ~ Last modified 4/5/21 11:53 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -46,14 +46,14 @@
 
         <activity
             android:name=".activities.SetlistEditorActivity"
-            android:label="@string/label_setlist_editor"
+            android:label="@string/title_setlist_editor"
             android:parentActivityName="pl.gunock.lyriccast.activities.SetlistEditorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar" />
 
         <activity
             android:name=".activities.SongEditorActivity"
-            android:label="@string/label_song_editor"
+            android:label="@string/title_song_editor"
             android:parentActivityName="pl.gunock.lyriccast.activities.SongEditorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar"
@@ -61,28 +61,28 @@
 
         <activity
             android:name=".activities.SongControlsActivity"
-            android:label="@string/label_controls"
+            android:label="@string/title_controls"
             android:parentActivityName="pl.gunock.lyriccast.activities.SongControlsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar" />
 
         <activity
             android:name=".activities.SetlistControlsActivity"
-            android:label="@string/label_controls"
+            android:label="@string/title_controls"
             android:parentActivityName="pl.gunock.lyriccast.activities.SetlistControlsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar" />
 
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/label_settings"
+            android:label="@string/title_settings"
             android:parentActivityName="pl.gunock.lyriccast.activities.SettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar" />
 
         <activity
             android:name=".activities.CategoryManagerActivity"
-            android:label="@string/label_categories"
+            android:label="@string/title_categories"
             android:parentActivityName="pl.gunock.lyriccast.activities.CategoryManagerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LyricCast.Light.NoActionBar" />

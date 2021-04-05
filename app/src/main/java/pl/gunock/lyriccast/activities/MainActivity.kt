@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:25 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:23 PM
+ * Last modified 4/5/21 11:54 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -135,10 +135,10 @@ class MainActivity : AppCompatActivity() {
 
                 val navController = findNavController(R.id.navh_main)
 
-                if (tab.text == getString(R.string.label_songs)) {
+                if (tab.text == getString(R.string.title_songs)) {
                     Log.d(TAG, "Switching to song list")
                     navController.navigate(R.id.action_Setlists_to_Songs)
-                } else if (tab.text == getString(R.string.label_setlists)) {
+                } else if (tab.text == getString(R.string.title_setlists)) {
                     Log.d(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_Songs_to_Setlists)
                 }
@@ -187,7 +187,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportAll(uri: Uri) {
-        val dialogFragment = ProgressDialogFragment(getString(R.string.preparing_data))
+        val dialogFragment =
+            ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Light_Dialog
@@ -201,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
             val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
-            dialogFragment.message = getString(R.string.export_saving_json)
+            dialogFragment.message = getString(R.string.main_activity_export_saving_json)
             val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
             val categoriesString =
                 JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
@@ -210,11 +211,11 @@ class MainActivity : AppCompatActivity() {
             File(exportDir, "categories.json").writeText(categoriesString)
             File(exportDir, "setlists.json").writeText(setlistsString)
 
-            dialogFragment.message = getString(R.string.export_saving_zip)
+            dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            dialogFragment.message = getString(R.string.export_deleting_temp)
+            dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
             dialogFragment.dismiss()
         }
@@ -235,7 +236,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun importLyricCast(uri: Uri) {
         val inputStream = contentResolver.openInputStream(uri) ?: return
-        val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
+        val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Light_Dialog
@@ -296,7 +297,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun importOpenSong(uri: Uri) {
         val inputStream = contentResolver.openInputStream(uri) ?: return
-        val dialogFragment = ProgressDialogFragment(getString(R.string.loading_file))
+        val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Light_Dialog

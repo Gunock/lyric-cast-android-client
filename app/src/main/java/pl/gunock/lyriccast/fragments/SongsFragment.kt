@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:11 PM
+ * Last modified 4/5/21 11:54 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -314,7 +314,8 @@ class SongsFragment : Fragment() {
 
     private fun exportSelectedSongs(uri: Uri): Boolean {
         val activity = requireActivity()
-        val dialogFragment = ProgressDialogFragment(getString(R.string.preparing_data))
+        val dialogFragment =
+            ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Light_Dialog
@@ -341,17 +342,17 @@ class SongsFragment : Fragment() {
                 .filter { it.name in categoryNames }
                 .map { it.toJson() }
 
-            dialogFragment.message = getString(R.string.export_saving_json)
+            dialogFragment.message = getString(R.string.main_activity_export_saving_json)
             val songsString = JSONArray(songJsons).toString()
             val categoriesString = JSONArray(categoryJsons).toString()
             File(exportDir, "songs.json").writeText(songsString)
             File(exportDir, "categories.json").writeText(categoriesString)
 
-            dialogFragment.message = getString(R.string.export_saving_zip)
+            dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            dialogFragment.message = getString(R.string.export_deleting_temp)
+            dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
             dialogFragment.dismiss()
         }

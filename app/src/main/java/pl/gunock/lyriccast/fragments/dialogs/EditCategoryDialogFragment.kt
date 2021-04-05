@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:01 PM
+ * Last modified 4/5/21 11:53 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -60,9 +60,9 @@ class EditCategoryDialogFragment(
         savedInstanceState: Bundle?
     ): View? {
         if (mCategoryItem == null) {
-            dialog?.setTitle(getString(R.string.add_category))
+            dialog?.setTitle(getString(R.string.category_manager_add_category))
         } else {
-            dialog?.setTitle(getString(R.string.edit_category))
+            dialog?.setTitle(getString(R.string.category_manager_edit_category))
         }
 
         mCategoryNames = mDialogViewModel.categoryNames.value ?: setOf()
@@ -159,11 +159,11 @@ class EditCategoryDialogFragment(
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {
                     mNameInputLayout.error = " "
-                    mNameInput.error = getString(R.string.enter_category_name)
+                    mNameInput.error = getString(R.string.category_manager_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     mNameInputLayout.error = " "
-                    mNameInput.error = getString(R.string.category_name_already_used)
+                    mNameInput.error = getString(R.string.category_manager_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     mNameInputLayout.error = null

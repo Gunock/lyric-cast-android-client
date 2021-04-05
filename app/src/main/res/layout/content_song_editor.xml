@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/15/21 12:09 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/15/21 12:03 PM
+  ~ Last modified 4/5/21 11:56 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_song_title"
                 android:singleLine="true"
-                android:text="@string/input_new_song" />
+                android:text="@string/song_editor_input_new_song" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,9 +70,9 @@
                 android:id="@+id/tin_section_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/input_section_name"
+                android:hint="@string/song_editor_input_section_name"
                 android:singleLine="true"
-                android:text="@string/input_new_section" />
+                android:text="@string/song_editor_input_new_section" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,7 +89,7 @@
         android:background="@null"
         android:ems="10"
         android:gravity="top"
-        android:hint="@string/hint_enter_lyrics"
+        android:hint="@string/song_editor_hint_enter_lyrics"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
             android:backgroundTint="@color/colorButton"
-            android:contentDescription="@string/button_move_left"
+            android:contentDescription="@string/song_editor_button_move_left"
             android:tint="@color/colorButtonText"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintEnd_toStartOf="@+id/btn_delete_section"
@@ -125,7 +125,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:backgroundTint="@color/colorButton"
-            android:text="@string/button_delete_section"
+            android:text="@string/song_editor_button_delete_section"
             android:textColor="@color/colorButtonText"
             app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
             app:layout_constraintEnd_toEndOf="parent"
@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:backgroundTint="@color/colorButton"
-            android:contentDescription="@string/button_move_right"
+            android:contentDescription="@string/song_editor_button_move_right"
             android:tint="@color/colorButtonText"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintStart_toEndOf="@+id/btn_delete_section"
@@ -157,13 +157,13 @@
                 android:id="@+id/tab_chorus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/input_new_section" />
+                android:text="@string/song_editor_input_new_section" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/button_add" />
+                android:text="@string/editor_button_add" />
 
         </com.google.android.material.tabs.TabLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

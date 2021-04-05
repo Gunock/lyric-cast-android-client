@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:11 PM
+ * Last modified 4/5/21 11:53 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -293,7 +293,7 @@ class SetlistEditorFragment : Fragment() {
         if (mSetlistSongs.isEmpty()) {
             val toast = Toast.makeText(
                 requireContext(),
-                getString(R.string.empty_setlist_warning),
+                getString(R.string.setlist_editor_empty_warning),
                 Toast.LENGTH_SHORT
             )
             toast.show()
@@ -376,11 +376,11 @@ class SetlistEditorFragment : Fragment() {
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {
                     mSetlistNameInputLayout.error = " "
-                    mSetlistNameInput.error = getString(R.string.enter_setlist_name)
+                    mSetlistNameInput.error = getString(R.string.setlist_editor_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     mSetlistNameInputLayout.error = " "
-                    mSetlistNameInput.error = getString(R.string.setlist_name_already_used)
+                    mSetlistNameInput.error = getString(R.string.setlist_editor_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     mSetlistNameInputLayout.error = null

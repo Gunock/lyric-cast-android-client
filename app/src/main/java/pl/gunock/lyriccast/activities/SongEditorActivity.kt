@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:51 PM
+ * Last modified 4/5/21 11:56 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -161,14 +161,14 @@ class SongEditorActivity : AppCompatActivity() {
                 mSectionNameTextWatcher.ignoreBeforeTextChanged = true
 
                 when (val tabText = tab.text.toString().trim()) {
-                    getString(R.string.button_add) -> {
+                    getString(R.string.editor_button_add) -> {
                         if (mSongSectionTabLayout.tabCount <= 1) {
                             return@ItemSelectedTabListener
                         }
 
                         mSectionLyricsInput.setText("")
 
-                        val newSectionText = getString(R.string.input_new_section)
+                        val newSectionText = getString(R.string.song_editor_input_new_section)
                         while (
                             mTabCountMap.keys.any { sectionName ->
                                 sectionName.contains(newSectionText)
@@ -180,12 +180,14 @@ class SongEditorActivity : AppCompatActivity() {
                         }
 
                         val newTabText =
-                            getString(R.string.input_new_section_template).format(mNewSectionCount)
+                            getString(R.string.song_editor_input_new_section_template).format(
+                                mNewSectionCount
+                            )
                         mSectionNameInput.setText(newTabText)
                         mNewSectionCount++
 
                         val newAddTab = mSongSectionTabLayout.newTab()
-                        newAddTab.text = getString(R.string.button_add)
+                        newAddTab.text = getString(R.string.editor_button_add)
                         addTab(newAddTab)
                     }
                     else -> {
@@ -233,7 +235,7 @@ class SongEditorActivity : AppCompatActivity() {
             return false
         }
 
-        val addText = getString(R.string.button_add)
+        val addText = getString(R.string.editor_button_add)
 
         val presentation: MutableList<String> = mutableListOf()
         for (position in 0 until mSongSectionTabLayout.tabCount) {
@@ -288,7 +290,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         val newAddTab = mSongSectionTabLayout.newTab()
         addTab(newAddTab)
-        newAddTab.text = getString(R.string.button_add)
+        newAddTab.text = getString(R.string.editor_button_add)
 
         val sectionLyricsInput = findViewById<EditText>(R.id.tin_section_lyrics)
         sectionLyricsInput.setText(lyricsTextMap[presentation.first()]!!)
@@ -312,7 +314,7 @@ class SongEditorActivity : AppCompatActivity() {
     private fun removeTab(tab: TabLayout.Tab) {
         val tabText = tab.text.toString()
 
-        if (tabText == getString(R.string.button_add)) {
+        if (tabText == getString(R.string.editor_button_add)) {
             return
         }
 
@@ -329,7 +331,8 @@ class SongEditorActivity : AppCompatActivity() {
             mSongSectionTabLayout.removeTab(tab)
         } else {
             mNewSectionCount = 1
-            val newTabText = getString(R.string.input_new_section_template).format(mNewSectionCount)
+            val newTabText =
+                getString(R.string.song_editor_input_new_section_template).format(mNewSectionCount)
 
             mTabCountMap[tabText] = 1
             tab.text = newTabText
@@ -349,11 +352,11 @@ class SongEditorActivity : AppCompatActivity() {
             when (validateSongTitle(newText)) {
                 NameValidationState.EMPTY -> {
                     mSongTitleInputLayout.error = " "
-                    mSongTitleInput.error = getString(R.string.enter_song_title)
+                    mSongTitleInput.error = getString(R.string.song_editor_enter_title)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
                     mSongTitleInputLayout.error = " "
-                    mSongTitleInput.error = getString(R.string.song_title_already_used)
+                    mSongTitleInput.error = getString(R.string.song_editor_title_already_used)
                 }
                 NameValidationState.VALID -> {
                     mSongTitleInputLayout.error = null

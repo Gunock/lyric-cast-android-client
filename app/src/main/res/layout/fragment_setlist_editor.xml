@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/17/21 12:00 AM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/16/21 4:59 PM
+  ~ Last modified 4/5/21 11:53 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -47,7 +47,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
             android:backgroundTint="@color/colorButton"
-            android:text="@string/button_save"
+            android:text="@string/editor_button_save"
             android:textColor="@color/colorButtonText"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +60,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/colorButton"
-            android:text="@string/button_pick_songs"
+            android:text="@string/setlist_editor_button_pick_songs"
             android:textColor="@color/colorButtonText"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:01 PM
+ * Last modified 4/5/21 11:53 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -46,7 +46,7 @@ class ImportDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dialog?.setTitle(getString(R.string.import_dialog_title))
+        dialog?.setTitle(getString(R.string.main_activity_import_dialog_title))
 
         return inflater.inflate(R.layout.dialog_fragment_import, container, false)
     }
