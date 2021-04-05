@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:19 PM
+ * Last modified 4/5/21 10:42 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -248,14 +248,26 @@ class MainActivity : AppCompatActivity() {
             @Suppress("BlockingMethodInNonBlockingContext")
             inputStream.close()
 
-            val songsJson = JSONArray(File(importDir, "songs.json").readText())
-            val categoriesJson = JSONArray(File(importDir, "categories.json").readText())
+            val songsJson: JSONArray
+            val categoriesJson: JSONArray
+            val setlistsJson: JSONArray?
+            try {
+                songsJson = JSONArray(File(importDir, "songs.json").readText())
+                categoriesJson = JSONArray(File(importDir, "categories.json").readText())
 
-            val setlistsFile = File(importDir, "setlists.json")
-            val setlistsJson = if (setlistsFile.exists()) {
-                JSONArray(File(importDir, "setlists.json").readText())
-            } else {
-                null
+                val setlistsFile = File(importDir, "setlists.json")
+                setlistsJson = if (setlistsFile.exists()) {
+                    JSONArray(File(importDir, "setlists.json").readText())
+                } else {
+                    null
+                }
+            } catch (exception: Exception) {
+                dialogFragment.message = "Incorrect file format"
+                CoroutineScope(Dispatchers.Main).launch {
+                    dialogFragment.setErrorColor(true)
+                    dialogFragment.setShowOkButton(true)
+                }
+                return@launch
             }
 
             val transferData = DatabaseTransferData(
@@ -292,7 +304,16 @@ class MainActivity : AppCompatActivity() {
             val importSongXmlParser =
                 ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
 
-            val importedSongs = importSongXmlParser.parseZip(contentResolver, inputStream)
+            val importedSongs: Set<SongDto> = try {
+                importSongXmlParser.parseZip(contentResolver, inputStream)
+            } catch (exception: Exception) {
+                dialogFragment.message = "Incorrect file format"
+                CoroutineScope(Dispatchers.Main).launch {
+                    dialogFragment.setErrorColor(true)
+                    dialogFragment.setShowOkButton(true)
+                }
+                return@launch
+            }
             @Suppress("BlockingMethodInNonBlockingContext")
             inputStream.close()
 

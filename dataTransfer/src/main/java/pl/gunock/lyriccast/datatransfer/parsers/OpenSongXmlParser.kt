@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:17 PM
+ * Last modified 4/5/21 10:41 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -43,7 +43,6 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
         }
 
         mImportDirectory.deleteRecursively()
-        mImportDirectory.mkdirs()
         return result
     }
 

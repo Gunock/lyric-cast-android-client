@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/2/21 12:44 AM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/2/21 12:12 AM
+  ~ Last modified 4/5/21 10:35 PM
   -->
 
 <resources>
@@ -12,6 +12,9 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="checkBox">#FF757575</color>
     <color name="checkBoxHighlight">@color/colorAccent</color>
+    <color name="dialogButton">@color/colorAccent</color>
+    <color name="indeterminateProgressBar">@color/colorAccent</color>
+    <color name="errorIndeterminateProgressBar">#FF0000</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
