@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:55 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:54 PM
+ * Last modified 4/5/21 4:51 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -31,15 +31,15 @@ import pl.gunock.lyriccast.listeners.SessionCreatedListener
  */
 class SongControlsActivity : AppCompatActivity() {
 
-    private lateinit var songTitleView: TextView
-    private lateinit var slideNumberView: TextView
-    private lateinit var slidePreviewView: TextView
+    private lateinit var mSongTitleView: TextView
+    private lateinit var mSlideNumberView: TextView
+    private lateinit var mSlidePreviewView: TextView
 
-    private var castContext: CastContext? = null
-    private lateinit var sessionCreatedListener: SessionCreatedListener
+    private var mCastContext: CastContext? = null
+    private lateinit var mSessionCreatedListener: SessionCreatedListener
 
-    private var currentSlide = 0
-    private lateinit var lyrics: Array<String>
+    private var mCurrentSlide = 0
+    private lateinit var mLyrics: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,20 +49,20 @@ class SongControlsActivity : AppCompatActivity() {
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        songTitleView = findViewById(R.id.tv_controls_song_title)
-        slideNumberView = findViewById(R.id.tv_song_slide_number)
-        slidePreviewView = findViewById(R.id.tv_slide_preview)
+        mSongTitleView = findViewById(R.id.tv_controls_song_title)
+        mSlideNumberView = findViewById(R.id.tv_song_slide_number)
+        mSlidePreviewView = findViewById(R.id.tv_slide_preview)
 
-        lyrics = intent.getStringArrayExtra("lyrics")!!
+        mLyrics = intent.getStringArrayExtra("lyrics")!!
 
-        castContext = CastContext.getSharedInstance()
-        sessionCreatedListener = SessionCreatedListener {
+        mCastContext = CastContext.getSharedInstance()
+        mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        castContext?.sessionManager?.addSessionManagerListener(sessionCreatedListener)
+        mCastContext?.sessionManager?.addSessionManagerListener(mSessionCreatedListener)
 
-        songTitleView.text = intent.getStringExtra("songTitle")
+        mSongTitleView.text = intent.getStringExtra("songTitle")
 
         setupListeners()
 
@@ -77,7 +77,7 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        castContext?.sessionManager?.removeSessionManagerListener(sessionCreatedListener)
+        mCastContext?.sessionManager?.removeSessionManagerListener(mSessionCreatedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -85,8 +85,8 @@ class SongControlsActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (castContext != null) {
-            castActionProvider.routeSelector = castContext!!.mergedSelector
+        if (mCastContext != null) {
+            castActionProvider.routeSelector = mCastContext!!.mergedSelector
         }
 
         return true
@@ -105,32 +105,32 @@ class SongControlsActivity : AppCompatActivity() {
         }
 
         findViewById<ImageButton>(R.id.btn_song_prev).setOnClickListener {
-            if (currentSlide <= 0) {
+            if (mCurrentSlide <= 0) {
                 return@setOnClickListener
             }
-            currentSlide--
+            mCurrentSlide--
             sendSlide()
         }
 
         findViewById<ImageButton>(R.id.btn_song_next).setOnClickListener {
-            if (currentSlide >= lyrics.size - 1) {
+            if (mCurrentSlide >= mLyrics.size - 1) {
                 return@setOnClickListener
             }
-            currentSlide++
+            mCurrentSlide++
             sendSlide()
         }
     }
 
     private fun sendBlank() {
-        if (castContext == null) {
+        if (mCastContext == null) {
             return
         }
 
-        MessageHelper.sendControlMessage(castContext!!, ControlAction.BLANK)
+        MessageHelper.sendControlMessage(mCastContext!!, ControlAction.BLANK)
     }
 
     private fun sendConfigure() {
-        if (castContext == null) {
+        if (mCastContext == null) {
             return
         }
 
@@ -144,7 +144,7 @@ class SongControlsActivity : AppCompatActivity() {
         }
 
         MessageHelper.sendControlMessage(
-            castContext!!,
+            mCastContext!!,
             ControlAction.CONFIGURE,
             configurationJson
         )
@@ -152,16 +152,16 @@ class SongControlsActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun sendSlide() {
-        slideNumberView.text = "${currentSlide + 1}/${lyrics.size}"
-        slidePreviewView.text = lyrics[currentSlide]
+        mSlideNumberView.text = "${mCurrentSlide + 1}/${mLyrics.size}"
+        mSlidePreviewView.text = mLyrics[mCurrentSlide]
 
-        if (castContext == null) {
+        if (mCastContext == null) {
             return
         }
 
         MessageHelper.sendContentMessage(
-            castContext!!,
-            lyrics[currentSlide]
+            mCastContext!!,
+            mLyrics[mCurrentSlide]
         )
     }
 

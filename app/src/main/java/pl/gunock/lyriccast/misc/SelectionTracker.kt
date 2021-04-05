@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 3:46 PM
+ * Last modified 4/5/21 5:12 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -11,8 +11,8 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class SelectionTracker<T : RecyclerView.ViewHolder>(
-    private val recyclerView: RecyclerView,
-    private val onSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
+    private val mRecyclerView: RecyclerView,
+    private val mOnSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
 ) {
 
     var count: Int = 0
@@ -26,19 +26,19 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
     var countAfter: Int = 0
         private set
 
-    private val selectedItemIds: MutableSet<Long> = mutableSetOf()
+    private val mSelectedItemIds: MutableSet<Long> = mutableSetOf()
 
     fun reset() {
         countAfter = 0
         count = 0
-        selectedItemIds.clear()
+        mSelectedItemIds.clear()
     }
 
     fun attach(holder: T) {
         holder.itemView.setOnLongClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (onSelect(holder, holder.adapterPosition, true)) {
+            if (mOnSelect(holder, holder.adapterPosition, true)) {
                 view.requestFocus()
                 count = countItems(holder, modifySelectedItems = true)
             }
@@ -49,9 +49,9 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         holder.itemView.setOnClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (onSelect(holder, holder.adapterPosition, false)) {
+            if (mOnSelect(holder, holder.adapterPosition, false)) {
                 view.requestFocus()
-                recyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                mRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 count = countItems(holder, modifySelectedItems = true)
             }
             countAfter = count
@@ -60,14 +60,14 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
 
     private fun countItems(holder: T, modifySelectedItems: Boolean = true): Int {
         var updatedCount: Int = count
-        if (selectedItemIds.contains(holder.itemId)) {
+        if (mSelectedItemIds.contains(holder.itemId)) {
             if (modifySelectedItems) {
-                selectedItemIds.remove(holder.itemId)
+                mSelectedItemIds.remove(holder.itemId)
             }
             updatedCount--
         } else {
             if (modifySelectedItems) {
-                selectedItemIds.add(holder.itemId)
+                mSelectedItemIds.add(holder.itemId)
             }
             updatedCount++
         }

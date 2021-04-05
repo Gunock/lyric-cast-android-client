@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:33 PM
+ * Last modified 4/5/21 4:55 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -23,20 +23,22 @@ import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistSongItemsAdapter(
-    val context: Context,
-    val songItems: MutableList<SongItem>,
+    private val mContext: Context,
+    private val mSongItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val selectionTracker: SelectionTracker<ViewHolder>?,
-    val onHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
+    private val mSelectionTracker: SelectionTracker<ViewHolder>?,
+    private val mOnHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
+
+    val songItems: List<SongItem> get() = mSongItems
 
     init {
         setHasStableIds(true)
     }
 
     fun resetSelection() {
-        songItems.forEach { it.isSelected.value = false }
-        selectionTracker?.reset()
+        mSongItems.forEach { it.isSelected.value = false }
+        mSelectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,23 +53,23 @@ class SetlistSongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val item = songItems[position]
+        val item = mSongItems[position]
         return item.song.id + position
     }
 
-    override fun getItemCount() = songItems.size
+    override fun getItemCount() = mSongItems.size
 
     fun moveItem(from: Int, to: Int) {
-        val item = songItems.removeAt(from)
-        songItems.add(to, item)
+        val item = mSongItems.removeAt(from)
+        mSongItems.add(to, item)
     }
 
     fun duplicateSelectedItem() {
-        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected.value!! }
-        val selectedItem = songItems[selectedItemIndex].copy()
+        val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItem = mSongItems[selectedItemIndex].copy()
         selectedItem.isSelected.value = false
 
-        songItems.add(selectedItemIndex + 1, selectedItem)
+        mSongItems.add(selectedItemIndex + 1, selectedItem)
         notifyItemInserted(selectedItemIndex + 1)
     }
 
@@ -78,11 +80,11 @@ class SetlistSongItemsAdapter(
     }
 
     private fun deleteSelectedItem(): Boolean {
-        val selectedItemIndex = songItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
         if (selectedItemIndex == -1) {
             return false
         }
-        songItems.removeAt(selectedItemIndex)
+        mSongItems.removeAt(selectedItemIndex)
         notifyItemRemoved(selectedItemIndex)
         return true
     }
@@ -90,31 +92,31 @@ class SetlistSongItemsAdapter(
     inner class ViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
-        private val handleView: View = itemView.findViewById(R.id.imv_handle)
-        private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
+        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
+        private val mHandleView: View = itemView.findViewById(R.id.imv_handle)
+        private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
 
         fun bind(position: Int) {
-            val item = songItems[position]
-            selectionTracker?.attach(this)
+            val item = mSongItems[position]
+            mSelectionTracker?.attach(this)
             setupListeners()
 
-            item.isSelected.observe(context.getLifecycleOwner()!!) {
-                checkBox.isChecked = it
+            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+                mCheckBox.isChecked = it
             }
 
             showCheckBox
-                .observe(context.getLifecycleOwner()!!, VisibilityObserver(handleView, true))
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+                .observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mHandleView, true))
+            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
 
-            titleTextView.text = item.song.title
+            mTitleTextView.text = item.song.title
         }
 
         private fun setupListeners() {
             @SuppressLint("ClickableViewAccessibility")
-            if (onHandleTouchListener != null) {
-                handleView.setOnTouchListener { view, event ->
-                    onHandleTouchListener.execute(this, view, event)
+            if (mOnHandleTouchListener != null) {
+                mHandleView.setOnTouchListener { view, event ->
+                    mOnHandleTouchListener.execute(this, view, event)
                 }
             }
         }

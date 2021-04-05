@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 6:32 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 6:25 PM
+ * Last modified 4/5/21 5:01 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -31,25 +31,25 @@ import java.util.*
 
 
 class EditCategoryDialogFragment(
-    private val categoryItem: CategoryItem? = null
+    private val mCategoryItem: CategoryItem? = null
 ) : DialogFragment() {
 
     companion object {
         const val TAG = "EditCategoryDialogFragment"
     }
 
-    private val categoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
+    private val mCategoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
 
-    private lateinit var nameInputLayout: TextInputLayout
-    private lateinit var nameInput: TextView
-    private lateinit var colorSpinner: Spinner
+    private lateinit var mNameInputLayout: TextInputLayout
+    private lateinit var mNameInput: TextView
+    private lateinit var mColorSpinner: Spinner
 
-    private lateinit var dialogViewModel: EditCategoryDialogViewModel
+    private lateinit var mDialogViewModel: EditCategoryDialogViewModel
 
-    private lateinit var categoryNames: Set<String>
+    private lateinit var mCategoryNames: Set<String>
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogViewModel =
+        mDialogViewModel =
             ViewModelProvider(requireActivity()).get(EditCategoryDialogViewModel::class.java)
         return super.onCreateDialog(savedInstanceState)
     }
@@ -59,13 +59,13 @@ class EditCategoryDialogFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (categoryItem == null) {
+        if (mCategoryItem == null) {
             dialog?.setTitle(getString(R.string.add_category))
         } else {
             dialog?.setTitle(getString(R.string.edit_category))
         }
 
-        categoryNames = dialogViewModel.categoryNames.value ?: setOf()
+        mCategoryNames = mDialogViewModel.categoryNames.value ?: setOf()
 
         return inflater.inflate(R.layout.dialog_fragment_edit_category, container, false)
     }
@@ -73,11 +73,11 @@ class EditCategoryDialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        nameInputLayout = view.findViewById(R.id.tv_category_name)
-        nameInput = view.findViewById(R.id.tin_category_name)
-        colorSpinner = view.findViewById(R.id.spn_category_color)
+        mNameInputLayout = view.findViewById(R.id.tv_category_name)
+        mNameInput = view.findViewById(R.id.tin_category_name)
+        mColorSpinner = view.findViewById(R.id.spn_category_color)
 
-        nameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
+        mNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
         setupColorSpinner()
         setupListeners(view)
@@ -94,34 +94,34 @@ class EditCategoryDialogFragment(
             requireContext(),
             colors
         )
-        colorSpinner.adapter = colorSpinnerAdapter
+        mColorSpinner.adapter = colorSpinnerAdapter
 
-        if (categoryItem?.category?.color != null) {
-            nameInput.text = categoryItem.category.name.toUpperCase(Locale.ROOT)
-            colorSpinner.setSelection(colorValues.indexOf(categoryItem.category.color!!))
+        if (mCategoryItem?.category?.color != null) {
+            mNameInput.text = mCategoryItem.category.name.toUpperCase(Locale.ROOT)
+            mColorSpinner.setSelection(colorValues.indexOf(mCategoryItem.category.color!!))
         }
     }
 
     private fun setupListeners(view: View) {
-        nameInput.addTextChangedListener(categoryNameTextWatcher)
+        mNameInput.addTextChangedListener(mCategoryNameTextWatcher)
 
         view.findViewById<Button>(R.id.btn_save_category).setOnClickListener {
-            val categoryName = nameInput.text.toString()
+            val categoryName = mNameInput.text.toString()
             if (validateCategoryName(categoryName) != NameValidationState.VALID) {
-                nameInput.text = categoryName
-                nameInput.requestFocus()
+                mNameInput.text = categoryName
+                mNameInput.requestFocus()
                 return@setOnClickListener
             }
 
-            val selectedColor = colorSpinner.selectedItem as ColorItem
+            val selectedColor = mColorSpinner.selectedItem as ColorItem
 
-            val category: Category = if (dialogViewModel.category.value != null) {
-                dialogViewModel.category.value!!
+            val category: Category = if (mDialogViewModel.category.value != null) {
+                mDialogViewModel.category.value!!
             } else {
-                Category(null, nameInput.text.toString(), selectedColor.value)
+                Category(null, mNameInput.text.toString(), selectedColor.value)
             }
 
-            dialogViewModel.category.value = category
+            mDialogViewModel.category.value = category
             dismiss()
         }
 
@@ -135,11 +135,11 @@ class EditCategoryDialogFragment(
             return NameValidationState.EMPTY
         }
 
-        if (categoryItem != null && categoryItem.category.name == name) {
+        if (mCategoryItem != null && mCategoryItem.category.name == name) {
             return NameValidationState.VALID
         }
 
-        if (categoryNames.contains(name)) {
+        if (mCategoryNames.contains(name)) {
             return NameValidationState.ALREADY_IN_USE
         }
 
@@ -158,16 +158,16 @@ class EditCategoryDialogFragment(
 
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {
-                    nameInputLayout.error = " "
-                    nameInput.error = getString(R.string.enter_category_name)
+                    mNameInputLayout.error = " "
+                    mNameInput.error = getString(R.string.enter_category_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    nameInputLayout.error = " "
-                    nameInput.error = getString(R.string.category_name_already_used)
+                    mNameInputLayout.error = " "
+                    mNameInput.error = getString(R.string.category_name_already_used)
                 }
                 NameValidationState.VALID -> {
-                    nameInputLayout.error = null
-                    nameInput.error = null
+                    mNameInputLayout.error = null
+                    mNameInput.error = null
                 }
             }
         }

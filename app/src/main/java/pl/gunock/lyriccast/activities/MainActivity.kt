@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 3:52 PM
+ * Last modified 4/5/21 5:03 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -57,14 +57,14 @@ class MainActivity : AppCompatActivity() {
         const val IMPORT_RESULT_CODE = 2
     }
 
-    private var castContext: CastContext? = null
+    private var mCastContext: CastContext? = null
 
-    private lateinit var repository: LyricCastRepository
-    private val databaseViewModel: DatabaseViewModel by viewModels {
+    private lateinit var mRepository: LyricCastRepository
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
-    private lateinit var importDialogViewModel: ImportDialogViewModel
+    private lateinit var mImportDialogViewModel: ImportDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,13 +73,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
 
         // TODO: Possible leak
-        importDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
+        mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
 
-        castContext = CastContext.getSharedInstance(this)
-        repository = (application as LyricCastApplication).repository
+        mCastContext = CastContext.getSharedInstance(this)
+        mRepository = (application as LyricCastApplication).repository
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,8 +87,8 @@ class MainActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (castContext != null) {
-            castActionProvider.routeSelector = castContext!!.mergedSelector
+        if (mCastContext != null) {
+            castActionProvider.routeSelector = mCastContext!!.mergedSelector
         }
 
         return true
@@ -115,11 +115,11 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             IMPORT_RESULT_CODE -> {
                 Log.d(TAG, "Handling import result")
-                Log.d(TAG, "Import parameters $importDialogViewModel")
+                Log.d(TAG, "Import parameters $mImportDialogViewModel")
                 Log.d(TAG, "Selected file URI: $uri")
-                if (importDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
+                if (mImportDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
                     importOpenSong(uri)
-                } else if (importDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
+                } else if (mImportDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
                     importLyricCast(uri)
                 }
             }
@@ -192,15 +192,14 @@ class MainActivity : AppCompatActivity() {
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
 
-        val message = dialogFragment.message
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val exportData = databaseViewModel.getDatabaseTransferData()
+            val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
-            message.postValue(getString(R.string.export_saving_json))
+            dialogFragment.message = getString(R.string.export_saving_json)
             val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
             val categoriesString =
                 JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
@@ -209,11 +208,11 @@ class MainActivity : AppCompatActivity() {
             File(exportDir, "categories.json").writeText(categoriesString)
             File(exportDir, "setlists.json").writeText(setlistsString)
 
-            message.postValue(getString(R.string.export_saving_zip))
+            dialogFragment.message = getString(R.string.export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            message.postValue(getString(R.string.export_deleting_temp))
+            dialogFragment.message = getString(R.string.export_deleting_temp)
             exportDir.deleteRecursively()
             dialogFragment.dismiss()
         }
@@ -226,8 +225,8 @@ class MainActivity : AppCompatActivity() {
             R.style.Theme_LyricCast_Light_Dialog
         )
 
-        importDialogViewModel.accepted.value = false
-        importDialogViewModel.accepted.observe(this) { if (it) startImport() }
+        mImportDialogViewModel.accepted.value = false
+        mImportDialogViewModel.accepted.observe(this) { if (it) startImport() }
         dialogFragment.show(supportFragmentManager, ImportDialogFragment.TAG)
         return true
     }
@@ -266,14 +265,14 @@ class MainActivity : AppCompatActivity() {
             )
 
             val importOptions = ImportOptions(
-                importDialogViewModel.importFormat,
-                importDialogViewModel.deleteAll,
-                importDialogViewModel.replaceOnConflict
+                mImportDialogViewModel.importFormat,
+                mImportDialogViewModel.deleteAll,
+                mImportDialogViewModel.replaceOnConflict
             )
 
-            databaseViewModel.importSongs(
+            mDatabaseViewModel.importSongs(
                 transferData,
-                dialogFragment.message,
+                dialogFragment.messageLiveData,
                 importOptions
             )
 
@@ -300,14 +299,14 @@ class MainActivity : AppCompatActivity() {
 
             val colors: IntArray = resources.getIntArray(R.array.category_color_values)
             val importOptions = ImportOptions(
-                importDialogViewModel.importFormat,
-                importDialogViewModel.deleteAll,
-                importDialogViewModel.replaceOnConflict,
+                mImportDialogViewModel.importFormat,
+                mImportDialogViewModel.deleteAll,
+                mImportDialogViewModel.replaceOnConflict,
                 colors
             )
-            databaseViewModel.importSongs(
+            mDatabaseViewModel.importSongs(
                 importedSongs,
-                dialogFragment.message,
+                dialogFragment.messageLiveData,
                 importOptions
             )
             dialogFragment.dismiss()
@@ -315,7 +314,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startImport(): Boolean {
-        importDialogViewModel.accepted.removeObservers(this)
+        mImportDialogViewModel.accepted.removeObservers(this)
 
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)

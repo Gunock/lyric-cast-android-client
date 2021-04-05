@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:23 AM
+ * Last modified 4/5/21 5:01 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -28,15 +28,15 @@ class ImportDialogFragment : DialogFragment() {
         const val TAG = "ImportDialogFragment"
     }
 
-    private lateinit var importFormatSpinner: Spinner
-    private lateinit var deleteAllCheckBox: CheckBox
-    private lateinit var replaceOnConflictCheckBox: CheckBox
+    private lateinit var mImportFormatSpinner: Spinner
+    private lateinit var mDeleteAllCheckBox: CheckBox
+    private lateinit var mReplaceOnConflictCheckBox: CheckBox
 
-    private lateinit var importDialogViewModel: ImportDialogViewModel
+    private lateinit var mImportDialogViewModel: ImportDialogViewModel
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        importDialogViewModel =
+        mImportDialogViewModel =
             ViewModelProvider(requireActivity()).get(ImportDialogViewModel::class.java)
         return super.onCreateDialog(savedInstanceState)
     }
@@ -54,18 +54,18 @@ class ImportDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        importFormatSpinner = view.findViewById(R.id.spn_import_format)
-        deleteAllCheckBox = view.findViewById(R.id.chk_delete_all)
-        replaceOnConflictCheckBox = view.findViewById(R.id.chk_replace_on_conflict)
+        mImportFormatSpinner = view.findViewById(R.id.spn_import_format)
+        mDeleteAllCheckBox = view.findViewById(R.id.chk_delete_all)
+        mReplaceOnConflictCheckBox = view.findViewById(R.id.chk_replace_on_conflict)
 
         setupColorSpinner()
         setupListeners(view)
-        importDialogViewModel.importFormat =
-            ImportFormat.getByName(importFormatSpinner.selectedItem as String)
+        mImportDialogViewModel.importFormat =
+            ImportFormat.getByName(mImportFormatSpinner.selectedItem as String)
     }
 
     private fun setupColorSpinner() {
-        importFormatSpinner.adapter = ArrayAdapter.createFromResource(
+        mImportFormatSpinner.adapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.import_formats,
             android.R.layout.simple_list_item_1
@@ -73,22 +73,22 @@ class ImportDialogFragment : DialogFragment() {
     }
 
     private fun setupListeners(view: View) {
-        deleteAllCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            importDialogViewModel.deleteAll = isChecked
+        mDeleteAllCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            mImportDialogViewModel.deleteAll = isChecked
             if (isChecked) {
-                replaceOnConflictCheckBox.isChecked = false
-                replaceOnConflictCheckBox.isEnabled = false
+                mReplaceOnConflictCheckBox.isChecked = false
+                mReplaceOnConflictCheckBox.isEnabled = false
             } else {
-                replaceOnConflictCheckBox.isEnabled = true
+                mReplaceOnConflictCheckBox.isEnabled = true
             }
         }
 
         view.findViewById<Button>(R.id.btn_import).setOnClickListener {
-            importDialogViewModel.deleteAll = deleteAllCheckBox.isChecked
-            importDialogViewModel.replaceOnConflict = replaceOnConflictCheckBox.isChecked
-            importDialogViewModel.importFormat =
-                ImportFormat.getByName(importFormatSpinner.selectedItem as String)
-            importDialogViewModel.accepted.value = true
+            mImportDialogViewModel.deleteAll = mDeleteAllCheckBox.isChecked
+            mImportDialogViewModel.replaceOnConflict = mReplaceOnConflictCheckBox.isChecked
+            mImportDialogViewModel.importFormat =
+                ImportFormat.getByName(mImportFormatSpinner.selectedItem as String)
+            mImportDialogViewModel.accepted.value = true
             dismiss()
         }
 

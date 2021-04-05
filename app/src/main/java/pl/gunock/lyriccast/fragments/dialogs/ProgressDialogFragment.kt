@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/2/21 11:52 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/2/21 3:35 PM
+ * Last modified 4/5/21 5:03 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -23,9 +23,12 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         const val TAG = "ProgressDialogFragment"
     }
 
-    val message = MutableLiveData(messageText)
+    val messageLiveData = MutableLiveData(messageText)
+    var message: String
+        get() = messageLiveData.value!!
+        set(value) = messageLiveData.postValue(value)
 
-    lateinit var messageTextView: TextView
+    lateinit var mMessageTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,10 +43,10 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        messageTextView = view.findViewById(R.id.tv_progress_message)
-        messageTextView.text = message.value
+        mMessageTextView = view.findViewById(R.id.tv_progress_message)
+        mMessageTextView.text = message
 
-        message.observe(this) { messageTextView.text = it }
+        messageLiveData.observe(this) { mMessageTextView.text = it }
     }
 
 }

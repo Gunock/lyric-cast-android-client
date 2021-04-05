@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:09 PM
+ * Last modified 4/5/21 5:14 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -28,9 +28,9 @@ import java.util.*
 import kotlin.system.measureTimeMillis
 
 class SongItemsAdapter(
-    val context: Context,
+    private val mContext: Context,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val selectionTracker: SelectionTracker<ViewHolder>?
+    private val mSelectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
     private companion object {
@@ -41,22 +41,23 @@ class SongItemsAdapter(
         setHasStableIds(true)
     }
 
-    private val lock = Any()
-    private val checkBoxColor = context.getColor(R.color.checkBox)
-    private val checkBoxHighlightColor = context.getColor(R.color.checkBoxHighlight)
-    private val brightColor = context.getColor(R.color.white)
-    private val darkColor = context.getColor(R.color.black)
-    val checkBoxColors = intArrayOf(checkBoxHighlightColor, checkBoxColor)
+    private val mLock = Any()
 
-    private var _items: SortedSet<SongItem> = sortedSetOf()
-    private var _visibleItems: Set<SongItem> = setOf()
-    val songItems: List<SongItem> get() = _visibleItems.toList()
+    private val mCheckBoxColor = mContext.getColor(R.color.checkBox)
+    private val mCheckBoxHighlightColor = mContext.getColor(R.color.checkBoxHighlight)
+    private val mBrightColor = mContext.getColor(R.color.white)
+    private val mDarkColor = mContext.getColor(R.color.black)
+    private val mCheckBoxColors = intArrayOf(mCheckBoxHighlightColor, mCheckBoxColor)
+
+    private var mItems: SortedSet<SongItem> = sortedSetOf()
+    private var mVisibleItems: Set<SongItem> = setOf()
+    val songItems: List<SongItem> get() = mVisibleItems.toList()
 
     fun submitCollection(songs: Collection<SongAndCategory>) {
-        synchronized(lock) {
-            _items.clear()
-            _items.addAll(songs.map { SongItem(it) })
-            _visibleItems = _items
+        synchronized(mLock) {
+            mItems.clear()
+            mItems.addAll(songs.map { SongItem(it) })
+            mVisibleItems = mItems
             notifyDataSetChanged()
         }
     }
@@ -82,7 +83,7 @@ class SongItemsAdapter(
         }
 
         val duration = measureTimeMillis {
-            _visibleItems = _items.filter { songItem ->
+            mVisibleItems = mItems.filter { songItem ->
                 predicates.all { predicate -> predicate(songItem) }
             }.toSortedSet()
         }
@@ -91,8 +92,8 @@ class SongItemsAdapter(
     }
 
     fun resetSelection() {
-        _visibleItems.forEach { it.isSelected.value = false }
-        selectionTracker?.reset()
+        mVisibleItems.forEach { it.isSelected.value = false }
+        mSelectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -107,43 +108,43 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return _visibleItems.toList()[position].song.id
+        return mVisibleItems.toList()[position].song.id
     }
 
-    override fun getItemCount() = _visibleItems.size
+    override fun getItemCount() = mVisibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
-        private val titleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
-        private val categoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
+        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
+        private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
+        private val mCategoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
 
         init {
-            checkBox
-            categoryTextView.setTextColor(this@SongItemsAdapter.brightColor)
+            mCategoryTextView.setTextColor(this@SongItemsAdapter.mBrightColor)
         }
 
         fun bind(position: Int) {
-            val item = _visibleItems.toList()[position]
-            selectionTracker?.attach(this)
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
-            item.isSelected.observe(context.getLifecycleOwner()!!) {
-                checkBox.isChecked = it
+            val item = mVisibleItems.toList()[position]
+            mSelectionTracker?.attach(this)
+            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
+            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+                mCheckBox.isChecked = it
             }
 
-            titleTextView.text = item.song.title
+            mTitleTextView.text = item.song.title
 
             if (item.category != null) {
-                categoryTextView.text = item.category.name
-                checkBox.buttonTintList = ColorStateList.valueOf(this@SongItemsAdapter.brightColor)
-                titleTextView.setTextColor(this@SongItemsAdapter.brightColor)
+                mCategoryTextView.text = item.category.name
+                mCheckBox.buttonTintList =
+                    ColorStateList.valueOf(this@SongItemsAdapter.mBrightColor)
+                mTitleTextView.setTextColor(this@SongItemsAdapter.mBrightColor)
                 (itemView as CardView).setCardBackgroundColor(item.category.color!!)
             } else {
-                categoryTextView.text = ""
+                mCategoryTextView.text = ""
 
-                checkBox.buttonTintList = ColorStateList(CHECKBOX_STATES, checkBoxColors)
+                mCheckBox.buttonTintList = ColorStateList(CHECKBOX_STATES, mCheckBoxColors)
 
-                titleTextView.setTextColor(darkColor)
-                (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.brightColor)
+                mTitleTextView.setTextColor(mDarkColor)
+                (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.mBrightColor)
             }
         }
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 7:45 PM
+ * Last modified 4/5/21 5:13 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -15,7 +15,7 @@ data class SetlistItem(
 ) : Comparable<SetlistItem> {
 
     val normalizedName by lazy { setlist.name.normalize() }
-    var isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun compareTo(other: SetlistItem): Int {
         return setlist.name.compareTo(other.setlist.name)

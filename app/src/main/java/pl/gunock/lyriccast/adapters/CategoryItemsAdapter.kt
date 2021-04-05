@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:15 PM
+ * Last modified 4/5/21 4:51 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -29,24 +29,24 @@ class CategoryItemsAdapter(
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
-    private val lock = Any()
-    private var _items: SortedSet<CategoryItem> = sortedSetOf()
-    val categoryItems: List<CategoryItem> get() = _items.toList()
+    private val mLock = Any()
+    private var mItems: SortedSet<CategoryItem> = sortedSetOf()
+    val categoryItems: List<CategoryItem> get() = mItems.toList()
 
     init {
         setHasStableIds(true)
     }
 
     fun submitCollection(songs: Collection<Category>) {
-        synchronized(lock) {
-            _items.clear()
-            _items.addAll(songs.map { CategoryItem(it) })
+        synchronized(mLock) {
+            mItems.clear()
+            mItems.addAll(songs.map { CategoryItem(it) })
             notifyDataSetChanged()
         }
     }
 
     fun resetSelection() {
-        _items.forEach { it.isSelected.value = false }
+        mItems.forEach { it.isSelected.value = false }
         selectionTracker?.reset()
     }
 
@@ -65,27 +65,30 @@ class CategoryItemsAdapter(
         return categoryItems[position].category.id
     }
 
-    override fun getItemCount() = _items.size
+    override fun getItemCount() = mItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
-        private val name: TextView = itemView.findViewById(R.id.tv_category_name)
-        private val colorCard: CardView = itemView.findViewById(R.id.cdv_category_color)
+        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
+        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_category_name)
+        private val mColorCardView: CardView = itemView.findViewById(R.id.cdv_category_color)
 
         fun bind(position: Int) {
             val item: CategoryItem = categoryItems[position]
             selectionTracker?.attach(this)
 
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(colorCard, true))
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+            showCheckBox.observe(
+                context.getLifecycleOwner()!!,
+                VisibilityObserver(mColorCardView, true)
+            )
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
             item.isSelected.observe(context.getLifecycleOwner()!!) {
-                checkBox.isChecked = it
+                mCheckBox.isChecked = it
             }
 
-            name.text = categoryItems[adapterPosition].category.name
+            mNameTextView.text = categoryItems[adapterPosition].category.name
 
             if (item.category.color != null) {
-                colorCard.setCardBackgroundColor(item.category.color!!)
+                mColorCardView.setCardBackgroundColor(item.category.color!!)
             }
 
         }

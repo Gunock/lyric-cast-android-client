@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:34 PM
+ * Last modified 4/5/21 5:11 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -48,28 +48,28 @@ class SetlistsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 4
     }
 
-    private lateinit var repository: LyricCastRepository
-    private val databaseViewModel: DatabaseViewModel by viewModels {
+    private lateinit var mRepository: LyricCastRepository
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
             requireContext(),
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
-    private lateinit var searchViewEditText: EditText
-    private lateinit var setlistRecyclerView: RecyclerView
+    private lateinit var mSearchViewEditText: EditText
+    private lateinit var mSetlistRecyclerView: RecyclerView
 
-    private lateinit var setlistItemsAdapter: SetlistItemsAdapter
-    private lateinit var selectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
+    private lateinit var mSetlistItemsAdapter: SetlistItemsAdapter
+    private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
-    private var actionMenu: Menu? = null
-    private var actionMode: ActionMode? = null
-    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+    private var mActionMenu: Menu? = null
+    private var mActionMode: ActionMode? = null
+    private val mActionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
             menu.findItem(R.id.action_menu_add_setlist).isVisible = false
             mode.title = ""
-            actionMenu = menu
+            mActionMenu = menu
             return true
         }
 
@@ -94,8 +94,8 @@ class SetlistsFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
-            actionMode = null
-            actionMenu = null
+            mActionMode = null
+            mActionMenu = null
             resetSelection()
         }
     }
@@ -104,7 +104,7 @@ class SetlistsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository = (requireActivity().application as LyricCastApplication).repository
+        mRepository = (requireActivity().application as LyricCastApplication).repository
     }
 
     override fun onCreateView(
@@ -118,9 +118,9 @@ class SetlistsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_setlists)
-        searchViewEditText = searchView.editText!!
+        mSearchViewEditText = searchView.editText!!
 
-        setlistRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_setlists).apply {
+        mSetlistRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_setlists).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
@@ -146,11 +146,11 @@ class SetlistsFragment : Fragment() {
         super.onResume()
 
         resetSelection()
-        searchViewEditText.setText("")
+        mSearchViewEditText.setText("")
     }
 
     override fun onStop() {
-        actionMode?.finish()
+        mActionMode?.finish()
         super.onStop()
     }
 
@@ -173,18 +173,17 @@ class SetlistsFragment : Fragment() {
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
-        val message = dialogFragment.message
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val selectedSongs = setlistItemsAdapter.setlistItems
+            val selectedSongs = mSetlistItemsAdapter.mSetlistItems
                 .filter { it.isSelected.value!! }
 
             val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
 
-            val exportData = databaseViewModel.getDatabaseTransferData()
+            val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
             val exportSetlists = exportData.setlistDtos!!
                 .filter { it.name in setlistNames }
@@ -207,7 +206,7 @@ class SetlistsFragment : Fragment() {
             val setlistJsons = exportSetlists.filter { it.name in setlistNames }
                 .map { it.toJson() }
 
-            message.postValue(getString(R.string.export_saving_json))
+            dialogFragment.message = getString(R.string.export_saving_json)
             val songsString = JSONArray(songJsons).toString()
             val categoriesString = JSONArray(categoryJsons).toString()
             val setlistsString = JSONArray(setlistJsons).toString()
@@ -215,11 +214,11 @@ class SetlistsFragment : Fragment() {
             File(exportDir, "categories.json").writeText(categoriesString)
             File(exportDir, "setlists.json").writeText(setlistsString)
 
-            message.postValue(getString(R.string.export_saving_zip))
+            dialogFragment.message = getString(R.string.export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            message.postValue(getString(R.string.export_deleting_temp))
+            dialogFragment.message = getString(R.string.export_deleting_temp)
             exportDir.deleteRecursively()
             dialogFragment.dismiss()
         }
@@ -231,16 +230,16 @@ class SetlistsFragment : Fragment() {
 
     private fun setupSetlists() {
         val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
-        selectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
-        setlistItemsAdapter = SetlistItemsAdapter(
+        mSelectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
+        mSetlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
-            selectionTracker = selectionTracker
+            selectionTracker = mSelectionTracker
         )
 
-        setlistRecyclerView.adapter = setlistItemsAdapter
+        setlistRecyclerView.adapter = mSetlistItemsAdapter
 
-        databaseViewModel.allSetlists.observe(requireActivity()) { setlist ->
-            setlistItemsAdapter.submitCollection(setlist ?: return@observe)
+        mDatabaseViewModel.allSetlists.observe(requireActivity()) { setlist ->
+            mSetlistItemsAdapter.submitCollection(setlist ?: return@observe)
         }
     }
 
@@ -250,8 +249,8 @@ class SetlistsFragment : Fragment() {
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = setlistItemsAdapter.setlistItems[position]
-        if (!isLongClick && selectionTracker.count == 0) {
+        val item = mSetlistItemsAdapter.mSetlistItems[position]
+        if (!isLongClick && mSelectionTracker.count == 0) {
             pickSetlist(item)
         } else {
             return selectSetlist(item)
@@ -260,12 +259,12 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        searchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            setlistItemsAdapter.filterItems(newText)
+        mSearchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
+            mSetlistItemsAdapter.filterItems(newText)
             resetSelection()
         })
 
-        searchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+        mSearchViewEditText.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
@@ -280,19 +279,19 @@ class SetlistsFragment : Fragment() {
 
     private fun selectSetlist(item: SetlistItem): Boolean {
         item.isSelected.value = !item.isSelected.value!!
-        when (selectionTracker.countAfter) {
+        when (mSelectionTracker.countAfter) {
             0 -> {
-                actionMode?.finish()
+                mActionMode?.finish()
                 return false
             }
             1 -> {
-                if (!setlistItemsAdapter.showCheckBox.value!!) {
-                    setlistItemsAdapter.showCheckBox.value = true
+                if (!mSetlistItemsAdapter.showCheckBox.value!!) {
+                    mSetlistItemsAdapter.showCheckBox.value = true
                 }
 
-                if (actionMode == null) {
-                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                        actionModeCallback
+                if (mActionMode == null) {
+                    mActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                        mActionModeCallback
                     )
                 }
 
@@ -305,11 +304,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedItem = setlistItemsAdapter.setlistItems
+        val selectedItem = mSetlistItemsAdapter.mSetlistItems
             .first { setlistItem -> setlistItem.isSelected.value!! }
 
         val setlistWithSongs =
-            runBlocking { repository.getSetlistWithSongs(selectedItem.setlist.id) }
+            runBlocking { mRepository.getSetlistWithSongs(selectedItem.setlist.id) }
 
         val intent = Intent(context, SetlistEditorActivity::class.java)
         intent.putExtra("setlistWithSongs", setlistWithSongs)
@@ -321,11 +320,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun deleteSelectedSetlists(): Boolean {
-        val selectedSetlists = setlistItemsAdapter.setlistItems
+        val selectedSetlists = mSetlistItemsAdapter.mSetlistItems
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.setlist.id }
 
-        databaseViewModel.deleteSetlists(selectedSetlists)
+        mDatabaseViewModel.deleteSetlists(selectedSetlists)
         resetSelection()
 
         return true
@@ -335,18 +334,18 @@ class SetlistsFragment : Fragment() {
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
     ) {
-        actionMenu ?: return
-        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
+        mActionMenu ?: return
+        mActionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
+        mActionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+        mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun resetSelection() {
-        if (setlistItemsAdapter.showCheckBox.value!!) {
-            setlistItemsAdapter.showCheckBox.value = false
+        if (mSetlistItemsAdapter.showCheckBox.value!!) {
+            mSetlistItemsAdapter.showCheckBox.value = false
         }
 
-        setlistItemsAdapter.resetSelection()
+        mSetlistItemsAdapter.resetSelection()
     }
 
 }
