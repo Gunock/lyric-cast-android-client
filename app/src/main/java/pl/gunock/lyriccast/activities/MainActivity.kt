@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 11:25 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 10:42 PM
+ * Last modified 4/5/21 11:23 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -166,11 +166,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
             val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
+            fabAdd.clearFocus()
         }
 
         findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
             val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
+            fabAdd.clearFocus()
         }
     }
 
