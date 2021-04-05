@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 2:00 AM
+ * Last modified 4/5/21 4:26 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,9 +24,9 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.Song
@@ -45,8 +45,8 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private val args: SetlistEditorSongsFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(
             requireContext(),
             (requireActivity().application as LyricCastApplication).repository
         )
@@ -166,7 +166,7 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
         categorySpinner.adapter = categorySpinnerAdapter
 
-        lyricCastViewModel.allCategories.observe(requireActivity()) { categories ->
+        databaseViewModel.allCategories.observe(requireActivity()) { categories ->
             categorySpinnerAdapter.submitCollection(categories)
         }
     }
@@ -175,7 +175,6 @@ class SetlistEditorSongsFragment : Fragment() {
         val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
         songsRecyclerView.setHasFixedSize(true)
         songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        songsRecyclerView.adapter = songItemsAdapter
 
         val selectionTracker =
             SelectionTracker(songsRecyclerView) { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
@@ -190,12 +189,14 @@ class SetlistEditorSongsFragment : Fragment() {
             selectionTracker = selectionTracker
         )
 
-        lyricCastViewModel.allSongs.observe(requireActivity()) { songs ->
+        databaseViewModel.allSongs.observe(requireActivity()) { songs ->
             songItemsAdapter.submitCollection(songs ?: return@observe)
             songItemsAdapter.songItems.forEach { item ->
                 item.isSelected.value = selectedSongs.contains(item.song)
             }
         }
+
+        songsRecyclerView.adapter = songItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {

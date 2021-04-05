@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/3/21 9:09 PM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/3/21 7:52 PM
+ * Last modified 4/5/21 4:09 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -123,10 +123,13 @@ class SongItemsAdapter(
         }
 
         fun bind(position: Int) {
+            val item = _visibleItems.toList()[position]
             selectionTracker?.attach(this)
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+            item.isSelected.observe(context.getLifecycleOwner()!!) {
+                checkBox.isChecked = it
+            }
 
-            val item = _visibleItems.toList()[position]
             titleTextView.text = item.song.title
 
             if (item.category != null) {
@@ -142,11 +145,6 @@ class SongItemsAdapter(
                 titleTextView.setTextColor(darkColor)
                 (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.brightColor)
             }
-
-            item.isSelected.observe(context.getLifecycleOwner()!!) {
-                checkBox.isChecked = it
-            }
-
         }
     }
 }

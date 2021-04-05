@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:25 AM
+ * Last modified 4/5/21 4:07 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,8 +20,8 @@ import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
@@ -29,17 +30,53 @@ import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryManagerActivity : AppCompatActivity() {
 
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
-    private lateinit var menu: Menu
     private lateinit var categoryItemsRecyclerView: RecyclerView
 
     private lateinit var editCategoryDialogViewModel: EditCategoryDialogViewModel
 
     private lateinit var categoryItemsAdapter: CategoryItemsAdapter
     private lateinit var selectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
+
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_category_manager, menu)
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions(showDelete = false, showEdit = false)
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> deleteSelectedCategories()
+                R.id.action_menu_edit -> editSelectedCategory()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            resetSelection()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +89,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         editCategoryDialogViewModel =
             ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
 
-        lyricCastViewModel.allCategories.observe(this) { categories ->
+        databaseViewModel.allCategories.observe(this) { categories ->
             editCategoryDialogViewModel.categoryNames.value =
                 categories.map { category -> category.name }.toSet()
         }
@@ -65,18 +102,14 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        this.menu = menu
         menuInflater.inflate(R.menu.menu_category_manager, menu)
 
-        showMenuActions(showDelete = false, showEdit = false)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_delete -> deleteSelectedCategories()
-            R.id.menu_edit -> editSelectedCategory()
-            R.id.menu_category_manager -> showAddCategoryDialog()
+            R.id.menu_add_category -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -99,7 +132,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         )
         categoryItemsRecyclerView.adapter = categoryItemsAdapter
 
-        lyricCastViewModel.allCategories.observe(this) { categories ->
+        databaseViewModel.allCategories.observe(this) { categories ->
             categoryItemsAdapter.submitCollection(categories)
         }
     }
@@ -111,10 +144,11 @@ class CategoryManagerActivity : AppCompatActivity() {
         isLongClick: Boolean
     ): Boolean {
         val item = categoryItemsAdapter.categoryItems[position]
+
         if (isLongClick || selectionTracker.count != 0) {
-            selectCategory(item)
-            return true
+            return selectCategory(item)
         }
+
         return false
     }
 
@@ -123,7 +157,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }
 
-        runBlocking { lyricCastViewModel.deleteCategories(selectedCategories) }
+        runBlocking { databaseViewModel.deleteCategories(selectedCategories) }
 
         resetSelection()
 
@@ -160,47 +194,45 @@ class CategoryManagerActivity : AppCompatActivity() {
         return true
     }
 
-    private fun selectCategory(
-        item: CategoryItem
-    ) {
+    private fun selectCategory(item: CategoryItem): Boolean {
+        item.isSelected.value = !item.isSelected.value!!
+
         when (selectionTracker.countAfter) {
             0 -> {
-                if (categoryItemsAdapter.showCheckBox.value!!) {
-                    categoryItemsAdapter.showCheckBox.value = false
-                }
-                showMenuActions(showDelete = false, showEdit = false)
+                actionMode?.finish()
+                return false
             }
             1 -> {
                 if (!categoryItemsAdapter.showCheckBox.value!!) {
                     categoryItemsAdapter.showCheckBox.value = true
                 }
 
-                showMenuActions(showAdd = false)
+                if (actionMode == null) {
+                    actionMode = startSupportActionMode(actionModeCallback)
+                }
+
+                showMenuActions()
             }
-            2 -> showMenuActions(showAdd = false, showEdit = false)
+            2 -> showMenuActions(showEdit = false)
         }
 
-        item.isSelected.value = !item.isSelected.value!!
+        return true
     }
 
     private fun resetSelection() {
-        categoryItemsAdapter.showCheckBox.value = false
-        categoryItemsAdapter.categoryItems.forEach { categoryItem ->
-            categoryItem.isSelected.value = false
+        if (categoryItemsAdapter.showCheckBox.value!!) {
+            categoryItemsAdapter.showCheckBox.value = false
         }
-        selectionTracker.reset()
-
-        showMenuActions(showDelete = false, showEdit = false)
+        categoryItemsAdapter.resetSelection()
     }
 
     private fun showMenuActions(
-        showAdd: Boolean = true,
         showDelete: Boolean = true,
         showEdit: Boolean = true
     ) {
-        menu.findItem(R.id.menu_category_manager).isVisible = showAdd
-        menu.findItem(R.id.menu_delete).isVisible = showDelete
-        menu.findItem(R.id.menu_edit).isVisible = showEdit
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showDelete
+        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
     private fun observeViewModelCategory(viewModelCategory: Category?) {
@@ -208,7 +240,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             return
         }
 
-        lyricCastViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
+        databaseViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
 
         editCategoryDialogViewModel.category.removeObservers(this)
         editCategoryDialogViewModel.category.value = null

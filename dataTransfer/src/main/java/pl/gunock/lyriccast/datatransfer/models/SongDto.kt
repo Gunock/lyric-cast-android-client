@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:45 AM
+ * Last modified 4/5/21 1:12 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.models
@@ -15,13 +15,13 @@ data class SongDto(
     val title: String,
     val lyrics: Map<String, String>,
     val presentation: List<String>,
-    val category: String = ""
+    val category: String? = null
 ) {
     constructor(json: JSONObject) : this(
         json.getString("title"),
         json.getJSONObject("lyrics").toStringMap(),
         json.getStringList("presentation"),
-        json.getString("category")
+        json.optString("category")
     )
 
     fun toJson(): JSONObject {
@@ -29,7 +29,7 @@ data class SongDto(
             put("title", title)
             put("lyrics", JSONObject.wrap(lyrics))
             put("presentation", JSONObject.wrap(presentation))
-            put("category", category)
+            put("category", JSONObject.wrap(category))
         }
     }
 

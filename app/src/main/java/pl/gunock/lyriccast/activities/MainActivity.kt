@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:02 AM
+ * Last modified 4/5/21 3:52 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -32,9 +32,9 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.extensions.toJSONObjectList
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
@@ -51,8 +51,8 @@ import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    companion object {
-        private const val TAG = "MainActivity"
+    private companion object {
+        const val TAG = "MainActivity"
         const val EXPORT_RESULT_CODE = 1
         const val IMPORT_RESULT_CODE = 2
     }
@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity() {
     private var castContext: CastContext? = null
 
     private lateinit var repository: LyricCastRepository
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var importDialogViewModel: ImportDialogViewModel
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_category_manager -> goToCategoryManager()
+            R.id.menu_add_category -> goToCategoryManager()
             R.id.menu_settings -> goToSettings()
             R.id.menu_import_songs -> showImportDialog()
             R.id.menu_export_all -> startExport()
@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val exportData = lyricCastViewModel.getDatabaseTransferData()
+            val exportData = databaseViewModel.getDatabaseTransferData()
 
             message.postValue(getString(R.string.export_saving_json))
             val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
@@ -251,11 +251,18 @@ class MainActivity : AppCompatActivity() {
 
             val songsJson = JSONArray(File(importDir, "songs.json").readText())
             val categoriesJson = JSONArray(File(importDir, "categories.json").readText())
-            val setlistsJson = JSONArray(File(importDir, "setlists.json").readText())
+
+            val setlistsFile = File(importDir, "setlists.json")
+            val setlistsJson = if (setlistsFile.exists()) {
+                JSONArray(File(importDir, "setlists.json").readText())
+            } else {
+                null
+            }
+
             val transferData = DatabaseTransferData(
                 songDtos = songsJson.toJSONObjectList().map { SongDto(it) },
                 categoryDtos = categoriesJson.toJSONObjectList().map { CategoryDto(it) },
-                setlistDtos = setlistsJson.toJSONObjectList().map { SetlistDto(it) }
+                setlistDtos = setlistsJson?.toJSONObjectList()?.map { SetlistDto(it) }
             )
 
             val importOptions = ImportOptions(
@@ -264,7 +271,7 @@ class MainActivity : AppCompatActivity() {
                 importDialogViewModel.replaceOnConflict
             )
 
-            lyricCastViewModel.importSongs(
+            databaseViewModel.importSongs(
                 transferData,
                 dialogFragment.message,
                 importOptions
@@ -298,7 +305,7 @@ class MainActivity : AppCompatActivity() {
                 importDialogViewModel.replaceOnConflict,
                 colors
             )
-            lyricCastViewModel.importSongs(
+            databaseViewModel.importSongs(
                 importedSongs,
                 dialogFragment.message,
                 importOptions

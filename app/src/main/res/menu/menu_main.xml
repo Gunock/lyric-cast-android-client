@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/4/21 11:45 PM
+  ~ Last modified 4/5/21 3:52 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,23 +9,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pl.gunock.lyriccast.activities.MainActivity"
     tools:ignore="AlwaysShowAction">
-
-    <item
-        android:id="@+id/menu_edit"
-        android:icon="@drawable/baseline_mode_edit_white_24dp"
-        android:title="@string/button_edit"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/menu_add_setlist"
-        android:icon="@drawable/baseline_playlist_add_white_24dp"
-        android:title="@string/button_add_setlist"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/menu_delete"
-        android:icon="@drawable/baseline_delete_outline_white_24dp"
-        android:title="@string/button_delete"
-        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_cast"
@@ -38,7 +21,7 @@
         android:id="@+id/menu_settings"
         android:title="@string/label_settings" />
     <item
-        android:id="@+id/menu_category_manager"
+        android:id="@+id/menu_add_category"
         android:title="@string/label_category_manager" />
     <item
         android:id="@+id/menu_import_songs"

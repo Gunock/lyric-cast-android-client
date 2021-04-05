@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 4:15 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -75,22 +75,14 @@ class CategoryItemsAdapter(
         fun bind(position: Int) {
             val item: CategoryItem = categoryItems[position]
             selectionTracker?.attach(this)
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
+
             showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(colorCard, true))
+            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(checkBox))
             item.isSelected.observe(context.getLifecycleOwner()!!) {
                 checkBox.isChecked = it
             }
 
             name.text = categoryItems[adapterPosition].category.name
-
-            if (!showCheckBox.value!!) {
-                checkBox.visibility = View.GONE
-            } else {
-                checkBox.visibility = View.VISIBLE
-                checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    item.isSelected.value = isChecked
-                }
-            }
 
             if (item.category.color != null) {
                 colorCard.setCardBackgroundColor(item.category.color!!)

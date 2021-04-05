@@ -1,0 +1,35 @@
+<!--
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/5/21 3:23 PM
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/action_menu_edit"
+        android:icon="@drawable/baseline_mode_edit_white_24dp"
+        android:title="@string/button_edit"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_menu_add_setlist"
+        android:icon="@drawable/baseline_playlist_add_white_24dp"
+        android:title="@string/button_add_setlist"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_menu_export_selected"
+        android:icon="@drawable/baseline_upload_file_white_24dp"
+        android:title="@string/export_selected"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_menu_delete"
+        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:title="@string/button_delete"
+        app:showAsAction="always" />
+
+</menu>
