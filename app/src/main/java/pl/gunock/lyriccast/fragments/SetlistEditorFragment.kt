@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 1:35 AM
+ * Last modified 4/5/21 1:21 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -27,9 +27,9 @@ import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
@@ -48,8 +48,8 @@ class SetlistEditorFragment : Fragment() {
 
     private val args: SetlistEditorFragmentArgs by navArgs()
     private lateinit var repository: LyricCastRepository
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(
             requireContext(),
             (requireActivity().application as LyricCastApplication).repository
         )
@@ -120,7 +120,7 @@ class SetlistEditorFragment : Fragment() {
 
         setlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
 
-        lyricCastViewModel.allSetlists.observe(requireActivity()) { setlists ->
+        databaseViewModel.allSetlists.observe(requireActivity()) { setlists ->
             setlistNames = setlists.map { setlist -> setlist.name }.toSet()
         }
 
@@ -278,7 +278,7 @@ class SetlistEditorFragment : Fragment() {
         }
 
         val setlistWithSongs = createSetlistWithSongs()
-        lyricCastViewModel.upsertSetlist(setlistWithSongs)
+        databaseViewModel.upsertSetlist(setlistWithSongs)
         Log.i(TAG, "Created setlist: $setlistWithSongs")
         return true
     }

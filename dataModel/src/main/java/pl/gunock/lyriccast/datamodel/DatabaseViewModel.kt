@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:10 AM
+ * Last modified 4/5/21 1:14 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -22,7 +22,7 @@ import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 
-class LyricCastViewModel(
+class DatabaseViewModel(
     resources: Resources,
     private val repository: LyricCastRepository
 ) : ViewModel() {
@@ -66,9 +66,9 @@ class LyricCastViewModel(
     ) {
         val categoryDtos: List<CategoryDto> = songDtoSet.map { songDto -> songDto.category }
             .distinct()
-            .mapIndexed { index, categoryName ->
+            .mapIndexedNotNull { index, categoryName ->
                 CategoryDto(
-                    name = categoryName.take(30),
+                    name = categoryName?.take(30) ?: return@mapIndexedNotNull null,
                     color = options.colors[index % options.colors.size]
                 )
             }
@@ -83,14 +83,14 @@ class LyricCastViewModel(
 
 }
 
-class LyricCastViewModelFactory(
+class DatabaseViewModelFactory(
     private val context: Context,
     private val repository: LyricCastRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LyricCastViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(DatabaseViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LyricCastViewModel(context.resources, repository) as T
+            return DatabaseViewModel(context.resources, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

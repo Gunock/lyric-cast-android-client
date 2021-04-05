@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:09 AM
+ * Last modified 4/5/21 12:25 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -101,7 +101,7 @@ internal class DataTransferProcessor(
                 }
             }
 
-            val setlistNames = setlists.map { it.name }.toHashSet()
+            val setlistNames = setlists.map { it.name }.toSet()
             val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
                 data.setlistDtos
                     .filter { it.name in setlistNames }

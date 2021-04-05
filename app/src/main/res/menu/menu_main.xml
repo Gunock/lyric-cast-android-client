@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/4/21 11:45 PM
+  ~ Last modified 4/5/21 12:31 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,6 +20,11 @@
         android:id="@+id/menu_add_setlist"
         android:icon="@drawable/baseline_playlist_add_white_24dp"
         android:title="@string/button_add_setlist"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_export_selected"
+        android:icon="@drawable/baseline_upload_file_white_24dp"
+        android:title="@string/export_selected"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_delete"

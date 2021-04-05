@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:25 AM
+ * Last modified 4/5/21 12:41 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,8 +19,8 @@ import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
@@ -29,8 +29,8 @@ import pl.gunock.lyriccast.models.CategoryItem
 
 class CategoryManagerActivity : AppCompatActivity() {
 
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var menu: Menu
@@ -52,7 +52,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         editCategoryDialogViewModel =
             ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
 
-        lyricCastViewModel.allCategories.observe(this) { categories ->
+        databaseViewModel.allCategories.observe(this) { categories ->
             editCategoryDialogViewModel.categoryNames.value =
                 categories.map { category -> category.name }.toSet()
         }
@@ -99,7 +99,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         )
         categoryItemsRecyclerView.adapter = categoryItemsAdapter
 
-        lyricCastViewModel.allCategories.observe(this) { categories ->
+        databaseViewModel.allCategories.observe(this) { categories ->
             categoryItemsAdapter.submitCollection(categories)
         }
     }
@@ -123,7 +123,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }
 
-        runBlocking { lyricCastViewModel.deleteCategories(selectedCategories) }
+        runBlocking { databaseViewModel.deleteCategories(selectedCategories) }
 
         resetSelection()
 
@@ -208,7 +208,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             return
         }
 
-        lyricCastViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
+        databaseViewModel.upsertCategory(editCategoryDialogViewModel.category.value!!)
 
         editCategoryDialogViewModel.category.removeObservers(this)
         editCategoryDialogViewModel.category.value = null

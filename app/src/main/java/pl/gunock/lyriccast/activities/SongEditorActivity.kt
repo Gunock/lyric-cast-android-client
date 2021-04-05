@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 12:07 AM
+ * Created by Tomasz Kiljanczyk on 4/5/21 1:21 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:07 AM
+ * Last modified 4/5/21 1:21 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -27,9 +27,9 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.LyricCastViewModel
-import pl.gunock.lyriccast.datamodel.LyricCastViewModelFactory
 import pl.gunock.lyriccast.datamodel.entities.Category
 import pl.gunock.lyriccast.datamodel.entities.LyricsSection
 import pl.gunock.lyriccast.datamodel.entities.Song
@@ -45,8 +45,8 @@ class SongEditorActivity : AppCompatActivity() {
 
     private var intentSong: Song? = null
     private lateinit var repository: LyricCastRepository
-    private val lyricCastViewModel: LyricCastViewModel by viewModels {
-        LyricCastViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+    private val databaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
     }
 
     private lateinit var sectionNameInput: EditText
@@ -85,7 +85,7 @@ class SongEditorActivity : AppCompatActivity() {
         songTitleInput.filters = arrayOf(InputFilter.LengthFilter(30))
         sectionNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
-        lyricCastViewModel.allSongs.observe(this) { songs ->
+        databaseViewModel.allSongs.observe(this) { songs ->
             songTitles = songs.map { songAndCategory -> songAndCategory.song.title }.toSet()
         }
         setupCategorySpinner()
@@ -131,7 +131,7 @@ class SongEditorActivity : AppCompatActivity() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
         categorySpinner.adapter = categorySpinnerAdapter
 
-        lyricCastViewModel.allCategories.observe(this) { categories ->
+        databaseViewModel.allCategories.observe(this) { categories ->
             categorySpinnerAdapter.submitCollection(categories, Category.NONE)
 
             if (intentSong != null) {
@@ -254,7 +254,7 @@ class SongEditorActivity : AppCompatActivity() {
         val order = presentation.mapIndexed { index, sectionName -> sectionName to index }
 
         val songWithLyricsSections = SongWithLyricsSections(song, lyricsSections)
-        runBlocking { lyricCastViewModel.upsertSong(songWithLyricsSections, order) }
+        runBlocking { databaseViewModel.upsertSong(songWithLyricsSections, order) }
 
         return true
     }
