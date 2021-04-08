@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 6:46 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,13 +9,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/window_background_1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ConstraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/window_background_2"
         android:elevation="6dp"
         android:outlineProvider="background"
         android:paddingBottom="8dp"
@@ -25,13 +26,12 @@
 
         <ImageButton
             android:id="@+id/btn_song_prev"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
-            android:backgroundTint="@color/colorButton"
             android:contentDescription="@string/controls_previous"
             android:rotation="180"
-            android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/btn_song_blank"
             app:layout_constraintEnd_toStartOf="@+id/btn_song_blank"
             app:layout_constraintTop_toTopOf="@+id/btn_song_blank"
@@ -39,12 +39,11 @@
 
         <ImageButton
             android:id="@+id/btn_song_next"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:backgroundTint="@color/colorButton"
             android:contentDescription="@string/controls_next"
-            android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/btn_song_blank"
             app:layout_constraintStart_toEndOf="@+id/btn_song_blank"
             app:layout_constraintTop_toTopOf="@+id/btn_song_blank"
@@ -52,12 +51,11 @@
 
         <Button
             android:id="@+id/btn_song_blank"
+            style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/colorButton"
             android:text="@string/controls_button_blank"
-            android:textColor="@color/colorButtonText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

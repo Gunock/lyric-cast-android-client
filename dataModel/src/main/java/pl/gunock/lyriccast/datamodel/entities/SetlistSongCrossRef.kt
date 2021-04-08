@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+ * Created by Tomasz Kiljanczyk on 4/8/21 2:01 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 1:32 AM
+ * Last modified 4/8/21 1:51 PM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -58,10 +58,10 @@ data class SetlistSongCrossRef(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeValue(setlistSongCrossRefId)
         parcel.writeLong(setlistId)
         parcel.writeLong(songId)
         parcel.writeInt(order)
-        parcel.writeValue(setlistSongCrossRefId)
     }
 
     override fun describeContents(): Int {

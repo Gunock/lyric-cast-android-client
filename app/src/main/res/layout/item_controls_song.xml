@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljańczyk on 3/13/21 3:21 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/13/21 2:57 PM
+  ~ Last modified 4/8/21 6:24 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_song"
+    style="@style/LyricCast.RecyclerView.Item2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"

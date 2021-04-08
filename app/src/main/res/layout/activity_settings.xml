@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Created by Tomasz Kiljańczyk on 3/3/21 11:55 PM
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/3/21 11:31 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,15 +12,12 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.LyricCast.Dark.ActionBar">
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_settings"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.LyricCast.Light" />
+            android:layout_height="?attr/actionBarSize" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

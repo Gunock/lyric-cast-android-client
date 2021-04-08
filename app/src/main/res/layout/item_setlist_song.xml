@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 6:40 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_song"
+    style="@style/LyricCast.RecyclerView.Item2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -24,6 +25,7 @@
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
+    app:cardBackgroundColor="@color/window_background_2"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
@@ -73,6 +75,7 @@
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
             android:text="@string/placeholder_title"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="@color/text"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toStartOf="@+id/imv_handle"
             app:layout_constraintStart_toEndOf="@+id/chk_item_song"
@@ -80,6 +83,7 @@
 
         <ImageView
             android:id="@+id/imv_handle"
+            style="@style/LyricCast.RecyclerView.Item.Handle"
             android:layout_width="64dp"
             android:layout_height="0dp"
             android:contentDescription="@string/setlist_editor_img_drag_song"
@@ -88,8 +92,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_view_headline_black_24dp"
-            app:tint="@color/colorPrimary" />
+            app:srcCompat="@drawable/baseline_view_headline_black_24dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

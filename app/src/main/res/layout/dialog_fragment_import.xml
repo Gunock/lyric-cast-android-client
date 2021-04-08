@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 5:37 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.LyricCast.Dialog.NoTitle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -22,7 +23,6 @@
 
         <Spinner
             android:id="@+id/spn_import_format"
-            style="@style/Widget.LyricCast.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
@@ -49,7 +49,6 @@
                 android:id="@+id/chk_replace_on_conflict"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="@string/main_activity_import_replace_on_conflict"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chk_delete_all" />
@@ -64,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@android:string/cancel"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/accent"
         app:layout_constraintEnd_toStartOf="@+id/btn_import"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
 
@@ -74,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/main_activity_menu_import"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/accent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
 

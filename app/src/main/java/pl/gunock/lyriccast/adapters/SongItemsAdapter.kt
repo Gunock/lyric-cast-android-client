@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:14 PM
+ * Last modified 4/8/21 6:35 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -43,10 +43,11 @@ class SongItemsAdapter(
 
     private val mLock = Any()
 
-    private val mCheckBoxColor = mContext.getColor(R.color.checkBox)
-    private val mCheckBoxHighlightColor = mContext.getColor(R.color.checkBoxHighlight)
-    private val mBrightColor = mContext.getColor(R.color.white)
-    private val mDarkColor = mContext.getColor(R.color.black)
+    private val mCheckBoxColor = mContext.getColor(R.color.check_box)
+    private val mCheckBoxHighlightColor = mContext.getColor(R.color.check_box_highlight)
+    private val mDefaultItemCardColor = mContext.getColor(R.color.window_background_2)
+    private val mWithCategoryTextColor = mContext.getColor(R.color.text_item_with_category)
+    private val mNoCategoryTextColor = mContext.getColor(R.color.text_item_no_category)
     private val mCheckBoxColors = intArrayOf(mCheckBoxHighlightColor, mCheckBoxColor)
 
     private var mItems: SortedSet<SongItem> = sortedSetOf()
@@ -119,7 +120,7 @@ class SongItemsAdapter(
         private val mCategoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
 
         init {
-            mCategoryTextView.setTextColor(this@SongItemsAdapter.mBrightColor)
+            mCategoryTextView.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
         }
 
         fun bind(position: Int) {
@@ -135,16 +136,16 @@ class SongItemsAdapter(
             if (item.category != null) {
                 mCategoryTextView.text = item.category.name
                 mCheckBox.buttonTintList =
-                    ColorStateList.valueOf(this@SongItemsAdapter.mBrightColor)
-                mTitleTextView.setTextColor(this@SongItemsAdapter.mBrightColor)
+                    ColorStateList.valueOf(this@SongItemsAdapter.mWithCategoryTextColor)
+                mTitleTextView.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
                 (itemView as CardView).setCardBackgroundColor(item.category.color!!)
             } else {
                 mCategoryTextView.text = ""
 
                 mCheckBox.buttonTintList = ColorStateList(CHECKBOX_STATES, mCheckBoxColors)
 
-                mTitleTextView.setTextColor(mDarkColor)
-                (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.mBrightColor)
+                mTitleTextView.setTextColor(mNoCategoryTextColor)
+                (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.mDefaultItemCardColor)
             }
         }
     }

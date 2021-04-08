@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,7 +16,6 @@
         android:id="@+id/tbl_main_fragments"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:elevation="10dp"
@@ -24,15 +23,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tabIndicatorColor="@android:color/white"
-        app:tabTextColor="@android:color/white">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/windowBackground"
+            android:longClickable="false"
             android:text="@string/title_songs" />
 
         <com.google.android.material.tabs.TabItem
@@ -107,9 +105,11 @@
                 android:clickable="false"
                 android:contentDescription="@string/main_activity_button_add_setlist"
                 android:visibility="visible"
+                app:backgroundTint="@color/fab_background_1"
                 app:fabCustomSize="40dp"
                 app:maxImageSize="24dp"
-                app:srcCompat="@drawable/baseline_playlist_add_white_24dp" />
+                app:srcCompat="@drawable/baseline_playlist_add_white_24dp"
+                app:tint="@color/fab_icon" />
 
         </LinearLayout>
 
@@ -151,8 +151,10 @@
                 android:cropToPadding="false"
                 android:scaleType="center"
                 android:visibility="visible"
+                app:backgroundTint="@color/fab_background_1"
                 app:fabCustomSize="40dp"
-                app:srcCompat="@drawable/baseline_music_note_white_24dp"
+                app:srcCompat="@drawable/baseline_music_note_black_24dp"
+                app:tint="@color/fab_icon"
                 app:useCompatPadding="false" />
         </LinearLayout>
 
@@ -169,12 +171,12 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:scaleType="center"
-        android:tint="@color/design_default_color_on_primary"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/fab_background_2"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"
-        app:srcCompat="@drawable/baseline_add_black_24dp" />
+        app:srcCompat="@drawable/baseline_add_black_24dp"
+        app:tint="@color/fab_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

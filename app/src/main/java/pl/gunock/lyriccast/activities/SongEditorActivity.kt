@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:56 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -18,9 +18,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
@@ -116,10 +113,8 @@ class SongEditorActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_save -> {
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (saveSong()) {
-                        finish()
-                    }
+                if (saveSong()) {
+                    finish()
                 }
                 return true
             }

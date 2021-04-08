@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 2:01 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:55 PM
+ * Last modified 4/8/21 1:48 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -54,7 +54,7 @@ class SetlistSongItemsAdapter(
 
     override fun getItemId(position: Int): Long {
         val item = mSongItems[position]
-        return item.song.id + position
+        return item.song.id
     }
 
     override fun getItemCount() = mSongItems.size
