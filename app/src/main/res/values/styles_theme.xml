@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 2:09 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/8/21 2:07 PM
   -->
 
 <resources>
@@ -44,7 +44,7 @@
         <item name="android:windowNoTitle">false</item>
         <item name="android:background">@color/window_background_2</item>
 
-        <item name="android:textColor">@color/accent</item>
+        <item name="android:textColor">@color/dialog_text</item>
         <item name="colorPrimary">@color/dialog_text</item>
         <item name="colorAccent">@color/dialog_button</item>
     </style>
