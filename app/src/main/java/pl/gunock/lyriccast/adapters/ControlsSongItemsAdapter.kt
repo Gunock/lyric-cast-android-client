@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 6:50 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 6:39 PM
+ * Last modified 4/8/21 6:50 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -36,7 +36,7 @@ class ControlsSongItemsAdapter(
     private val mCardHighlightColor = mContext.getColor(R.color.accent)
     private val mDefaultItemCardColor = mContext.getColor(R.color.window_background_1)
     private val mTextDefaultColor = mContext.getColor(R.color.text)
-    private val mTextHighlightColor = mContext.getColor(R.color.black)
+    private val mTextHighlightColor = mContext.getColor(R.color.button_text_2)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
