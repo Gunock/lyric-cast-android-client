@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 2:25 PM
+  ~ Last modified 4/8/21 10:07 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,10 +18,10 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:background="@color/color_primary_dark"
-        android:elevation="@dimen/dimen_card_elevation_small"
+        android:elevation="@dimen/card_elevation_small"
         android:outlineProvider="background"
         app:cardBackgroundColor="@color/placeholder_card_color_1"
-        app:cardCornerRadius="@dimen/dimen_card_radius_small"
+        app:cardCornerRadius="@dimen/card_radius_small"
         app:layout_constraintBottom_toBottomOf="@+id/tv_spinner_color_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_spinner_color_name">

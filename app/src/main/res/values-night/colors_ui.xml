@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 6:13 PM
+  ~ Last modified 4/8/21 10:47 PM
   -->
 
 <resources>
@@ -31,7 +31,7 @@
 
     <color name="dialog_background">@color/very_dark_gray</color>
     <color name="dialog_text">@color/very_dim_white</color>
-    <color name="dialog_button">@color/very_dim_white</color>
+    <color name="dialog_button">@color/royal_blue</color>
 
     <color name="button_background">@color/royal_blue_dark</color>
     <color name="button_text_1">@color/black</color>

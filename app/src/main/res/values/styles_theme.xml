@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 6:45 PM
+  ~ Last modified 4/8/21 10:48 PM
   -->
 
 <resources>
@@ -57,6 +57,20 @@
         <item name="colorAccent">@color/dialog_button</item>
 
         <item name="spinnerStyle">@style/Widget.LyricCast.Spinner.Underlined</item>
+        <item name="buttonBarNegativeButtonStyle">
+            @style/Theme.LyricCast.Dialog.NegativeButtonStyle
+        </item>
+        <item name="buttonBarPositiveButtonStyle">
+            @style/Theme.LyricCast.Dialog.PositiveButtonStyle
+        </item>
+    </style>
+
+    <style name="Theme.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dialog_button</item>
+    </style>
+
+    <style name="Theme.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dialog_button</item>
     </style>
 
     <style name="Theme.LyricCast.Dialog.NoTitle" parent="Theme.LyricCast.Dialog">

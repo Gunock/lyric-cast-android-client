@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 6:28 PM
+  ~ Last modified 4/8/21 10:16 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/window_background_2"
-        android:elevation="6dp"
+        android:elevation="@dimen/elevation_medium"
         android:outlineProvider="background"
         android:paddingBottom="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +116,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:background="@color/window_background_2"
-        android:elevation="6dp"
+        android:elevation="@dimen/elevation_medium"
         android:fadeScrollbars="false"
         android:outlineProvider="background"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
