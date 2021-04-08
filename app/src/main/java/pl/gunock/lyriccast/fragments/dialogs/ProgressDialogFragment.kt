@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 10:36 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -52,9 +52,9 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mDefaultTextColor = requireContext().getColor(R.color.dialogButton)
-        mDefaultProgressColor = requireContext().getColor(R.color.indeterminateProgressBar)
-        mErrorProgressColor = requireContext().getColor(R.color.errorIndeterminateProgressBar)
+        mDefaultTextColor = requireContext().getColor(R.color.dialog_button)
+        mDefaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
+        mErrorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
         mMessageTextView = view.findViewById(R.id.tv_progress_message)
         mProgressBar = view.findViewById(R.id.pgb_progress)

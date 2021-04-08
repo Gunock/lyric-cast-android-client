@@ -1,20 +1,20 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:26 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.helpers.MessageHelper
@@ -77,9 +77,9 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun turnOnWifi() {
-        val builder = AlertDialog.Builder(this)
         var buttonClicked = false
-        builder.setMessage("Turn on WiFi to enable casting.")
+        AlertDialog.Builder(this, R.style.Theme_LyricCast_Dialog_NoTitle)
+            .setMessage("Turn on WiFi to enable casting.")
             .setPositiveButton("Go to settings") { _, _ ->
                 buttonClicked = true
                 val turnWifiOn = Intent(Settings.ACTION_WIRELESS_SETTINGS)

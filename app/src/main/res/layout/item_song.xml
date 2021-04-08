@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/1/21 8:53 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_song"
+    style="@style/LyricCast.RecyclerView.Item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -24,6 +25,7 @@
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
+    app:cardBackgroundColor="@color/color_secondary"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
@@ -63,6 +65,7 @@
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
             android:text="@string/placeholder_title"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="@color/text"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/chk_item_song"
@@ -78,7 +81,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:text="@string/placeholder_category"
-            android:textColor="@color/black"
+            android:textColor="@color/text_item_no_category"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

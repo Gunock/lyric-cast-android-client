@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/8/21 1:41 PM
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <size android:width="2dp" />
+    <solid android:color="@color/white" />
+</shape>

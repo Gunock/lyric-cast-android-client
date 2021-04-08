@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.LyricCast.Dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -50,7 +51,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@android:string/cancel"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/accent"
         app:layout_constraintEnd_toStartOf="@+id/btn_save_category"
         app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
 
@@ -61,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/editor_button_save"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/accent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
 

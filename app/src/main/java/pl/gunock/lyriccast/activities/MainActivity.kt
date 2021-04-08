@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:54 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -128,13 +128,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpListeners() {
+        val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
+
         val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
         mainTabLayout.addOnTabSelectedListener(
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
-                val navController = findNavController(R.id.navh_main)
+                fabAdd.clearFocus()
 
+                val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
                     Log.d(TAG, "Switching to song list")
                     navController.navigate(R.id.action_Setlists_to_Songs)
@@ -145,7 +148,6 @@ class MainActivity : AppCompatActivity() {
             })
 
         val fabContainer = findViewById<View>(R.id.cstl_fab_container)
-        val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
         fabAdd.setOnClickListener {
             if (fabContainer.isVisible) {
                 fabContainer.visibility = View.GONE
@@ -191,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Light_Dialog
+            R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
 
@@ -225,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         val dialogFragment = ImportDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Light_Dialog
+            R.style.Theme_LyricCast_Dialog
         )
 
         mImportDialogViewModel.accepted.value = false
@@ -239,7 +241,7 @@ class MainActivity : AppCompatActivity() {
         val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Light_Dialog
+            R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
         CoroutineScope(Dispatchers.IO).launch {
@@ -300,7 +302,7 @@ class MainActivity : AppCompatActivity() {
         val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Light_Dialog
+            R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
         CoroutineScope(Dispatchers.IO).launch {

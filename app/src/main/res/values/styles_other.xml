@@ -1,0 +1,21 @@
+<!--
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/8/21 1:41 PM
+  -->
+
+<resources>
+
+    <style name="LyricCast.RecyclerView.Item" parent="">
+        <item name="cardBackgroundColor">@color/window_background_2</item>
+    </style>
+
+    <style name="LyricCast.RecyclerView.Item.Handle" parent="">
+        <item name="tint">@color/item_handle</item>
+    </style>
+
+    <style name="LyricCast.Spinner.Item" parent="">
+        <item name="backgroundColor">@color/window_background_2</item>
+    </style>
+
+</resources>

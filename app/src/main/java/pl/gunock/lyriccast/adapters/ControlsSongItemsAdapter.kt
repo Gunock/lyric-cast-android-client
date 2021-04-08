@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:53 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -33,9 +33,10 @@ class ControlsSongItemsAdapter(
         const val ANIMATION_DURATION: Long = 400L
     }
 
-    private val mCardHighlightColor = mContext.getColor(R.color.colorAccent)
-    private val mBrightColor = mContext.getColor(R.color.white)
-    private val mDarkColor = mContext.getColor(R.color.black)
+    private val mCardHighlightColor = mContext.getColor(R.color.accent)
+    private val mDefaultItemCardColor = mContext.getColor(R.color.color_secondary)
+    private val mTextDefaultColor = mContext.getColor(R.color.text)
+    private val mTextHighlightColor = mContext.getColor(R.color.black)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -55,7 +56,7 @@ class ControlsSongItemsAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
         private val mItemCardView: CardView = itemView.findViewById(R.id.item_song)
         private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
-        private var mCurrentCardColor = mBrightColor
+        private var mCurrentCardColor = mDefaultItemCardColor
 
         fun bind(position: Int) {
             val item: SongItem = songItems[position]
@@ -91,10 +92,10 @@ class ControlsSongItemsAdapter(
             val textTo: Int
             if (value) {
                 cardTo = mCardHighlightColor
-                textTo = mBrightColor
+                textTo = mTextHighlightColor
             } else {
-                cardTo = mBrightColor
-                textTo = mDarkColor
+                cardTo = mDefaultItemCardColor
+                textTo = mTextDefaultColor
             }
 
             with(ValueAnimator()) {
@@ -112,7 +113,7 @@ class ControlsSongItemsAdapter(
                 setIntValues(mCurrentCardColor, cardTo)
                 setEvaluator(ArgbEvaluator())
                 addUpdateListener { animator ->
-                    mItemCardView.setBackgroundColor(animator.animatedValue as Int)
+                    mItemCardView.setCardBackgroundColor(animator.animatedValue as Int)
                 }
 
                 duration = ANIMATION_DURATION

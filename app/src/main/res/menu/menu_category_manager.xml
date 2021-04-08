@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 4:34 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 3:52 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/menu_add_category"
-        android:title="@string/button_add"
+        android:title="@string/editor_button_add"
         app:showAsAction="always" />
 
 </menu>

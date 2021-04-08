@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,10 +17,12 @@
         android:id="@+id/ConstraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/color_secondary"
         android:elevation="6dp"
         android:outlineProvider="bounds"
         android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <Spinner
@@ -36,6 +38,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_filter_songs"
+            style="@style/Widget.LyricCast.TextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,7 +58,8 @@
             android:id="@+id/swt_selected_songs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusableInTouchMode="true"
+            android:focusable="auto"
+            android:focusableInTouchMode="false"
             android:text="@string/setlist_editor_hint_selected"
             app:layout_constraintBottom_toBottomOf="@+id/spn_category"
             app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +78,6 @@
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
-        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

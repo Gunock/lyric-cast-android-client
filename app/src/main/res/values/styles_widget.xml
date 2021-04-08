@@ -1,0 +1,61 @@
+<!--
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/8/21 1:41 PM
+  -->
+
+<resources>
+
+    <style name="Widget.LyricCast.TextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="Widget.LyricCast.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabIndicatorColor">@color/tab_indicator</item>
+        <item name="tabTextColor">@color/white</item>
+        <item name="android:background">@color/color_primary</item>
+    </style>
+
+    <style name="Widget.LyricCast.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="background">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+
+        <item name="colorPrimary">@color/accent</item>
+        <item name="hintTextColor">@color/accent</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
+    </style>
+
+    <style name="LyricCast.MaterialThemeOverlay.EditText" parent="">
+        <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
+    </style>
+
+    <style name="Widget.LyricCast.EditText" parent="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="background">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="android:colorControlActivated">@color/white</item>
+    </style>
+
+    <style name="Widget.LyricCast.Spinner.Underlined" parent="Widget.AppCompat.Spinner.Underlined" />
+
+    <style name="Widget.LyricCast.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/check_box</item>
+    </style>
+
+    <style name="Widget.LyricCast.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
+        <item name="android:titleTextColor">@color/white</item>
+        <item name="android:background">@color/color_primary</item>
+    </style>
+
+    <style name="Widget.LyricCast.AppBarLayout.Light" parent="Widget.LyricCast.AppBarLayout">
+        <item name="android:background">@color/color_secondary</item>
+    </style>
+
+</resources>

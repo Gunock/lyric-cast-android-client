@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:53 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +15,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/color_secondary"
         android:elevation="6dp"
         android:outlineProvider="background"
         android:padding="8dp"
@@ -27,7 +27,6 @@
             android:id="@+id/tv_setlist_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
             app:counterEnabled="true"
             app:counterMaxLength="30"
             app:layout_constraintTop_toTopOf="parent"
@@ -46,9 +45,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:backgroundTint="@color/colorButton"
+            android:backgroundTint="@color/button_background"
             android:text="@string/editor_button_save"
-            android:textColor="@color/colorButtonText"
+            android:textColor="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_setlist_name" />
@@ -59,9 +58,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/colorButton"
+            android:backgroundTint="@color/button_background"
             android:text="@string/setlist_editor_button_pick_songs"
-            android:textColor="@color/colorButtonText"
+            android:textColor="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_setlist_name" />

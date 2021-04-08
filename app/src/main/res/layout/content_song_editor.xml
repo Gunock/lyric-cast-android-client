@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/5/21 11:56 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +15,7 @@
         android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/window_background_2"
         android:elevation="6dp"
         android:outlineProvider="background"
         android:padding="8dp"
@@ -60,6 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            app:boxBackgroundMode="filled"
             app:counterEnabled="true"
             app:counterMaxLength="30"
             app:layout_constraintEnd_toEndOf="parent"
@@ -86,7 +87,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:background="@null"
         android:ems="10"
         android:gravity="top"
         android:hint="@string/song_editor_hint_enter_lyrics"
@@ -101,7 +101,7 @@
         android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/window_background_2"
         android:elevation="6dp"
         android:paddingTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -111,9 +111,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
-            android:backgroundTint="@color/colorButton"
+            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/song_editor_button_move_left"
-            android:tint="@color/colorButtonText"
+            android:tint="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintEnd_toStartOf="@+id/btn_delete_section"
             app:layout_constraintTop_toTopOf="@+id/btn_delete_section"
@@ -124,9 +124,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/colorButton"
+            android:backgroundTint="@color/button_background"
             android:text="@string/song_editor_button_delete_section"
-            android:textColor="@color/colorButtonText"
+            android:textColor="@color/button_text_2"
             app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -136,9 +136,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:backgroundTint="@color/colorButton"
+            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/song_editor_button_move_right"
-            android:tint="@color/colorButtonText"
+            android:tint="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintStart_toEndOf="@+id/btn_delete_section"
             app:layout_constraintTop_toTopOf="@+id/btn_delete_section"

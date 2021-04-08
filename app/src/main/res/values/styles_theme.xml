@@ -1,0 +1,56 @@
+<!--
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/8/21 1:41 PM
+  -->
+
+<resources>
+
+    <style name="Theme.LyricCast.DarkActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/royal_blue_dark</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="background">@android:color/transparent</item>
+
+        <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
+        <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
+
+        <item name="android:textViewStyle">@style/Widget.LyricCast.TextView</item>
+        <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
+        <item name="tabStyle">@style/Widget.LyricCast.TabLayout</item>
+        <item name="checkboxStyle">@style/Widget.LyricCast.CheckBox</item>
+        <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout</item>
+    </style>
+
+    <style name="Theme.LyricCast.NoActionBar" parent="Theme.LyricCast.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/color_primary</item>
+    </style>
+
+    <style name="Theme.LyricCast.NoActionBar.Light" parent="Theme.LyricCast.NoActionBar">
+        <item name="colorPrimaryDark">@color/color_secondary</item>
+        <item name="actionModeBackground">@color/color_secondary</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout.Light</item>
+    </style>
+
+    <style name="Theme.LyricCast.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
+
+        <item name="android:windowMinWidthMajor">75%</item>
+        <item name="android:windowMinWidthMinor">75%</item>
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:background">@color/window_background_2</item>
+
+        <item name="android:textColor">@color/accent</item>
+        <item name="colorPrimary">@color/dialog_text</item>
+        <item name="colorAccent">@color/dialog_button</item>
+    </style>
+
+    <style name="Theme.LyricCast.Dialog.NoTitle" parent="Theme.LyricCast.Dialog">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+</resources>

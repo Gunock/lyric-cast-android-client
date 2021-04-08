@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 11:56 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 11:54 PM
+ * Last modified 4/8/21 1:41 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -170,7 +170,7 @@ class SetlistsFragment : Fragment() {
             ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Light_Dialog
+            R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 

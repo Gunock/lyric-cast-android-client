@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/31/21 2:08 AM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/LyricCast.Spinner.Item"
     android:layout_width="match_parent"
     android:layout_height="46dp"
+    android:background="@color/color_secondary"
     android:clipToPadding="false"
     android:padding="8dp">
 
@@ -15,10 +17,10 @@
         android:id="@+id/cdv_spinner_category_color"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/color_primary_dark"
         android:elevation="@dimen/dimen_card_elevation_small"
         android:outlineProvider="background"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
+        app:cardBackgroundColor="@color/placeholder_card_color_1"
         app:cardCornerRadius="@dimen/dimen_card_radius_small"
         app:layout_constraintBottom_toBottomOf="@+id/tv_spinner_color_name"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +39,10 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:text="@string/placeholder_text"
+        android:textColor="@color/text"
+        android:textColorHighlight="@null"
+        android:textColorHint="@null"
+        android:textColorLink="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cdv_spinner_category_color"

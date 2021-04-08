@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 3/31/21 3:38 PM
+  ~ Last modified 4/8/21 1:41 PM
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_category"
+    style="@style/LyricCast.RecyclerView.Item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -21,6 +22,7 @@
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
+    app:cardBackgroundColor="@color/window_background_2"
     app:cardCornerRadius="@dimen/dimen_card_radius_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
@@ -50,7 +52,7 @@
         <TextView
             android:id="@+id/tv_category_name"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="48dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="2"
@@ -69,12 +71,12 @@
             android:id="@+id/cdv_category_color"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/color_primary_dark"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:elevation="@dimen/dimen_card_elevation_small"
             android:outlineProvider="background"
-            app:cardBackgroundColor="@color/colorPrimaryDark"
+            app:cardBackgroundColor="@color/placeholder_card_color_1"
             app:cardCornerRadius="@dimen/dimen_card_radius_big"
             app:cardMaxElevation="@null"
             app:layout_constraintBottom_toBottomOf="parent"
