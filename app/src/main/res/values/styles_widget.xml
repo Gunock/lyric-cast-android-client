@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 2:09 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 2:00 PM
+  ~ Last modified 4/8/21 5:41 PM
   -->
 
 <resources>
@@ -16,6 +16,13 @@
         <item name="android:background">@color/color_primary</item>
     </style>
 
+    <style name="Widget.LyricCast.TabLayout.Bottom" parent="Widget.LyricCast.TabLayout">
+        <item name="android:background">@color/window_background_2</item>
+
+        <item name="tabTextColor">@color/text</item>
+        <item name="tabIndicatorColor">@color/accent</item>
+    </style>
+
     <style name="Widget.LyricCast.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
@@ -26,36 +33,62 @@
         <item name="hintTextColor">@color/accent</item>
         <item name="android:textColorHint">@color/text_hint</item>
 
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
+
         <item name="materialThemeOverlay">@style/LyricCast.MaterialThemeOverlay.EditText</item>
     </style>
 
-    <style name="LyricCast.MaterialThemeOverlay.EditText" parent="">
+    <style name="LyricCast.MaterialThemeOverlay.EditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
         <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
     </style>
 
-    <style name="Widget.LyricCast.EditText" parent="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+    <style name="Widget.LyricCast.EditText" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
 
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="colorControlActivated">@color/white</item>
-        <item name="android:colorControlActivated">@color/white</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="colorControlActivated">@color/text_hint</item>
+        <item name="android:colorControlActivated">@color/text_hint</item>
     </style>
 
-    <style name="Widget.LyricCast.Spinner.Underlined" parent="Widget.AppCompat.Spinner.Underlined" />
+    <style name="Widget.LyricCast.Spinner.Underlined" parent="Widget.AppCompat.Spinner.Underlined">
+        <item name="android:backgroundTint">@color/text_hint</item>
+    </style>
 
     <style name="Widget.LyricCast.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
         <item name="buttonTint">@color/check_box</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
-        <item name="android:titleTextColor">@color/white</item>
         <item name="android:background">@color/color_primary</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout.Light" parent="Widget.LyricCast.AppBarLayout">
         <item name="android:background">@color/color_secondary</item>
+    </style>
+
+    <style name="Widget.LyricCast.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/button_background</item>
+        <item name="android:textColor">@color/button_text_1</item>
+    </style>
+
+    <style name="Widget.LyricCast.Button.Light" parent="Widget.LyricCast.Button">
+        <item name="android:textColor">@color/button_text_2</item>
+    </style>
+
+    <style name="Widget.LyricCast.ImageButton" parent="Widget.AppCompat.ImageButton">
+        <item name="android:backgroundTint">@color/button_background</item>
+        <item name="android:tint">@color/button_text_1</item>
+    </style>
+
+    <style name="Widget.LyricCast.ImageButton.Light" parent="Widget.LyricCast.ImageButton">
+        <item name="android:tint">@color/button_text_2</item>
     </style>
 
 </resources>

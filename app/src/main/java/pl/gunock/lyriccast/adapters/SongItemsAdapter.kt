@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/8/21 6:35 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -45,7 +45,7 @@ class SongItemsAdapter(
 
     private val mCheckBoxColor = mContext.getColor(R.color.check_box)
     private val mCheckBoxHighlightColor = mContext.getColor(R.color.check_box_highlight)
-    private val mDefaultItemCardColor = mContext.getColor(R.color.color_secondary)
+    private val mDefaultItemCardColor = mContext.getColor(R.color.window_background_2)
     private val mWithCategoryTextColor = mContext.getColor(R.color.text_item_with_category)
     private val mNoCategoryTextColor = mContext.getColor(R.color.text_item_no_category)
     private val mCheckBoxColors = intArrayOf(mCheckBoxHighlightColor, mCheckBoxColor)

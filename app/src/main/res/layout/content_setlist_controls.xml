@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/8/21 6:28 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,14 +9,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/window_background_2"
+    android:background="@color/window_background_1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/window_background_1"
+        android:background="@color/window_background_2"
         android:elevation="6dp"
         android:outlineProvider="background"
         android:paddingBottom="8dp"
@@ -26,12 +26,11 @@
 
         <ImageButton
             android:id="@+id/btn_setlist_prev_song"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/setlist_controls_previous_song"
-            android:tint="@color/button_text_1"
             app:layout_constraintBottom_toBottomOf="@+id/btn_setlist_prev"
             app:layout_constraintEnd_toStartOf="@+id/btn_setlist_prev"
             app:layout_constraintTop_toTopOf="@+id/btn_setlist_prev"
@@ -39,12 +38,11 @@
 
         <Button
             android:id="@+id/btn_setlist_blank"
+            style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/button_background"
             android:text="@string/controls_button_blank"
-            android:textColor="@color/button_text_1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -61,13 +59,12 @@
 
         <ImageButton
             android:id="@+id/btn_setlist_prev"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/controls_previous"
             android:rotation="180"
-            android:tint="@color/button_text_1"
             app:layout_constraintBottom_toBottomOf="@+id/btn_setlist_blank"
             app:layout_constraintEnd_toStartOf="@+id/btn_setlist_blank"
             app:layout_constraintTop_toTopOf="@+id/btn_setlist_blank"
@@ -75,12 +72,11 @@
 
         <ImageButton
             android:id="@+id/btn_setlist_next_song"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/setlist_controls_next_song"
-            android:tint="@color/button_text_1"
             app:layout_constraintBottom_toBottomOf="@+id/btn_setlist_next"
             app:layout_constraintStart_toEndOf="@+id/btn_setlist_next"
             app:layout_constraintTop_toTopOf="@+id/btn_setlist_next"
@@ -88,12 +84,11 @@
 
         <ImageButton
             android:id="@+id/btn_setlist_next"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/controls_next"
-            android:tint="@color/button_text_1"
             app:layout_constraintBottom_toBottomOf="@+id/btn_setlist_blank"
             app:layout_constraintStart_toEndOf="@+id/btn_setlist_blank"
             app:layout_constraintTop_toTopOf="@+id/btn_setlist_blank"
@@ -120,7 +115,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:background="@color/window_background_1"
+        android:background="@color/window_background_2"
         android:elevation="6dp"
         android:fadeScrollbars="false"
         android:outlineProvider="background"

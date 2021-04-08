@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/8/21 5:55 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,6 +9,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/window_background_1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +47,6 @@
 
         <Spinner
             android:id="@+id/spn_song_editor_category"
-            style="@style/Widget.LyricCast.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
@@ -81,17 +81,22 @@
 
     <EditText
         android:id="@+id/tin_section_lyrics"
+        style="@style/Widget.LyricCast.EditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:ems="10"
         android:gravity="top"
         android:hint="@string/song_editor_hint_enter_lyrics"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
+        android:paddingStart="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingBottom="0dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -108,12 +113,11 @@
 
         <ImageButton
             android:id="@+id/btn_move_section_left"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/song_editor_button_move_left"
-            android:tint="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintEnd_toStartOf="@+id/btn_delete_section"
             app:layout_constraintTop_toTopOf="@+id/btn_delete_section"
@@ -121,24 +125,22 @@
 
         <Button
             android:id="@+id/btn_delete_section"
+            style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/button_background"
             android:text="@string/song_editor_button_delete_section"
-            android:textColor="@color/button_text_2"
             app:layout_constraintBottom_toTopOf="@+id/tbl_song_section"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
             android:id="@+id/btn_move_section_right"
+            style="@style/Widget.LyricCast.ImageButton.Light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/song_editor_button_move_right"
-            android:tint="@color/button_text_2"
             app:layout_constraintBottom_toBottomOf="@+id/btn_delete_section"
             app:layout_constraintStart_toEndOf="@+id/btn_delete_section"
             app:layout_constraintTop_toTopOf="@+id/btn_delete_section"
@@ -146,6 +148,7 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tbl_song_section"
+            style="@style/Widget.LyricCast.TabLayout.Bottom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

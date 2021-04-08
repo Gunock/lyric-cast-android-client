@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/8/21 6:13 PM
   -->
 
 <resources>
-    <color name="color_primary">#000000</color>
-    <color name="color_primary_dark">#000000</color>
-    <color name="color_secondary">#303030</color>
+    <color name="color_primary">@color/almost_black</color>
+    <color name="color_primary_dark">@color/almost_black</color>
+    <color name="color_secondary">@color/very_dark_gray</color>
     <color name="accent">@color/royal_blue</color>
 
     <color name="text">@color/dim_white</color>
     <color name="text_hint">@color/very_dim_white</color>
 
-    <color name="window_background_1">@color/color_primary</color>
-    <color name="window_background_2">@color/color_secondary</color>
+    <color name="window_background_1">@color/almost_black</color>
+    <color name="window_background_2">@color/very_dark_gray</color>
+    <color name="window_background_3">@color/almost_black</color>
 
-    <color name="tab_indicator">@color/accent</color>
+    <color name="tab_indicator">@color/royal_blue</color>
 
-    <color name="text_item_with_category">#000000</color>
+    <color name="placeholder_card_color_1">@color/royal_blue_dark</color>
+    <color name="text_item_with_category">@color/black</color>
     <color name="text_item_no_category">@color/dim_white</color>
     <color name="item_handle">@color/very_dim_white</color>
 
     <color name="fab_icon">@color/very_dim_white</color>
-    <color name="fab_background_1">@color/color_secondary</color>
+    <color name="fab_background_1">@color/very_dark_gray</color>
     <color name="fab_background_2">@color/royal_blue_dark</color>
+    <color name="fab_background_3">@color/royal_blue_dark</color>
 
-    <color name="dialog_background">@color/color_secondary</color>
+    <color name="dialog_background">@color/very_dark_gray</color>
     <color name="dialog_text">@color/very_dim_white</color>
     <color name="dialog_button">@color/very_dim_white</color>
 
@@ -34,9 +37,9 @@
     <color name="button_text_1">@color/black</color>
     <color name="button_text_2">@color/very_dim_white</color>
 
-    <color name="check_box">@color/text</color>
-    <color name="check_box_highlight">@color/accent</color>
+    <color name="check_box">@color/dim_white</color>
+    <color name="check_box_highlight">@color/royal_blue</color>
 
-    <color name="indeterminate_progress_bar">@color/accent</color>
-    <color name="error_Indeterminate_progress_bar">#FF0000</color>
+    <color name="indeterminate_progress_bar">@color/royal_blue</color>
+    <color name="error_Indeterminate_progress_bar">@color/red</color>
 </resources>

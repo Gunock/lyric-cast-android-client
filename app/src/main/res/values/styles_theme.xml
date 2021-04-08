@@ -1,13 +1,13 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 2:09 PM
+  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 2:07 PM
+  ~ Last modified 4/8/21 6:45 PM
   -->
 
 <resources>
 
     <style name="Theme.LyricCast.DarkActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/royal_blue_dark</item>
+        <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="background">@android:color/transparent</item>
@@ -15,7 +15,15 @@
         <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
         <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
 
+        <item name="mediaRouteButtonTint">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+
         <item name="android:textViewStyle">@style/Widget.LyricCast.TextView</item>
+        <item name="materialButtonStyle">@style/Widget.LyricCast.Button</item>
+        <item name="buttonStyle">@style/Widget.LyricCast.Button</item>
+        <item name="imageButtonStyle">@style/Widget.LyricCast.ImageButton</item>
+        <item name="spinnerStyle">@style/Widget.LyricCast.Spinner.Underlined</item>
         <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
         <item name="tabStyle">@style/Widget.LyricCast.TabLayout</item>
         <item name="checkboxStyle">@style/Widget.LyricCast.CheckBox</item>
@@ -47,6 +55,8 @@
         <item name="android:textColor">@color/dialog_text</item>
         <item name="colorPrimary">@color/dialog_text</item>
         <item name="colorAccent">@color/dialog_button</item>
+
+        <item name="spinnerStyle">@style/Widget.LyricCast.Spinner.Underlined</item>
     </style>
 
     <style name="Theme.LyricCast.Dialog.NoTitle" parent="Theme.LyricCast.Dialog">

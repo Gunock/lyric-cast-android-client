@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/8/21 6:02 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -259,6 +259,7 @@ class SongsFragment : Fragment() {
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
         intent.putExtra("lyrics", lyrics.toTypedArray())
+        intent.putExtra("songTitle", songWithLyrics.song.title)
         startActivity(intent)
     }
 
