@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:01 PM
+ * Last modified 4/9/21 10:28 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -86,13 +86,13 @@ class LaunchActivity : AppCompatActivity() {
         var buttonClicked = false
         // TODO: Possible leak
         AlertDialog.Builder(this, R.style.Theme_LyricCast_Dialog_NoTitle)
-            .setMessage("Turn on WiFi to enable casting.")
-            .setPositiveButton("Go to settings") { _, _ ->
+            .setMessage(getString(R.string.launch_activity_turn_on_wifi))
+            .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
                 buttonClicked = true
                 val turnWifiOn = Intent(Settings.ACTION_WIRELESS_SETTINGS)
                 startActivityForResult(turnWifiOn, TURN_ON_WIFI_RESULT_CODE)
             }
-            .setNegativeButton("Ignore") { _, _ ->
+            .setNegativeButton(getString(R.string.launch_activity_ignore)) { _, _ ->
                 buttonClicked = true
                 goToMain()
             }

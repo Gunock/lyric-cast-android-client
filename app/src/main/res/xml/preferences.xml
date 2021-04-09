@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 5:36 PM
+  ~ Last modified 4/9/21 10:14 PM
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="Application">
+    <PreferenceCategory app:title="@string/preference_section_app">
         <ListPreference
             android:id="@+id/pref_app_theme"
             app:defaultValue="@string/preference_theme_default_value"
@@ -18,7 +18,7 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Chromecast">
+    <PreferenceCategory app:title="@string/preference_section_chromecast">
         <ListPreference
             android:id="@+id/pref_background_color"
             app:defaultValue="@string/preference_cast_background_color_default_value"

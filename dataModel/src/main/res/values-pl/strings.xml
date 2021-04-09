@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/9/21 10:31 PM
+  -->
+
+<resources>
+    <string name="data_transfer_processor_importing_categories">Importowanie kategorii …</string>
+    <string name="data_transfer_processor_importing_songs">Importowanie piosenek …</string>
+    <string name="data_transfer_processor_importing_setlists">Importowanie list …</string>
+    <string name="data_transfer_processor_finishing_import">Finalizowanie importu …</string>
+</resources>

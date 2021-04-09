@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/9/21 10:31 PM
+  -->
+
+<resources>
+    <!-- Titles -->
+    <string name="title_category_manager">Zarządzanie kategoriami</string>
+    <string name="title_categories">Kategorie</string>
+    <string name="title_settings">Ustawienia</string>
+    <string name="title_song_editor">Edytor piosenek</string>
+    <string name="title_setlist_editor">Edytor list</string>
+    <string name="title_controls">Sterowanie</string>
+    <string name="title_setlists">Listy</string>
+    <string name="title_songs">Piosenki</string>
+
+    <!-- Hints -->
+    <string name="hint_song_title">Tytuł piosenki</string>
+    <string name="hint_setlist_name">Nazwa listy</string>
+
+    <!-- Option/Action Menu -->
+    <string name="option_menu_cast">Rzutuj</string>
+    <string name="action_menu_button_delete">Usuń</string>
+
+    <!-- Launch Activity -->
+    <string name="launch_activity_turn_on_wifi">Włącz WiFi aby umożliwić rzutowanie.</string>
+    <string name="launch_activity_go_to_settings">Przejdź do ustawień</string>
+    <string name="launch_activity_ignore">Ignoruj</string>
+
+    <!-- Main Activity -->
+    <string name="main_activity_loading_file">Wczytywanie pliku …</string>
+    <string name="main_activity_import_delete_all_before_import">Usuń wszystko przed importem</string>
+    <string name="main_activity_import_replace_on_conflict">Podmień w przypadku konfliktu</string>
+    <string name="main_activity_import_dialog_title">Import</string>
+    <string name="main_activity_import_incorrect_file_format">Niewłaściwy format pliku</string>
+    <string name="main_activity_export_preparing_data">Przygotowywanie danych …</string>
+    <string name="main_activity_export_saving_json">Zapisywanie do tymczasowego katalogu …</string>
+    <string name="main_activity_export_saving_zip">Zapisywanie paczki zip …</string>
+    <string name="main_activity_export_deleting_temp">Usuwanie tymczasowego katalogu …</string>
+    <string name="main_activity_action_menu_export_selected">Eksportuj zaznaczone</string>
+    <string name="main_activity_menu_export">Eksportuj wszystko</string>
+    <string name="main_activity_menu_import">Importuj</string>
+    <string name="main_activity_button_edit">Edytuj</string>
+    <string name="main_activity_button_add_song">Dodaj piosenkę</string>
+    <string name="main_activity_button_add_setlist">Dodaj listę</string>
+
+    <!-- Song/Setlist Controls -->
+    <string name="controls_button_blank">Blank</string>
+    <string name="controls_previous">Poprzedni</string>
+    <string name="controls_next">Następny</string>
+
+    <!-- Setlist Controls -->
+    <string name="setlist_controls_previous_song">Poprzednia piosenka</string>
+    <string name="setlist_controls_next_song">Następna piosenka</string>
+
+    <!-- Editors -->
+    <string name="editor_button_save">Zapisz</string>
+    <string name="editor_button_add">Dodaj</string>
+
+    <!-- Category Manager -->
+    <string name="category_manager_hint_category_name">Nazwa kategorii</string>
+    <string name="category_manager_add_category">Dodawanie kategorii</string>
+    <string name="category_manager_edit_category">Edycja kategorii</string>
+    <string name="category_manager_name_already_used">Nazwa kategorii już zajęta</string>
+    <string name="category_manager_enter_name">Proszę podać nazwę kategorii</string>
+
+    <!-- Setlist Editor -->
+    <string name="setlist_editor_hint_selected">Zaznaczone</string>
+    <string name="setlist_editor_button_pick_songs">Wybierz piosenki</string>
+    <string name="setlist_editor_action_menu_duplicate">Zduplikuj</string>
+    <string name="setlist_editor_img_drag_song">Przesuń piosenkę</string>
+    <string name="setlist_editor_empty_warning">Puste listy są niedozwolone!</string>
+    <string name="setlist_editor_name_already_used">Nazwa listy już zajęta</string>
+    <string name="setlist_editor_enter_name">Przoszę podać nazwę listy</string>
+
+    <!-- Song Editor -->
+    <string name="song_editor_hint_enter_lyrics">Wprowadź słowa</string>
+    <string name="song_editor_input_section_name">Nazwa sekcji</string>
+    <string name="song_editor_input_new_song">Nowa piosenka</string>
+    <string name="song_editor_input_new_section">NOWA SEKCJA</string>
+    <string name="song_editor_input_new_section_template">NOWA SEKCJA %d</string>
+    <string name="song_editor_button_move_left">Przesuń w lewo</string>
+    <string name="song_editor_button_move_right">Przesuń w prawo</string>
+    <string name="song_editor_button_delete_section">Usuń sekcję</string>
+    <string name="song_editor_title_already_used">Tytuł piosenki już zajęty</string>
+    <string name="song_editor_enter_title">Proszę podać tytuł piosenki</string>
+
+    <!-- Other -->
+    <string name="category_all">WSZYSTKIE</string>
+    <string name="category_none">BRAK</string>
+</resources>

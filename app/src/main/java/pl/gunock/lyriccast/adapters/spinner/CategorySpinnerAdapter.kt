@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:14 PM
+ * Last modified 4/9/21 10:25 PM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -22,9 +22,13 @@ class CategorySpinnerAdapter(
     private val mLock = Any()
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mItems: MutableList<Category> = mutableListOf()
+
+    private val mCategoryAll: Category =
+        Category(Long.MIN_VALUE, context.getString(R.string.category_all))
+
     val categories: List<Category> get() = mItems
 
-    fun submitCollection(categories: Collection<Category>, firstCategory: Category = Category.ALL) {
+    fun submitCollection(categories: Collection<Category>, firstCategory: Category = mCategoryAll) {
         synchronized(mLock) {
             mItems.clear()
             mItems.addAll(listOf(firstCategory) + categories.toSortedSet())

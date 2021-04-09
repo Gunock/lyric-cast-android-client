@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/9/21 10:15 PM
+  -->
+
+<resources>
+    <!-- Titles -->
+    <string name="preference_theme_title">Motyw</string>
+    <string name="preference_cast_background_title">Kolor tła</string>
+    <string name="preference_cast_font_color_title">Kolor czcionki</string>
+
+    <!-- Section titles -->
+    <string name="preference_section_app">Aplikacja</string>
+</resources>

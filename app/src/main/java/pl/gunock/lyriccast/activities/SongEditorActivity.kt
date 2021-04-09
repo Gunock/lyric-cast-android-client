@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 10:31 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -63,6 +63,8 @@ class SongEditorActivity : AppCompatActivity() {
 
     private var mNewSectionCount = 1
 
+    private lateinit var mCategoryNone: Category
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,6 +72,7 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        mCategoryNone = Category(Long.MIN_VALUE, baseContext.getString(R.string.category_none))
         mRepository = (application as LyricCastApplication).repository
 
         mSongTitleInputLayout = findViewById(R.id.tv_song_title)
@@ -127,7 +130,7 @@ class SongEditorActivity : AppCompatActivity() {
         mCategorySpinner.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.observe(this) { categories ->
-            categorySpinnerAdapter.submitCollection(categories, Category.NONE)
+            categorySpinnerAdapter.submitCollection(categories, mCategoryNone)
 
             if (mIntentSong != null) {
                 val categoryIndex = (mCategorySpinner.adapter as CategorySpinnerAdapter).categories

@@ -1,25 +1,25 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 4:58 PM
+  ~ Last modified 4/9/21 10:28 PM
   -->
 
 <resources>
-    <string name="app_name">LyricCast</string>
+    <string name="app_name" translatable="false">LyricCast</string>
 
     <!-- Chromecast -->
-    <string name="chromecast_app_id">67E9729E</string>
-    <string name="chromecast_content_namespace">urn:x-cast:lyric.cast.content</string>
-    <string name="chromecast_control_namespace">urn:x-cast:lyric.cast.control</string>
-    <string name="chromecast_content_message_template">{\"text\":\"%1$s\"}</string>
-    <string name="chromecast_control_message_template">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
+    <string name="chromecast_app_id" translatable="false">67E9729E</string>
+    <string name="chromecast_content_namespace" translatable="false">urn:x-cast:lyric.cast.content</string>
+    <string name="chromecast_control_namespace" translatable="false">urn:x-cast:lyric.cast.control</string>
+    <string name="chromecast_content_message_template" translatable="false">{\"text\":\"%1$s\"}</string>
+    <string name="chromecast_control_message_template" translatable="false">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
 
     <!-- Placeholders -->
-    <string name="placeholder_text">Text</string>
-    <string name="placeholder_title">Title</string>
-    <string name="placeholder_name">Name</string>
-    <string name="placeholder_category">Category</string>
-    <string name="placeholder_progress_message">Importing data …</string>
+    <string name="placeholder_text" translatable="false">Text</string>
+    <string name="placeholder_title" translatable="false">Title</string>
+    <string name="placeholder_name" translatable="false">Name</string>
+    <string name="placeholder_category" translatable="false">Category</string>
+    <string name="placeholder_progress_message" translatable="false">Importing data …</string>
 
     <!-- Titles -->
     <string name="title_category_manager">Category manager</string>
@@ -38,6 +38,11 @@
     <!-- Option/Action Menu -->
     <string name="option_menu_cast">Cast</string>
     <string name="action_menu_button_delete">Delete</string>
+
+    <!-- Launch Activity -->
+    <string name="launch_activity_turn_on_wifi">Turn on WiFi to enable casting.</string>
+    <string name="launch_activity_go_to_settings">Go to settings</string>
+    <string name="launch_activity_ignore">Ignore</string>
 
     <!-- Main Activity -->
     <string name="main_activity_import_delete_all_before_import">Delete all before import</string>
@@ -62,7 +67,7 @@
     <string name="controls_next">Next</string>
 
     <!-- Setlist Controls -->
-    <string name="setlist_controls_song_item_title_template">%d. %s</string>
+    <string name="setlist_controls_song_item_title_template" translatable="false">%d. %s</string>
     <string name="setlist_controls_previous_song">Previous song</string>
     <string name="setlist_controls_next_song">Next song</string>
 
@@ -98,4 +103,7 @@
     <string name="song_editor_enter_title">Please enter song title</string>
     <string name="song_editor_title_already_used">Song title already in use</string>
 
+    <!-- Other -->
+    <string name="category_all">ALL</string>
+    <string name="category_none">NONE</string>
 </resources>
