@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:13 PM
+ * Last modified 4/9/21 11:03 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -14,7 +14,8 @@ import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 
 data class SongItem(
     val song: Song,
-    val category: Category? = null
+    val category: Category? = null,
+    var id: Long = song.id
 ) : Comparable<SongItem> {
 
     val normalizedTitle by lazy { song.title.normalize() }

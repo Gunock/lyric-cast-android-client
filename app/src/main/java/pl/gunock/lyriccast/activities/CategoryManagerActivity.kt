@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:45 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -169,7 +169,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val dialogFragment = EditCategoryDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog
+            R.style.Theme_LyricCast_Dialog_NoTitle
         )
 
         dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
@@ -185,7 +185,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog
+            R.style.Theme_LyricCast_Dialog_NoTitle
         )
 
         dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)

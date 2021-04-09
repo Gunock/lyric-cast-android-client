@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:45 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -59,11 +59,6 @@ class EditCategoryDialogFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (mCategoryItem == null) {
-            dialog?.setTitle(getString(R.string.category_manager_add_category))
-        } else {
-            dialog?.setTitle(getString(R.string.category_manager_edit_category))
-        }
 
         mCategoryNames = mDialogViewModel.categoryNames.value ?: setOf()
 
@@ -76,6 +71,12 @@ class EditCategoryDialogFragment(
         mNameInputLayout = view.findViewById(R.id.tv_category_name)
         mNameInput = view.findViewById(R.id.tin_category_name)
         mColorSpinner = view.findViewById(R.id.spn_category_color)
+
+        view.findViewById<TextView>(R.id.tv_dialog_title).text = if (mCategoryItem == null) {
+            getString(R.string.category_manager_add_category)
+        } else {
+            getString(R.string.category_manager_edit_category)
+        }
 
         mNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
@@ -158,16 +159,13 @@ class EditCategoryDialogFragment(
 
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {
-                    mNameInputLayout.error = " "
-                    mNameInput.error = getString(R.string.category_manager_enter_name)
+                    mNameInputLayout.error = getString(R.string.category_manager_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mNameInputLayout.error = " "
-                    mNameInput.error = getString(R.string.category_manager_name_already_used)
+                    mNameInputLayout.error = getString(R.string.category_manager_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     mNameInputLayout.error = null
-                    mNameInput.error = null
                 }
             }
         }

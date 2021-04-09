@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 6:50 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 6:50 PM
+ * Last modified 4/9/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -62,7 +62,7 @@ class ControlsSongItemsAdapter(
             val item: SongItem = songItems[position]
             val titleText = itemView.context.resources.getString(
                 R.string.setlist_controls_song_item_title_template,
-                adapterPosition + 1,
+                absoluteAdapterPosition + 1,
                 item.song.title
             )
             mTitleTextView.text = titleText
@@ -71,18 +71,18 @@ class ControlsSongItemsAdapter(
         }
 
         private fun setupListeners() {
-            songItems[adapterPosition].highlight
+            songItems[absoluteAdapterPosition].highlight
                 .observe(mContext.getLifecycleOwner()!!, this::observeHighlight)
 
             if (onItemLongClickListener != null) {
                 mItemCardView.setOnLongClickListener { view ->
-                    onItemLongClickListener.execute(this, adapterPosition, view)
+                    onItemLongClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
 
             if (onItemClickListener != null) {
                 mItemCardView.setOnClickListener { view ->
-                    onItemClickListener.execute(this, adapterPosition, view)
+                    onItemClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
         }

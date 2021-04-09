@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:51 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -120,8 +120,8 @@ class SetlistEditorFragment : Fragment() {
                     holder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder
                 ): Boolean {
-                    val from = holder.adapterPosition
-                    val to = target.adapterPosition
+                    val from = holder.absoluteAdapterPosition
+                    val to = target.absoluteAdapterPosition
                     mSongItemsAdapter.moveItem(from, to)
                     mSongItemsAdapter.notifyItemMoved(from, to)
 
@@ -375,16 +375,14 @@ class SetlistEditorFragment : Fragment() {
 
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {
-                    mSetlistNameInputLayout.error = " "
-                    mSetlistNameInput.error = getString(R.string.setlist_editor_enter_name)
+                    mSetlistNameInputLayout.error = getString(R.string.setlist_editor_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mSetlistNameInputLayout.error = " "
-                    mSetlistNameInput.error = getString(R.string.setlist_editor_name_already_used)
+                    mSetlistNameInputLayout.error =
+                        getString(R.string.setlist_editor_name_already_used)
                 }
                 NameValidationState.VALID -> {
                     mSetlistNameInputLayout.error = null
-                    mSetlistNameInput.error = null
                 }
             }
         }

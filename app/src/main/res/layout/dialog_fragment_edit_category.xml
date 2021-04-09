@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 3:06 PM
+  ~ Last modified 4/9/21 11:45 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,17 +11,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:background="@color/window_background_2"
     android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder_title"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tv_category_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         app:counterEnabled="true"
         app:counterMaxLength="30"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tin_category_name"

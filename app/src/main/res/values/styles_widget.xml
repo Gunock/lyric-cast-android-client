@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 4:48 PM
+  ~ Last modified 4/9/21 11:24 PM
   -->
 
 <resources>
@@ -29,7 +29,6 @@
 
         <item name="boxStrokeColor">@color/text_input_stroke</item>
 
-        <item name="colorPrimary">@color/accent</item>
         <item name="hintTextColor">@color/accent</item>
         <item name="android:textColorHint">@color/text_hint</item>
 

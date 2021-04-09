@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:47 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -11,10 +11,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import pl.gunock.lyriccast.R
@@ -46,8 +43,6 @@ class ImportDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dialog?.setTitle(getString(R.string.main_activity_import_dialog_title))
-
         return inflater.inflate(R.layout.dialog_fragment_import, container, false)
     }
 
@@ -57,6 +52,9 @@ class ImportDialogFragment : DialogFragment() {
         mImportFormatSpinner = view.findViewById(R.id.spn_import_format)
         mDeleteAllCheckBox = view.findViewById(R.id.chk_delete_all)
         mReplaceOnConflictCheckBox = view.findViewById(R.id.chk_replace_on_conflict)
+
+        view.findViewById<TextView>(R.id.tv_dialog_title).text =
+            getString(R.string.main_activity_import_dialog_title)
 
         setupColorSpinner()
         setupListeners(view)

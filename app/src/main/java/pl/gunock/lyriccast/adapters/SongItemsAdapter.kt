@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 6:35 PM
+ * Last modified 4/9/21 11:03 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -109,7 +109,7 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return mVisibleItems.toList()[position].song.id
+        return mVisibleItems.toList()[position].id
     }
 
     override fun getItemCount() = mVisibleItems.size

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 2:01 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:48 PM
+ * Last modified 4/9/21 11:03 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -32,7 +32,11 @@ class SetlistSongItemsAdapter(
 
     val songItems: List<SongItem> get() = mSongItems
 
+    private var availableId: Long = 0L
+
     init {
+        mSongItems.forEach { it.id = availableId++ }
+
         setHasStableIds(true)
     }
 
@@ -41,24 +45,6 @@ class SetlistSongItemsAdapter(
         mSelectionTracker?.reset()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_setlist_song, parent, false)
-
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(position)
-    }
-
-    override fun getItemId(position: Int): Long {
-        val item = mSongItems[position]
-        return item.song.id
-    }
-
-    override fun getItemCount() = mSongItems.size
-
     fun moveItem(from: Int, to: Int) {
         val item = mSongItems.removeAt(from)
         mSongItems.add(to, item)
@@ -66,7 +52,7 @@ class SetlistSongItemsAdapter(
 
     fun duplicateSelectedItem() {
         val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
-        val selectedItem = mSongItems[selectedItemIndex].copy()
+        val selectedItem = mSongItems[selectedItemIndex].copy(id = availableId++)
         selectedItem.isSelected.value = false
 
         mSongItems.add(selectedItemIndex + 1, selectedItem)
@@ -88,6 +74,24 @@ class SetlistSongItemsAdapter(
         notifyItemRemoved(selectedItemIndex)
         return true
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view: View = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_setlist_song, parent, false)
+
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(position)
+    }
+
+    override fun getItemId(position: Int): Long {
+        val item = mSongItems[position]
+        return item.id
+    }
+
+    override fun getItemCount() = mSongItems.size
 
     inner class ViewHolder(
         itemView: View

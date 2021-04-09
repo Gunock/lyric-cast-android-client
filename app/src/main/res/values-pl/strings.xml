@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:49 PM
+  ~ Last modified 4/9/21 11:05 PM
   -->
 
 <resources>
@@ -72,7 +72,7 @@
     <string name="setlist_editor_img_drag_song">Przesuń piosenkę</string>
     <string name="setlist_editor_empty_warning">Puste listy są niedozwolone!</string>
     <string name="setlist_editor_name_already_used">Nazwa listy już zajęta</string>
-    <string name="setlist_editor_enter_name">Przoszę podać nazwę listy</string>
+    <string name="setlist_editor_enter_name">Proszę podać nazwę listy</string>
 
     <!-- Song Editor -->
     <string name="song_editor_hint_enter_lyrics">Wprowadź słowa</string>

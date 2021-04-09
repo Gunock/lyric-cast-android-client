@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:36 PM
+ * Last modified 4/9/21 11:48 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -227,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         val dialogFragment = ImportDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog
+            R.style.Theme_LyricCast_Dialog_NoTitle
         )
 
         mImportDialogViewModel.accepted.value = false

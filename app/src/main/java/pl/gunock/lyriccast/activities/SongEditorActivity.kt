@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 10:31 PM
+ * Last modified 4/9/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -349,16 +349,13 @@ class SongEditorActivity : AppCompatActivity() {
 
             when (validateSongTitle(newText)) {
                 NameValidationState.EMPTY -> {
-                    mSongTitleInputLayout.error = " "
-                    mSongTitleInput.error = getString(R.string.song_editor_enter_title)
+                    mSongTitleInputLayout.error = getString(R.string.song_editor_enter_title)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mSongTitleInputLayout.error = " "
-                    mSongTitleInput.error = getString(R.string.song_editor_title_already_used)
+                    mSongTitleInputLayout.error = getString(R.string.song_editor_title_already_used)
                 }
                 NameValidationState.VALID -> {
                     mSongTitleInputLayout.error = null
-                    mSongTitleInput.error = null
                 }
             }
         }

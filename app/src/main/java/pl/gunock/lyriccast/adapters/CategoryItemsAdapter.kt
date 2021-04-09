@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:51 PM
+ * Last modified 4/9/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -85,7 +85,7 @@ class CategoryItemsAdapter(
                 mCheckBox.isChecked = it
             }
 
-            mNameTextView.text = categoryItems[adapterPosition].category.name
+            mNameTextView.text = categoryItems[absoluteAdapterPosition].category.name
 
             if (item.category.color != null) {
                 mColorCardView.setCardBackgroundColor(item.category.color!!)

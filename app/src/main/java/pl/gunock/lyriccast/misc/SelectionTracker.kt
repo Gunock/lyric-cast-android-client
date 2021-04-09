@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:12 PM
+ * Last modified 4/9/21 11:08 PM
  */
 
 package pl.gunock.lyriccast.misc
@@ -38,7 +38,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         holder.itemView.setOnLongClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (mOnSelect(holder, holder.adapterPosition, true)) {
+            if (mOnSelect(holder, holder.absoluteAdapterPosition, true)) {
                 view.requestFocus()
                 count = countItems(holder, modifySelectedItems = true)
             }
@@ -49,7 +49,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
         holder.itemView.setOnClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (mOnSelect(holder, holder.adapterPosition, false)) {
+            if (mOnSelect(holder, holder.absoluteAdapterPosition, false)) {
                 view.requestFocus()
                 mRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 count = countItems(holder, modifySelectedItems = true)

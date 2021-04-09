@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 5:36 PM
+  ~ Last modified 4/9/21 11:45 PM
   -->
 
 <resources>
@@ -10,7 +10,6 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="background">@color/window_background_1</item>
 
         <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
         <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
@@ -51,17 +50,16 @@
     </style>
 
     <style name="Theme.LyricCast.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">
-        <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
-
         <item name="android:windowMinWidthMajor">75%</item>
         <item name="android:windowMinWidthMinor">75%</item>
         <item name="android:windowNoTitle">false</item>
-        <item name="android:background">@color/window_background_2</item>
 
         <item name="android:textColor">@color/dialog_text</item>
-        <item name="colorPrimary">@color/dialog_text</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/dialog_button</item>
 
+        <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
         <item name="spinnerStyle">@style/Widget.LyricCast.Spinner.Underlined</item>
         <item name="buttonBarNegativeButtonStyle">
             @style/Theme.LyricCast.Dialog.NegativeButtonStyle
