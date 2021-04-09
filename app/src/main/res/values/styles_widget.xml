@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:24 PM
+  ~ Last modified 4/9/21 11:56 PM
   -->
 
 <resources>
@@ -13,7 +13,7 @@
     <style name="Widget.LyricCast.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabIndicatorColor">@color/tab_indicator</item>
         <item name="tabTextColor">@color/white</item>
-        <item name="android:background">@color/color_primary</item>
+        <item name="android:background">@color/color_background_primary</item>
     </style>
 
     <style name="Widget.LyricCast.TabLayout.Bottom" parent="Widget.LyricCast.TabLayout">
@@ -36,10 +36,10 @@
         <item name="android:paddingRight">4dp</item>
         <item name="android:paddingBottom">8dp</item>
 
-        <item name="materialThemeOverlay">@style/LyricCast.MaterialThemeOverlay.EditText</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.LyricCast.EditText</item>
     </style>
 
-    <style name="LyricCast.MaterialThemeOverlay.EditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
+    <style name="ThemeOverlay.LyricCast.EditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
         <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
     </style>
 
@@ -65,7 +65,7 @@
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
-        <item name="android:background">@color/color_primary</item>
+        <item name="android:background">@color/color_background_primary</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout.Light" parent="Widget.LyricCast.AppBarLayout">
@@ -97,6 +97,14 @@
     <style name="Widget.LyricCast.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="tint">@color/white</item>
         <item name="android:tint">@color/white</item>
+    </style>
+
+    <style name="Widget.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dialog_button</item>
+    </style>
+
+    <style name="Widget.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dialog_button</item>
     </style>
 
 </resources>

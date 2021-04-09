@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:45 PM
+  ~ Last modified 4/9/21 11:56 PM
   -->
 
 <resources>
@@ -62,19 +62,11 @@
         <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
         <item name="spinnerStyle">@style/Widget.LyricCast.Spinner.Underlined</item>
         <item name="buttonBarNegativeButtonStyle">
-            @style/Theme.LyricCast.Dialog.NegativeButtonStyle
+            @style/Widget.LyricCast.Dialog.NegativeButtonStyle
         </item>
         <item name="buttonBarPositiveButtonStyle">
-            @style/Theme.LyricCast.Dialog.PositiveButtonStyle
+            @style/Widget.LyricCast.Dialog.PositiveButtonStyle
         </item>
-    </style>
-
-    <style name="Theme.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/dialog_button</item>
-    </style>
-
-    <style name="Theme.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/dialog_button</item>
     </style>
 
     <style name="Theme.LyricCast.Dialog.NoTitle" parent="Theme.LyricCast.Dialog">
