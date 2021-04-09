@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/9/21 5:04 PM
+  -->
+
+<resources>
+    <!-- Keys -->
+    <string name="preference_theme_key">appTheme</string>
+    <string name="preference_cast_background_key">backgroundColor</string>
+    <string name="preference_cast_font_color_key">fontColor</string>
+
+    <!-- Titles -->
+    <string name="preference_theme_title">Theme</string>
+    <string name="preference_cast_background_title">Background color</string>
+
+    <!-- Default values -->
+    <string name="preference_cast_font_color_title">Font color</string>
+    <string name="preference_theme_default_value">-1</string>
+    <string name="preference_cast_background_color_default_value">Black</string>
+    <string name="preference_cast_font_color_default_value">White</string>
+</resources>

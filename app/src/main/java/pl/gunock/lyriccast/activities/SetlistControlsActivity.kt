@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:33 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:32 PM
+ * Last modified 4/9/21 5:36 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,12 +16,10 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
@@ -36,6 +34,7 @@ import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
+import pl.gunock.lyriccast.models.LyricCastSettings
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
@@ -272,14 +271,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             return
         }
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
-        val backgroundColor = prefs.getString("backgroundColor", "Black")
-        val fontColor = prefs.getString("fontColor", "White")
-
-        val configurationJson = JSONObject().apply {
-            put("backgroundColor", backgroundColor)
-            put("fontColor", fontColor)
-        }
+        val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
             mCastContext!!,

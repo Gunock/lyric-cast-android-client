@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:23 AM
+ * Last modified 4/9/21 5:36 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -268,7 +268,8 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (exception: Exception) {
                 Log.e(TAG, exception.stackTraceToString())
-                dialogFragment.message = getString(R.string.import_incorrect_file_format)
+                dialogFragment.message =
+                    getString(R.string.main_activity_import_incorrect_file_format)
                 CoroutineScope(Dispatchers.Main).launch {
                     dialogFragment.setErrorColor(true)
                     dialogFragment.setShowOkButton(true)
@@ -313,7 +314,8 @@ class MainActivity : AppCompatActivity() {
                 importSongXmlParser.parseZip(contentResolver, uri)
             } catch (exception: Exception) {
                 Log.e(TAG, exception.stackTraceToString())
-                dialogFragment.message = getString(R.string.import_incorrect_file_format)
+                dialogFragment.message =
+                    getString(R.string.main_activity_import_incorrect_file_format)
                 CoroutineScope(Dispatchers.Main).launch {
                     dialogFragment.setErrorColor(true)
                     dialogFragment.setShowOkButton(true)

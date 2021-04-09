@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 10:29 PM
+ * Last modified 4/9/21 5:01 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,8 +16,10 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.helpers.MessageHelper
+import pl.gunock.lyriccast.models.LyricCastSettings
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -33,6 +35,9 @@ class LaunchActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_launch)
         setSupportActionBar(findViewById(R.id.toolbar_launch))
+
+        val settings = LyricCastSettings(baseContext)
+        AppCompatDelegate.setDefaultNightMode(settings.appTheme)
     }
 
     override fun onStart() {
@@ -79,6 +84,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun turnOnWifi() {
         var buttonClicked = false
+        // TODO: Possible leak
         AlertDialog.Builder(this, R.style.Theme_LyricCast_Dialog_NoTitle)
             .setMessage("Turn on WiFi to enable casting.")
             .setPositiveButton("Go to settings") { _, _ ->
@@ -94,7 +100,9 @@ class LaunchActivity : AppCompatActivity() {
                 if (!buttonClicked) {
                     goToMain()
                 }
-            }.create().show()
+            }
+            .create()
+            .show()
     }
 
     private fun goToMain() {

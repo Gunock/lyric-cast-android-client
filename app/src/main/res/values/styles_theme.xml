@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 12:08 PM
+  ~ Last modified 4/9/21 5:36 PM
   -->
 
 <resources>
@@ -17,7 +17,6 @@
 
         <item name="mediaRouteButtonTint">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
 
         <item name="android:textViewStyle">@style/Widget.LyricCast.TextView</item>
         <item name="materialButtonStyle">@style/Widget.LyricCast.Button</item>
@@ -28,6 +27,13 @@
         <item name="tabStyle">@style/Widget.LyricCast.TabLayout</item>
         <item name="checkboxStyle">@style/Widget.LyricCast.CheckBox</item>
         <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout</item>
+
+        <item name="toolbarNavigationButtonStyle">
+            @style/Widget.LyricCast.Toolbar.Button.Navigation
+        </item>
+        <item name="android:actionOverflowButtonStyle">
+            @style/Widget.LyricCast.ActionButton.Overflow
+        </item>
     </style>
 
     <style name="Theme.LyricCast.NoActionBar" parent="Theme.LyricCast.DarkActionBar">

@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 5:41 PM
+  ~ Last modified 4/9/21 4:48 PM
   -->
 
 <resources>
@@ -89,6 +89,15 @@
 
     <style name="Widget.LyricCast.ImageButton.Light" parent="Widget.LyricCast.ImageButton">
         <item name="android:tint">@color/button_text_2</item>
+    </style>
+
+    <style name="Widget.LyricCast.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@color/white</item>
+    </style>
+
+    <style name="Widget.LyricCast.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@color/white</item>
+        <item name="android:tint">@color/white</item>
     </style>
 
 </resources>

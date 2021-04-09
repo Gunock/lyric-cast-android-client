@@ -1,10 +1,22 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/4/21 2:00 AM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/4/21 12:30 AM
+  ~ Last modified 4/9/21 3:18 PM
   -->
 
 <resources>
+    <!-- Theme Preference -->
+    <string-array name="theme_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System default</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>1</item>
+        <item>2</item>
+        <item>-1</item>
+    </string-array>
+
     <!-- Color Preference -->
     <string-array name="color_entries">
         <item>Black</item>

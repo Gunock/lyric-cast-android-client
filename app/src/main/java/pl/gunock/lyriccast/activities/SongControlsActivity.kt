@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:51 PM
+ * Last modified 4/9/21 5:36 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,14 +17,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastContext
-import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
+import pl.gunock.lyriccast.models.LyricCastSettings
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -134,14 +133,7 @@ class SongControlsActivity : AppCompatActivity() {
             return
         }
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
-        val backgroundColor = prefs.getString("backgroundColor", "Black")
-        val fontColor = prefs.getString("fontColor", "White")
-
-        val configurationJson = JSONObject().apply {
-            put("backgroundColor", backgroundColor)
-            put("fontColor", fontColor)
-        }
+        val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
             mCastContext!!,
