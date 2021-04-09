@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
+  ~ Created by Tomasz Kiljanczyk on 4/10/21 12:13 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:46 PM
+  ~ Last modified 4/10/21 12:13 AM
   -->
 
 <resources>
@@ -16,7 +16,7 @@
     <!-- Theme entries -->
     <string name="preference_theme_light">Jasny</string>
     <string name="preference_theme_dark">Ciemny</string>
-    <string name="preference_theme_system">Domyślne ustawienie systemu</string>
+    <string name="preference_theme_system">Systemowy</string>
 
     <!-- Color entries -->
     <string name="preference_color_black">Czarny</string>

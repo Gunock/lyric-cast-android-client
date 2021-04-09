@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/10/21 12:13 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:36 PM
+ * Last modified 4/10/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -23,7 +23,13 @@ import pl.gunock.lyriccast.models.LyricCastSettings
 
 class SettingsActivity : AppCompatActivity() {
 
-    lateinit var preferences: SharedPreferences
+    private val preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == "appTheme") {
+                val settings = LyricCastSettings(baseContext)
+                AppCompatDelegate.setDefaultNightMode(settings.appTheme)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,20 +46,8 @@ class SettingsActivity : AppCompatActivity() {
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        // TODO: Possible leak
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        preferences.registerOnSharedPreferenceChangeListener(this::onPreferenceChangeListener)
-    }
-
-    private fun onPreferenceChangeListener(
-        @Suppress("UNUSED_PARAMETER")
-        sharedPreferences: SharedPreferences,
-        key: String
-    ) {
-        if (key == "appTheme") {
-            val settings = LyricCastSettings(baseContext)
-            AppCompatDelegate.setDefaultNightMode(settings.appTheme)
-        }
+        PreferenceManager.getDefaultSharedPreferences(baseContext)
+            .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
 
