@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 4/10/21 12:22 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:56 PM
+  ~ Last modified 4/10/21 12:21 AM
   -->
 
 <resources>
@@ -39,7 +39,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/color_primary</item>
+        <item name="actionModeBackground">@color/color_background_primary</item>
     </style>
 
     <style name="Theme.LyricCast.NoActionBar.Light" parent="Theme.LyricCast.NoActionBar">
