@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:31 PM
+  ~ Last modified 4/9/21 10:49 PM
   -->
 
 <resources>
@@ -86,7 +86,20 @@
     <string name="song_editor_title_already_used">Tytuł piosenki już zajęty</string>
     <string name="song_editor_enter_title">Proszę podać tytuł piosenki</string>
 
-    <!-- Other -->
+    <!-- Category -->
+    <string name="category_color_maroon">Kasztanowy</string>
+    <string name="category_color_tomato">Pomidorowy</string>
+    <string name="category_color_golden">Złoty</string>
+    <string name="category_color_olive">Oliwkowy</string>
+    <string name="category_color_cyan">Cyjan</string>
+    <string name="category_color_turquoise">Turkusowy</string>
+    <string name="category_color_royal_blue">Królewski niebieski</string>
+    <string name="category_color_violet">Fioletowy</string>
+    <string name="category_color_pink">Różowy</string>
+    <string name="category_color_navajo_white">Beżowy</string>
+    <string name="category_color_slate_gray">Popielaty</string>
+    <string name="category_color_gray">Szary</string>
+    <string name="category_color_steel_blue">Stalowonienieski</string>
     <string name="category_all">WSZYSTKIE</string>
     <string name="category_none">BRAK</string>
 </resources>

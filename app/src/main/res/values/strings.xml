@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:28 PM
+  ~ Last modified 4/9/21 10:46 PM
   -->
 
 <resources>
@@ -103,7 +103,20 @@
     <string name="song_editor_enter_title">Please enter song title</string>
     <string name="song_editor_title_already_used">Song title already in use</string>
 
-    <!-- Other -->
+    <!-- Category -->
+    <string name="category_color_maroon">Maroon</string>
+    <string name="category_color_tomato">Tomato</string>
+    <string name="category_color_golden">Gold</string>
+    <string name="category_color_olive">Olive</string>
+    <string name="category_color_cyan">Cyan</string>
+    <string name="category_color_turquoise">Turquoise</string>
+    <string name="category_color_royal_blue">Royal blue</string>
+    <string name="category_color_violet">Violet</string>
+    <string name="category_color_pink">Pink</string>
+    <string name="category_color_navajo_white">Navajo white</string>
+    <string name="category_color_slate_gray">Slate gray</string>
+    <string name="category_color_gray">Gray</string>
+    <string name="category_color_steel_blue">Steel blue</string>
     <string name="category_all">ALL</string>
     <string name="category_none">NONE</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:15 PM
+  ~ Last modified 4/9/21 10:44 PM
   -->
 
 <resources>
@@ -23,4 +23,17 @@
     <!-- Section titles -->
     <string name="preference_section_app">Application</string>
     <string name="preference_section_chromecast" translatable="false">Chromecast</string>
+
+
+    <!-- Theme entries -->
+    <string name="preference_theme_light">Light</string>
+    <string name="preference_theme_dark">Dark</string>
+    <string name="preference_theme_system">System default</string>
+
+    <!-- Color entries -->
+    <string name="preference_color_black">Black</string>
+    <string name="preference_color_white">White</string>
+    <string name="preference_color_blue">Blue</string>
+    <string name="preference_color_red">Red</string>
+    <string name="preference_color_pink">Pink</string>
 </resources>

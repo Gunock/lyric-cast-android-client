@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:15 PM
+  ~ Last modified 4/9/21 10:46 PM
   -->
 
 <resources>
@@ -12,4 +12,16 @@
 
     <!-- Section titles -->
     <string name="preference_section_app">Aplikacja</string>
+
+    <!-- Theme entries -->
+    <string name="preference_theme_light">Jasny</string>
+    <string name="preference_theme_dark">Ciemny</string>
+    <string name="preference_theme_system">Domyślne ustawienie systemu</string>
+
+    <!-- Color entries -->
+    <string name="preference_color_black">Czarny</string>
+    <string name="preference_color_white">Biały</string>
+    <string name="preference_color_blue">Niebieski</string>
+    <string name="preference_color_red">Czerwony</string>
+    <string name="preference_color_pink">Różowy</string>
 </resources>
