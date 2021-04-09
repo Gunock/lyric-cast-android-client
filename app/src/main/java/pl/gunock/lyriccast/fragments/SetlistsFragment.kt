@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:20 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -217,7 +217,7 @@ class SetlistsFragment : Fragment() {
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
+            FileHelper.zip(activity.contentResolver, uri, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()

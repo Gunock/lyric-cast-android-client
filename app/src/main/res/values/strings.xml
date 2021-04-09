@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/9/21 11:22 AM
   -->
 
 <resources>
@@ -96,5 +96,6 @@
     <string name="song_editor_button_delete_section">Delete section</string>
     <string name="song_editor_enter_title">Please enter song title</string>
     <string name="song_editor_title_already_used">Song title already in use</string>
+    <string name="import_incorrect_file_format">Incorrect file format</string>
 
 </resources>

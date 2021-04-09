@@ -1,73 +1,67 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 12:28 AM
+ * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 12:25 AM
+ * Last modified 4/9/21 11:59 AM
  */
 
 package pl.gunock.lyriccast.common.helpers
 
 import android.content.ContentResolver
-import android.os.Build
+import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
+import net.lingala.zip4j.io.inputstream.ZipInputStream
+import net.lingala.zip4j.io.outputstream.ZipOutputStream
+import net.lingala.zip4j.model.ZipParameters
+import net.lingala.zip4j.model.enums.CompressionLevel
+import net.lingala.zip4j.model.enums.CompressionMethod
 import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
+
 
 object FileHelper {
     private const val TAG = "FileHelper"
 
-    fun unzip(resolver: ContentResolver, inputStream: InputStream, targetLocation: String) {
+    fun unzip(resolver: ContentResolver, sourceUri: Uri, targetLocation: String): Boolean {
         Log.d(TAG, "Unzipping stream to '$targetLocation'")
-        createDirectory(targetLocation)
 
-        val zipIn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ZipInputStream(inputStream, Charsets.ISO_8859_1)
-        } else {
-            ZipInputStream(inputStream)
-        }
+        createDirectory(targetLocation)
+        val inputStream = resolver.openInputStream(sourceUri) ?: return false
+        val zipInputStream = ZipInputStream(inputStream)
 
         while (true) {
-            val zipEntry: ZipEntry = zipIn.nextEntry ?: break
+            val entry = zipInputStream.nextEntry ?: break
+            val filePath = "${targetLocation}/${entry.fileName}"
 
-            Log.d(TAG, "Extracting file: ${zipEntry.name}")
-
-
-            if (zipEntry.isDirectory) {
-                continue
+            if (entry.isDirectory) {
+                createDirectory(filePath)
+            } else {
+                File(filePath).outputStream().use { it.write(zipInputStream.readBytes()) }
+                Log.v(TAG, "Unzipped file at $filePath")
             }
-
-            val file = File("$targetLocation/${zipEntry.name}")
-            val fileUri = file.toUri()
-            Log.d(TAG, "Extracting file to: ${file.canonicalPath}")
-
-            createDirectory(file.parent)
-            resolver.openOutputStream(fileUri)!!.write(zipIn.readBytes())
-            zipIn.closeEntry()
-            Log.d(TAG, "File extracted to: $fileUri")
         }
-        zipIn.close()
+        zipInputStream.close()
+        inputStream.close()
+        return true
     }
 
-    fun zip(outputStream: OutputStream, sourceLocation: String) {
+    fun zip(resolver: ContentResolver, targetUri: Uri, sourceLocation: String) {
         Log.d(TAG, "Zipping files from '$sourceLocation'")
         createDirectory(sourceLocation)
 
         val fileList = File(sourceLocation).listFiles() ?: return
 
-        val zipOut = ZipOutputStream(outputStream)
+        val zipOut = ZipOutputStream(resolver.openOutputStream(targetUri))
+        val parameters = ZipParameters()
+        parameters.compressionMethod = CompressionMethod.DEFLATE
+        parameters.compressionLevel = CompressionLevel.NORMAL
         for (file in fileList) {
             if (file.isDirectory) {
-                zipDirectory(zipOut, file, file.name)
-                continue
+                zipDirectory(zipOut, file, parameters)
+            } else {
+                parameters.fileNameInZip = file.name
+                zipOut.putNextEntry(parameters)
+                zipOut.write(file.readBytes())
+                zipOut.closeEntry()
             }
-
-            zipOut.putNextEntry(ZipEntry(file.name))
-            zipOut.write(file.readBytes())
-            zipOut.closeEntry()
         }
         zipOut.close()
     }
@@ -75,17 +69,19 @@ object FileHelper {
     private fun zipDirectory(
         outputStream: ZipOutputStream,
         directory: File,
-        directoryPath: String
+        parameters: ZipParameters,
+        outputPath: String = directory.path
     ) {
         val fileList = directory.listFiles() ?: return
         for (file in fileList) {
-            val outputFilePath = "$directoryPath/${file.name}"
+            val outputFilePath = "${outputPath}/${file.name}"
             if (file.isDirectory) {
-                zipDirectory(outputStream, file, outputFilePath)
+                zipDirectory(outputStream, file, parameters, outputFilePath)
                 continue
             }
 
-            outputStream.putNextEntry(ZipEntry(outputFilePath))
+            parameters.fileNameInZip = outputFilePath
+            outputStream.putNextEntry(parameters)
             outputStream.write(file.readBytes())
             outputStream.closeEntry()
         }
@@ -98,12 +94,13 @@ object FileHelper {
 
         val file = File(path)
         if (!file.exists()) {
-            Log.d(TAG, "'$path' does not exists")
             if (File(path).mkdirs()) {
                 Log.d(TAG, "'$path' directory creation succeeded")
             } else {
                 Log.d(TAG, "'$path' directory creation failed")
             }
+        } else {
+            Log.d(TAG, "'$path' already exists")
         }
     }
 }

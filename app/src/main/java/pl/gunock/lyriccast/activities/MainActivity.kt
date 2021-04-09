@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/9/21 11:23 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
+            FileHelper.zip(contentResolver, uri, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
             importDir.deleteRecursively()
             importDir.mkdirs()
 
-            FileHelper.unzip(contentResolver, inputStream, importDir.path)
+            FileHelper.unzip(contentResolver, uri, importDir.path)
             @Suppress("BlockingMethodInNonBlockingContext")
             inputStream.close()
 
@@ -267,7 +267,8 @@ class MainActivity : AppCompatActivity() {
                     null
                 }
             } catch (exception: Exception) {
-                dialogFragment.message = "Incorrect file format"
+                Log.e(TAG, exception.stackTraceToString())
+                dialogFragment.message = getString(R.string.import_incorrect_file_format)
                 CoroutineScope(Dispatchers.Main).launch {
                     dialogFragment.setErrorColor(true)
                     dialogFragment.setShowOkButton(true)
@@ -298,7 +299,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun importOpenSong(uri: Uri) {
-        val inputStream = contentResolver.openInputStream(uri) ?: return
         val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
@@ -310,17 +310,16 @@ class MainActivity : AppCompatActivity() {
                 ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
 
             val importedSongs: Set<SongDto> = try {
-                importSongXmlParser.parseZip(contentResolver, inputStream)
+                importSongXmlParser.parseZip(contentResolver, uri)
             } catch (exception: Exception) {
-                dialogFragment.message = "Incorrect file format"
+                Log.e(TAG, exception.stackTraceToString())
+                dialogFragment.message = getString(R.string.import_incorrect_file_format)
                 CoroutineScope(Dispatchers.Main).launch {
                     dialogFragment.setErrorColor(true)
                     dialogFragment.setShowOkButton(true)
                 }
                 return@launch
             }
-            @Suppress("BlockingMethodInNonBlockingContext")
-            inputStream.close()
 
             val colors: IntArray = resources.getIntArray(R.array.category_color_values)
             val importOptions = ImportOptions(

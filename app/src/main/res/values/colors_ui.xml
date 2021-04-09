@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 6:39 PM
+  ~ Last modified 4/9/21 12:08 PM
   -->
 
 <resources>
@@ -27,9 +27,7 @@
     <color name="fab_icon">@color/white</color>
     <color name="fab_background_1">@color/cyan</color>
     <color name="fab_background_2">@color/royal_blue_dark</color>
-    <color name="fab_background_3">@color/royal_blue_dark</color>
 
-    <color name="dialog_background">@color/color_secondary</color>
     <color name="dialog_text">@android:color/primary_text_light</color>
     <color name="dialog_button">@color/cyan</color>
 

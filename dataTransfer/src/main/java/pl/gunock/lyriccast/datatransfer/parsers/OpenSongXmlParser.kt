@@ -1,12 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 10:44 PM
+ * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 10:41 PM
+ * Last modified 4/9/21 11:48 AM
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
 
 import android.content.ContentResolver
+import android.net.Uri
+import android.util.Log
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
 import pl.gunock.lyriccast.common.helpers.FileHelper
@@ -18,16 +20,21 @@ import java.util.*
 
 internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir) {
 
-    override fun parseZip(resolver: ContentResolver, inputStream: InputStream): Set<SongDto> {
+    companion object {
+        const val TAG = "OpenSongXmlParser"
+    }
+
+    override fun parseZip(resolver: ContentResolver, targetUri: Uri): Set<SongDto> {
         mImportDirectory.deleteRecursively()
         mImportDirectory.mkdirs()
-        FileHelper.unzip(resolver, inputStream, mImportDirectory.canonicalPath)
+        FileHelper.unzip(resolver, targetUri, mImportDirectory.canonicalPath)
 
         val fileList1 = mImportDirectory.listFiles() ?: arrayOf()
         val result: MutableSet<SongDto> = mutableSetOf()
         for (file1 in fileList1) {
             if (!file1.isDirectory) {
-                result.add(parse(file1.inputStream()))
+                Log.v(TAG, file1.canonicalPath)
+                file1.inputStream().use { result.add(parse(it)) }
                 continue
             }
 
@@ -37,7 +44,8 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
                 if (file2.isDirectory) {
                     continue
                 }
-                val song = parse(file2.inputStream(), category)
+                Log.v(TAG, "Parsing file at ${file2.canonicalPath}")
+                val song = file2.inputStream().use { parse(it, category) }
                 result.add(song)
             }
         }

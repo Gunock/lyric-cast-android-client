@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 10:13 PM
+  ~ Last modified 4/9/21 12:10 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,7 +11,6 @@
     android:id="@+id/ConstraintLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/window_background_1"
     tools:context=".fragments.SongsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
