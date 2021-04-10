@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 4/10/21 1:22 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 12:04 PM
+ * Last modified 4/10/21 1:16 PM
  */
 
 apply plugin: 'com.android.application'
@@ -74,6 +74,8 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
     implementation "androidx.room:room-ktx:$room_version"
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'

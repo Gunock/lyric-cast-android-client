@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/10/21 12:22 AM
+  ~ Created by Tomasz Kiljanczyk on 4/10/21 1:22 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/10/21 12:21 AM
+  ~ Last modified 4/10/21 1:19 PM
   -->
 
 <resources>
@@ -50,8 +50,8 @@
     </style>
 
     <style name="Theme.LyricCast.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">
-        <item name="android:windowMinWidthMajor">75%</item>
-        <item name="android:windowMinWidthMinor">75%</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
         <item name="android:windowNoTitle">false</item>
 
         <item name="android:textColor">@color/dialog_text</item>
