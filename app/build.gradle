@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:33 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 3:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:16 PM
+ * Last modified 4/11/21 3:07 PM
  */
 
 apply plugin: 'com.android.application'
@@ -11,8 +11,13 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 android {
     signingConfigs {
         release {
+        storeFile file(var)
+            storePassword 'eAdmin.1@2'
+            keyAlias 'LyricCast-release'
+            keyPassword 'eAdmin.1@2'
         }
     }
+
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
 

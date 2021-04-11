@@ -1,8 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 3:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 12:04 PM
+ * Last modified 4/11/21 3:02 PM
  */
+
+ext {
+    var = 'C:\\Users\\aszcz\\OneDrive\\Dokumenty\\AndroidKeystores\\android-release.keystore'
+}
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
