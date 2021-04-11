@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/4/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/4/21 11:25 PM
+ * Last modified 4/11/21 12:55 PM
  */
 
 package pl.gunock.lyriccast.helpers
@@ -28,7 +28,8 @@ object MessageHelper {
         CONTROL_MESSAGE_TEMPLATE = resources.getString(R.string.chromecast_control_message_template)
     }
 
-    fun sendContentMessage(context: CastContext, message: String) {
+    fun sendContentMessage(message: String) {
+        val context: CastContext = CastContext.getSharedInstance()!!
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTENT_MESSAGE_TEMPLATE.format(message)
             .replace("\n", "<br>")
@@ -45,12 +46,13 @@ object MessageHelper {
         castSession.sendMessage(CONTENT_NAMESPACE, messageContent)
     }
 
-    fun sendControlMessage(context: CastContext, action: ControlAction) {
-        sendControlMessage(context, action, null)
+    fun sendControlMessage(action: ControlAction) {
+        sendControlMessage(action, null)
     }
 
 
-    fun sendControlMessage(context: CastContext, action: ControlAction, json: JSONObject) {
+    fun sendControlMessage(action: ControlAction, json: JSONObject) {
+        val context: CastContext = CastContext.getSharedInstance()!!
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), null)
         val messageJson = JSONObject(messageContent).apply {
@@ -68,7 +70,8 @@ object MessageHelper {
         castSession.sendMessage(CONTROL_NAMESPACE, messageJson.toString())
     }
 
-    private fun sendControlMessage(context: CastContext, action: ControlAction, value: String?) {
+    private fun sendControlMessage(action: ControlAction, value: String?) {
+        val context: CastContext = CastContext.getSharedInstance()!!
         val castSession = context.sessionManager.currentCastSession
         val messageContent = CONTROL_MESSAGE_TEMPLATE.format(action.toString(), value)
 

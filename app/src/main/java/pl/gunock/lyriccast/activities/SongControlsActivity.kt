@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/10/21 11:05 PM
+ * Last modified 4/11/21 2:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,8 +16,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
-import androidx.fragment.app.Fragment
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.gms.cast.framework.SessionManager
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.enums.ControlAction
@@ -25,18 +25,10 @@ import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.models.LyricCastSettings
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
+
 class SongControlsActivity : AppCompatActivity() {
 
-    private lateinit var mSongTitleView: TextView
-    private lateinit var mSlideNumberView: TextView
-    private lateinit var mSlidePreviewView: TextView
-
-    private lateinit var mCastContext: CastContext
-    private lateinit var mSessionCreatedListener: SessionCreatedListener
-
+    private var mSessionCreatedListener: SessionCreatedListener? = null
     private var mCurrentSlide = 0
     private lateinit var mLyrics: Array<String>
 
@@ -48,24 +40,26 @@ class SongControlsActivity : AppCompatActivity() {
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mSongTitleView = findViewById(R.id.tv_controls_song_title)
-        mSlideNumberView = findViewById(R.id.tv_song_slide_number)
-        mSlidePreviewView = findViewById(R.id.tv_slide_preview)
+        findViewById<TextView>(R.id.tv_controls_song_title).text =
+            intent.getStringExtra("songTitle")
 
         mLyrics = intent.getStringArrayExtra("lyrics")!!
 
-        mCastContext = CastContext.getSharedInstance()!!
+        setupListeners()
+
         mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        mCastContext.sessionManager.addSessionManagerListener(mSessionCreatedListener)
 
-        mSongTitleView.text = intent.getStringExtra("songTitle")
+        val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
+        sessionsManager.addSessionManagerListener(mSessionCreatedListener)
 
-        setupListeners()
-
-        sendSlide()
+        if (sessionsManager.currentSession?.isConnected == true) {
+            sendConfigure()
+            sendSlide()
+        }
+        setPreview()
     }
 
     override fun onResume() {
@@ -75,8 +69,9 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        CastContext.getSharedInstance()!!.sessionManager
+            .removeSessionManagerListener(mSessionCreatedListener)
         super.onDestroy()
-        mCastContext.sessionManager.removeSessionManagerListener(mSessionCreatedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -85,7 +80,7 @@ class SongControlsActivity : AppCompatActivity() {
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
 
-        castActionProvider.routeSelector = mCastContext.mergedSelector
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
 
         return true
     }
@@ -107,6 +102,8 @@ class SongControlsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             mCurrentSlide--
+
+            setPreview()
             sendSlide()
         }
 
@@ -115,33 +112,35 @@ class SongControlsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             mCurrentSlide++
+
+            setPreview()
             sendSlide()
         }
     }
 
     private fun sendBlank() {
-        MessageHelper.sendControlMessage(mCastContext, ControlAction.BLANK)
+        MessageHelper.sendControlMessage(ControlAction.BLANK)
     }
 
     private fun sendConfigure() {
         val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
-            mCastContext,
             ControlAction.CONFIGURE,
             configurationJson
         )
     }
 
     @SuppressLint("SetTextI18n")
-    private fun sendSlide() {
-        mSlideNumberView.text = "${mCurrentSlide + 1}/${mLyrics.size}"
-        mSlidePreviewView.text = mLyrics[mCurrentSlide]
+    private fun setPreview() {
+        findViewById<TextView>(R.id.tv_song_slide_number).text =
+            "${mCurrentSlide + 1}/${mLyrics.size}"
 
-        MessageHelper.sendContentMessage(
-            mCastContext,
-            mLyrics[mCurrentSlide]
-        )
+        findViewById<TextView>(R.id.tv_slide_preview).text = mLyrics[mCurrentSlide]
+    }
+
+    private fun sendSlide() {
+        MessageHelper.sendContentMessage(mLyrics[mCurrentSlide])
     }
 
     private fun goToSettings(): Boolean {

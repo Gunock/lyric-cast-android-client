@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:09 AM
+ * Last modified 4/11/21 1:58 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -28,6 +28,7 @@ import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.Song
+import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
@@ -41,10 +42,6 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private lateinit var mRepository: LyricCastRepository
 
-    private lateinit var mSlidePreviewView: TextView
-    private lateinit var mSongTitleView: TextView
-
-    private lateinit var mCastContext: CastContext
     private var mSessionCreatedListener: SessionCreatedListener? = null
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
 
@@ -61,16 +58,65 @@ class SetlistControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         mRepository = (application as LyricCastApplication).repository
-        mCastContext = CastContext.getSharedInstance()!!
+
         mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        mCastContext.sessionManager!!.addSessionManagerListener(mSessionCreatedListener)
 
-        mSlidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
-        mSongTitleView = findViewById(R.id.tv_current_song_title)
+        CastContext.getSharedInstance()!!.sessionManager.addSessionManagerListener(
+            mSessionCreatedListener
+        )
 
+        val setlistWithSongs = setupLyrics()
+
+        val songsAndCategories =
+            runBlocking { mRepository.getSongsAndCategories(setlistWithSongs.songs) }
+                .map { it.song.id to it }
+                .toMap()
+
+        val setlistPresentation = setlistWithSongs.setlistSongCrossRefs
+            .sorted()
+            .map { it.songId }
+
+        setupRecyclerView(setlistPresentation.map { songsAndCategories[it]!! })
+
+        setupListeners()
+        setPreview()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        sendConfigure()
+        sendSlide()
+    }
+
+    override fun onDestroy() {
+        CastContext.getSharedInstance()!!.sessionManager.removeSessionManagerListener(
+            mSessionCreatedListener
+        )
+        super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_controls, menu)
+
+        val castActionProvider =
+            MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_settings -> goToSettings()
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setupLyrics(): SetlistWithSongs {
         val setlist: Setlist = intent.getParcelableExtra("setlist")!!
         val setlistWithSongs = runBlocking { mRepository.getSetlistWithSongs(setlist.id)!! }
         val songs = setlistWithSongs.songs
@@ -103,42 +149,7 @@ class SetlistControlsActivity : AppCompatActivity() {
                 return@flatMapIndexed lyrics
             }
 
-
-        val songsAndCategories = runBlocking { mRepository.getSongsAndCategories(songs) }
-            .map { it.song.id to it }
-            .toMap()
-
-        val setlistPresentation = setlistWithSongs.setlistSongCrossRefs
-            .sorted()
-            .map { it.songId }
-
-        setupRecyclerView(setlistPresentation.map { songsAndCategories[it]!! })
-
-        setupListeners()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        sendConfigure()
-        sendSlide()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_controls, menu)
-
-        val castActionProvider =
-            MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        castActionProvider.routeSelector = mCastContext.mergedSelector
-
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_settings -> goToSettings()
-            else -> super.onOptionsItemSelected(item)
-        }
+        return setlistWithSongs
     }
 
     private fun setupRecyclerView(songs: List<SongAndCategory>) {
@@ -172,7 +183,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
-            MessageHelper.sendControlMessage(mCastContext, ControlAction.BLANK)
+            MessageHelper.sendControlMessage(ControlAction.BLANK)
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
@@ -180,6 +191,8 @@ class SetlistControlsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             mCurrentLyricsPosition--
+
+            setPreview()
             sendSlide()
         }
 
@@ -203,6 +216,7 @@ class SetlistControlsActivity : AppCompatActivity() {
                 mCurrentLyricsPosition = previousSongStartIndex
             }
 
+            setPreview()
             sendSlide()
         }
 
@@ -211,6 +225,8 @@ class SetlistControlsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             mCurrentLyricsPosition++
+
+            setPreview()
             sendSlide()
         }
 
@@ -224,6 +240,8 @@ class SetlistControlsActivity : AppCompatActivity() {
             }?.key ?: return@setOnClickListener
 
             mCurrentLyricsPosition = nextSongIndex
+
+            setPreview()
             sendSlide()
         }
     }
@@ -242,16 +260,21 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendSlide() {
+    private fun setPreview() {
         if (mSongTitles.containsKey(mCurrentLyricsPosition)) {
             val songTitle = mSongTitles[mCurrentLyricsPosition]!!
-            mSongTitleView.text = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
+            findViewById<TextView>(R.id.tv_current_song_title).text =
+                songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
+
             highlightSong(songTitle)
         }
 
-        mSlidePreviewView.text = mSetlistLyrics[mCurrentLyricsPosition]
+        findViewById<TextView>(R.id.tv_setlist_slide_preview).text =
+            mSetlistLyrics[mCurrentLyricsPosition]
+    }
+
+    private fun sendSlide() {
         MessageHelper.sendContentMessage(
-            mCastContext,
             mSetlistLyrics[mCurrentLyricsPosition]
         )
     }
@@ -260,6 +283,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         val title = mSongItemsAdapter.songItems[position].song.title
         val indexedTitle = "[$position] $title"
         mCurrentLyricsPosition = mSongStartPoints[indexedTitle]!!
+
+        setPreview()
         sendSlide()
         return true
     }
@@ -269,7 +294,6 @@ class SetlistControlsActivity : AppCompatActivity() {
         val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
-            mCastContext,
             ControlAction.CONFIGURE,
             configurationJson
         )

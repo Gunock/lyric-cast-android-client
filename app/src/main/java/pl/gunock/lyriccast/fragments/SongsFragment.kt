@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:00 AM
+ * Last modified 4/11/21 2:14 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -116,7 +116,9 @@ class SongsFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         mCategoryAll = Category(Long.MIN_VALUE, requireContext().getString(R.string.category_all))
+
         mRepository = (requireActivity().application as LyricCastApplication).repository
+        mDatabaseViewModel.removeObservers(requireActivity())
     }
 
     override fun onCreateView(
@@ -201,8 +203,10 @@ class SongsFragment : Fragment() {
         mCategorySpinner!!.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
-            (mCategorySpinner!!.adapter as CategorySpinnerAdapter).submitCollection(categories)
-            mCategorySpinner!!.setSelection(0)
+            if (mCategorySpinner != null) {
+                (mCategorySpinner!!.adapter as CategorySpinnerAdapter).submitCollection(categories)
+                mCategorySpinner!!.setSelection(0)
+            }
         }
     }
 

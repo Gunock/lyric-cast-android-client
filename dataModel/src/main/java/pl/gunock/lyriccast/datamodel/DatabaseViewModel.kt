@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:04 AM
+ * Last modified 4/11/21 2:14 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -30,6 +30,12 @@ class DatabaseViewModel(
     val allCategories: LiveData<List<Category>> = mRepository.allCategories.asLiveData()
 
     private val mDataTransferProcessor = DataTransferProcessor(resources, mRepository)
+
+    fun removeObservers(lifecycleOwner: LifecycleOwner) {
+        allSongs.removeObservers(lifecycleOwner)
+        allSetlists.removeObservers(lifecycleOwner)
+        allCategories.removeObservers(lifecycleOwner)
+    }
 
     suspend fun upsertSong(song: SongWithLyricsSections, order: List<Pair<String, Int>>) =
         mRepository.upsertSong(song, order)

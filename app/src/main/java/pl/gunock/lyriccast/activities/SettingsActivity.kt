@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/10/21 12:13 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/10/21 12:12 AM
+ * Last modified 4/11/21 2:08 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -23,7 +23,7 @@ import pl.gunock.lyriccast.models.LyricCastSettings
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
+    private var mPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == "appTheme") {
                 val settings = LyricCastSettings(baseContext)
@@ -47,7 +47,12 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+            .registerOnSharedPreferenceChangeListener(mPreferenceChangeListener)
+    }
+
+    override fun onDestroy() {
+        mPreferenceChangeListener = null
+        super.onDestroy()
     }
 
 

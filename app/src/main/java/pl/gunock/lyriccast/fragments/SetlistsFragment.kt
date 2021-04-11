@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:55 AM
+ * Last modified 4/11/21 2:02 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -101,6 +101,7 @@ class SetlistsFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         mRepository = (requireActivity().application as LyricCastApplication).repository
+        mDatabaseViewModel.removeObservers(requireActivity())
     }
 
     override fun onCreateView(

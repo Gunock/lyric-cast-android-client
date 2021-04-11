@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:04 AM
+ * Last modified 4/11/21 2:14 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -135,10 +135,6 @@ class MainActivity : AppCompatActivity() {
                 tab ?: return@ItemSelectedTabListener
 
                 fabAdd.clearFocus()
-
-                mDatabaseViewModel.allSongs.removeObservers(this)
-                mDatabaseViewModel.allCategories.removeObservers(this)
-                mDatabaseViewModel.allSetlists.removeObservers(this)
 
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
