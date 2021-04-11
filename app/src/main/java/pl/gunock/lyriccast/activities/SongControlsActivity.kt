@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:53 PM
+ * Last modified 4/11/21 9:12 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -21,9 +21,7 @@ import com.google.android.gms.cast.framework.SessionManager
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
-import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
-import pl.gunock.lyriccast.models.LyricCastSettings
 
 
 class SongControlsActivity : AppCompatActivity() {
@@ -134,12 +132,7 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun sendConfigure() {
-        val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
-
-        MessageHelper.sendControlMessage(
-            ControlAction.CONFIGURE,
-            configurationJson
-        )
+        MessageHelper.sendConfiguration(baseContext)
     }
 
     @SuppressLint("SetTextI18n")

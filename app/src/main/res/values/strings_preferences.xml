@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:50 PM
+  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:44 PM
+  ~ Last modified 4/11/21 9:12 PM
   -->
 
 <resources>
@@ -9,6 +9,7 @@
     <string name="preference_theme_key" translatable="false">appTheme</string>
     <string name="preference_cast_background_key" translatable="false">backgroundColor</string>
     <string name="preference_cast_font_color_key" translatable="false">fontColor</string>
+    <string name="preference_cast_max_font_size_key" translatable="false">fontMaxSize</string>
 
     <!-- Default values -->
     <string name="preference_theme_default_value" translatable="false">-1</string>
@@ -19,6 +20,7 @@
     <string name="preference_theme_title">Theme</string>
     <string name="preference_cast_background_title">Background color</string>
     <string name="preference_cast_font_color_title">Font color</string>
+    <string name="preference_cast_max_font_size_title">Maximum font size</string>
 
     <!-- Section titles -->
     <string name="preference_section_app">Application</string>

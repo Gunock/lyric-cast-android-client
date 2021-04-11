@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/11/21 8:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/11/21 8:48 PM
+  ~ Last modified 4/11/21 9:12 PM
   -->
 
 <resources>
@@ -11,7 +11,6 @@
     <string name="chromecast_app_id" translatable="false">67E9729E</string>
     <string name="chromecast_content_namespace" translatable="false">urn:x-cast:lyric.cast.content</string>
     <string name="chromecast_control_namespace" translatable="false">urn:x-cast:lyric.cast.control</string>
-    <string name="chromecast_control_message_template" translatable="false">{\"action\":\"%1$s\",\"value\":\"%2$s\"}</string>
 
     <!-- Placeholders -->
     <string name="placeholder_text" translatable="false">Text</string>

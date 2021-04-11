@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 8:49 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 8:15 PM
+ * Last modified 4/11/21 10:00 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -31,11 +31,9 @@ import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
-import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
-import pl.gunock.lyriccast.models.LyricCastSettings
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
@@ -306,12 +304,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun sendConfigure() {
-        val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
-
-        MessageHelper.sendControlMessage(
-            ControlAction.CONFIGURE,
-            configurationJson
-        )
+        MessageHelper.sendConfiguration(baseContext)
     }
 
     private fun goToSettings(): Boolean {

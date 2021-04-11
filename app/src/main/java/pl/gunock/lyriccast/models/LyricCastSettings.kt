@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:36 PM
+ * Last modified 4/11/21 9:23 PM
  */
 
 package pl.gunock.lyriccast.models
@@ -22,24 +22,26 @@ class LyricCastSettings(context: Context) {
 
     private val mCastBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
     private val mCastFontColorKey = context.getString(R.string.preference_cast_font_color_key)
+    private val mCastMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
+
     private val mAppThemeKey = context.getString(R.string.preference_theme_key)
 
-    val castBackgroundColor by lazy {
+    private val mCastBackgroundColor by lazy {
         mPreferences.getString(mCastBackgroundColorKey, mCastBackgroundColorDefault)
     }
-    val castFontColor by lazy {
-        mPreferences.getString(
-            mCastFontColorKey,
-            mCastFontColorKeyDefault
-        )
+    private val mCastFontColor by lazy {
+        mPreferences.getString(mCastFontColorKey, mCastFontColorKeyDefault)
+    }
+    private val mCastMaxFontSize by lazy {
+        mPreferences.getInt(mCastMaxFontSizeKey, 100)
     }
     val appTheme by lazy { mPreferences.getString(mAppThemeKey, mAppThemeKeyDefault)!!.toInt() }
 
-
     fun getCastConfigurationJson(): JSONObject {
         return JSONObject().apply {
-            put("backgroundColor", castBackgroundColor)
-            put("fontColor", castFontColor)
+            put("backgroundColor", mCastBackgroundColor)
+            put("fontColor", mCastFontColor)
+            put("maxFontSize", mCastMaxFontSize)
         }
     }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 10:14 PM
+  ~ Last modified 4/11/21 10:00 PM
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,13 +29,22 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:id="@+id/pref_fontColor"
+            android:id="@+id/pref_font_color"
             app:defaultValue="@string/preference_cast_font_color_default_value"
             app:key="@string/preference_cast_font_color_key"
             app:title="@string/preference_cast_font_color_title"
             app:entries="@array/color_entries"
             app:entryValues="@array/color_values"
             app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            android:id="@+id/pref_max_font_size"
+            android:max="100"
+            app:defaultValue="90"
+            app:key="@string/preference_cast_max_font_size_key"
+            app:min="30"
+            app:showSeekBarValue="true"
+            app:title="@string/preference_cast_max_font_size_title" />
 
     </PreferenceCategory>
 

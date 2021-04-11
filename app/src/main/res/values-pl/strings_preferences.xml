@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/10/21 12:13 AM
+  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/10/21 12:13 AM
+  ~ Last modified 4/11/21 9:12 PM
   -->
 
 <resources>
@@ -9,6 +9,7 @@
     <string name="preference_theme_title">Motyw</string>
     <string name="preference_cast_background_title">Kolor tła</string>
     <string name="preference_cast_font_color_title">Kolor czcionki</string>
+    <string name="preference_cast_max_font_size_title">Maksymalny rozmiar czcionki</string>
 
     <!-- Section titles -->
     <string name="preference_section_app">Aplikacja</string>
