@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 8:49 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:53 PM
+ * Last modified 4/11/21 8:15 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -289,12 +289,6 @@ class SetlistControlsActivity : AppCompatActivity() {
             mSetlistLyrics[mCurrentLyricsPosition]
     }
 
-    private fun sendSlide() {
-        MessageHelper.sendContentMessage(
-            mSetlistLyrics[mCurrentLyricsPosition]
-        )
-    }
-
     private fun selectSong(position: Int): Boolean {
         val title = mSongItemsAdapter.songItems[position].song.title
         val indexedTitle = "[$position] $title"
@@ -305,8 +299,13 @@ class SetlistControlsActivity : AppCompatActivity() {
         return true
     }
 
-    private fun sendConfigure() {
+    private fun sendSlide() {
+        MessageHelper.sendContentMessage(
+            mSetlistLyrics[mCurrentLyricsPosition]
+        )
+    }
 
+    private fun sendConfigure() {
         val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 8:49 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:10 PM
+ * Last modified 4/11/21 8:48 PM
  */
 
 package pl.gunock.lyriccast.helpers
@@ -21,23 +21,25 @@ object MessageHelper {
 
     private var CONTENT_NAMESPACE: String = ""
     private var CONTROL_NAMESPACE: String = ""
-    private var CONTENT_MESSAGE_TEMPLATE: String = ""
     private var CONTROL_MESSAGE_TEMPLATE: String = ""
 
 
     fun initialize(resources: Resources) {
         CONTENT_NAMESPACE = resources.getString(R.string.chromecast_content_namespace)
         CONTROL_NAMESPACE = resources.getString(R.string.chromecast_control_namespace)
-        CONTENT_MESSAGE_TEMPLATE = resources.getString(R.string.chromecast_content_message_template)
         CONTROL_MESSAGE_TEMPLATE = resources.getString(R.string.chromecast_control_message_template)
     }
 
     fun sendContentMessage(message: String) {
         val context: CastContext = CastContext.getSharedInstance()!!
         val castSession = context.sessionManager.currentCastSession
-        val messageContent = CONTENT_MESSAGE_TEMPLATE.format(message)
-            .replace("\n", "<br>")
+
+        val formattedMessage = message.replace("\n", "<br>")
             .replace("\r", "")
+
+        val contentJson = JSONObject().put("text", formattedMessage)
+        val messageContent = contentJson.toString()
+
 
         Log.d(TAG, "Sending content message")
         Log.d(TAG, "Namespace: $CONTENT_NAMESPACE")
@@ -54,11 +56,6 @@ object MessageHelper {
         isBlanked = blanked
         sendControlMessage(ControlAction.BLANK, blanked)
     }
-
-    fun sendControlMessage(action: ControlAction) {
-        sendControlMessage(action, null)
-    }
-
 
     fun sendControlMessage(action: ControlAction, json: JSONObject) {
         val context: CastContext = CastContext.getSharedInstance()!!
