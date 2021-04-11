@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 4:51 PM
+ * Last modified 4/11/21 1:55 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
@@ -26,7 +27,7 @@ import java.util.*
 import kotlin.system.measureTimeMillis
 
 class SetlistItemsAdapter(
-    private val mContext: Context,
+    context: Context,
     var showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     val selectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
@@ -36,14 +37,20 @@ class SetlistItemsAdapter(
     }
 
     private val mLock = Any()
+    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
+
     private var mItems: SortedSet<SetlistItem> = sortedSetOf()
     private var mVisibleItems: Set<SetlistItem> = setOf()
-    val mSetlistItems: List<SetlistItem> get() = mItems.toList()
+    val setlistItems: List<SetlistItem> get() = mItems.toList()
 
     init {
         setHasStableIds(true)
     }
 
+    fun removeObservers() {
+        showCheckBox.removeObservers(mLifecycleOwner)
+        mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
+    }
 
     fun submitCollection(setlistWithSongs: Collection<Setlist>) {
         synchronized(mLock) {
@@ -96,8 +103,8 @@ class SetlistItemsAdapter(
             val item = mVisibleItems.toList()[position]
             selectionTracker?.attach(this)
 
-            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
-            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            item.isSelected.observe(mLifecycleOwner) {
                 mCheckBox.isChecked = it
             }
 

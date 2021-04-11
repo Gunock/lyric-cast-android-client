@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:20 AM
+ * Last modified 4/11/21 1:55 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,15 +50,12 @@ class SetlistsFragment : Fragment() {
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
-            requireContext(),
+            requireContext().resources,
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
-    private lateinit var mSearchViewEditText: EditText
-    private lateinit var mSetlistRecyclerView: RecyclerView
-
-    private lateinit var mSetlistItemsAdapter: SetlistItemsAdapter
+    private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
     private var mActionMenu: Menu? = null
@@ -117,16 +113,15 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_setlists)
-        mSearchViewEditText = searchView.editText!!
-
-        mSetlistRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_setlists).apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-        }
-
-        setupSetlists()
+        setupRecyclerView()
         setupListeners()
+    }
+
+    override fun onDestroyView() {
+        mSetlistItemsAdapter!!.removeObservers()
+        mSetlistItemsAdapter = null
+
+        super.onDestroyView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -146,7 +141,7 @@ class SetlistsFragment : Fragment() {
         super.onResume()
 
         resetSelection()
-        mSearchViewEditText.setText("")
+        requireView().findViewById<EditText>(R.id.tin_setlist_filter).setText("")
     }
 
     override fun onStop() {
@@ -179,7 +174,7 @@ class SetlistsFragment : Fragment() {
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val selectedSongs = mSetlistItemsAdapter.mSetlistItems
+            val selectedSongs = mSetlistItemsAdapter!!.setlistItems
                 .filter { it.isSelected.value!! }
 
             val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
@@ -229,18 +224,21 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun setupSetlists() {
-        val setlistRecyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
-        mSelectionTracker = SelectionTracker(setlistRecyclerView, this::onSetlistClick)
+    private fun setupRecyclerView() {
+        val recyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        mSelectionTracker = SelectionTracker(this::onSetlistClick)
         mSetlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
             selectionTracker = mSelectionTracker
         )
 
-        setlistRecyclerView.adapter = mSetlistItemsAdapter
+        recyclerView.adapter = mSetlistItemsAdapter
 
         mDatabaseViewModel.allSetlists.observe(requireActivity()) { setlist ->
-            mSetlistItemsAdapter.submitCollection(setlist ?: return@observe)
+            mSetlistItemsAdapter?.submitCollection(setlist ?: return@observe)
         }
     }
 
@@ -250,7 +248,7 @@ class SetlistsFragment : Fragment() {
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = mSetlistItemsAdapter.mSetlistItems[position]
+        val item = mSetlistItemsAdapter!!.setlistItems[position]
         if (!isLongClick && mSelectionTracker.count == 0) {
             pickSetlist(item)
         } else {
@@ -260,12 +258,14 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        mSearchViewEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            mSetlistItemsAdapter.filterItems(newText)
+        val filterEditText: EditText = requireView().findViewById(R.id.tin_setlist_filter)
+
+        filterEditText.addTextChangedListener(InputTextChangedListener { newText ->
+            mSetlistItemsAdapter!!.filterItems(newText)
             resetSelection()
         })
 
-        mSearchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+        filterEditText.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
@@ -286,8 +286,8 @@ class SetlistsFragment : Fragment() {
                 return false
             }
             1 -> {
-                if (!mSetlistItemsAdapter.showCheckBox.value!!) {
-                    mSetlistItemsAdapter.showCheckBox.value = true
+                if (!mSetlistItemsAdapter!!.showCheckBox.value!!) {
+                    mSetlistItemsAdapter!!.showCheckBox.value = true
                 }
 
                 if (mActionMode == null) {
@@ -305,7 +305,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedItem = mSetlistItemsAdapter.mSetlistItems
+        val selectedItem = mSetlistItemsAdapter!!.setlistItems
             .first { setlistItem -> setlistItem.isSelected.value!! }
 
         val setlistWithSongs =
@@ -321,7 +321,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun deleteSelectedSetlists(): Boolean {
-        val selectedSetlists = mSetlistItemsAdapter.mSetlistItems
+        val selectedSetlists = mSetlistItemsAdapter!!.setlistItems
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.setlist.id }
 
@@ -342,11 +342,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        if (mSetlistItemsAdapter.showCheckBox.value!!) {
-            mSetlistItemsAdapter.showCheckBox.value = false
+        if (mSetlistItemsAdapter!!.showCheckBox.value!!) {
+            mSetlistItemsAdapter!!.showCheckBox.value = false
         }
 
-        mSetlistItemsAdapter.resetSelection()
+        mSetlistItemsAdapter!!.resetSelection()
     }
 
 }

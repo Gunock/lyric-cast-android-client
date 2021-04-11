@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:03 PM
+ * Last modified 4/11/21 2:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
@@ -23,7 +24,7 @@ import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
 
 class SetlistSongItemsAdapter(
-    private val mContext: Context,
+    context: Context,
     private val mSongItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     private val mSelectionTracker: SelectionTracker<ViewHolder>?,
@@ -32,12 +33,18 @@ class SetlistSongItemsAdapter(
 
     val songItems: List<SongItem> get() = mSongItems
 
+    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
     private var availableId: Long = 0L
 
     init {
         mSongItems.forEach { it.id = availableId++ }
 
         setHasStableIds(true)
+    }
+
+    fun removeObservers() {
+        showCheckBox.removeObservers(mLifecycleOwner)
+        songItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
     fun resetSelection() {
@@ -105,13 +112,13 @@ class SetlistSongItemsAdapter(
             mSelectionTracker?.attach(this)
             setupListeners()
 
-            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+            item.isSelected.observe(mLifecycleOwner) {
                 mCheckBox.isChecked = it
             }
 
             showCheckBox
-                .observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mHandleView, true))
-            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
+                .observe(mLifecycleOwner, VisibilityObserver(mHandleView, true))
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
 
             mTitleTextView.text = item.song.title
         }

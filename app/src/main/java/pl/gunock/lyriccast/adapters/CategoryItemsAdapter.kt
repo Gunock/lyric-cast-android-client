@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:08 PM
+ * Last modified 4/11/21 12:08 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
@@ -24,12 +25,14 @@ import pl.gunock.lyriccast.models.CategoryItem
 import java.util.*
 
 class CategoryItemsAdapter(
-    val context: Context,
+    context: Context,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val selectionTracker: SelectionTracker<ViewHolder>?
+    private val mSelectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
     private val mLock = Any()
+    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
+
     private var mItems: SortedSet<CategoryItem> = sortedSetOf()
     val categoryItems: List<CategoryItem> get() = mItems.toList()
 
@@ -47,7 +50,7 @@ class CategoryItemsAdapter(
 
     fun resetSelection() {
         mItems.forEach { it.isSelected.value = false }
-        selectionTracker?.reset()
+        mSelectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -74,14 +77,11 @@ class CategoryItemsAdapter(
 
         fun bind(position: Int) {
             val item: CategoryItem = categoryItems[position]
-            selectionTracker?.attach(this)
+            mSelectionTracker?.attach(this)
 
-            showCheckBox.observe(
-                context.getLifecycleOwner()!!,
-                VisibilityObserver(mColorCardView, true)
-            )
-            showCheckBox.observe(context.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
-            item.isSelected.observe(context.getLifecycleOwner()!!) {
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mColorCardView, true))
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            item.isSelected.observe(mLifecycleOwner) {
                 mCheckBox.isChecked = it
             }
 

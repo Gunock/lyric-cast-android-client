@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:08 PM
+ * Last modified 4/11/21 12:09 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
@@ -23,20 +24,22 @@ import pl.gunock.lyriccast.models.SongItem
 
 
 class ControlsSongItemsAdapter(
-    private val mContext: Context,
+    context: Context,
     val songItems: List<SongItem>,
-    val onItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
-    val onItemClickListener: ClickAdapterItemListener<ViewHolder>? = null
+    private val mOnItemLongClickListener: LongClickAdapterItemListener<ViewHolder>? = null,
+    private val mOnItemClickListener: ClickAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<ControlsSongItemsAdapter.ViewHolder>() {
 
     private companion object {
         const val ANIMATION_DURATION: Long = 400L
     }
 
-    private val mCardHighlightColor = mContext.getColor(R.color.accent)
-    private val mDefaultItemCardColor = mContext.getColor(R.color.window_background_1)
-    private val mTextDefaultColor = mContext.getColor(R.color.text)
-    private val mTextHighlightColor = mContext.getColor(R.color.button_text_2)
+    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
+
+    private val mCardHighlightColor = context.getColor(R.color.accent)
+    private val mDefaultItemCardColor = context.getColor(R.color.window_background_1)
+    private val mTextDefaultColor = context.getColor(R.color.text)
+    private val mTextHighlightColor = context.getColor(R.color.button_text_2)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -72,17 +75,17 @@ class ControlsSongItemsAdapter(
 
         private fun setupListeners() {
             songItems[absoluteAdapterPosition].highlight
-                .observe(mContext.getLifecycleOwner()!!, this::observeHighlight)
+                .observe(mLifecycleOwner, this::observeHighlight)
 
-            if (onItemLongClickListener != null) {
+            if (mOnItemLongClickListener != null) {
                 mItemCardView.setOnLongClickListener { view ->
-                    onItemLongClickListener.execute(this, absoluteAdapterPosition, view)
+                    mOnItemLongClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
 
-            if (onItemClickListener != null) {
+            if (mOnItemClickListener != null) {
                 mItemCardView.setOnClickListener { view ->
-                    onItemClickListener.execute(this, absoluteAdapterPosition, view)
+                    mOnItemClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
         }

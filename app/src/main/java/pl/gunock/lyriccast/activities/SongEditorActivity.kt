@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:08 PM
+ * Last modified 4/11/21 12:06 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -43,7 +43,10 @@ class SongEditorActivity : AppCompatActivity() {
     private var mIntentSong: Song? = null
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+        DatabaseViewModelFactory(
+            baseContext.resources,
+            (application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var mSectionNameInput: EditText

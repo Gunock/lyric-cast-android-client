@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 10:25 PM
+ * Last modified 4/11/21 2:00 AM
  */
 
 package pl.gunock.lyriccast.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -22,8 +23,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.cast.framework.CastContext
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,20 +59,16 @@ class SongsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 3
     }
 
-    private var mCastContext: CastContext? = null
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
-            requireContext(),
+            requireContext().resources,
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
-    private lateinit var mSearchViewEditText: EditText
-    private lateinit var mCategorySpinner: Spinner
-    private lateinit var mSongItemsRecyclerView: RecyclerView
-
-    private lateinit var mSongItemsAdapter: SongItemsAdapter
+    private var mCategorySpinner: Spinner? = null
+    private var mSongItemsAdapter: SongItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
 
     private var mActionMenu: Menu? = null
@@ -134,29 +129,27 @@ class SongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mCastContext = CastContext.getSharedInstance()
-
-        val searchView: TextInputLayout = view.findViewById(R.id.tv_filter_songs)
-        mSearchViewEditText = searchView.editText!!
-
-        mCategorySpinner = view.findViewById(R.id.spn_category)
-        mSongItemsRecyclerView = view.findViewById(R.id.rcv_songs)
-
         view.findViewById<SwitchCompat>(R.id.swt_selected_songs).visibility = View.GONE
 
-        mSongItemsRecyclerView.setHasFixedSize(true)
-        mSongItemsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        mCategorySpinner = view.findViewById(R.id.spn_category)
 
         setupCategorySpinner()
-        setupSongs()
+        setupRecyclerView()
         setupListeners()
+    }
+
+    override fun onDestroyView() {
+        mSongItemsAdapter!!.removeObservers()
+        mSongItemsAdapter = null
+        mCategorySpinner = null
+        super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
 
         resetSelection()
-        mSearchViewEditText.setText("")
+        requireView().findViewById<EditText>(R.id.tin_song_filter).setText("")
     }
 
     override fun onStop() {
@@ -178,48 +171,57 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        mSearchViewEditText.addTextChangedListener(InputTextChangedListener {
+        val filterEditText: EditText = requireView().findViewById(R.id.tin_song_filter)
+        filterEditText.addTextChangedListener(InputTextChangedListener {
             filterSongs(
-                mSearchViewEditText.editableText.toString(),
-                getSelectedCategoryId()
+                filterEditText.editableText.toString(),
+                getSelectedCategoryId(mCategorySpinner!!)
             )
         })
 
-        mSearchViewEditText.setOnFocusChangeListener { view, hasFocus ->
+        filterEditText.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
         }
 
-        mCategorySpinner.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            filterSongs(
-                mSearchViewEditText.editableText.toString(),
-                getSelectedCategoryId()
-            )
-        }
+        mCategorySpinner!!.onItemSelectedListener =
+            ItemSelectedSpinnerListener { _, _ ->
+                filterSongs(
+                    filterEditText.editableText.toString(),
+                    getSelectedCategoryId(mCategorySpinner!!)
+                )
+            }
     }
 
+    @SuppressLint("CutPasteId")
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
-        mCategorySpinner.adapter = categorySpinnerAdapter
+
+        mCategorySpinner!!.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
-            categorySpinnerAdapter.submitCollection(categories)
-            mCategorySpinner.setSelection(0)
+            (mCategorySpinner!!.adapter as CategorySpinnerAdapter).submitCollection(categories)
+            mCategorySpinner!!.setSelection(0)
         }
     }
 
-    private fun setupSongs() {
-        mSelectionTracker = SelectionTracker(mSongItemsRecyclerView, this::onSongClick)
+    private fun setupRecyclerView() {
+
+        mSelectionTracker = SelectionTracker(this::onSongClick)
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
             mSelectionTracker = mSelectionTracker
         )
-        mSongItemsRecyclerView.adapter = mSongItemsAdapter
 
-        mDatabaseViewModel.allSongs.observe(requireActivity(), { songs ->
-            mSongItemsAdapter.submitCollection(songs ?: return@observe)
-        })
+        val recyclerView: RecyclerView = requireView().findViewById(R.id.rcv_songs)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = mSongItemsAdapter
+
+        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
+            mSongItemsAdapter?.submitCollection(songs ?: return@observe)
+        }
     }
 
     private fun onSongClick(
@@ -228,7 +230,7 @@ class SongsFragment : Fragment() {
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = mSongItemsAdapter.songItems[position]
+        val item = mSongItemsAdapter!!.songItems[position]
 
         if (!isLongClick && mSelectionTracker.count == 0) {
             pickSong(item)
@@ -245,7 +247,7 @@ class SongsFragment : Fragment() {
     ) {
         Log.v(TAG, "filterSongs invoked")
 
-        mSongItemsAdapter.filterItems(title, categoryId = categoryId)
+        mSongItemsAdapter!!.filterItems(title, categoryId = categoryId)
         resetSelection()
     }
 
@@ -274,8 +276,8 @@ class SongsFragment : Fragment() {
                 return false
             }
             1 -> {
-                if (!mSongItemsAdapter.showCheckBox.value!!) {
-                    mSongItemsAdapter.showCheckBox.value = true
+                if (!mSongItemsAdapter!!.showCheckBox.value!!) {
+                    mSongItemsAdapter!!.showCheckBox.value = true
                 }
 
                 if (mActionMode == null) {
@@ -294,7 +296,7 @@ class SongsFragment : Fragment() {
 
     private fun editSelectedSong(): Boolean {
         val selectedItem =
-            mSongItemsAdapter.songItems.first { songItem -> songItem.isSelected.value!! }
+            mSongItemsAdapter!!.songItems.first { songItem -> songItem.isSelected.value!! }
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("song", selectedItem.song)
@@ -330,7 +332,7 @@ class SongsFragment : Fragment() {
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val selectedSongs = mSongItemsAdapter.songItems
+            val selectedSongs = mSongItemsAdapter!!.songItems
                 .filter { it.isSelected.value!! }
 
             val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
@@ -367,11 +369,11 @@ class SongsFragment : Fragment() {
 
     private fun addSetlist(): Boolean {
         val setlist = Setlist(null, "")
-        val songs = mSongItemsAdapter.songItems
+        val songs = mSongItemsAdapter!!.songItems
             .filter { it.isSelected.value == true }
             .map { item -> item.song }
 
-        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter.songItems
+        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter!!.songItems
             .mapIndexed { index, item ->
                 SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
@@ -388,7 +390,7 @@ class SongsFragment : Fragment() {
     }
 
     private fun deleteSelectedSongs(): Boolean {
-        val selectedSongs = mSongItemsAdapter.songItems
+        val selectedSongs = mSongItemsAdapter!!.songItems
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.song.id }
 
@@ -400,11 +402,11 @@ class SongsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        if (mSongItemsAdapter.showCheckBox.value!!) {
-            mSongItemsAdapter.showCheckBox.value = false
+        if (mSongItemsAdapter!!.showCheckBox.value!!) {
+            mSongItemsAdapter!!.showCheckBox.value = false
         }
 
-        mSongItemsAdapter.resetSelection()
+        mSongItemsAdapter!!.resetSelection()
     }
 
     private fun showMenuActions(
@@ -418,7 +420,7 @@ class SongsFragment : Fragment() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun getSelectedCategoryId(): Long {
-        return ((mCategorySpinner.selectedItem ?: mCategoryAll) as Category).id
+    private fun getSelectedCategoryId(categorySpinner: Spinner): Long {
+        return ((categorySpinner.selectedItem ?: mCategoryAll) as Category).id
     }
 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:03 PM
+ * Last modified 4/11/21 2:05 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
@@ -28,7 +29,7 @@ import java.util.*
 import kotlin.system.measureTimeMillis
 
 class SongItemsAdapter(
-    private val mContext: Context,
+    context: Context,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     private val mSelectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
@@ -42,17 +43,23 @@ class SongItemsAdapter(
     }
 
     private val mLock = Any()
+    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
 
-    private val mCheckBoxColor = mContext.getColor(R.color.check_box)
-    private val mCheckBoxHighlightColor = mContext.getColor(R.color.check_box_highlight)
-    private val mDefaultItemCardColor = mContext.getColor(R.color.window_background_2)
-    private val mWithCategoryTextColor = mContext.getColor(R.color.text_item_with_category)
-    private val mNoCategoryTextColor = mContext.getColor(R.color.text_item_no_category)
+    private val mCheckBoxColor = context.getColor(R.color.check_box)
+    private val mCheckBoxHighlightColor = context.getColor(R.color.check_box_highlight)
+    private val mDefaultItemCardColor = context.getColor(R.color.window_background_2)
+    private val mWithCategoryTextColor = context.getColor(R.color.text_item_with_category)
+    private val mNoCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val mCheckBoxColors = intArrayOf(mCheckBoxHighlightColor, mCheckBoxColor)
 
     private var mItems: SortedSet<SongItem> = sortedSetOf()
     private var mVisibleItems: Set<SongItem> = setOf()
     val songItems: List<SongItem> get() = mVisibleItems.toList()
+
+    fun removeObservers() {
+        showCheckBox.removeObservers(mLifecycleOwner)
+        mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
+    }
 
     fun submitCollection(songs: Collection<SongAndCategory>) {
         synchronized(mLock) {
@@ -126,8 +133,8 @@ class SongItemsAdapter(
         fun bind(position: Int) {
             val item = mVisibleItems.toList()[position]
             mSelectionTracker?.attach(this)
-            showCheckBox.observe(mContext.getLifecycleOwner()!!, VisibilityObserver(mCheckBox))
-            item.isSelected.observe(mContext.getLifecycleOwner()!!) {
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            item.isSelected.observe(mLifecycleOwner) {
                 mCheckBox.isChecked = it
             }
 

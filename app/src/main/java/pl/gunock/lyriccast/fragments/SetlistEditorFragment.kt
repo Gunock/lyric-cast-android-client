@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:51 PM
+ * Last modified 4/11/21 1:42 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -52,19 +52,15 @@ class SetlistEditorFragment : Fragment() {
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModelFactory(
-            requireContext(),
+            requireContext().resources,
             (requireActivity().application as LyricCastApplication).repository
         )
     }
 
     private val mSetlistNameTextWatcher: SetlistNameTextWatcher = SetlistNameTextWatcher()
 
-    private lateinit var mSongsRecyclerView: RecyclerView
-    private lateinit var mSetlistNameInputLayout: TextInputLayout
-    private lateinit var mSetlistNameInput: TextView
-
     private var mSetlistSongs: List<SongItem> = listOf()
-    private lateinit var mSongItemsAdapter: SetlistSongItemsAdapter
+    private var mSongItemsAdapter: SetlistSongItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
     private var mIntentSetlistWithSongs: SetlistWithSongs? = null
@@ -122,14 +118,17 @@ class SetlistEditorFragment : Fragment() {
                 ): Boolean {
                     val from = holder.absoluteAdapterPosition
                     val to = target.absoluteAdapterPosition
-                    mSongItemsAdapter.moveItem(from, to)
-                    mSongItemsAdapter.notifyItemMoved(from, to)
+
+                    val adapter = recyclerView.adapter as SetlistSongItemsAdapter
+                    adapter.moveItem(from, to)
+                    adapter.notifyItemMoved(from, to)
 
                     return true
                 }
 
                 override fun onSwiped(holder: RecyclerView.ViewHolder, direction: Int) {}
             }
+
         ItemTouchHelper(simpleItemTouchCallback)
     }
 
@@ -146,15 +145,21 @@ class SetlistEditorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_setlist_editor, container, false)
     }
 
+    override fun onDestroyView() {
+        mDatabaseViewModel.allSetlists.removeObservers(requireActivity())
+        itemTouchHelper.attachToRecyclerView(null)
+        mSongItemsAdapter!!.removeObservers()
+        mSongItemsAdapter = null
+        super.onDestroyView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mIntentSetlistWithSongs = requireActivity().intent.getParcelableExtra("setlistWithSongs")
 
-        mSetlistNameInputLayout = view.findViewById(R.id.tv_setlist_name)
-        mSetlistNameInput = view.findViewById(R.id.tin_setlist_name)
-
-        mSetlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
+        val setlistNameInput: TextView = view.findViewById(R.id.tin_setlist_name)
+        setlistNameInput.filters = arrayOf(InputFilter.LengthFilter(30))
 
         mDatabaseViewModel.allSetlists.observe(requireActivity()) { setlists ->
             mSetlistNames = setlists.map { setlist -> setlist.name }.toSet()
@@ -165,16 +170,11 @@ class SetlistEditorFragment : Fragment() {
                 runBlocking { mRepository.getSongsAndCategories(mArgs.setlistWithSongs!!.songs) }
                     .map { song -> SongItem(song) }
 
-            mSetlistNameInput.text = mArgs.setlistWithSongs!!.setlist.name
+            setlistNameInput.text = mArgs.setlistWithSongs!!.setlist.name
         } else if (mIntentSetlistWithSongs != null) {
-            mSetlistNameInput.text = mIntentSetlistWithSongs!!.setlist.name
+            setlistNameInput.text = mIntentSetlistWithSongs!!.setlist.name
             mSetlistSongs = mIntentSetlistWithSongs!!.songs
                 .map { song -> SongItem(song) }
-        }
-
-        mSongsRecyclerView = view.findViewById<RecyclerView>(R.id.rcv_songs).apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
         }
 
         setupListeners(view)
@@ -187,9 +187,10 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun setupListeners(view: View) {
-        mSetlistNameInput.addTextChangedListener(mSetlistNameTextWatcher)
+        val setlistNameInput: TextView = view.findViewById(R.id.tin_setlist_name)
+        setlistNameInput.addTextChangedListener(mSetlistNameTextWatcher)
 
-        mSetlistNameInput.setOnFocusChangeListener { view_, hasFocus ->
+        setlistNameInput.setOnFocusChangeListener { view_, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view_)
             }
@@ -222,15 +223,20 @@ class SetlistEditorFragment : Fragment() {
                 return@TouchAdapterItemListener true
             }
 
-        mSelectionTracker = SelectionTracker(mSongsRecyclerView, this::onSetlistClick)
+        mSelectionTracker = SelectionTracker(this::onSetlistClick)
         mSongItemsAdapter = SetlistSongItemsAdapter(
             requireContext(),
             mSetlistSongs.toMutableList(),
             mSelectionTracker = mSelectionTracker,
             mOnHandleTouchListener = onHandleTouchListener
         )
-        mSongsRecyclerView.adapter = mSongItemsAdapter
-        itemTouchHelper.attachToRecyclerView(mSongsRecyclerView)
+
+        val songsRecyclerView: RecyclerView = requireView().findViewById(R.id.rcv_songs)
+        songsRecyclerView.setHasFixedSize(true)
+        songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        songsRecyclerView.adapter = mSongItemsAdapter
+
+        itemTouchHelper.attachToRecyclerView(songsRecyclerView)
     }
 
     private fun onSetlistClick(
@@ -240,25 +246,26 @@ class SetlistEditorFragment : Fragment() {
         isLongClick: Boolean
     ): Boolean {
         if (isLongClick || mSelectionTracker.count != 0) {
-            val item: SongItem = mSongItemsAdapter.songItems[position]
+            val item: SongItem = mSongItemsAdapter!!.songItems[position]
             return selectSong(item)
         }
         return false
     }
 
     private fun createSetlistWithSongs(): SetlistWithSongs {
-        val setlistName = mSetlistNameInput.text.toString()
+        val setlistNameInput: TextView = requireView().findViewById(R.id.tin_setlist_name)
+        val setlistName = setlistNameInput.text.toString()
         val setlist = if (mArgs.setlistWithSongs != null) {
             Setlist(mArgs.setlistWithSongs!!.setlist.setlistId, setlistName)
         } else {
             Setlist(null, setlistName)
         }
 
-        val songs = mSongItemsAdapter.songItems
+        val songs = mSongItemsAdapter!!.songItems
             .map { item -> item.song }
             .distinct()
 
-        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter.songItems
+        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter!!.songItems
             .mapIndexed { index, item ->
                 SetlistSongCrossRef(null, setlist.id, item.song.id, index)
             }
@@ -282,11 +289,12 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun saveSetlist(): Boolean {
-        val setlistName = mSetlistNameInput.text.toString().trim()
+        val setlistNameInput: TextView = requireView().findViewById(R.id.tin_setlist_name)
+        val setlistName = setlistNameInput.text.toString().trim()
 
         if (validateSetlistName(setlistName) != NameValidationState.VALID) {
-            mSetlistNameInput.text = setlistName
-            mSetlistNameInput.requestFocus()
+            setlistNameInput.text = setlistName
+            setlistNameInput.requestFocus()
             return false
         }
 
@@ -311,15 +319,15 @@ class SetlistEditorFragment : Fragment() {
 
         when (mSelectionTracker.countAfter) {
             0 -> {
-                if (mSongItemsAdapter.showCheckBox.value!!) {
-                    mSongItemsAdapter.showCheckBox.value = false
+                if (mSongItemsAdapter!!.showCheckBox.value!!) {
+                    mSongItemsAdapter!!.showCheckBox.value = false
                 }
                 mActionMode?.finish()
                 return false
             }
             1 -> {
-                if (!mSongItemsAdapter.showCheckBox.value!!) {
-                    mSongItemsAdapter.showCheckBox.value = true
+                if (!mSongItemsAdapter!!.showCheckBox.value!!) {
+                    mSongItemsAdapter!!.showCheckBox.value = true
                 }
 
                 if (mActionMode == null) {
@@ -342,24 +350,24 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun removeSelectedSongs(): Boolean {
-        mSongItemsAdapter.removeSelectedItems()
+        mSongItemsAdapter!!.removeSelectedItems()
         resetSelection()
 
         return true
     }
 
     private fun duplicateSong(): Boolean {
-        mSongItemsAdapter.duplicateSelectedItem()
+        mSongItemsAdapter!!.duplicateSelectedItem()
         resetSelection()
 
         return true
     }
 
     private fun resetSelection() {
-        if (mSongItemsAdapter.showCheckBox.value!!) {
-            mSongItemsAdapter.showCheckBox.value = false
+        if (mSongItemsAdapter!!.showCheckBox.value!!) {
+            mSongItemsAdapter!!.showCheckBox.value = false
         }
-        mSongItemsAdapter.resetSelection()
+        mSongItemsAdapter!!.resetSelection()
         showMenuActions(showDelete = false, showDuplicate = false)
     }
 
@@ -371,18 +379,21 @@ class SetlistEditorFragment : Fragment() {
         }
 
         override fun afterTextChanged(s: Editable?) {
+            val setlistNameInputLayout: TextInputLayout =
+                requireView().findViewById(R.id.tv_setlist_name)
+
             val newText = s.toString().trim()
 
             when (validateSetlistName(newText)) {
                 NameValidationState.EMPTY -> {
-                    mSetlistNameInputLayout.error = getString(R.string.setlist_editor_enter_name)
+                    setlistNameInputLayout.error = getString(R.string.setlist_editor_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mSetlistNameInputLayout.error =
+                    setlistNameInputLayout.error =
                         getString(R.string.setlist_editor_name_already_used)
                 }
                 NameValidationState.VALID -> {
-                    mSetlistNameInputLayout.error = null
+                    setlistNameInputLayout.error = null
                 }
             }
         }

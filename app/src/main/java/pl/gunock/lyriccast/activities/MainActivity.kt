@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:48 PM
+ * Last modified 4/11/21 2:04 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -57,11 +57,12 @@ class MainActivity : AppCompatActivity() {
         const val IMPORT_RESULT_CODE = 2
     }
 
-    private var mCastContext: CastContext? = null
-
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+        DatabaseViewModelFactory(
+            baseContext.resources,
+            (application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
@@ -78,7 +79,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
 
-        mCastContext = CastContext.getSharedInstance(this)
         mRepository = (application as LyricCastApplication).repository
     }
 
@@ -87,9 +87,8 @@ class MainActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (mCastContext != null) {
-            castActionProvider.routeSelector = mCastContext!!.mergedSelector
-        }
+
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
 
         return true
     }
@@ -136,6 +135,10 @@ class MainActivity : AppCompatActivity() {
                 tab ?: return@ItemSelectedTabListener
 
                 fabAdd.clearFocus()
+
+                mDatabaseViewModel.allSongs.removeObservers(this)
+                mDatabaseViewModel.allCategories.removeObservers(this)
+                mDatabaseViewModel.allSetlists.removeObservers(this)
 
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {

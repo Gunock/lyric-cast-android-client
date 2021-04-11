@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:19 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:19 PM
+ * Last modified 4/11/21 12:04 AM
  */
 
 package pl.gunock.lyriccast.datamodel
 
-import android.content.Context
 import android.content.res.Resources
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
@@ -84,13 +83,13 @@ class DatabaseViewModel(
 }
 
 class DatabaseViewModelFactory(
-    private val mContext: Context,
+    private val mResources: Resources,
     private val mRepository: LyricCastRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DatabaseViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DatabaseViewModel(mContext.resources, mRepository) as T
+            return DatabaseViewModel(mResources, mRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

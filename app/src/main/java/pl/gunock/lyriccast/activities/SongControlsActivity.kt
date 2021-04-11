@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:36 PM
+ * Last modified 4/10/21 11:05 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -34,7 +34,7 @@ class SongControlsActivity : AppCompatActivity() {
     private lateinit var mSlideNumberView: TextView
     private lateinit var mSlidePreviewView: TextView
 
-    private var mCastContext: CastContext? = null
+    private lateinit var mCastContext: CastContext
     private lateinit var mSessionCreatedListener: SessionCreatedListener
 
     private var mCurrentSlide = 0
@@ -54,12 +54,12 @@ class SongControlsActivity : AppCompatActivity() {
 
         mLyrics = intent.getStringArrayExtra("lyrics")!!
 
-        mCastContext = CastContext.getSharedInstance()
+        mCastContext = CastContext.getSharedInstance()!!
         mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        mCastContext?.sessionManager?.addSessionManagerListener(mSessionCreatedListener)
+        mCastContext.sessionManager.addSessionManagerListener(mSessionCreatedListener)
 
         mSongTitleView.text = intent.getStringExtra("songTitle")
 
@@ -74,9 +74,9 @@ class SongControlsActivity : AppCompatActivity() {
         sendConfigure()
     }
 
-    override fun onStop() {
-        super.onStop()
-        mCastContext?.sessionManager?.removeSessionManagerListener(mSessionCreatedListener)
+    override fun onDestroy() {
+        super.onDestroy()
+        mCastContext.sessionManager.removeSessionManagerListener(mSessionCreatedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -84,9 +84,8 @@ class SongControlsActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (mCastContext != null) {
-            castActionProvider.routeSelector = mCastContext!!.mergedSelector
-        }
+
+        castActionProvider.routeSelector = mCastContext.mergedSelector
 
         return true
     }
@@ -121,22 +120,14 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun sendBlank() {
-        if (mCastContext == null) {
-            return
-        }
-
-        MessageHelper.sendControlMessage(mCastContext!!, ControlAction.BLANK)
+        MessageHelper.sendControlMessage(mCastContext, ControlAction.BLANK)
     }
 
     private fun sendConfigure() {
-        if (mCastContext == null) {
-            return
-        }
-
         val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
-            mCastContext!!,
+            mCastContext,
             ControlAction.CONFIGURE,
             configurationJson
         )
@@ -147,12 +138,8 @@ class SongControlsActivity : AppCompatActivity() {
         mSlideNumberView.text = "${mCurrentSlide + 1}/${mLyrics.size}"
         mSlidePreviewView.text = mLyrics[mCurrentSlide]
 
-        if (mCastContext == null) {
-            return
-        }
-
         MessageHelper.sendContentMessage(
-            mCastContext!!,
+            mCastContext,
             mLyrics[mCurrentSlide]
         )
     }

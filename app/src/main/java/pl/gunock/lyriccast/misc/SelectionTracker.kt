@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:08 PM
+ * Last modified 4/11/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.misc
@@ -11,7 +11,6 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class SelectionTracker<T : RecyclerView.ViewHolder>(
-    private val mRecyclerView: RecyclerView,
     private val mOnSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
 ) {
 
@@ -51,7 +50,7 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
             countAfter = countItems(holder, modifySelectedItems = false)
             if (mOnSelect(holder, holder.absoluteAdapterPosition, false)) {
                 view.requestFocus()
-                mRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 count = countItems(holder, modifySelectedItems = true)
             }
             countAfter = count

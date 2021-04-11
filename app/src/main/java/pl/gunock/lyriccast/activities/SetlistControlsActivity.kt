@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 5:36 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 5:36 PM
+ * Last modified 4/11/21 12:09 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -44,7 +44,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var mSlidePreviewView: TextView
     private lateinit var mSongTitleView: TextView
 
-    private var mCastContext: CastContext? = null
+    private lateinit var mCastContext: CastContext
     private var mSessionCreatedListener: SessionCreatedListener? = null
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
 
@@ -61,12 +61,12 @@ class SetlistControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         mRepository = (application as LyricCastApplication).repository
-        mCastContext = CastContext.getSharedInstance()
+        mCastContext = CastContext.getSharedInstance()!!
         mSessionCreatedListener = SessionCreatedListener {
             sendConfigure()
             sendSlide()
         }
-        mCastContext?.sessionManager!!.addSessionManagerListener(mSessionCreatedListener)
+        mCastContext.sessionManager!!.addSessionManagerListener(mSessionCreatedListener)
 
         mSlidePreviewView = findViewById(R.id.tv_setlist_slide_preview)
         mSongTitleView = findViewById(R.id.tv_current_song_title)
@@ -129,9 +129,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        if (mCastContext != null) {
-            castActionProvider.routeSelector = mCastContext!!.mergedSelector
-        }
+        castActionProvider.routeSelector = mCastContext.mergedSelector
 
         return true
     }
@@ -165,8 +163,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         mSongItemsAdapter = ControlsSongItemsAdapter(
             this,
             songItemList,
-            onItemLongClickListener = onLongClickListener,
-            onItemClickListener = onClickListener
+            mOnItemLongClickListener = onLongClickListener,
+            mOnItemClickListener = onClickListener
         )
 
         songRecyclerView.adapter = mSongItemsAdapter
@@ -174,7 +172,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
-            MessageHelper.sendControlMessage(mCastContext!!, ControlAction.BLANK)
+            MessageHelper.sendControlMessage(mCastContext, ControlAction.BLANK)
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
@@ -253,7 +251,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         mSlidePreviewView.text = mSetlistLyrics[mCurrentLyricsPosition]
         MessageHelper.sendContentMessage(
-            mCastContext!!,
+            mCastContext,
             mSetlistLyrics[mCurrentLyricsPosition]
         )
     }
@@ -267,14 +265,11 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun sendConfigure() {
-        if (mCastContext == null) {
-            return
-        }
 
         val configurationJson = LyricCastSettings(baseContext).getCastConfigurationJson()
 
         MessageHelper.sendControlMessage(
-            mCastContext!!,
+            mCastContext,
             ControlAction.CONFIGURE,
             configurationJson
         )

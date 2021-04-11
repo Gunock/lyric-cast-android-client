@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 10:31 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 10:25 PM
+ * Last modified 4/11/21 12:47 AM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -20,6 +20,7 @@ class CategorySpinnerAdapter(
     context: Context
 ) : BaseAdapter() {
     private val mLock = Any()
+
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mItems: MutableList<Category> = mutableListOf()
 

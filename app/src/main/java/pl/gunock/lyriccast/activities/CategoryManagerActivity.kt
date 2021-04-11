@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:45 PM
+ * Last modified 4/11/21 12:12 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -31,7 +31,10 @@ import pl.gunock.lyriccast.models.CategoryItem
 class CategoryManagerActivity : AppCompatActivity() {
 
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(baseContext, (application as LyricCastApplication).repository)
+        DatabaseViewModelFactory(
+            baseContext.resources,
+            (application as LyricCastApplication).repository
+        )
     }
 
     private lateinit var mCategoryItemsRecyclerView: RecyclerView
@@ -124,11 +127,11 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun setupCategories() {
-        mSelectionTracker = SelectionTracker(mCategoryItemsRecyclerView, this::onCategoryClick)
+        mSelectionTracker = SelectionTracker(this::onCategoryClick)
 
         mCategoryItemsAdapter = CategoryItemsAdapter(
             mCategoryItemsRecyclerView.context,
-            selectionTracker = mSelectionTracker
+            mSelectionTracker = mSelectionTracker
         )
         mCategoryItemsRecyclerView.adapter = mCategoryItemsAdapter
 
