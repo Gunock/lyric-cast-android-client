@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/10/21 1:22 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/10/21 1:16 PM
+ * Last modified 4/11/21 2:16 PM
  */
 
 apply plugin: 'com.android.application'
@@ -9,6 +9,10 @@ apply plugin: 'kotlin-android'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
+    signingConfigs {
+        release {
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
 

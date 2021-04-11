@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:42 AM
+ * Last modified 4/11/21 2:33 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
@@ -34,6 +33,7 @@ import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
+import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.helpers.KeyboardHelper
@@ -165,25 +165,29 @@ class SetlistEditorFragment : Fragment() {
             mSetlistNames = setlists.map { setlist -> setlist.name }.toSet()
         }
 
+        var setlistSongs: Map<Long, Song> = mapOf()
+        var setlistSongsCrossRef: List<SetlistSongCrossRef> = listOf()
         if (mArgs.setlistWithSongs != null) {
-            mSetlistSongs =
-                runBlocking { mRepository.getSongsAndCategories(mArgs.setlistWithSongs!!.songs) }
-                    .map { song -> SongItem(song) }
+            setlistSongs = mArgs.setlistWithSongs!!.songs
+                .map { it.id to it }
+                .toMap()
+
+            setlistSongsCrossRef = mArgs.setlistWithSongs!!.setlistSongCrossRefs
 
             setlistNameInput.text = mArgs.setlistWithSongs!!.setlist.name
         } else if (mIntentSetlistWithSongs != null) {
             setlistNameInput.text = mIntentSetlistWithSongs!!.setlist.name
-            mSetlistSongs = mIntentSetlistWithSongs!!.songs
-                .map { song -> SongItem(song) }
+            setlistSongs = mIntentSetlistWithSongs!!.songs
+                .map { it.id to it }
+                .toMap()
+            setlistSongsCrossRef = mIntentSetlistWithSongs!!.setlistSongCrossRefs
         }
 
+        mSetlistSongs = setlistSongsCrossRef.sorted()
+            .map { SongItem(setlistSongs[it.songId]!!) }
+
         setupListeners(view)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        setupSongList()
+        setupRecyclerView()
     }
 
     private fun setupListeners(view: View) {
@@ -212,7 +216,7 @@ class SetlistEditorFragment : Fragment() {
         }
     }
 
-    private fun setupSongList() {
+    private fun setupRecyclerView() {
         val onHandleTouchListener =
             TouchAdapterItemListener { holder: SetlistSongItemsAdapter.ViewHolder, view, event ->
                 view.requestFocus()

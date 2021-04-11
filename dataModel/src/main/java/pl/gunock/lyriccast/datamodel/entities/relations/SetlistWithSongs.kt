@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 2:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 1:02 AM
+ * Last modified 4/11/21 2:33 PM
  */
 
 package pl.gunock.lyriccast.datamodel.entities.relations
@@ -30,6 +30,7 @@ data class SetlistWithSongs(
     )
     val setlistSongCrossRefs: List<SetlistSongCrossRef>
 ) : Parcelable {
+
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(Setlist::class.java.classLoader)!!,
         parcel.createTypedArrayList(Song)?.toList() ?: listOf(),
