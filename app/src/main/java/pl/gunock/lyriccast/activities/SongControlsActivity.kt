@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:14 PM
+ * Last modified 4/11/21 7:53 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,40 +20,54 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
+import pl.gunock.lyriccast.cast.SessionStartedListener
 import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
-import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.models.LyricCastSettings
 
 
 class SongControlsActivity : AppCompatActivity() {
 
-    private var mSessionCreatedListener: SessionCreatedListener? = null
+    private var mSessionStartedListener: SessionStartedListener? = null
     private var mCurrentSlide = 0
     private lateinit var mLyrics: Array<String>
+
+    private var mBlankOffColor: Int = Int.MIN_VALUE
+    private var mBlankOnColor: Int = Int.MIN_VALUE
+    private val mCurrentBlankColor: Int
+        get() = if (MessageHelper.isBlanked) {
+            mBlankOnColor
+        } else {
+            mBlankOffColor
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_song_controls)
         setSupportActionBar(findViewById(R.id.toolbar_controls))
-
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        mBlankOffColor = resources.getColor(R.color.green, null)
+        mBlankOnColor = resources.getColor(R.color.red, null)
 
         findViewById<TextView>(R.id.tv_controls_song_title).text =
             intent.getStringExtra("songTitle")
 
         mLyrics = intent.getStringArrayExtra("lyrics")!!
 
+        findViewById<Button>(R.id.btn_song_blank).setBackgroundColor(mCurrentBlankColor)
+
         setupListeners()
 
-        mSessionCreatedListener = SessionCreatedListener {
+        mSessionStartedListener = SessionStartedListener {
+            findViewById<Button>(R.id.btn_song_blank).setBackgroundColor(mBlankOffColor)
             sendConfigure()
             sendSlide()
         }
 
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(mSessionCreatedListener)
+        sessionsManager.addSessionManagerListener(mSessionStartedListener)
 
         if (sessionsManager.currentSession?.isConnected == true) {
             sendConfigure()
@@ -70,7 +84,7 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(mSessionCreatedListener)
+            .removeSessionManagerListener(mSessionStartedListener)
         super.onDestroy()
     }
 
@@ -94,7 +108,8 @@ class SongControlsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         findViewById<Button>(R.id.btn_song_blank).setOnClickListener {
-            sendBlank()
+            MessageHelper.sendBlank(!MessageHelper.isBlanked)
+            it.setBackgroundColor(mCurrentBlankColor)
         }
 
         findViewById<ImageButton>(R.id.btn_song_prev).setOnClickListener {
@@ -116,10 +131,6 @@ class SongControlsActivity : AppCompatActivity() {
             setPreview()
             sendSlide()
         }
-    }
-
-    private fun sendBlank() {
-        MessageHelper.sendControlMessage(ControlAction.BLANK)
     }
 
     private fun sendConfigure() {

@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/10/21 8:54 PM
+ * Last modified 4/11/21 7:10 PM
  */
 
 package pl.gunock.lyriccast.enums
 
 enum class ControlAction {
-    HEARTBEAT,
     BLANK,
     CONFIGURE
 }

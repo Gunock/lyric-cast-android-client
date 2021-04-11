@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 6:49 PM
+  ~ Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 6:12 PM
+  ~ Last modified 4/11/21 7:24 PM
   -->
 
 <resources>
@@ -14,7 +14,8 @@
     <color name="dim_white">#EEEEEE</color>
     <color name="very_dim_white">#DDDDDD</color>
     <color name="cyan">#03DAC5</color>
-    <color name="red">#FF0000</color>
+    <color name="red">#CC4444</color>
+    <color name="green">#22AA22</color>
 
     <!--    Value source: https://www.rapidtables.com/web/color/RGB_Color.html -->
     <color name="maroon">#800000</color>

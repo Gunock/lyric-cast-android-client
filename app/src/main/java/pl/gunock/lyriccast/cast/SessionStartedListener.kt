@@ -1,15 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:00 PM
+ * Last modified 4/11/21 7:31 PM
  */
 
-package pl.gunock.lyriccast.listeners
+package pl.gunock.lyriccast.cast
 
 import com.google.android.gms.cast.framework.Session
 import com.google.android.gms.cast.framework.SessionManagerListener
 
-class SessionCreatedListener(
+class SessionStartedListener(
     private val mListener: (session: Session) -> Unit
 ) : SessionManagerListener<Session> {
 

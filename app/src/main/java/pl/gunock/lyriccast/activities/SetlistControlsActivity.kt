@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
+ * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:58 PM
+ * Last modified 4/11/21 7:53 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -24,6 +24,7 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
+import pl.gunock.lyriccast.cast.SessionStartedListener
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
@@ -34,7 +35,6 @@ import pl.gunock.lyriccast.enums.ControlAction
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
-import pl.gunock.lyriccast.listeners.SessionCreatedListener
 import pl.gunock.lyriccast.models.LyricCastSettings
 import pl.gunock.lyriccast.models.SongItem
 
@@ -42,13 +42,22 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private lateinit var mRepository: LyricCastRepository
 
-    private var mSessionCreatedListener: SessionCreatedListener? = null
+    private var mSessionStartedListener: SessionStartedListener? = null
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
 
     private lateinit var mSetlistLyrics: List<String>
     private var mSongTitles: MutableMap<Int, String> = mutableMapOf()
     private var mSongStartPoints: MutableMap<String, Int> = mutableMapOf()
     private var mCurrentLyricsPosition: Int = 0
+
+    private var mBlankOffColor: Int = Int.MIN_VALUE
+    private var mBlankOnColor: Int = Int.MIN_VALUE
+    private val mCurrentBlankColor: Int
+        get() = if (MessageHelper.isBlanked) {
+            mBlankOnColor
+        } else {
+            mBlankOffColor
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,15 +66,21 @@ class SetlistControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        mBlankOffColor = resources.getColor(R.color.green, null)
+        mBlankOnColor = resources.getColor(R.color.red, null)
+
         mRepository = (application as LyricCastApplication).repository
 
-        mSessionCreatedListener = SessionCreatedListener {
+        findViewById<Button>(R.id.btn_setlist_blank).setBackgroundColor(mCurrentBlankColor)
+
+        mSessionStartedListener = SessionStartedListener {
+            findViewById<Button>(R.id.btn_setlist_blank).setBackgroundColor(mBlankOffColor)
             sendConfigure()
             sendSlide()
         }
 
         CastContext.getSharedInstance()!!.sessionManager.addSessionManagerListener(
-            mSessionCreatedListener
+            mSessionStartedListener
         )
 
         val setlistWithSongs = setupLyrics()
@@ -94,7 +109,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         CastContext.getSharedInstance()!!.sessionManager.removeSessionManagerListener(
-            mSessionCreatedListener
+            mSessionStartedListener
         )
         super.onDestroy()
     }
@@ -183,7 +198,8 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
-            MessageHelper.sendControlMessage(ControlAction.BLANK)
+            MessageHelper.sendBlank(!MessageHelper.isBlanked)
+            it.setBackgroundColor(mCurrentBlankColor)
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
