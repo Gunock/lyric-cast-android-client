@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/15/21 1:10 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/15/21 1:10 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,10 @@
 
         <action
             android:id="@+id/action_Songs_to_Setlists"
-            app:destination="@id/Setlists" />
+            app:destination="@id/Setlists"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/nav_graph_main"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -28,7 +31,10 @@
         tools:layout="@layout/fragment_setlists">
         <action
             android:id="@+id/action_Setlists_to_Songs"
-            app:destination="@id/Songs" />
+            app:destination="@id/Songs"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph_main"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>
