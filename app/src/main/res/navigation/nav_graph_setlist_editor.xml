@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 4/15/21 1:10 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 4/15/21 1:10 PM
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,10 @@
 
         <action
             android:id="@+id/action_SetlistEditorSongs_to_SetlistEditor"
-            app:destination="@id/SetlistEditor" />
+            app:destination="@id/SetlistEditor"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/SetlistEditor"
+            app:popUpToInclusive="false" />
         <argument
             android:name="setlistWithSongs"
             app:argType="pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs" />
@@ -31,7 +34,9 @@
 
         <action
             android:id="@+id/action_SetlistEditor_to_SetlistEditorSongs"
-            app:destination="@id/SetlistEditorSongs" />
+            app:destination="@id/SetlistEditorSongs"
+            app:launchSingleTop="true"
+            app:popUpToInclusive="false" />
         <argument
             android:name="setlistWithSongs"
             android:defaultValue="@null"
