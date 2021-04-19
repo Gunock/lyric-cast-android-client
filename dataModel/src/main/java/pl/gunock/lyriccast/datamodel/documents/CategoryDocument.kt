@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 4:41 PM
+ * Last modified 4/20/21 12:33 AM
  */
 
-package pl.gunock.lyriccast.datamodel.entities
+package pl.gunock.lyriccast.datamodel.documents
 
 import io.realm.RealmObject
 import io.realm.annotations.Ignore
@@ -23,6 +23,10 @@ open class CategoryDocument(
     val idLong: Long = id.date.time
 
     constructor() : this("", null, ObjectId())
+
+    constructor(dto: CategoryDto) : this(dto.name, dto.color, ObjectId())
+
+    constructor(document: CategoryDocument, id: ObjectId) : this(document.name, document.color, id)
 
     fun toDto(): CategoryDto {
         return CategoryDto(name, color)

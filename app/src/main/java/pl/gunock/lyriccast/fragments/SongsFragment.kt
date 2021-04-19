@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 5:03 PM
+ * Last modified 4/20/21 1:05 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -29,13 +29,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.activities.SongControlsActivity
 import pl.gunock.lyriccast.activities.SongEditorActivity
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.common.helpers.FileHelper
-import pl.gunock.lyriccast.datamodel.MongoDatabaseViewModel
-import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
@@ -52,8 +53,8 @@ class SongsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 3
     }
 
-    private val mDatabaseViewModel: MongoDatabaseViewModel by viewModels {
-        MongoDatabaseViewModel.Factory(requireContext().resources)
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModel.Factory(requireContext().resources)
     }
 
     private var mCategorySpinner: Spinner? = null
@@ -356,23 +357,16 @@ class SongsFragment : Fragment() {
     }
 
     private fun addSetlist(): Boolean {
-        // TODO: Rework for MongoDB
-//        val setlist = Setlist(null, "")
-//        val songs = mSongItemsAdapter!!.songItems
-//            .filter { it.isSelected.value == true }
-//            .map { item -> item.song }
-//
-//        val crossRef: List<SetlistSongCrossRef> = songs.mapIndexed { index, song ->
-//            SetlistSongCrossRef(null, setlist.id, song.id, index)
-//        }
-//
-//        val setlistWithSongs = SetlistWithSongs(setlist, songs, crossRef)
-//
-//        val intent = Intent(context, SetlistEditorActivity::class.java)
-//        intent.putExtra("setlistWithSongs", setlistWithSongs)
-//        startActivity(intent)
-//
-//        resetSelection()
+        val setlistSongs = mSongItemsAdapter!!.songItems
+            .filter { it.isSelected.value == true }
+            .map { item -> item.song.id.toString() }
+            .toTypedArray()
+
+        val intent = Intent(context, SetlistEditorActivity::class.java)
+        intent.putExtra("setlistSongs", setlistSongs)
+        startActivity(intent)
+
+        resetSelection()
 
         return true
     }

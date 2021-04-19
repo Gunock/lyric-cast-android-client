@@ -1,49 +1,96 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 4:51 PM
+ * Last modified 4/20/21 12:51 AM
  */
 
 package pl.gunock.lyriccast.datamodel
 
 import android.content.res.Resources
-import androidx.lifecycle.*
-import kotlinx.coroutines.launch
-import pl.gunock.lyriccast.datamodel.entities.Setlist
-import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmResults
+import io.realm.kotlin.where
+import org.bson.types.ObjectId
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
+import java.io.Closeable
 
 
 class DatabaseViewModel(
     resources: Resources,
-    private val mRepository: LyricCastRepository
-) : ViewModel() {
-    val allSetlists: LiveData<List<Setlist>> = mRepository.allSetlists.asLiveData()
+    private val mRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
+        .allowQueriesOnUiThread(true)
+        .allowWritesOnUiThread(true)
+        .build(),
+    private val mRealm: Realm = Realm.getInstance(mRealmConfig)
+) : ViewModel(), Closeable {
 
-    private val mDataTransferProcessor = DataTransferProcessor(resources, mRepository)
+    private val mDataTransferProcessor = DataTransferProcessor(resources, mRealm)
 
-    fun removeObservers(lifecycleOwner: LifecycleOwner) {
-        allSetlists.removeObservers(lifecycleOwner)
+    val allSongs: RealmResults<SongDocument> =
+        mRealm.where<SongDocument>().findAllAsync()
+
+    val allSetlists: RealmResults<SetlistDocument> =
+        mRealm.where<SetlistDocument>().findAllAsync()
+
+    val allCategories: RealmResults<CategoryDocument> =
+        mRealm.where<CategoryDocument>().findAllAsync()
+
+    fun upsertSong(song: SongDocument) = mRealm.executeTransaction { mRealm.insertOrUpdate(song) }
+
+    fun deleteSongs(songIds: Collection<ObjectId>) = mRealm.executeTransaction {
+        for (id in songIds) {
+            allSongs.where()
+                .equalTo("id", id)
+                .findFirst()
+                ?.deleteFromRealm()
+        }
     }
 
-    fun upsertSetlist(setlist: SetlistWithSongs) =
-        viewModelScope.launch { mRepository.upsertSetlist(setlist) }
+    fun upsertSetlist(setlist: SetlistDocument) =
+        mRealm.executeTransaction { mRealm.insertOrUpdate(setlist) }
 
-    fun deleteSetlists(setlistIds: List<Long>) =
-        viewModelScope.launch { mRepository.deleteSetlists(setlistIds) }
+    fun deleteSetlists(setlistIds: Collection<ObjectId>) = mRealm.executeTransaction {
+        for (id in setlistIds) {
+            allSetlists.where()
+                .equalTo("id", id)
+                .findFirst()
+                ?.deleteFromRealm()
+        }
+    }
 
-    suspend fun importSongs(
+    fun upsertCategory(category: CategoryDocument) =
+        mRealm.executeTransaction { mRealm.insertOrUpdate(category) }
+
+    fun deleteCategories(categoryIds: Collection<ObjectId>) = mRealm.executeTransaction {
+        for (id in categoryIds) {
+            allCategories.where()
+                .equalTo("id", id)
+                .findFirst()
+                ?.deleteFromRealm()
+        }
+    }
+
+    fun importSongs(
         data: DatabaseTransferData,
         message: MutableLiveData<String>,
         options: ImportOptions
     ) {
-        mDataTransferProcessor.importSongs(data, message, options)
+        mRealm.executeTransaction {
+            mDataTransferProcessor.importSongs(data, message, options)
+        }
     }
 
-    suspend fun importSongs(
+    fun importSongs(
         songDtoSet: Set<SongDto>,
         message: MutableLiveData<String>,
         options: ImportOptions
@@ -58,23 +105,27 @@ class DatabaseViewModel(
             }
 
         val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
-        mDataTransferProcessor.importSongs(data, message, options)
+        importSongs(data, message, options)
     }
 
-    suspend fun getDatabaseTransferData(): DatabaseTransferData {
+    fun getDatabaseTransferData(): DatabaseTransferData {
         return mDataTransferProcessor.getDatabaseTransferData()
     }
 
+    override fun close() {
+        mRealm.close()
+    }
+
     class Factory(
-        private val mResources: Resources,
-        private val mRepository: LyricCastRepository
+        private val mResources: Resources
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(DatabaseViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return DatabaseViewModel(mResources, mRepository) as T
+            if (!modelClass.isAssignableFrom(DatabaseViewModel::class.java)) {
+                throw IllegalArgumentException("Unknown ViewModel class")
             }
-            throw IllegalArgumentException("Unknown ViewModel class")
+
+            @Suppress("UNCHECKED_CAST")
+            return DatabaseViewModel(mResources) as T
         }
     }
 }

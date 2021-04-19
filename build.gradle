@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/16/21 8:13 PM
+ * Last modified 4/20/21 12:10 AM
  */
 
 ext {
@@ -11,7 +11,6 @@ ext {
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        room_version = '2.2.6'
         nav_version = '2.3.5'
     }
     ext.kotlin_version = '1.4.32'

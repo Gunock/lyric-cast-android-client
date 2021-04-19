@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 4:41 PM
+ * Last modified 4/20/21 12:33 AM
  */
 
-package pl.gunock.lyriccast.datamodel.entities
+package pl.gunock.lyriccast.datamodel.documents
 
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -34,6 +34,22 @@ open class SongDocument(
     val lyricsList: List<String> = presentation.map { lyricsMap[it]!! }
 
     constructor() : this("", RealmList(), RealmList(), null, ObjectId())
+
+    constructor(dto: SongDto, category: CategoryDocument?) : this(
+        dto.title,
+        RealmList(),
+        RealmList(),
+        category,
+        ObjectId()
+    )
+
+    constructor(document: SongDocument, id: ObjectId) : this(
+        document.title,
+        document.lyrics,
+        document.presentation,
+        document.category,
+        id
+    )
 
     fun toDto(): SongDto {
         return SongDto(title, lyricsMap, presentation, category?.name ?: "")

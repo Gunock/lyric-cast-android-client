@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 5:11 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -22,8 +22,8 @@ import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
-import pl.gunock.lyriccast.datamodel.MongoDatabaseViewModel
-import pl.gunock.lyriccast.datamodel.entities.SongDocument
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.helpers.MessageHelper
 
 
@@ -55,7 +55,7 @@ class SongControlsActivity : AppCompatActivity() {
         val songId: ObjectId = intent.getSerializableExtra("songId")!! as ObjectId
 
         val databaseViewModel =
-            MongoDatabaseViewModel.Factory(resources).create(MongoDatabaseViewModel::class.java)
+            DatabaseViewModel.Factory(resources).create(DatabaseViewModel::class.java)
         val song: SongDocument = databaseViewModel.allSongs
             .where()
             .equalTo("id", songId)

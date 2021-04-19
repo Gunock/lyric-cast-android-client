@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:55 AM
+ * Last modified 4/20/21 12:11 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
-import pl.gunock.lyriccast.datamodel.entities.Setlist
+import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SetlistItem
@@ -52,7 +52,7 @@ class SetlistItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    fun submitCollection(setlistWithSongs: Collection<Setlist>) {
+    fun submitCollection(setlistWithSongs: Collection<SetlistDocument>) {
         synchronized(mLock) {
             mItems.clear()
             mItems.addAll(setlistWithSongs.map { SetlistItem(it) })
@@ -90,7 +90,7 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return mVisibleItems.toList()[position].setlist.id
+        return mVisibleItems.toList()[position].setlist.idLong
     }
 
     override fun getItemCount() = mVisibleItems.size

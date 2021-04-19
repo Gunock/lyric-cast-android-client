@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 5:10 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -19,15 +19,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
-import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
-import pl.gunock.lyriccast.datamodel.entities.Song
-import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
@@ -42,14 +39,11 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(
-            requireContext().resources,
-            (requireActivity().application as LyricCastApplication).repository
-        )
+        DatabaseViewModel.Factory(requireContext().resources)
     }
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
-    private lateinit var mSelectedSongs: MutableSet<Song>
+    private var mSelectedSongs: MutableSet<SongDocument> = mutableSetOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +59,6 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mSelectedSongs = mArgs.setlistWithSongs.songs.toMutableSet()
 
         setupRecyclerView(view)
         setupCategorySpinner()
@@ -91,34 +83,33 @@ class SetlistEditorSongsFragment : Fragment() {
             android.R.id.home -> {
                 updateSelectedSongs()
 
-                val setlistSongs = mArgs.setlistWithSongs.songs
+                val setlistSongIds = mArgs.presentation
+                    .distinct()
                     .toMutableList()
 
-                val removedSongs =
-                    setlistSongs.filter { song -> !this.mSelectedSongs.contains(song) }
-                val addedSongs =
-                    this.mSelectedSongs.filter { song -> !setlistSongs.contains(song) }
+                val selectedSongIds = mSelectedSongs.map { it.id.toString() }
 
-                setlistSongs.removeAll(removedSongs)
-                setlistSongs.addAll(addedSongs)
+                val removedSongIds =
+                    setlistSongIds.filter { songId -> !selectedSongIds.contains(songId) }
+                val addedSongIds =
+                    selectedSongIds.filter { songId -> !setlistSongIds.contains(songId) }
 
-                val removedSongIds = removedSongs.map { song -> song.id }
-                var setlistSongCrossRefs = mArgs.setlistWithSongs.setlistSongCrossRefs
-                    .toMutableList()
+                setlistSongIds.removeAll(removedSongIds)
+                setlistSongIds.addAll(addedSongIds)
 
-                setlistSongCrossRefs = setlistSongCrossRefs.filter { crossRef ->
-                    !removedSongIds.contains(crossRef.songId)
-                }.toMutableList()
-
-                val setlist = mArgs.setlistWithSongs.setlist
-                addedSongs.forEachIndexed { index, song ->
-                    val setlistSongCrossRef = SetlistSongCrossRef(null, setlist.id, song.id, index)
-                    setlistSongCrossRefs.add(setlistSongCrossRef)
+                val presentation: MutableList<String> = mArgs.presentation.toMutableList()
+                presentation.removeAll { songId ->
+                    !setlistSongIds.contains(songId)
                 }
 
-                val setlistWithSongs = SetlistWithSongs(setlist, setlistSongs, setlistSongCrossRefs)
+                presentation.addAll(addedSongIds)
+
                 val action = SetlistEditorSongsFragmentDirections
-                    .actionSetlistEditorSongsToSetlistEditor(setlistWithSongs = setlistWithSongs)
+                    .actionSetlistEditorSongsToSetlistEditor(
+                        setlistId = mArgs.setlistId,
+                        presentation = presentation.toTypedArray(),
+                        setlistName = mArgs.setlistName
+                    )
 
                 findNavController().navigate(action)
                 return true
@@ -164,10 +155,9 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
         categorySpinner.adapter = categorySpinnerAdapter
 
-        // TODO: Rework for MongoDB
-//        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
-//            categorySpinnerAdapter.submitCollection(categories)
-//        }
+        mDatabaseViewModel.allCategories.addChangeListener { categories ->
+            categorySpinnerAdapter.submitCollection(categories)
+        }
     }
 
     private fun setupRecyclerView(view: View) {
@@ -188,13 +178,12 @@ class SetlistEditorSongsFragment : Fragment() {
             mSelectionTracker = selectionTracker
         )
 
-        // TODO: Rework for MongoDB
-//        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
-//            mSongItemsAdapter!!.submitCollection(songs ?: return@observe)
-//            mSongItemsAdapter!!.songItems.forEach { item ->
-//                item.isSelected.value = mSelectedSongs.contains(item.song)
-//            }
-//        }
+        mDatabaseViewModel.allSongs.addChangeListener { songs ->
+            mSongItemsAdapter!!.submitCollection(songs)
+            mSongItemsAdapter!!.songItems.forEach { item ->
+                item.isSelected.value = mArgs.presentation.contains(item.song.id.toString())
+            }
+        }
 
         songsRecyclerView.adapter = mSongItemsAdapter
     }
@@ -211,18 +200,16 @@ class SetlistEditorSongsFragment : Fragment() {
         Log.d(TAG, "filterSongs invoked")
 
         updateSelectedSongs()
-        // TODO: Rework for MongoDB
-//        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
+        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
     }
 
     private fun updateSelectedSongs() {
-        // TODO: Rework for MongoDB
-//        for (item in mSongItemsAdapter!!.songItems) {
-//            if (item.isSelected.value!!) {
-//                mSelectedSongs.add(item.song)
-//            } else {
-//                mSelectedSongs.remove(item.song)
-//            }
-//        }
+        for (item in mSongItemsAdapter!!.songItems) {
+            if (item.isSelected.value!!) {
+                mSelectedSongs.add(item.song)
+            } else {
+                mSelectedSongs.remove(item.song)
+            }
+        }
     }
 }

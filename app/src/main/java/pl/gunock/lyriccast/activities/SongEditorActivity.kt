@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 5:11 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -25,10 +25,10 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
-import pl.gunock.lyriccast.datamodel.MongoDatabaseViewModel
-import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
-import pl.gunock.lyriccast.datamodel.entities.LyricsSectionDocument
-import pl.gunock.lyriccast.datamodel.entities.SongDocument
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.documents.LyricsSectionDocument
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
@@ -40,8 +40,8 @@ class SongEditorActivity : AppCompatActivity() {
 
     private var mIntentSong: SongDocument? = null
 
-    private val mDatabaseViewModel: MongoDatabaseViewModel by viewModels {
-        MongoDatabaseViewModel.Factory(resources)
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModel.Factory(resources)
     }
 
     private lateinit var mSectionNameInput: EditText

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 4:12 PM
+ * Last modified 4/20/21 12:54 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -31,7 +31,7 @@ import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
-import pl.gunock.lyriccast.datamodel.MongoDatabaseViewModel
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
@@ -54,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         const val IMPORT_RESULT_CODE = 2
     }
 
-    private val mDatabaseViewModel: MongoDatabaseViewModel by viewModels {
-        MongoDatabaseViewModel.Factory(resources)
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModel.Factory(resources)
     }
 
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
@@ -267,6 +267,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 return@launch
             }
+            importDir.deleteRecursively()
 
             val transferData = DatabaseTransferData(
                 songDtos = songsJson.toJSONObjectList().map { SongDto(it) },
@@ -279,14 +280,15 @@ class MainActivity : AppCompatActivity() {
                 mImportDialogViewModel.replaceOnConflict
             )
 
-            mDatabaseViewModel.importSongs(
-                transferData,
-                dialogFragment.messageLiveData,
-                importOptions
-            )
+            CoroutineScope(Dispatchers.Main).launch {
+                mDatabaseViewModel.importSongs(
+                    transferData,
+                    dialogFragment.messageLiveData,
+                    importOptions
+                )
 
-            importDir.deleteRecursively()
-            dialogFragment.dismiss()
+                dialogFragment.dismiss()
+            }
         }
     }
 
@@ -320,12 +322,14 @@ class MainActivity : AppCompatActivity() {
                 mImportDialogViewModel.replaceOnConflict,
                 colors
             )
-            mDatabaseViewModel.importSongs(
-                importedSongs,
-                dialogFragment.messageLiveData,
-                importOptions
-            )
-            dialogFragment.dismiss()
+            CoroutineScope(Dispatchers.Main).launch {
+                mDatabaseViewModel.importSongs(
+                    importedSongs,
+                    dialogFragment.messageLiveData,
+                    importOptions
+                )
+                dialogFragment.dismiss()
+            }
         }
     }
 
