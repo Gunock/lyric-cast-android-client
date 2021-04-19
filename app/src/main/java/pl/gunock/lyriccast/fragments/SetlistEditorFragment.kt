@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:33 PM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:33 PM
+ * Last modified 4/18/21 6:22 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -29,7 +29,6 @@ import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
 import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.datamodel.entities.Setlist
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
@@ -51,7 +50,7 @@ class SetlistEditorFragment : Fragment() {
     private val mArgs: SetlistEditorFragmentArgs by navArgs()
     private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(
+        DatabaseViewModel.Factory(
             requireContext().resources,
             (requireActivity().application as LyricCastApplication).repository
         )
@@ -183,8 +182,9 @@ class SetlistEditorFragment : Fragment() {
             setlistSongsCrossRef = mIntentSetlistWithSongs!!.setlistSongCrossRefs
         }
 
-        mSetlistSongs = setlistSongsCrossRef.sorted()
-            .map { SongItem(setlistSongs[it.songId]!!) }
+        // TODO: Rework for MongoDB
+//        mSetlistSongs = setlistSongsCrossRef.sorted()
+//            .map { SongItem(setlistSongs[it.songId]!!) }
 
         setupListeners(view)
         setupRecyclerView()
@@ -265,15 +265,18 @@ class SetlistEditorFragment : Fragment() {
             Setlist(null, setlistName)
         }
 
-        val songs = mSongItemsAdapter!!.songItems
-            .map { item -> item.song }
-            .distinct()
+        // TODO: Rework for MongoDB
+//        val songs = mSongItemsAdapter!!.songItems
+//            .map { item -> item.song }
+//            .distinct()
+//
+//        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter!!.songItems
+//            .mapIndexed { index, item ->
+//                SetlistSongCrossRef(null, setlist.id, item.song.id, index)
+//            }
 
-        val crossRef: List<SetlistSongCrossRef> = mSongItemsAdapter!!.songItems
-            .mapIndexed { index, item ->
-                SetlistSongCrossRef(null, setlist.id, item.song.id, index)
-            }
-
+        val songs: List<Song> = listOf()
+        val crossRef: List<SetlistSongCrossRef> = listOf()
         return SetlistWithSongs(setlist, songs, crossRef)
     }
 

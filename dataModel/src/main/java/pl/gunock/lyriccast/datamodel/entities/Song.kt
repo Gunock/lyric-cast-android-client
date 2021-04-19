@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:33 AM
+ * Last modified 4/19/21 5:11 PM
  */
 
 package pl.gunock.lyriccast.datamodel.entities
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast.datamodel.entities
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import pl.gunock.lyriccast.datamodel.extensions.toNonNullable
@@ -20,12 +19,6 @@ data class Song(
     @PrimaryKey(autoGenerate = true)
     val songId: Long? = null,
     var title: String = "",
-    @ForeignKey(
-        entity = Category::class,
-        parentColumns = ["categoryId"],
-        childColumns = ["categoryId"],
-        onDelete = ForeignKey.SET_NULL
-    )
     var categoryId: Long? = null
 ) : Parcelable {
     val id: Long get() = songId.toNonNullable()

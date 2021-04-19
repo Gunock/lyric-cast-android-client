@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:31 PM
+ * Last modified 4/19/21 5:11 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,9 +17,7 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.gms.cast.framework.CastContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.cast.SessionStartedListener
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.models.LyricCastSettings
 
@@ -37,12 +35,6 @@ class LaunchActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_launch)
         setSupportActionBar(findViewById(R.id.toolbar_launch))
-
-        // Initializes CastContext
-        CastContext.getSharedInstance(applicationContext)
-        CastContext.getSharedInstance()!!
-            .sessionManager
-            .addSessionManagerListener(SessionStartedListener { MessageHelper.sendBlank(false) })
 
         val settings = LyricCastSettings(applicationContext)
         AppCompatDelegate.setDefaultNightMode(settings.appTheme)

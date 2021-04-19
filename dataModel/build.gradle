@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:21 AM
+ * Last modified 4/16/21 8:19 PM
  */
 
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'realm-android'
 }
 
 android {
@@ -30,6 +31,14 @@ android {
                         "room.expandProjection": "true"]
             }
         }
+
+        realm {
+            syncEnabled = false
+        }
+    }
+
+    buildFeatures {
+        dataBinding true
     }
 
     buildTypes {

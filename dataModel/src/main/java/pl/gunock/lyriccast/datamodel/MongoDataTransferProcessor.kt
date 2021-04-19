@@ -7,24 +7,31 @@
 package pl.gunock.lyriccast.datamodel
 
 import android.content.res.Resources
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import io.realm.Realm
+import io.realm.RealmResults
+import io.realm.kotlin.where
+import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
+import pl.gunock.lyriccast.datamodel.entities.SetlistDocument
+import pl.gunock.lyriccast.datamodel.entities.SongDocument
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
-import pl.gunock.lyriccast.datamodel.models.ImportOptions
+import pl.gunock.lyriccast.datatransfer.models.CategoryDto
+import pl.gunock.lyriccast.datatransfer.models.SetlistDto
+import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal class DataTransferProcessor(
+internal class MongoDataTransferProcessor(
     private val mResources: Resources,
-    private val mRepository: LyricCastRepository
+    private val mRealm: Realm
 ) {
     private companion object {
         const val TAG = "DataTransferProcessor"
     }
 
-    fun importSongs(
-        data: DatabaseTransferData,
-        message: MutableLiveData<String>,
-        options: ImportOptions
-    ) {
+    // TODO: Rework for MongoDB
+//    suspend fun importSongs(
+//        data: DatabaseTransferData,
+//        message: MutableLiveData<String>,
+//        options: ImportOptions
+//    ) {
 //        if (options.deleteAll) {
 //            mRepository.clear()
 //        }
@@ -142,16 +149,24 @@ internal class DataTransferProcessor(
 //
 //            mRepository.upsertSetlists(setlists, setlistCrossRefMap)
 //        }
-
-        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
-        Log.d(TAG, "Finished import")
-    }
+//
+//        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
+//        Log.d(TAG, "Finished import")
+//    }
 
     fun getDatabaseTransferData(): DatabaseTransferData {
+        val songs: RealmResults<SongDocument> = mRealm.where<SongDocument>().findAll()
+        val categories: RealmResults<CategoryDocument> = mRealm.where<CategoryDocument>().findAll()
+        val setlists: RealmResults<SetlistDocument> = mRealm.where<SetlistDocument>().findAll()
+
+        val songDtos: List<SongDto> = songs.map { it.toDto() }
+        val categoryDtos: List<CategoryDto> = categories.map { it.toDto() }
+        val setlistDtos: List<SetlistDto> = setlists.map { it.toDto() }
+
         return DatabaseTransferData(
-            songDtos = null,
-            categoryDtos = null,
-            setlistDtos = null
+            songDtos = songDtos,
+            categoryDtos = categoryDtos,
+            setlistDtos = setlistDtos
         )
     }
 }

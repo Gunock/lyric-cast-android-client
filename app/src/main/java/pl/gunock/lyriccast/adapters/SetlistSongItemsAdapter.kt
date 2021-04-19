@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:05 AM
+ * Last modified 4/19/21 2:01 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -59,7 +59,9 @@ class SetlistSongItemsAdapter(
 
     fun duplicateSelectedItem() {
         val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
-        val selectedItem = mSongItems[selectedItemIndex].copy(id = availableId++)
+        val selectedItem = mSongItems[selectedItemIndex].copy()
+        selectedItem.id = availableId++
+
         selectedItem.isSelected.value = false
 
         mSongItems.add(selectedItemIndex + 1, selectedItem)

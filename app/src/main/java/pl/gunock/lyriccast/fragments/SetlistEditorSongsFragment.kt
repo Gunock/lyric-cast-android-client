@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 1:51 AM
+ * Last modified 4/19/21 5:10 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -24,8 +24,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
-import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
 import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
 import pl.gunock.lyriccast.datamodel.entities.Song
 import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
@@ -43,7 +42,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(
+        DatabaseViewModel.Factory(
             requireContext().resources,
             (requireActivity().application as LyricCastApplication).repository
         )
@@ -79,8 +78,6 @@ class SetlistEditorSongsFragment : Fragment() {
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
 
-        mDatabaseViewModel.allCategories.removeObservers(requireActivity())
-        mDatabaseViewModel.allSongs.removeObservers(requireActivity())
         super.onDestroyView()
     }
 
@@ -134,7 +131,7 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
         val filterEditText: EditText = requireView().findViewById(R.id.tin_song_filter)
         filterEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSongs(newText, (categorySpinner.selectedItem as Category).id)
+            filterSongs(newText, (categorySpinner.selectedItem as CategoryDocument).idLong)
         })
 
         filterEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -147,7 +144,7 @@ class SetlistEditorSongsFragment : Fragment() {
             ItemSelectedSpinnerListener { _, _ ->
                 filterSongs(
                     filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as Category).id
+                    (categorySpinner.selectedItem as CategoryDocument).idLong
                 )
             }
 
@@ -155,7 +152,7 @@ class SetlistEditorSongsFragment : Fragment() {
             .setOnCheckedChangeListener { _, isChecked ->
                 filterSongs(
                     filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as Category).id,
+                    (categorySpinner.selectedItem as CategoryDocument).idLong,
                     isSelected = if (isChecked) true else null
                 )
             }
@@ -167,9 +164,10 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
         categorySpinner.adapter = categorySpinnerAdapter
 
-        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
-            categorySpinnerAdapter.submitCollection(categories)
-        }
+        // TODO: Rework for MongoDB
+//        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
+//            categorySpinnerAdapter.submitCollection(categories)
+//        }
     }
 
     private fun setupRecyclerView(view: View) {
@@ -190,12 +188,13 @@ class SetlistEditorSongsFragment : Fragment() {
             mSelectionTracker = selectionTracker
         )
 
-        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
-            mSongItemsAdapter!!.submitCollection(songs ?: return@observe)
-            mSongItemsAdapter!!.songItems.forEach { item ->
-                item.isSelected.value = mSelectedSongs.contains(item.song)
-            }
-        }
+        // TODO: Rework for MongoDB
+//        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
+//            mSongItemsAdapter!!.submitCollection(songs ?: return@observe)
+//            mSongItemsAdapter!!.songItems.forEach { item ->
+//                item.isSelected.value = mSelectedSongs.contains(item.song)
+//            }
+//        }
 
         songsRecyclerView.adapter = mSongItemsAdapter
     }
@@ -206,22 +205,24 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun filterSongs(
         title: String,
-        categoryId: Long = Long.MIN_VALUE,
+        categoryId: Long = 0,
         isSelected: Boolean? = null
     ) {
         Log.d(TAG, "filterSongs invoked")
 
         updateSelectedSongs()
-        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
+        // TODO: Rework for MongoDB
+//        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
     }
 
     private fun updateSelectedSongs() {
-        for (item in mSongItemsAdapter!!.songItems) {
-            if (item.isSelected.value!!) {
-                mSelectedSongs.add(item.song)
-            } else {
-                mSelectedSongs.remove(item.song)
-            }
-        }
+        // TODO: Rework for MongoDB
+//        for (item in mSongItemsAdapter!!.songItems) {
+//            if (item.isSelected.value!!) {
+//                mSelectedSongs.add(item.song)
+//            } else {
+//                mSelectedSongs.remove(item.song)
+//            }
+//        }
     }
 }

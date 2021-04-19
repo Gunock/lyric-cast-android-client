@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:15 PM
+ * Last modified 4/19/21 4:12 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -28,13 +28,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
-import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
+import pl.gunock.lyriccast.datamodel.MongoDatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
@@ -57,9 +54,8 @@ class MainActivity : AppCompatActivity() {
         const val IMPORT_RESULT_CODE = 2
     }
 
-    private lateinit var mRepository: LyricCastRepository
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(resources, (application as LyricCastApplication).repository)
+    private val mDatabaseViewModel: MongoDatabaseViewModel by viewModels {
+        MongoDatabaseViewModel.Factory(resources)
     }
 
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
@@ -75,8 +71,6 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
-
-        mRepository = (application as LyricCastApplication).repository
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -193,24 +187,25 @@ class MainActivity : AppCompatActivity() {
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
 
+        val exportData = mDatabaseViewModel.getDatabaseTransferData()
+
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_json)
             val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
             val categoriesString =
                 JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
             val setlistsString = JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
+
             File(exportDir, "songs.json").writeText(songsString)
             File(exportDir, "categories.json").writeText(categoriesString)
             File(exportDir, "setlists.json").writeText(setlistsString)
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
-            @Suppress("BlockingMethodInNonBlockingContext")
             FileHelper.zip(contentResolver, uri, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)

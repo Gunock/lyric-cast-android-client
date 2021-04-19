@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:45 PM
+ * Last modified 4/19/21 4:41 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
-import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.entities.CategoryDocument
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.models.CategoryItem
@@ -116,10 +116,10 @@ class EditCategoryDialogFragment(
 
             val selectedColor = mColorSpinner.selectedItem as ColorItem
 
-            val category: Category = if (mDialogViewModel.category.value != null) {
+            val category: CategoryDocument = if (mDialogViewModel.category.value != null) {
                 mDialogViewModel.category.value!!
             } else {
-                Category(null, mNameInput.text.toString(), selectedColor.value)
+                CategoryDocument(name = mNameInput.text.toString(), color = selectedColor.value)
             }
 
             mDialogViewModel.category.value = category
