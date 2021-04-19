@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:33 AM
+ * Last modified 4/20/21 1:16 AM
  */
 
 package pl.gunock.lyriccast.datamodel.documents
@@ -25,7 +25,7 @@ open class SongDocument(
 ) : RealmObject() {
 
     @Ignore
-    val idLong: Long = id.date.time
+    val idLong: Long = id.hashCode().toLong()
 
     @Ignore
     val lyricsMap: Map<String, String> = lyrics.map { it.name to it.text }.toMap()

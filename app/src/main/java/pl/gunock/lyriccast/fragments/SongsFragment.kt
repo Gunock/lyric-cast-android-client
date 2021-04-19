@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:05 AM
+ * Last modified 4/20/21 1:30 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -27,6 +27,7 @@ import io.realm.RealmResults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.bson.types.ObjectId
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
@@ -44,6 +45,7 @@ import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SongItem
 import java.io.File
+import java.util.*
 
 
 class SongsFragment : Fragment() {
@@ -100,13 +102,6 @@ class SongsFragment : Fragment() {
 
     }
 
-    private lateinit var mCategoryAll: CategoryDocument
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        mCategoryAll = CategoryDocument(name = requireContext().getString(R.string.category_all))
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -202,7 +197,6 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-
         mSelectionTracker = SelectionTracker(this::onSongClick)
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
@@ -238,7 +232,7 @@ class SongsFragment : Fragment() {
 
     private fun filterSongs(
         title: String,
-        categoryId: Long = 0
+        categoryId: ObjectId
     ) {
         Log.v(TAG, "filterSongs invoked")
 
@@ -402,7 +396,9 @@ class SongsFragment : Fragment() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun getSelectedCategoryId(categorySpinner: Spinner): Long {
-        return ((categorySpinner.selectedItem ?: mCategoryAll) as CategoryDocument).idLong
+    private fun getSelectedCategoryId(categorySpinner: Spinner): ObjectId {
+        categorySpinner.selectedItem ?: return ObjectId(Date(0), 0)
+
+        return (categorySpinner.selectedItem as CategoryDocument).id
     }
 }

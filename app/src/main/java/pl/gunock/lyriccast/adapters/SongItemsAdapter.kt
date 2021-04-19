@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:11 AM
+ * Last modified 4/20/21 1:27 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -18,6 +18,7 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
@@ -72,7 +73,7 @@ class SongItemsAdapter(
 
     fun filterItems(
         songTitle: String,
-        categoryId: Long = 0,
+        categoryId: ObjectId = ObjectId(Date(0), 0),
         isSelected: Boolean? = null
     ) {
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
@@ -81,8 +82,8 @@ class SongItemsAdapter(
             predicates.add { songItem -> songItem.isSelected.value!! }
         }
 
-        if (categoryId > 0) {
-            predicates.add { songItem -> songItem.song.category?.idLong == categoryId }
+        if (categoryId != ObjectId(Date(0), 0)) {
+            predicates.add { songItem -> songItem.song.category?.id == categoryId }
         }
 
         val normalizedTitle = songTitle.trim().normalize()

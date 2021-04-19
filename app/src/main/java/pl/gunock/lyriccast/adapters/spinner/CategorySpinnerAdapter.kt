@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:11 AM
+ * Last modified 4/20/21 1:26 AM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -27,7 +27,7 @@ class CategorySpinnerAdapter(
     private var mItems: MutableList<CategoryDocument> = mutableListOf()
 
     private val mCategoryAll: CategoryDocument =
-        CategoryDocument(name = context.getString(R.string.category_all), id = ObjectId(Date(0)))
+        CategoryDocument(name = context.getString(R.string.category_all), id = ObjectId(Date(0), 0))
 
     val categories: List<CategoryDocument> get() = mItems
 

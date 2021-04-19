@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 1:24 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
@@ -122,7 +123,7 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
         val filterEditText: EditText = requireView().findViewById(R.id.tin_song_filter)
         filterEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSongs(newText, (categorySpinner.selectedItem as CategoryDocument).idLong)
+            filterSongs(newText, (categorySpinner.selectedItem as CategoryDocument).id)
         })
 
         filterEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -135,7 +136,7 @@ class SetlistEditorSongsFragment : Fragment() {
             ItemSelectedSpinnerListener { _, _ ->
                 filterSongs(
                     filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as CategoryDocument).idLong
+                    (categorySpinner.selectedItem as CategoryDocument).id
                 )
             }
 
@@ -143,7 +144,7 @@ class SetlistEditorSongsFragment : Fragment() {
             .setOnCheckedChangeListener { _, isChecked ->
                 filterSongs(
                     filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as CategoryDocument).idLong,
+                    (categorySpinner.selectedItem as CategoryDocument).id,
                     isSelected = if (isChecked) true else null
                 )
             }
@@ -194,7 +195,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun filterSongs(
         title: String,
-        categoryId: Long = 0,
+        categoryId: ObjectId,
         isSelected: Boolean? = null
     ) {
         Log.d(TAG, "filterSongs invoked")

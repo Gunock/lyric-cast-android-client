@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 1:29 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -154,6 +154,8 @@ class SetlistsFragment : Fragment() {
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
+        val exportData = mDatabaseViewModel.getDatabaseTransferData()
+
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
@@ -164,7 +166,6 @@ class SetlistsFragment : Fragment() {
 
             val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
             val exportSetlists = exportData.setlistDtos!!
                 .filter { it.name in setlistNames }
