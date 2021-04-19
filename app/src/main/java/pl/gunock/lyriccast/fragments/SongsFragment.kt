@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 10:26 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 10:26 PM
+ * Last modified 4/20/21 1:30 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -23,12 +23,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.realm.RealmResults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import org.bson.types.ObjectId
 import org.json.JSONArray
-import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.activities.SongControlsActivity
@@ -37,12 +37,7 @@ import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.entities.Category
-import pl.gunock.lyriccast.datamodel.entities.Setlist
-import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
-import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
@@ -50,6 +45,7 @@ import pl.gunock.lyriccast.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.models.SongItem
 import java.io.File
+import java.util.*
 
 
 class SongsFragment : Fragment() {
@@ -59,12 +55,8 @@ class SongsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 3
     }
 
-    private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(
-            requireContext().resources,
-            (requireActivity().application as LyricCastApplication).repository
-        )
+        DatabaseViewModel.Factory(requireContext().resources)
     }
 
     private var mCategorySpinner: Spinner? = null
@@ -110,16 +102,6 @@ class SongsFragment : Fragment() {
 
     }
 
-    private lateinit var mCategoryAll: Category
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        mCategoryAll = Category(Long.MIN_VALUE, requireContext().getString(R.string.category_all))
-
-        mRepository = (requireActivity().application as LyricCastApplication).repository
-        mDatabaseViewModel.removeObservers(requireActivity())
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -141,8 +123,11 @@ class SongsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        mDatabaseViewModel.close()
+
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
+        mCategorySpinner?.adapter = null
         mCategorySpinner = null
         super.onDestroyView()
     }
@@ -202,16 +187,16 @@ class SongsFragment : Fragment() {
 
         mCategorySpinner!!.adapter = categorySpinnerAdapter
 
-        mDatabaseViewModel.allCategories.observe(requireActivity()) { categories ->
+        mDatabaseViewModel.allCategories.addChangeListener { categories: RealmResults<CategoryDocument> ->
             if (mCategorySpinner != null) {
-                (mCategorySpinner!!.adapter as CategorySpinnerAdapter).submitCollection(categories)
+                categorySpinnerAdapter.submitCollection(categories)
                 mCategorySpinner!!.setSelection(0)
             }
         }
+
     }
 
     private fun setupRecyclerView() {
-
         mSelectionTracker = SelectionTracker(this::onSongClick)
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
@@ -223,8 +208,8 @@ class SongsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = mSongItemsAdapter
 
-        mDatabaseViewModel.allSongs.observe(requireActivity()) { songs ->
-            mSongItemsAdapter?.submitCollection(songs ?: return@observe)
+        mDatabaseViewModel.allSongs.addChangeListener { songs ->
+            mSongItemsAdapter?.submitCollection(songs)
         }
     }
 
@@ -247,7 +232,7 @@ class SongsFragment : Fragment() {
 
     private fun filterSongs(
         title: String,
-        categoryId: Long = Long.MIN_VALUE
+        categoryId: ObjectId
     ) {
         Log.v(TAG, "filterSongs invoked")
 
@@ -256,18 +241,10 @@ class SongsFragment : Fragment() {
     }
 
     private fun pickSong(item: SongItem) {
-        val songWithLyrics = runBlocking { mRepository.getSongWithLyrics(item.song.id) }!!
-
-        val lyricsTextMap = songWithLyrics.lyricsSectionsToTextMap()
-        val lyrics: List<String> = songWithLyrics.crossRef
-            .sorted()
-            .map { lyricsTextMap[it.lyricsSectionId]!! }
-
         resetSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
-        intent.putExtra("lyrics", lyrics.toTypedArray())
-        intent.putExtra("songTitle", songWithLyrics.song.title)
+        intent.putExtra("songId", item.song.id)
         startActivity(intent)
     }
 
@@ -297,13 +274,13 @@ class SongsFragment : Fragment() {
         return true
     }
 
-
     private fun editSelectedSong(): Boolean {
         val selectedItem =
             mSongItemsAdapter!!.songItems.first { songItem -> songItem.isSelected.value!! }
+
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
-        intent.putExtra("song", selectedItem.song)
+        intent.putExtra("songId", selectedItem.song.id)
         startActivity(intent)
 
         resetSelection()
@@ -331,6 +308,7 @@ class SongsFragment : Fragment() {
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
+        val exportData = mDatabaseViewModel.getDatabaseTransferData()
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
@@ -340,9 +318,10 @@ class SongsFragment : Fragment() {
                 .filter { it.isSelected.value!! }
 
             val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
-            val categoryNames: Set<String> = selectedSongs.mapNotNull { it.category?.name }.toSet()
+            val categoryNames: Set<String> =
+                selectedSongs.mapNotNull { it.song.category?.name }.toSet()
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
+
             val songJsons = exportData.songDtos!!
                 .filter { it.title in songTitles }
                 .map { it.toJson() }
@@ -372,19 +351,13 @@ class SongsFragment : Fragment() {
     }
 
     private fun addSetlist(): Boolean {
-        val setlist = Setlist(null, "")
-        val songs = mSongItemsAdapter!!.songItems
+        val setlistSongs = mSongItemsAdapter!!.songItems
             .filter { it.isSelected.value == true }
-            .map { item -> item.song }
-
-        val crossRef: List<SetlistSongCrossRef> = songs.mapIndexed { index, song ->
-            SetlistSongCrossRef(null, setlist.id, song.id, index)
-        }
-
-        val setlistWithSongs = SetlistWithSongs(setlist, songs, crossRef)
+            .map { item -> item.song.id.toString() }
+            .toTypedArray()
 
         val intent = Intent(context, SetlistEditorActivity::class.java)
-        intent.putExtra("setlistWithSongs", setlistWithSongs)
+        intent.putExtra("setlistSongs", setlistSongs)
         startActivity(intent)
 
         resetSelection()
@@ -423,7 +396,9 @@ class SongsFragment : Fragment() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun getSelectedCategoryId(categorySpinner: Spinner): Long {
-        return ((categorySpinner.selectedItem ?: mCategoryAll) as Category).id
+    private fun getSelectedCategoryId(categorySpinner: Spinner): ObjectId {
+        categorySpinner.selectedItem ?: return ObjectId(Date(0), 0)
+
+        return (categorySpinner.selectedItem as CategoryDocument).id
     }
 }

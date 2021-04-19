@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:05 AM
+ * Last modified 4/20/21 1:27 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -18,10 +18,11 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
-import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.SongItem
@@ -61,7 +62,7 @@ class SongItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    fun submitCollection(songs: Collection<SongAndCategory>) {
+    fun submitCollection(songs: Collection<SongDocument>) {
         synchronized(mLock) {
             mItems.clear()
             mItems.addAll(songs.map { SongItem(it) })
@@ -72,7 +73,7 @@ class SongItemsAdapter(
 
     fun filterItems(
         songTitle: String,
-        categoryId: Long = Long.MIN_VALUE,
+        categoryId: ObjectId = ObjectId(Date(0), 0),
         isSelected: Boolean? = null
     ) {
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
@@ -81,8 +82,8 @@ class SongItemsAdapter(
             predicates.add { songItem -> songItem.isSelected.value!! }
         }
 
-        if (categoryId != Long.MIN_VALUE) {
-            predicates.add { songItem -> songItem.category?.categoryId == categoryId }
+        if (categoryId != ObjectId(Date(0), 0)) {
+            predicates.add { songItem -> songItem.song.category?.id == categoryId }
         }
 
         val normalizedTitle = songTitle.trim().normalize()
@@ -116,7 +117,7 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return mVisibleItems.toList()[position].id
+        return mVisibleItems.toList()[position].song.idLong
     }
 
     override fun getItemCount() = mVisibleItems.size
@@ -140,12 +141,12 @@ class SongItemsAdapter(
 
             mTitleTextView.text = item.song.title
 
-            if (item.category != null) {
-                mCategoryTextView.text = item.category.name
+            if (item.song.category != null) {
+                mCategoryTextView.text = item.song.category?.name
                 mCheckBox.buttonTintList =
                     ColorStateList.valueOf(this@SongItemsAdapter.mWithCategoryTextColor)
                 mTitleTextView.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
-                (itemView as CardView).setCardBackgroundColor(item.category.color!!)
+                (itemView as CardView).setCardBackgroundColor(item.song.category?.color!!)
             } else {
                 mCategoryTextView.text = ""
 

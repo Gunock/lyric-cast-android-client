@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:08 AM
+ * Last modified 4/20/21 1:09 AM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -18,7 +18,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
 import pl.gunock.lyriccast.models.CategoryItem
@@ -40,10 +40,10 @@ class CategoryItemsAdapter(
         setHasStableIds(true)
     }
 
-    fun submitCollection(songs: Collection<Category>) {
+    fun submitCollection(categories: Collection<CategoryDocument>) {
         synchronized(mLock) {
             mItems.clear()
-            mItems.addAll(songs.map { CategoryItem(it) })
+            mItems.addAll(categories.map { CategoryItem(it) })
             notifyDataSetChanged()
         }
     }
@@ -65,7 +65,7 @@ class CategoryItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return categoryItems[position].category.id
+        return categoryItems[position].category.idLong
     }
 
     override fun getItemCount() = mItems.size

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:05 AM
+ * Last modified 4/19/21 11:20 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -25,44 +25,46 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistSongItemsAdapter(
     context: Context,
-    private val mSongItems: MutableList<SongItem>,
+    private val mItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     private val mSelectionTracker: SelectionTracker<ViewHolder>?,
     private val mOnHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
 
-    val songItems: List<SongItem> get() = mSongItems
+    val items: List<SongItem> get() = mItems
 
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
     private var availableId: Long = 0L
 
     init {
-        mSongItems.forEach { it.id = availableId++ }
+        mItems.forEach { it.id = availableId++ }
 
         setHasStableIds(true)
     }
 
     fun removeObservers() {
         showCheckBox.removeObservers(mLifecycleOwner)
-        songItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
+        items.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
     fun resetSelection() {
-        mSongItems.forEach { it.isSelected.value = false }
+        mItems.forEach { it.isSelected.value = false }
         mSelectionTracker?.reset()
     }
 
     fun moveItem(from: Int, to: Int) {
-        val item = mSongItems.removeAt(from)
-        mSongItems.add(to, item)
+        val item = mItems.removeAt(from)
+        mItems.add(to, item)
     }
 
     fun duplicateSelectedItem() {
-        val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
-        val selectedItem = mSongItems[selectedItemIndex].copy(id = availableId++)
+        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItem = mItems[selectedItemIndex].copy()
+        selectedItem.id = availableId++
+
         selectedItem.isSelected.value = false
 
-        mSongItems.add(selectedItemIndex + 1, selectedItem)
+        mItems.add(selectedItemIndex + 1, selectedItem)
         notifyItemInserted(selectedItemIndex + 1)
     }
 
@@ -73,11 +75,11 @@ class SetlistSongItemsAdapter(
     }
 
     private fun deleteSelectedItem(): Boolean {
-        val selectedItemIndex = mSongItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected.value!! }
         if (selectedItemIndex == -1) {
             return false
         }
-        mSongItems.removeAt(selectedItemIndex)
+        mItems.removeAt(selectedItemIndex)
         notifyItemRemoved(selectedItemIndex)
         return true
     }
@@ -94,11 +96,11 @@ class SetlistSongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val item = mSongItems[position]
+        val item = mItems[position]
         return item.id
     }
 
-    override fun getItemCount() = mSongItems.size
+    override fun getItemCount() = mItems.size
 
     inner class ViewHolder(
         itemView: View
@@ -108,7 +110,7 @@ class SetlistSongItemsAdapter(
         private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
 
         fun bind(position: Int) {
-            val item = mSongItems[position]
+            val item = mItems[position]
             mSelectionTracker?.attach(this)
             setupListeners()
 

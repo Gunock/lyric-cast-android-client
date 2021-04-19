@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 10:00 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,23 +14,20 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.cast.framework.CastContext
-import kotlinx.coroutines.runBlocking
-import pl.gunock.lyriccast.LyricCastApplication
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
-import pl.gunock.lyriccast.datamodel.entities.Setlist
-import pl.gunock.lyriccast.datamodel.entities.SetlistSongCrossRef
-import pl.gunock.lyriccast.datamodel.entities.Song
-import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
-import pl.gunock.lyriccast.datamodel.entities.relations.SongAndCategory
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
@@ -38,7 +35,9 @@ import pl.gunock.lyriccast.models.SongItem
 
 class SetlistControlsActivity : AppCompatActivity() {
 
-    private lateinit var mRepository: LyricCastRepository
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModel.Factory(resources)
+    }
 
     private var mSessionStartedListener: SessionStartedListener? = null
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
@@ -67,8 +66,6 @@ class SetlistControlsActivity : AppCompatActivity() {
         mBlankOffColor = resources.getColor(R.color.green, null)
         mBlankOnColor = resources.getColor(R.color.red, null)
 
-        mRepository = (application as LyricCastApplication).repository
-
         findViewById<Button>(R.id.btn_setlist_blank).setBackgroundColor(mCurrentBlankColor)
 
         mSessionStartedListener = SessionStartedListener {
@@ -81,18 +78,9 @@ class SetlistControlsActivity : AppCompatActivity() {
             mSessionStartedListener
         )
 
-        val setlistWithSongs = setupLyrics()
+        val setlist: SetlistDocument = setupLyrics()
 
-        val songsAndCategories =
-            runBlocking { mRepository.getSongsAndCategories(setlistWithSongs.songs) }
-                .map { it.song.id to it }
-                .toMap()
-
-        val setlistPresentation = setlistWithSongs.setlistSongCrossRefs
-            .sorted()
-            .map { it.songId }
-
-        setupRecyclerView(setlistPresentation.map { songsAndCategories[it]!! })
+        setupRecyclerView(setlist.presentation)
 
         setupListeners()
         setPreview()
@@ -129,30 +117,19 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupLyrics(): SetlistWithSongs {
-        val setlist: Setlist = intent.getParcelableExtra("setlist")!!
-        val setlistWithSongs = runBlocking { mRepository.getSetlistWithSongs(setlist.id)!! }
-        val songs = setlistWithSongs.songs
+    private fun setupLyrics(): SetlistDocument {
+        val setlistId: ObjectId = intent.getSerializableExtra("setlistId")!! as ObjectId
+        val setlist: SetlistDocument = mDatabaseViewModel.allSetlists
+            .where()
+            .equalTo("id", setlistId)
+            .findFirst()!!
+
         var setlistLyricsIndex = 0
+        mSetlistLyrics = setlist.presentation
+            .flatMapIndexed { index: Int, song: SongDocument ->
+                val lyrics = song.lyricsList
 
-        val songLyrics = runBlocking { mRepository.getSongsWithLyrics(songs) }
-            .map { songWithLyricsSections ->
-                val songId = songWithLyricsSections.song.id
-                val lyricsSectionsText = songWithLyricsSections.lyricsSections
-                    .zip(songWithLyricsSections.crossRef)
-                    .sortedBy { it.second }
-                    .map { it.first.text }
-                songId to lyricsSectionsText
-            }.toMap()
-
-        mSetlistLyrics = setlistWithSongs.setlistSongCrossRefs
-            .zip(setlistWithSongs.songs)
-            .sortedBy { it.first }
-            .flatMapIndexed { index: Int, pair: Pair<SetlistSongCrossRef, Song> ->
-                val songId = pair.second.songId
-                val lyrics = songLyrics[songId]!!
-
-                val indexedTitle = "[$index] ${pair.second.title}"
+                val indexedTitle = "[$index] ${song.title}"
                 mSongTitles[setlistLyricsIndex] = indexedTitle
                 mSongTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
                 mSongStartPoints[indexedTitle] = setlistLyricsIndex
@@ -162,10 +139,10 @@ class SetlistControlsActivity : AppCompatActivity() {
                 return@flatMapIndexed lyrics
             }
 
-        return setlistWithSongs
+        return setlist
     }
 
-    private fun setupRecyclerView(songs: List<SongAndCategory>) {
+    private fun setupRecyclerView(songs: List<SongDocument>) {
         val songRecyclerView: RecyclerView = findViewById(R.id.rcv_songs)
         songRecyclerView.setHasFixedSize(true)
         songRecyclerView.layoutManager = LinearLayoutManager(baseContext)

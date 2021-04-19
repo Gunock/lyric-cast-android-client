@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -9,9 +9,14 @@ package pl.gunock.lyriccast.datamodel
 import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import pl.gunock.lyriccast.datamodel.entities.*
-import pl.gunock.lyriccast.datamodel.entities.relations.SetlistWithSongs
-import pl.gunock.lyriccast.datamodel.entities.relations.SongWithLyricsSections
+import io.realm.Realm
+import io.realm.RealmList
+import io.realm.RealmResults
+import io.realm.kotlin.where
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.documents.LyricsSectionDocument
+import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
@@ -20,153 +25,173 @@ import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 internal class DataTransferProcessor(
     private val mResources: Resources,
-    private val mRepository: LyricCastRepository
+    private val mRealm: Realm
 ) {
     private companion object {
         const val TAG = "DataTransferProcessor"
     }
 
-    suspend fun importSongs(
+    fun importSongs(
         data: DatabaseTransferData,
         message: MutableLiveData<String>,
         options: ImportOptions
     ) {
         if (options.deleteAll) {
-            mRepository.clear()
+            mRealm.deleteAll()
         }
 
-        val removeConflicts = !options.deleteAll && !options.replaceOnConflict
+        val removeConflicts: Boolean = !options.deleteAll && !options.replaceOnConflict
 
         if (data.categoryDtos != null) {
             message.postValue(mResources.getString(R.string.data_transfer_processor_importing_categories))
-            val categories = data.categoryDtos.map { Category(it) }.toMutableList()
-            val allCategories = mRepository.getAllCategories()
-            val categoryNames = allCategories.map { it.name }.toSet()
-            if (removeConflicts) {
-                categories.removeAll { it.name in categoryNames }
-            } else if (options.replaceOnConflict) {
-                val categoryNameMap = allCategories.map { it.name to it }.toMap()
-                val categoriesToAdd: MutableList<Category> = mutableListOf()
-                categories.removeAll {
-                    if (it.name in categoryNames) {
-                        categoriesToAdd.add(it.copy(categoryId = categoryNameMap[it.name]!!.categoryId))
-                        return@removeAll true
-                    }
-                    return@removeAll false
-                }
-                categories.addAll(categoriesToAdd)
-            }
-
-            mRepository.upsertCategories(categories)
+            importCategories(data.categoryDtos, options, removeConflicts)
         }
 
         if (data.songDtos != null) {
             message.postValue(mResources.getString(R.string.data_transfer_processor_importing_songs))
-
-            val categoryMap: Map<String, Category> = mRepository.getAllCategories()
-                .map { it.name to it }
-                .toMap()
-
-            var orderMap: MutableMap<String, List<Pair<String, Int>>> = mutableMapOf()
-            val songsWithLyricsSections: MutableList<SongWithLyricsSections> = data.songDtos
-                .map { songDto ->
-                    val song = Song(songDto, categoryMap[songDto.category]?.categoryId)
-                    val lyricsSections: List<LyricsSection> = songDto.lyrics
-                        .map { LyricsSection(songId = -1, name = it.key, text = it.value) }
-
-                    val order: List<Pair<String, Int>> = songDto.presentation
-                        .mapIndexed { index, sectionName -> sectionName to index }
-
-                    orderMap[song.title] = order
-                    return@map SongWithLyricsSections(song, lyricsSections)
-                }.toMutableList()
-
-            val allSongs = mRepository.getAllSongs()
-            val songTitles = allSongs.map { it.title }.toSet()
-            if (removeConflicts) {
-                orderMap = orderMap.filter { it.key !in songTitles }.toMutableMap()
-                songsWithLyricsSections.removeAll { it.song.title in songTitles }
-            } else if (options.replaceOnConflict) {
-                val songTitleMap = allSongs.map { it.title to it }.toMap()
-                val songsToAdd: MutableList<SongWithLyricsSections> = mutableListOf()
-                songsWithLyricsSections.removeAll {
-                    if (it.song.title in songTitles) {
-                        songsToAdd
-                            .add(it.copy(song = it.song.copy(songId = songTitleMap[it.song.title]!!.songId)))
-                        return@removeAll true
-                    }
-                    return@removeAll false
-                }
-                songsWithLyricsSections.addAll(songsToAdd)
-            }
-
-            mRepository.upsertSongs(songsWithLyricsSections, orderMap)
+            importSongs(data.songDtos, options, removeConflicts)
         }
 
         if (data.setlistDtos != null) {
             message.postValue(mResources.getString(R.string.data_transfer_processor_importing_setlists))
-
-            val songTitleMap: Map<String, Song> = mRepository.getAllSongs()
-                .map { it.title to it }
-                .toMap()
-
-            val setlists: MutableList<Setlist> = data.setlistDtos
-                .map { Setlist(it) }
-                .toMutableList()
-
-            val allSetlists: List<SetlistWithSongs> = mRepository.getAllSetlists()
-            val setlistNames = allSetlists.map { it.setlist.name }.toSet()
-            if (removeConflicts) {
-
-                setlists.removeAll { it.name in setlistNames }
-            } else if (options.replaceOnConflict) {
-                val setlistNameMap = allSetlists.map { it.setlist.name to it.setlist }.toMap()
-                val setlistsToAdd: MutableList<Setlist> = mutableListOf()
-                setlists.removeAll {
-                    if (it.name in setlistNames) {
-                        setlistsToAdd.add(it.copy(setlistId = setlistNameMap[it.name]!!.setlistId))
-                        return@removeAll true
-                    }
-                    return@removeAll false
-                }
-                setlists.addAll(setlistsToAdd)
-            }
-
-            val newSetlistNames = setlists.map { it.name }.toSet()
-            val setlistCrossRefMap: Map<String, List<SetlistSongCrossRef>> =
-                data.setlistDtos
-                    .filter { it.name in newSetlistNames }
-                    .map { setlistDto ->
-                        val songList = setlistDto.songs
-
-                        val setlistSongCrossRefs: List<SetlistSongCrossRef> =
-                            songList.mapIndexed { index, songTitle ->
-                                SetlistSongCrossRef(null, -1, songTitleMap[songTitle]!!.id, index)
-                            }
-                        return@map setlistDto.name to setlistSongCrossRefs
-                    }.toMap()
-
-            mRepository.upsertSetlists(setlists, setlistCrossRefMap)
+            importSetlists(data.setlistDtos, options, removeConflicts)
         }
 
         message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
         Log.d(TAG, "Finished import")
     }
 
-    suspend fun getDatabaseTransferData(): DatabaseTransferData {
-        val categories: List<Category> = mRepository.getAllCategories()
-        val categoryMap: Map<Long?, String> = categories.map { it.categoryId to it.name }.toMap()
+    fun getDatabaseTransferData(): DatabaseTransferData {
+        val songs: RealmResults<SongDocument> = mRealm.where<SongDocument>().findAll()
+        val categories: RealmResults<CategoryDocument> = mRealm.where<CategoryDocument>().findAll()
+        val setlists: RealmResults<SetlistDocument> = mRealm.where<SetlistDocument>().findAll()
 
-        val songDtos: List<SongDto> = mRepository.getAllSongsWithLyricsSections().map {
-            it.toDto(categoryMap[it.song.categoryId])
-        }
-
+        val songDtos: List<SongDto> = songs.map { it.toDto() }
         val categoryDtos: List<CategoryDto> = categories.map { it.toDto() }
-        val setlistDtos: List<SetlistDto> = mRepository.getAllSetlists().map { it.toDto() }
+        val setlistDtos: List<SetlistDto> = setlists.map { it.toDto() }
+
         return DatabaseTransferData(
             songDtos = songDtos,
             categoryDtos = categoryDtos,
             setlistDtos = setlistDtos
         )
+    }
+
+    private fun importCategories(
+        categoryDtos: List<CategoryDto>,
+        options: ImportOptions,
+        removeConflicts: Boolean
+    ) {
+        val categories = categoryDtos.map { CategoryDocument(it) }.toMutableList()
+
+        val allCategories = mRealm.where<CategoryDocument>().findAll()
+
+        val categoryNames = allCategories.map { it.name }.toSet()
+        if (removeConflicts) {
+            categories.removeAll { it.name in categoryNames }
+        } else if (options.replaceOnConflict) {
+            val categoryNameMap = allCategories.map { it.name to it.id }.toMap()
+            val categoriesToAdd: MutableList<CategoryDocument> = mutableListOf()
+
+            categories.removeAll {
+                if (it.name in categoryNames) {
+                    categoriesToAdd.add(CategoryDocument(it, categoryNameMap[it.name]!!))
+                    return@removeAll true
+                }
+                return@removeAll false
+            }
+            categories.addAll(categoriesToAdd)
+        }
+
+        mRealm.insertOrUpdate(categories)
+    }
+
+    private fun importSongs(
+        songDtos: List<SongDto>,
+        options: ImportOptions,
+        removeConflicts: Boolean
+    ) {
+        val categoryMap: Map<String, CategoryDocument> = mRealm.where<CategoryDocument>()
+            .findAll()
+            .map { it.name to it }
+            .toMap()
+
+        val songs: MutableList<SongDocument> = songDtos
+            .map { dto ->
+                val lyricsSections: Array<LyricsSectionDocument> = dto.lyrics
+                    .map { LyricsSectionDocument(name = it.key, text = it.value) }
+                    .toTypedArray()
+
+                val song = SongDocument(dto, categoryMap[dto.category]!!)
+                song.lyrics = RealmList(*lyricsSections)
+                song.presentation = RealmList(*dto.presentation.toTypedArray())
+
+                return@map song
+            }.toMutableList()
+
+
+        val allSongs = mRealm.where<SongDocument>().findAll()
+        val songTitles = allSongs.map { it.title }.toSet()
+
+        if (removeConflicts) {
+            songs.removeAll { it.title in songTitles }
+        } else if (options.replaceOnConflict) {
+            val songTitleMap = allSongs.map { it.title to it.id }.toMap()
+            val songsToAdd: MutableList<SongDocument> = mutableListOf()
+            songs.removeAll {
+                if (it.title in songTitles) {
+                    songsToAdd.add(SongDocument(it, songTitleMap[it.title]!!))
+                    return@removeAll true
+                }
+                return@removeAll false
+            }
+            songs.addAll(songsToAdd)
+        }
+
+        mRealm.insertOrUpdate(songs)
+    }
+
+    private fun importSetlists(
+        setlistDtos: List<SetlistDto>,
+        options: ImportOptions,
+        removeConflicts: Boolean
+    ) {
+        val setlists: MutableList<SetlistDocument> = setlistDtos
+            .map { SetlistDocument(it) }
+            .toMutableList()
+
+        val allSetlists: List<SetlistDocument> = mRealm.where<SetlistDocument>().findAll()
+        val setlistNames = allSetlists.map { it.name }.toSet()
+
+        if (removeConflicts) {
+            setlists.removeAll { it.name in setlistNames }
+        } else if (options.replaceOnConflict) {
+            val setlistNameMap = allSetlists.map { it.name to it.id }.toMap()
+
+            val setlistsToAdd: MutableList<SetlistDocument> = mutableListOf()
+            setlists.removeAll {
+                if (it.name in setlistNames) {
+                    setlistsToAdd.add(SetlistDocument(it, setlistNameMap[it.name]!!))
+                    return@removeAll true
+                }
+                return@removeAll false
+            }
+            setlists.addAll(setlistsToAdd)
+        }
+
+        val songTitleMap: Map<String, SongDocument> = mRealm.where<SongDocument>()
+            .findAll()
+            .map { it.title to it }
+            .toMap()
+        val setlistDtoNameMap = setlistDtos.map { it.name to it.songs }.toMap()
+        setlists.forEach { setlist ->
+            val presentation: Array<SongDocument> = setlistDtoNameMap[setlist.name]!!
+                .map { songTitleMap[it]!! }
+                .toTypedArray()
+
+            setlist.presentation = RealmList(*presentation)
+        }
+
+        mRealm.insertOrUpdate(setlists)
     }
 }

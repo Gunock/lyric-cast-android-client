@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:02 PM
+ * Last modified 4/20/21 1:29 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -22,18 +22,14 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
-import pl.gunock.lyriccast.LyricCastApplication
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
-import pl.gunock.lyriccast.datamodel.LyricCastRepository
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.helpers.KeyboardHelper
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
@@ -47,12 +43,8 @@ class SetlistsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 4
     }
 
-    private lateinit var mRepository: LyricCastRepository
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(
-            requireContext().resources,
-            (requireActivity().application as LyricCastApplication).repository
-        )
+        DatabaseViewModel.Factory(requireContext().resources)
     }
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
@@ -94,14 +86,6 @@ class SetlistsFragment : Fragment() {
             mActionMenu = null
             resetSelection()
         }
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        mRepository = (requireActivity().application as LyricCastApplication).repository
-        mDatabaseViewModel.removeObservers(requireActivity())
     }
 
     override fun onCreateView(
@@ -170,6 +154,8 @@ class SetlistsFragment : Fragment() {
         )
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
+        val exportData = mDatabaseViewModel.getDatabaseTransferData()
+
         CoroutineScope(Dispatchers.IO).launch {
             val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
@@ -180,7 +166,6 @@ class SetlistsFragment : Fragment() {
 
             val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
             val exportSetlists = exportData.setlistDtos!!
                 .filter { it.name in setlistNames }
@@ -238,8 +223,8 @@ class SetlistsFragment : Fragment() {
 
         recyclerView.adapter = mSetlistItemsAdapter
 
-        mDatabaseViewModel.allSetlists.observe(requireActivity()) { setlist ->
-            mSetlistItemsAdapter?.submitCollection(setlist ?: return@observe)
+        mDatabaseViewModel.allSetlists.addChangeListener { setlists ->
+            mSetlistItemsAdapter?.submitCollection(setlists)
         }
     }
 
@@ -275,7 +260,7 @@ class SetlistsFragment : Fragment() {
 
     private fun pickSetlist(item: SetlistItem) {
         val intent = Intent(context, SetlistControlsActivity::class.java)
-        intent.putExtra("setlist", item.setlist)
+        intent.putExtra("setlistId", item.setlist.id)
         startActivity(intent)
     }
 
@@ -309,11 +294,8 @@ class SetlistsFragment : Fragment() {
         val selectedItem = mSetlistItemsAdapter!!.setlistItems
             .first { setlistItem -> setlistItem.isSelected.value!! }
 
-        val setlistWithSongs =
-            runBlocking { mRepository.getSetlistWithSongs(selectedItem.setlist.id) }
-
         val intent = Intent(context, SetlistEditorActivity::class.java)
-        intent.putExtra("setlistWithSongs", setlistWithSongs)
+        intent.putExtra("setlistId", selectedItem.setlist.id)
         startActivity(intent)
 
         resetSelection()

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:47 AM
+ * Last modified 4/20/21 1:26 AM
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import java.util.*
 
 class CategorySpinnerAdapter(
     context: Context
@@ -22,14 +24,17 @@ class CategorySpinnerAdapter(
     private val mLock = Any()
 
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
-    private var mItems: MutableList<Category> = mutableListOf()
+    private var mItems: MutableList<CategoryDocument> = mutableListOf()
 
-    private val mCategoryAll: Category =
-        Category(Long.MIN_VALUE, context.getString(R.string.category_all))
+    private val mCategoryAll: CategoryDocument =
+        CategoryDocument(name = context.getString(R.string.category_all), id = ObjectId(Date(0), 0))
 
-    val categories: List<Category> get() = mItems
+    val categories: List<CategoryDocument> get() = mItems
 
-    fun submitCollection(categories: Collection<Category>, firstCategory: Category = mCategoryAll) {
+    fun submitCollection(
+        categories: Collection<CategoryDocument>,
+        firstCategory: CategoryDocument = mCategoryAll
+    ) {
         synchronized(mLock) {
             mItems.clear()
             mItems.addAll(listOf(firstCategory) + categories.toSortedSet())
@@ -42,7 +47,7 @@ class CategorySpinnerAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return this.categories[position].id
+        return this.categories[position].idLong
     }
 
     override fun getCount(): Int {
@@ -65,7 +70,7 @@ class CategorySpinnerAdapter(
         private val mColorCardView: CardView =
             itemView.findViewById(R.id.cdv_spinner_category_color)
 
-        fun bind(item: Category) {
+        fun bind(item: CategoryDocument) {
             mNameTextView.text = item.name
             if (item.color != null) {
                 mColorCardView.visibility = View.VISIBLE

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 7:53 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 7:15 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,13 +16,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.runBlocking
-import pl.gunock.lyriccast.LyricCastApplication
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.DatabaseViewModelFactory
-import pl.gunock.lyriccast.datamodel.entities.Category
+import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewholders.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
@@ -31,7 +29,7 @@ import pl.gunock.lyriccast.models.CategoryItem
 class CategoryManagerActivity : AppCompatActivity() {
 
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModelFactory(resources, (application as LyricCastApplication).repository)
+        DatabaseViewModel.Factory(resources)
     }
 
     private lateinit var mCategoryItemsRecyclerView: RecyclerView
@@ -89,9 +87,9 @@ class CategoryManagerActivity : AppCompatActivity() {
         mEditCategoryDialogViewModel =
             ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
 
-        mDatabaseViewModel.allCategories.observe(this) { categories ->
-            mEditCategoryDialogViewModel.categoryNames.value =
-                categories.map { category -> category.name }.toSet()
+        mDatabaseViewModel.allCategories.addChangeListener { categories ->
+            val categoryNames: Set<String> = categories.map { it.name }.toSet()
+            mEditCategoryDialogViewModel.categoryNames.value = categoryNames
         }
 
         mCategoryItemsRecyclerView = findViewById(R.id.rcv_categories)
@@ -99,6 +97,11 @@ class CategoryManagerActivity : AppCompatActivity() {
         mCategoryItemsRecyclerView.layoutManager = LinearLayoutManager(baseContext)
 
         setupCategories()
+    }
+
+    override fun onDestroy() {
+        mDatabaseViewModel.close()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -132,7 +135,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         )
         mCategoryItemsRecyclerView.adapter = mCategoryItemsAdapter
 
-        mDatabaseViewModel.allCategories.observe(this) { categories ->
+        mDatabaseViewModel.allCategories.addChangeListener { categories ->
             mCategoryItemsAdapter.submitCollection(categories)
         }
     }
@@ -153,12 +156,11 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun deleteSelectedCategories(): Boolean {
-        val selectedCategories = mCategoryItemsAdapter.categoryItems
+        val selectedCategoryIds: List<ObjectId> = mCategoryItemsAdapter.categoryItems
             .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }
 
-        runBlocking { mDatabaseViewModel.deleteCategories(selectedCategories) }
-
+        mDatabaseViewModel.deleteCategories(selectedCategoryIds)
         resetSelection()
 
         return true
@@ -235,14 +237,15 @@ class CategoryManagerActivity : AppCompatActivity() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun observeViewModelCategory(viewModelCategory: Category?) {
+    private fun observeViewModelCategory(viewModelCategory: CategoryDocument?) {
         if (viewModelCategory == null) {
             return
         }
 
-        mDatabaseViewModel.upsertCategory(mEditCategoryDialogViewModel.category.value!!)
+        val categoryDocument: CategoryDocument = mEditCategoryDialogViewModel.category.value!!
+        mDatabaseViewModel.upsertCategory(categoryDocument)
 
-        mEditCategoryDialogViewModel.category.removeObservers(this)
+        mEditCategoryDialogViewModel.category.removeObservers(this@CategoryManagerActivity)
         mEditCategoryDialogViewModel.category.value = null
     }
 }

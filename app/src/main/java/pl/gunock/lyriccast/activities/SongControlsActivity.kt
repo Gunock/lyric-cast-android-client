@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 9:12 PM
+ * Last modified 4/20/21 12:46 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -18,9 +18,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.helpers.MessageHelper
 
 
@@ -28,7 +31,7 @@ class SongControlsActivity : AppCompatActivity() {
 
     private var mSessionStartedListener: SessionStartedListener? = null
     private var mCurrentSlide = 0
-    private lateinit var mLyrics: Array<String>
+    private lateinit var mLyrics: List<String>
 
     private var mBlankOffColor: Int = Int.MIN_VALUE
     private var mBlankOnColor: Int = Int.MIN_VALUE
@@ -49,10 +52,19 @@ class SongControlsActivity : AppCompatActivity() {
         mBlankOffColor = resources.getColor(R.color.green, null)
         mBlankOnColor = resources.getColor(R.color.red, null)
 
-        findViewById<TextView>(R.id.tv_controls_song_title).text =
-            intent.getStringExtra("songTitle")
+        val songId: ObjectId = intent.getSerializableExtra("songId")!! as ObjectId
 
-        mLyrics = intent.getStringArrayExtra("lyrics")!!
+        val databaseViewModel =
+            DatabaseViewModel.Factory(resources).create(DatabaseViewModel::class.java)
+        val song: SongDocument = databaseViewModel.allSongs
+            .where()
+            .equalTo("id", songId)
+            .findFirst()!!
+        databaseViewModel.close()
+
+        findViewById<TextView>(R.id.tv_controls_song_title).text = song.title
+
+        mLyrics = song.lyricsList
 
         findViewById<Button>(R.id.btn_song_blank).setBackgroundColor(mCurrentBlankColor)
 
