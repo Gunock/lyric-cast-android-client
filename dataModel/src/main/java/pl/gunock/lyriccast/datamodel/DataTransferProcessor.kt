@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 12:08 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 12:07 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -122,7 +122,7 @@ internal class DataTransferProcessor(
                     .map { LyricsSectionDocument(name = it.key, text = it.value) }
                     .toTypedArray()
 
-                val song = SongDocument(dto, categoryMap[dto.category]!!)
+                val song = SongDocument(dto, categoryMap[dto.category])
                 song.lyrics = RealmList(*lyricsSections)
                 song.presentation = RealmList(*dto.presentation.toTypedArray())
 
