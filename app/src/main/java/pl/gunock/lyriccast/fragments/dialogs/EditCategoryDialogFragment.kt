@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:11 AM
+ * Last modified 4/20/21 10:40 AM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -107,7 +107,7 @@ class EditCategoryDialogFragment(
         mNameInput.addTextChangedListener(mCategoryNameTextWatcher)
 
         view.findViewById<Button>(R.id.btn_save_category).setOnClickListener {
-            val categoryName = mNameInput.text.toString()
+            val categoryName = mNameInput.text.toString().trim()
             if (validateCategoryName(categoryName) != NameValidationState.VALID) {
                 mNameInput.text = categoryName
                 mNameInput.requestFocus()
@@ -155,7 +155,7 @@ class EditCategoryDialogFragment(
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val newText = s.toString()
+            val newText = s.toString().trim()
 
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:05 PM
+  ~ Last modified 4/20/21 10:25 AM
   -->
 
 <resources>
@@ -46,7 +46,7 @@
     <string name="main_activity_button_add_setlist">Dodaj listę</string>
 
     <!-- Song/Setlist Controls -->
-    <string name="controls_button_blank">Blank</string>
+    <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Poprzedni</string>
     <string name="controls_next">Następny</string>
 

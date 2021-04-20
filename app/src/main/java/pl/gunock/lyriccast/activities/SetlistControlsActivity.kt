@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 11:02 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -47,13 +47,22 @@ class SetlistControlsActivity : AppCompatActivity() {
     private var mSongStartPoints: MutableMap<String, Int> = mutableMapOf()
     private var mCurrentLyricsPosition: Int = 0
 
-    private var mBlankOffColor: Int = Int.MIN_VALUE
     private var mBlankOnColor: Int = Int.MIN_VALUE
+    private var mBlankOffColor: Int = Int.MIN_VALUE
     private val mCurrentBlankColor: Int
-        get() = if (MessageHelper.isBlanked) {
-            mBlankOnColor
-        } else {
+        get() = if (MessageHelper.isBlanked.value!!) {
             mBlankOffColor
+        } else {
+            mBlankOnColor
+        }
+
+    private lateinit var mBlankOffText: String
+    private lateinit var mBlankOnText: String
+    private val mCurrentBlankText: String
+        get() = if (MessageHelper.isBlanked.value!!) {
+            mBlankOffText
+        } else {
+            mBlankOnText
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,13 +72,16 @@ class SetlistControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mBlankOffColor = resources.getColor(R.color.green, null)
-        mBlankOnColor = resources.getColor(R.color.red, null)
+        mBlankOffText = getString(R.string.controls_off)
+        mBlankOnText = getString(R.string.controls_on)
+        mBlankOnColor = getColor(R.color.green)
+        mBlankOffColor = getColor(R.color.red)
 
-        findViewById<Button>(R.id.btn_setlist_blank).setBackgroundColor(mCurrentBlankColor)
+        val blankButton: Button = findViewById(R.id.btn_setlist_blank)
+        blankButton.setBackgroundColor(mCurrentBlankColor)
+        blankButton.text = mCurrentBlankText
 
         mSessionStartedListener = SessionStartedListener {
-            findViewById<Button>(R.id.btn_setlist_blank).setBackgroundColor(mBlankOffColor)
             sendConfigure()
             sendSlide()
         }
@@ -97,6 +109,10 @@ class SetlistControlsActivity : AppCompatActivity() {
         CastContext.getSharedInstance()!!.sessionManager.removeSessionManagerListener(
             mSessionStartedListener
         )
+
+        MessageHelper.isBlanked.removeObservers(this)
+        mDatabaseViewModel.close()
+
         super.onDestroy()
     }
 
@@ -172,9 +188,14 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        val buttonBlank: Button = findViewById(R.id.btn_setlist_blank)
         findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
-            MessageHelper.sendBlank(!MessageHelper.isBlanked)
-            it.setBackgroundColor(mCurrentBlankColor)
+            MessageHelper.sendBlank(!MessageHelper.isBlanked.value!!)
+        }
+
+        MessageHelper.isBlanked.observe(this) {
+            buttonBlank.setBackgroundColor(mCurrentBlankColor)
+            buttonBlank.text = mCurrentBlankText
         }
 
         findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
@@ -187,50 +208,11 @@ class SetlistControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<ImageButton>(R.id.btn_setlist_prev_song).setOnClickListener {
-            val currentSongTitle = mSongTitles.entries.last {
-                it.key <= mCurrentLyricsPosition
-            }.value
-
-            @Suppress("LiftReturnOrAssignment")
-            if (mSongTitles.values.toList()[0] == currentSongTitle) {
-                mCurrentLyricsPosition = 0
-            } else {
-
-                val previousSongTitle: String = mSongTitles.entries.lastOrNull {
-                    it.key < mCurrentLyricsPosition && it.value != currentSongTitle
-                }?.value ?: return@setOnClickListener
-
-                val previousSongStartIndex: Int = mSongTitles.entries.first {
-                    it.value == previousSongTitle
-                }.key
-                mCurrentLyricsPosition = previousSongStartIndex
-            }
-
-            setPreview()
-            sendSlide()
-        }
-
         findViewById<ImageButton>(R.id.btn_setlist_next).setOnClickListener {
             if (mCurrentLyricsPosition >= mSetlistLyrics.size - 1) {
                 return@setOnClickListener
             }
             mCurrentLyricsPosition++
-
-            setPreview()
-            sendSlide()
-        }
-
-        findViewById<ImageButton>(R.id.btn_setlist_next_song).setOnClickListener {
-            val currentSongTitle = mSongTitles.entries.last {
-                it.key <= mCurrentLyricsPosition
-            }.value
-
-            val nextSongIndex: Int = mSongTitles.entries.firstOrNull {
-                it.key > mCurrentLyricsPosition && it.value != currentSongTitle
-            }?.key ?: return@setOnClickListener
-
-            mCurrentLyricsPosition = nextSongIndex
 
             setPreview()
             sendSlide()

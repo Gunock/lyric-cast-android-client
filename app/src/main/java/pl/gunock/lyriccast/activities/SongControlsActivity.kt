@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 11:02 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -33,13 +33,22 @@ class SongControlsActivity : AppCompatActivity() {
     private var mCurrentSlide = 0
     private lateinit var mLyrics: List<String>
 
-    private var mBlankOffColor: Int = Int.MIN_VALUE
     private var mBlankOnColor: Int = Int.MIN_VALUE
+    private var mBlankOffColor: Int = Int.MIN_VALUE
     private val mCurrentBlankColor: Int
-        get() = if (MessageHelper.isBlanked) {
-            mBlankOnColor
-        } else {
+        get() = if (MessageHelper.isBlanked.value!!) {
             mBlankOffColor
+        } else {
+            mBlankOnColor
+        }
+
+    private lateinit var mBlankOffText: String
+    private lateinit var mBlankOnText: String
+    private val mCurrentBlankText: String
+        get() = if (MessageHelper.isBlanked.value!!) {
+            mBlankOffText
+        } else {
+            mBlankOnText
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +58,10 @@ class SongControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mBlankOffColor = resources.getColor(R.color.green, null)
-        mBlankOnColor = resources.getColor(R.color.red, null)
+        mBlankOffText = getString(R.string.controls_off)
+        mBlankOnText = getString(R.string.controls_on)
+        mBlankOnColor = getColor(R.color.green)
+        mBlankOffColor = getColor(R.color.red)
 
         val songId: ObjectId = intent.getSerializableExtra("songId")!! as ObjectId
 
@@ -66,12 +77,13 @@ class SongControlsActivity : AppCompatActivity() {
 
         mLyrics = song.lyricsList
 
-        findViewById<Button>(R.id.btn_song_blank).setBackgroundColor(mCurrentBlankColor)
+        val blankButton: Button = findViewById(R.id.btn_song_blank)
+        blankButton.setBackgroundColor(mCurrentBlankColor)
+        blankButton.text = mCurrentBlankText
 
         setupListeners()
 
         mSessionStartedListener = SessionStartedListener {
-            findViewById<Button>(R.id.btn_song_blank).setBackgroundColor(mBlankOffColor)
             sendConfigure()
             sendSlide()
         }
@@ -95,6 +107,8 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onDestroy() {
         CastContext.getSharedInstance()!!.sessionManager
             .removeSessionManagerListener(mSessionStartedListener)
+
+        MessageHelper.isBlanked.removeObservers(this)
         super.onDestroy()
     }
 
@@ -117,9 +131,14 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        findViewById<Button>(R.id.btn_song_blank).setOnClickListener {
-            MessageHelper.sendBlank(!MessageHelper.isBlanked)
-            it.setBackgroundColor(mCurrentBlankColor)
+        val buttonBlank: Button = findViewById(R.id.btn_song_blank)
+        buttonBlank.setOnClickListener {
+            MessageHelper.sendBlank(!MessageHelper.isBlanked.value!!)
+        }
+
+        MessageHelper.isBlanked.observe(this) {
+            buttonBlank.setBackgroundColor(mCurrentBlankColor)
+            buttonBlank.text = mCurrentBlankText
         }
 
         findViewById<ImageButton>(R.id.btn_song_prev).setOnClickListener {

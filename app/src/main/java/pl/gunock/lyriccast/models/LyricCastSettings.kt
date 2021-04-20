@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 9:23 PM
+ * Last modified 4/20/21 10:50 AM
  */
 
 package pl.gunock.lyriccast.models
@@ -12,6 +12,12 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 
 class LyricCastSettings(context: Context) {
+    val blankedOnStart by lazy {
+        mPreferences.getBoolean(mCastBlankKey, false)
+    }
+
+    val appTheme by lazy { mPreferences.getString(mAppThemeKey, mAppThemeKeyDefault)!!.toInt() }
+
     private val mPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     private val mCastBackgroundColorDefault =
@@ -20,6 +26,7 @@ class LyricCastSettings(context: Context) {
         context.getString(R.string.preference_cast_font_color_default_value)
     private val mAppThemeKeyDefault = context.getString(R.string.preference_theme_default_value)
 
+    private val mCastBlankKey = context.getString(R.string.preference_blank_key)
     private val mCastBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
     private val mCastFontColorKey = context.getString(R.string.preference_cast_font_color_key)
     private val mCastMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
@@ -35,7 +42,6 @@ class LyricCastSettings(context: Context) {
     private val mCastMaxFontSize by lazy {
         mPreferences.getInt(mCastMaxFontSizeKey, 100)
     }
-    val appTheme by lazy { mPreferences.getString(mAppThemeKey, mAppThemeKeyDefault)!!.toInt() }
 
     fun getCastConfigurationJson(): JSONObject {
         return JSONObject().apply {
