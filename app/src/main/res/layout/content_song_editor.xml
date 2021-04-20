@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+  ~ Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 12:10 PM
+  ~ Last modified 4/20/21 10:21 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -96,6 +96,7 @@
         android:paddingTop="0dp"
         android:paddingEnd="0dp"
         android:paddingBottom="0dp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

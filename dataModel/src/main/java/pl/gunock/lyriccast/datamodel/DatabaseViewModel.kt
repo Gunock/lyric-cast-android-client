@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:51 AM
+ * Last modified 4/20/21 10:31 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -126,6 +126,10 @@ class DatabaseViewModel(
 
             @Suppress("UNCHECKED_CAST")
             return DatabaseViewModel(mResources) as T
+        }
+
+        fun create(): DatabaseViewModel {
+            return create(DatabaseViewModel::class.java)
         }
     }
 }

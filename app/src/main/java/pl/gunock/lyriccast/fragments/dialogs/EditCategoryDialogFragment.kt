@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 5:24 PM
+ * Last modified 4/20/21 10:24 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -18,10 +18,13 @@ import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
+import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
+import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.fragments.viewmodels.EditCategoryDialogViewModel
@@ -38,6 +41,10 @@ class EditCategoryDialogFragment(
         const val TAG = "EditCategoryDialogFragment"
     }
 
+    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
+        DatabaseViewModel.Factory(resources)
+    }
+
     private val mCategoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
 
     private lateinit var mNameInputLayout: TextInputLayout
@@ -45,8 +52,6 @@ class EditCategoryDialogFragment(
     private lateinit var mColorSpinner: Spinner
 
     private lateinit var mDialogViewModel: EditCategoryDialogViewModel
-
-    private lateinit var mCategoryNames: Set<String>
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         mDialogViewModel =
@@ -59,9 +64,6 @@ class EditCategoryDialogFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        mCategoryNames = mDialogViewModel.categoryNames.value ?: setOf()
-
         return inflater.inflate(R.layout.dialog_fragment_edit_category, container, false)
     }
 
@@ -82,6 +84,11 @@ class EditCategoryDialogFragment(
 
         setupColorSpinner()
         setupListeners(view)
+    }
+
+    override fun onDestroy() {
+        mDatabaseViewModel.close()
+        super.onDestroy()
     }
 
     private fun setupColorSpinner() {
@@ -107,28 +114,36 @@ class EditCategoryDialogFragment(
         mNameInput.addTextChangedListener(mCategoryNameTextWatcher)
 
         view.findViewById<Button>(R.id.btn_save_category).setOnClickListener {
-            val categoryName = mNameInput.text.toString().trim()
-            if (validateCategoryName(categoryName) != NameValidationState.VALID) {
-                mNameInput.text = categoryName
-                mNameInput.requestFocus()
-                return@setOnClickListener
-            }
-
-            val selectedColor = mColorSpinner.selectedItem as ColorItem
-
-            val category: CategoryDocument = if (mDialogViewModel.category.value != null) {
-                mDialogViewModel.category.value!!
-            } else {
-                CategoryDocument(name = mNameInput.text.toString(), color = selectedColor.value)
-            }
-
-            mDialogViewModel.category.value = category
-            dismiss()
+            saveCategory()
         }
 
         view.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
             dismiss()
         }
+    }
+
+    private fun saveCategory() {
+        val categoryName = mNameInput.text.toString().trim()
+        if (validateCategoryName(categoryName) != NameValidationState.VALID) {
+            mNameInput.text = categoryName
+            mNameInput.requestFocus()
+            return
+        }
+
+        val selectedColor = mColorSpinner.selectedItem as ColorItem
+
+        val categoryId: ObjectId = if (mDialogViewModel.category != null) {
+            mDialogViewModel.category!!.id
+        } else {
+            ObjectId()
+        }
+
+        val categoryDocument =
+            CategoryDocument(name = categoryName, color = selectedColor.value, id = categoryId)
+
+        mDatabaseViewModel.upsertCategory(categoryDocument)
+        mDialogViewModel.category = null
+        dismiss()
     }
 
     private fun validateCategoryName(name: String): NameValidationState {
@@ -140,7 +155,7 @@ class EditCategoryDialogFragment(
             return NameValidationState.VALID
         }
 
-        if (mCategoryNames.contains(name)) {
+        if (mDialogViewModel.categoryNames.contains(name)) {
             return NameValidationState.ALREADY_IN_USE
         }
 

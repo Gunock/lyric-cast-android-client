@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:05 AM
+ * Last modified 4/20/21 10:21 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -136,12 +136,12 @@ class SetlistEditorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_setlist_editor, container, false)
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
         itemTouchHelper.attachToRecyclerView(null)
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
         mDatabaseViewModel.close()
-        super.onDestroyView()
+        super.onDestroy()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

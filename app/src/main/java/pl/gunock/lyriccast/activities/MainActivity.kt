@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 5:24 PM
+ * Last modified 4/20/21 10:45 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,7 +14,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
@@ -54,10 +53,7 @@ class MainActivity : AppCompatActivity() {
         const val IMPORT_RESULT_CODE = 2
     }
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(resources)
-    }
-
+    private lateinit var mDatabaseViewModel: DatabaseViewModel
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +61,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
+
+        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
 
         // TODO: Possible leak
         mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)

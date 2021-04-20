@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 11:05 AM
+ * Last modified 4/20/21 10:45 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -43,9 +42,7 @@ class SetlistsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 4
     }
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(requireContext().resources)
-    }
+    private lateinit var mDatabaseViewModel: DatabaseViewModel
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
@@ -86,6 +83,11 @@ class SetlistsFragment : Fragment() {
             mActionMenu = null
             resetSelection()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 11:05 AM
+ * Last modified 4/20/21 10:45 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -20,7 +20,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.realm.RealmResults
@@ -55,9 +54,7 @@ class SongsFragment : Fragment() {
         const val EXPORT_SELECTED_RESULT_CODE = 3
     }
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(requireContext().resources)
-    }
+    private lateinit var mDatabaseViewModel: DatabaseViewModel
 
     private var mCategorySpinner: Spinner? = null
     private var mSongItemsAdapter: SongItemsAdapter? = null
@@ -100,6 +97,11 @@ class SongsFragment : Fragment() {
             resetSelection()
         }
 
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(

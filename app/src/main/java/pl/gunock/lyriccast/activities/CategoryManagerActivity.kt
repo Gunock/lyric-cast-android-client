@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 5:24 PM
+ * Last modified 4/20/21 10:27 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,7 +20,6 @@ import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewmodels.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
@@ -89,7 +88,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
         mDatabaseViewModel.allCategories.addChangeListener { categories ->
             val categoryNames: Set<String> = categories.map { it.name }.toSet()
-            mEditCategoryDialogViewModel.categoryNames.value = categoryNames
+            mEditCategoryDialogViewModel.categoryNames = categoryNames
         }
 
         mCategoryItemsRecyclerView = findViewById(R.id.rcv_categories)
@@ -167,7 +166,6 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun showAddCategoryDialog(): Boolean {
-        mEditCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
         val dialogFragment = EditCategoryDialogFragment()
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
@@ -182,7 +180,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val categoryItem = mCategoryItemsAdapter.categoryItems
             .first { category -> category.isSelected.value!! }
 
-        mEditCategoryDialogViewModel.category.observe(this, this::observeViewModelCategory)
+        mEditCategoryDialogViewModel.category = categoryItem.category
 
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(
@@ -237,15 +235,4 @@ class CategoryManagerActivity : AppCompatActivity() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun observeViewModelCategory(viewModelCategory: CategoryDocument?) {
-        if (viewModelCategory == null) {
-            return
-        }
-
-        val categoryDocument: CategoryDocument = mEditCategoryDialogViewModel.category.value!!
-        mDatabaseViewModel.upsertCategory(categoryDocument)
-
-        mEditCategoryDialogViewModel.category.removeObservers(this@CategoryManagerActivity)
-        mEditCategoryDialogViewModel.category.value = null
-    }
 }
