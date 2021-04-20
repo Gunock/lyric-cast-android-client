@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 4:38 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:19 PM
+ * Last modified 4/20/21 3:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel.documents
@@ -16,9 +16,9 @@ import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 open class SongDocument(
+    @field:Required
     var title: String,
     var lyrics: RealmList<LyricsSectionDocument>,
-    @field:Required
     var presentation: RealmList<String>,
     var category: CategoryDocument? = null,
     @field:PrimaryKey

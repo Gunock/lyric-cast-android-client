@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 4:38 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:16 AM
+ * Last modified 4/20/21 3:55 PM
  */
 
 package pl.gunock.lyriccast.datamodel.documents
@@ -9,10 +9,12 @@ package pl.gunock.lyriccast.datamodel.documents
 import io.realm.RealmObject
 import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.Required
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 
 open class CategoryDocument(
+    @field:Required
     var name: String,
     var color: Int? = null,
     @field:PrimaryKey
