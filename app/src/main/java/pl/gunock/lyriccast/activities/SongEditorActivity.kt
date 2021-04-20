@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:46 AM
+ * Last modified 4/20/21 3:27 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -27,8 +27,8 @@ import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
-import pl.gunock.lyriccast.datamodel.documents.LyricsSectionDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.enums.NameValidationState
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener

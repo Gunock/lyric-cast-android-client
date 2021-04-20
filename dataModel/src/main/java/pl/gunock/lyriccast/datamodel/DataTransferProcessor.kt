@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 12:08 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:07 PM
+ * Last modified 4/20/21 3:27 PM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -14,9 +14,9 @@ import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.kotlin.where
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
-import pl.gunock.lyriccast.datamodel.documents.LyricsSectionDocument
 import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:16 AM
+ * Last modified 4/20/21 3:19 PM
  */
 
 package pl.gunock.lyriccast.datamodel.documents
@@ -12,6 +12,7 @@ import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
 import org.bson.types.ObjectId
+import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 open class SongDocument(
