@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+  ~ Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/11/21 10:00 PM
+  ~ Last modified 4/20/21 10:44 AM
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,6 +19,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/preference_section_chromecast">
+        <CheckBoxPreference
+            android:id="@+id/pref_blank"
+            android:defaultValue="false"
+            android:key="@string/preference_blank_key"
+            android:title="@string/preference_blank_title" />
         <ListPreference
             android:id="@+id/pref_background_color"
             app:defaultValue="@string/preference_cast_background_color_default_value"

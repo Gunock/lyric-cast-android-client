@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:54 AM
+ * Last modified 4/20/21 11:05 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -71,6 +71,11 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
         setUpListeners()
+    }
+
+    override fun onDestroy() {
+        mDatabaseViewModel.close()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

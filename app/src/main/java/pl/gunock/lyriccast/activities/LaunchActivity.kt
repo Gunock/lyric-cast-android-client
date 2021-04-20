@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/19/21 5:12 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/19/21 5:11 PM
+ * Last modified 4/20/21 10:50 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -44,7 +44,6 @@ class LaunchActivity : AppCompatActivity() {
         super.onStart()
 
         requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE)
-
     }
 
     override fun onRequestPermissionsResult(

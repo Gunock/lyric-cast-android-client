@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:05 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:29 AM
+ * Last modified 4/20/21 11:05 AM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -105,6 +105,8 @@ class SetlistsFragment : Fragment() {
     override fun onDestroyView() {
         mSetlistItemsAdapter!!.removeObservers()
         mSetlistItemsAdapter = null
+
+        mDatabaseViewModel.close()
 
         super.onDestroyView()
     }

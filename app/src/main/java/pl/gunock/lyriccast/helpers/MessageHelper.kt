@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 9:12 PM
+ * Last modified 4/20/21 10:55 AM
  */
 
 package pl.gunock.lyriccast.helpers
@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.helpers
 import android.content.Context
 import android.content.res.Resources
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
@@ -18,8 +19,7 @@ import pl.gunock.lyriccast.models.LyricCastSettings
 object MessageHelper {
     private const val TAG = "MessageHelper"
 
-    var isBlanked: Boolean = false
-        private set
+    val isBlanked: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private var CONTENT_NAMESPACE: String = ""
     private var CONTROL_NAMESPACE: String = ""
@@ -53,7 +53,7 @@ object MessageHelper {
     }
 
     fun sendBlank(blanked: Boolean) {
-        isBlanked = blanked
+        isBlanked.postValue(blanked)
         sendControlMessage(ControlAction.BLANK, blanked)
     }
 

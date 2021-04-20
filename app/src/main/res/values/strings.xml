@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/11/21 10:00 PM
+  ~ Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/11/21 9:12 PM
+  ~ Last modified 4/20/21 10:25 AM
   -->
 
 <resources>
@@ -60,9 +60,11 @@
     <string name="main_activity_loading_file">Loading file …</string>
 
     <!-- Song/Setlist Controls -->
-    <string name="controls_button_blank">Blank</string>
+    <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Previous</string>
     <string name="controls_next">Next</string>
+    <string name="controls_on" translatable="false">ON</string>
+    <string name="controls_off" translatable="false">OFF</string>
 
     <!-- Setlist Controls -->
     <string name="setlist_controls_song_item_title_template" translatable="false">%d. %s</string>
