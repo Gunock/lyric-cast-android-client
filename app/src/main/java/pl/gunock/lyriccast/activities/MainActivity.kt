@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:05 AM
+ * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 11:05 AM
+ * Last modified 4/20/21 5:24 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -43,7 +43,7 @@ import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
-import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
+import pl.gunock.lyriccast.fragments.viewmodels.ImportDialogViewModel
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 import java.io.File
 

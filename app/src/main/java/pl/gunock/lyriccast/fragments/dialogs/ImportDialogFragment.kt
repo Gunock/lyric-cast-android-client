@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+ * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:47 PM
+ * Last modified 4/20/21 5:24 PM
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
-import pl.gunock.lyriccast.fragments.viewholders.ImportDialogViewModel
+import pl.gunock.lyriccast.fragments.viewmodels.ImportDialogViewModel
 
 
 class ImportDialogFragment : DialogFragment() {
