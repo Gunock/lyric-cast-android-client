@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:45 PM
+ * Last modified 4/24/21 4:28 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -311,7 +311,7 @@ class SongsFragment : Fragment() {
 
         val exportData = mDatabaseViewModel.getDatabaseTransferData()
         CoroutineScope(Dispatchers.IO).launch {
-            val exportDir = File(requireActivity().filesDir.canonicalPath, ".export")
+            val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
 

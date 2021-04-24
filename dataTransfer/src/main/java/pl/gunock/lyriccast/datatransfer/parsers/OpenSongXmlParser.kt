@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:48 AM
+ * Last modified 4/24/21 4:44 PM
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -11,6 +11,7 @@ import android.net.Uri
 import android.util.Log
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datatransfer.models.OpenSongDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
@@ -57,7 +58,12 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
     override fun parse(inputStream: InputStream?, category: String): SongDto {
         val parser: XmlPullParser = Xml.newPullParser()
         parser.setInput(inputStream, null)
-        parser.nextTag()
+        try {
+            parser.nextTag()
+        } catch (e: XmlPullParserException) {
+            Log.e(TAG, "Encountered error for song in '${category}' category")
+            throw e
+        }
         parser.require(XmlPullParser.START_TAG, null, "song")
 
         val song = readSong(parser)

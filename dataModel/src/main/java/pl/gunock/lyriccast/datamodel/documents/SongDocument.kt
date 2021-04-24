@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 4:38 PM
+ * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:55 PM
+ * Last modified 4/24/21 4:24 PM
  */
 
 package pl.gunock.lyriccast.datamodel.documents
@@ -53,7 +53,7 @@ open class SongDocument(
     )
 
     fun toDto(): SongDto {
-        return SongDto(title, lyricsMap, presentation, category?.name ?: "")
+        return SongDto(title, lyricsMap, presentation.toList(), category?.name ?: "")
     }
 
     override fun toString(): String {
