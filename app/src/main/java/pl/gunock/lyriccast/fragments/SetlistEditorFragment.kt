@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 4/24/21 8:40 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:21 PM
+ * Last modified 4/24/21 8:39 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -158,6 +158,14 @@ class SetlistEditorFragment : Fragment() {
             mSetlistNames = setlists.map { setlist -> setlist.name }.toSet()
         }
 
+        if (mIntentSetlistId != null) {
+            mSetlistId = mIntentSetlistId!!
+            mIntentSetlist = mDatabaseViewModel.allSetlists
+                .where()
+                .equalTo("id", mIntentSetlistId)
+                .findFirst()
+        }
+
         val setlistSongs: MutableList<SongDocument> = mutableListOf()
         when {
             mArgs.setlistId != null -> {
@@ -175,12 +183,6 @@ class SetlistEditorFragment : Fragment() {
                 }
             }
             mIntentSetlistId != null -> {
-                mSetlistId = mIntentSetlistId!!
-                mIntentSetlist = mDatabaseViewModel.allSetlists
-                    .where()
-                    .equalTo("id", mIntentSetlistId)
-                    .findFirst()
-
                 setlistNameInput.text = mIntentSetlist!!.name
                 setlistSongs.addAll(mIntentSetlist!!.presentation)
             }
