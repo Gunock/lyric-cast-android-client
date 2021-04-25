@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
+  ~ Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 10:11 PM
+  ~ Last modified 4/25/21 1:18 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,7 +23,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabIndicatorFullWidth="true">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tab_add"

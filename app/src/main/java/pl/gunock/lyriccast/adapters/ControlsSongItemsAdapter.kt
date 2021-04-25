@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:09 AM
+ * Last modified 4/25/21 1:15 PM
  */
 
 package pl.gunock.lyriccast.adapters
@@ -37,7 +37,7 @@ class ControlsSongItemsAdapter(
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
 
     private val mCardHighlightColor = context.getColor(R.color.accent)
-    private val mDefaultItemCardColor = context.getColor(R.color.window_background_1)
+    private val mDefaultItemCardColor = context.getColor(R.color.window_background_2)
     private val mTextDefaultColor = context.getColor(R.color.text)
     private val mTextHighlightColor = context.getColor(R.color.button_text_2)
 

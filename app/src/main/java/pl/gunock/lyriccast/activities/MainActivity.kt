@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
+ * Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/24/21 4:28 PM
+ * Last modified 4/25/21 1:32 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -40,6 +41,7 @@ import pl.gunock.lyriccast.datatransfer.factories.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
+import pl.gunock.lyriccast.fragments.SetlistsFragment
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.fragments.viewmodels.ImportDialogViewModel
@@ -68,7 +70,16 @@ class MainActivity : AppCompatActivity() {
         mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
-        setUpListeners()
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navh_main) as NavHostFragment
+        val currentFragment = navHostFragment.childFragmentManager.fragments.first()
+        if (currentFragment is SetlistsFragment) {
+            val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
+            mainTabLayout.getTabAt(1)?.select()
+        }
+
+        setupListeners()
     }
 
     override fun onDestroy() {
@@ -120,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpListeners() {
+    private fun setupListeners() {
         val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
 
         val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
