@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/24/21 8:40 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/24/21 8:39 PM
+ * Last modified 5/1/21 12:52 PM
  */
 
 package pl.gunock.lyriccast.fragments
@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.RealmList
-import io.realm.RealmResults
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SetlistSongItemsAdapter
@@ -57,7 +56,6 @@ class SetlistEditorFragment : Fragment() {
     private var mSongItemsAdapter: SetlistSongItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
 
-    private var mIntentSetlistId: ObjectId? = null
     private var mIntentSetlist: SetlistDocument? = null
 
     private lateinit var mSetlistNames: Set<String>
@@ -147,7 +145,8 @@ class SetlistEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mIntentSetlistId = requireActivity().intent.getSerializableExtra("setlistId") as ObjectId?
+        val intentSetlistId =
+            requireActivity().intent.getSerializableExtra("setlistId") as ObjectId?
         val intentSetlistPresentation = requireActivity().intent
             .getStringArrayExtra("setlistSongs")
 
@@ -158,12 +157,9 @@ class SetlistEditorFragment : Fragment() {
             mSetlistNames = setlists.map { setlist -> setlist.name }.toSet()
         }
 
-        if (mIntentSetlistId != null) {
-            mSetlistId = mIntentSetlistId!!
-            mIntentSetlist = mDatabaseViewModel.allSetlists
-                .where()
-                .equalTo("id", mIntentSetlistId)
-                .findFirst()
+        if (intentSetlistId != null) {
+            mSetlistId = intentSetlistId
+            mIntentSetlist = mDatabaseViewModel.getSetlist(intentSetlistId)!!
         }
 
         val setlistSongs: MutableList<SongDocument> = mutableListOf()
@@ -174,25 +170,17 @@ class SetlistEditorFragment : Fragment() {
                 setlistNameInput.text = mArgs.setlistName
 
                 for (songId in mArgs.presentation!!) {
-                    val song = mDatabaseViewModel.allSongs
-                        .where()
-                        .equalTo("id", ObjectId(songId))
-                        .findFirst()!!
-
+                    val song: SongDocument = mDatabaseViewModel.getSong(ObjectId(songId))!!
                     setlistSongs.add(song)
                 }
             }
-            mIntentSetlistId != null -> {
+            intentSetlistId != null -> {
                 setlistNameInput.text = mIntentSetlist!!.name
                 setlistSongs.addAll(mIntentSetlist!!.presentation)
             }
             intentSetlistPresentation != null -> {
-                val allSongs: RealmResults<SongDocument> = mDatabaseViewModel.allSongs
                 for (songId in intentSetlistPresentation) {
-                    val song: SongDocument = allSongs.where()
-                        .equalTo("id", ObjectId(songId))
-                        .findFirst()!!
-
+                    val song: SongDocument = mDatabaseViewModel.getSong(ObjectId(songId))!!
                     setlistSongs.add(song)
                 }
             }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:31 PM
+ * Last modified 4/28/21 9:47 AM
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -45,6 +45,12 @@ class DatabaseViewModel(
     val allCategories: RealmResults<CategoryDocument> =
         mRealm.where<CategoryDocument>().findAllAsync()
 
+    fun getSong(id: ObjectId): SongDocument? {
+        return mRealm.where<SongDocument>()
+            .equalTo("id", id)
+            .findFirst()
+    }
+
     fun upsertSong(song: SongDocument) = mRealm.executeTransaction { mRealm.insertOrUpdate(song) }
 
     fun deleteSongs(songIds: Collection<ObjectId>) = mRealm.executeTransaction {
@@ -54,6 +60,12 @@ class DatabaseViewModel(
                 .findFirst()
                 ?.deleteFromRealm()
         }
+    }
+
+    fun getSetlist(id: ObjectId): SetlistDocument? {
+        return mRealm.where<SetlistDocument>()
+            .equalTo("id", id)
+            .findFirst()
     }
 
     fun upsertSetlist(setlist: SetlistDocument) =

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:27 PM
+ * Last modified 4/28/21 9:47 AM
  */
 
 package pl.gunock.lyriccast.activities
@@ -88,10 +88,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         val intentSongId: ObjectId? = intent.getSerializableExtra("songId") as ObjectId?
         if (intentSongId != null) {
-            mIntentSong = mDatabaseViewModel.allSongs
-                .where()
-                .equalTo("id", intentSongId)
-                .findFirst()
+            mIntentSong = mDatabaseViewModel.getSong(intentSongId)!!
         }
 
         Log.v(TAG, "Received song : $mIntentSong")

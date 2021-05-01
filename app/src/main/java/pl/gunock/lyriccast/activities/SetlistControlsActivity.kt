@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 11:02 AM
+ * Last modified 5/1/21 12:49 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -135,10 +135,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupLyrics(): SetlistDocument {
         val setlistId: ObjectId = intent.getSerializableExtra("setlistId")!! as ObjectId
-        val setlist: SetlistDocument = mDatabaseViewModel.allSetlists
-            .where()
-            .equalTo("id", setlistId)
-            .findFirst()!!
+        val setlist: SetlistDocument = mDatabaseViewModel.getSetlist(setlistId)!!
 
         var setlistLyricsIndex = 0
         mSetlistLyrics = setlist.presentation

@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/10/21 1:22 PM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/10/21 1:19 PM
+  ~ Last modified 4/28/21 8:39 AM
   -->
 
 <resources>
@@ -10,6 +10,7 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="android:navigationBarColor">@color/color_background_primary</item>
 
         <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
         <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>

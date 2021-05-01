@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 11:02 AM
+ * Last modified 5/1/21 12:49 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -67,10 +67,7 @@ class SongControlsActivity : AppCompatActivity() {
 
         val databaseViewModel =
             DatabaseViewModel.Factory(resources).create(DatabaseViewModel::class.java)
-        val song: SongDocument = databaseViewModel.allSongs
-            .where()
-            .equalTo("id", songId)
-            .findFirst()!!
+        val song: SongDocument = databaseViewModel.getSong(songId)!!
         databaseViewModel.close()
 
         findViewById<TextView>(R.id.tv_controls_song_title).text = song.title

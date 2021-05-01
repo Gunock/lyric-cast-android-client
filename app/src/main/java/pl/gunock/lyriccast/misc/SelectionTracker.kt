@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:05 AM
+ * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 12:12 AM
+ * Last modified 5/1/21 12:49 PM
  */
 
 package pl.gunock.lyriccast.misc
 
-import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
@@ -50,7 +49,6 @@ class SelectionTracker<T : RecyclerView.ViewHolder>(
             countAfter = countItems(holder, modifySelectedItems = false)
             if (mOnSelect(holder, holder.absoluteAdapterPosition, false)) {
                 view.requestFocus()
-                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 count = countItems(holder, modifySelectedItems = true)
             }
             countAfter = count
