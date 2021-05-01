@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:27 PM
+ * Last modified 5/1/21 2:40 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,6 +16,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
@@ -81,6 +83,10 @@ class CategoryManagerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_category_manager)
         setSupportActionBar(findViewById(R.id.toolbar_category_manager))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        val adView = findViewById<AdView>(R.id.adv_category_manager)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
 
         // TODO: Possible leak
         mEditCategoryDialogViewModel =

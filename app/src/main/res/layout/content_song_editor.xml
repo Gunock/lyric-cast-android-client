@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/24/21 8:40 PM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/24/21 8:12 PM
+  ~ Last modified 5/1/21 2:40 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,6 +11,16 @@
     android:layout_height="match_parent"
     android:background="@color/window_background_3"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adv_song_editor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"
@@ -22,7 +32,7 @@
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/adv_song_editor">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_song_title"

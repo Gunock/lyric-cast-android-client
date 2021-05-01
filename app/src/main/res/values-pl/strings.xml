@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/20/21 10:25 AM
+  ~ Last modified 5/1/21 1:16 PM
   -->
 
 <resources>
@@ -49,10 +49,6 @@
     <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Poprzedni</string>
     <string name="controls_next">Następny</string>
-
-    <!-- Setlist Controls -->
-    <string name="setlist_controls_previous_song">Poprzednia piosenka</string>
-    <string name="setlist_controls_next_song">Następna piosenka</string>
 
     <!-- Editors -->
     <string name="editor_button_save">Zapisz</string>

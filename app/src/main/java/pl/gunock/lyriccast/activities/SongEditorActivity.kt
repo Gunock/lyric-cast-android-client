@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/28/21 9:47 AM
+ * Last modified 5/1/21 2:40 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,6 +16,8 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.RealmList
@@ -65,10 +67,14 @@ class SongEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_song_editor)
+
         setSupportActionBar(findViewById(R.id.toolbar_main))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        val adView = findViewById<AdView>(R.id.adv_song_editor)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
 
         mCategoryNone = CategoryDocument(name = baseContext.getString(R.string.category_none))
 

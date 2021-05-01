@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 12:49 PM
+ * Last modified 5/1/21 9:25 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,6 +16,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import org.bson.types.ObjectId
@@ -58,6 +60,10 @@ class SongControlsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        val adView = findViewById<AdView>(R.id.adv_song_controls)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
         mBlankOnColor = getColor(R.color.green)
@@ -86,7 +92,7 @@ class SongControlsActivity : AppCompatActivity() {
         }
 
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(mSessionStartedListener)
+        sessionsManager.addSessionManagerListener(mSessionStartedListener!!)
 
         if (sessionsManager.currentSession?.isConnected == true) {
             sendConfigure()
@@ -103,7 +109,7 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(mSessionStartedListener)
+            .removeSessionManagerListener(mSessionStartedListener!!)
 
         MessageHelper.isBlanked.removeObservers(this)
         super.onDestroy()
@@ -115,7 +121,7 @@ class SongControlsActivity : AppCompatActivity() {
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
 
-        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector!!
 
         return true
     }
