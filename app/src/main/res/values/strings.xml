@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/20/21 10:25 AM
+  ~ Last modified 5/1/21 10:33 PM
   -->
 
 <resources>
@@ -68,8 +68,6 @@
 
     <!-- Setlist Controls -->
     <string name="setlist_controls_song_item_title_template" translatable="false">%d. %s</string>
-    <string name="setlist_controls_previous_song">Previous song</string>
-    <string name="setlist_controls_next_song">Next song</string>
 
     <!-- Editors -->
     <string name="editor_button_save">Save</string>

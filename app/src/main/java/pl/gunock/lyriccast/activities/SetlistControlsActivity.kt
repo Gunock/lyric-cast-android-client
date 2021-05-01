@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 12:49 PM
+ * Last modified 5/1/21 10:33 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
@@ -39,7 +41,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         DatabaseViewModel.Factory(resources)
     }
 
-    private var mSessionStartedListener: SessionStartedListener? = null
+    private lateinit var mSessionStartedListener: SessionStartedListener
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
 
     private lateinit var mSetlistLyrics: List<String>
@@ -71,6 +73,10 @@ class SetlistControlsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setlist_controls)
         setSupportActionBar(findViewById(R.id.toolbar_controls))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        val adView = findViewById<AdView>(R.id.adv_setlist_controls)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
 
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
@@ -121,7 +127,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
-        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector!!
 
         return true
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/25/21 1:32 PM
+ * Last modified 5/1/21 10:33 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -21,6 +21,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -79,6 +81,10 @@ class MainActivity : AppCompatActivity() {
             mainTabLayout.getTabAt(1)?.select()
         }
 
+        val adView = findViewById<AdView>(R.id.adv_main)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
         setupListeners()
     }
 
@@ -93,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
 
-        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector
+        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector!!
 
         return true
     }

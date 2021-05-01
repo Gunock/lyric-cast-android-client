@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/25/21 1:17 PM
+  ~ Last modified 5/1/21 10:33 PM
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,6 +35,16 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adv_setlist_controls"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
     <TextView
         android:id="@+id/tv_setlist_slide_preview"
         android:layout_width="0dp"
@@ -47,7 +57,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_songs"

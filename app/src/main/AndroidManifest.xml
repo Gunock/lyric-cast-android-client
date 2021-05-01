@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/24/21 8:40 PM
+  ~ Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/24/21 8:39 PM
+  ~ Last modified 5/1/21 10:33 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,6 +24,14 @@
         android:roundIcon="@mipmap/ic_lyriccast_round"
         android:screenOrientation="sensorPortrait"
         android:theme="@style/Theme.LyricCast.DarkActionBar">
+
+        <meta-data
+            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="pl.gunock.lyriccast.cast.CastOptionsProvider" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6869737417853314~7639627116" />
 
         <activity
             android:name=".activities.LaunchActivity"
@@ -80,10 +88,6 @@
             android:label="@string/title_categories"
             android:parentActivityName="pl.gunock.lyriccast.activities.CategoryManagerActivity"
             android:theme="@style/Theme.LyricCast.NoActionBar.Light" />
-
-        <meta-data
-            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="pl.gunock.lyriccast.cast.CastOptionsProvider" />
     </application>
 
 </manifest>

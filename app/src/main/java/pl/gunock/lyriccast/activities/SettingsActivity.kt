@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/11/21 2:14 PM
+ * Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/11/21 2:08 AM
+ * Last modified 5/1/21 10:33 PM
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.models.LyricCastSettings
 
@@ -34,8 +36,15 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
         setSupportActionBar(findViewById(R.id.toolbar_settings))
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        val adView1 = findViewById<AdView>(R.id.adv_settings_1)
+        val adView2 = findViewById<AdView>(R.id.adv_settings_2)
+        val adRequest = AdRequest.Builder().build()
+        adView1.loadAd(adRequest)
+        adView2.loadAd(adRequest)
 
         if (savedInstanceState == null) {
             supportFragmentManager
