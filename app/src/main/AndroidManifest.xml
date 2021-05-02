@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+  ~ Created by Tomasz Kiljanczyk on 5/2/21 1:23 PM
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 5/1/21 9:24 PM
+  ~ Last modified 5/2/21 1:21 PM
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +31,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6869737417853314~7639627116" />
+            android:value="@string/ads_application_id" />
 
         <activity
             android:name=".activities.LaunchActivity"

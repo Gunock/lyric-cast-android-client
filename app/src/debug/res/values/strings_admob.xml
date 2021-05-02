@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 5/2/21 1:23 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 5/2/21 1:21 PM
+  -->
+
+<resources>
+    <string name="ads_application_id" translatable="false">ca-app-pub-6869737417853314~7639627116</string>
+    <string name="ads_uid_main" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_song_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_setlist_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_song_editor" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_setlist_editor" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_category_manager" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_settings1" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_uid_settings2" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+</resources>
