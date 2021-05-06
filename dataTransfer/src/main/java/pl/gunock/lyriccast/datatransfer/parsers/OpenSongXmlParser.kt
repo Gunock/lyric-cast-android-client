@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/24/21 4:44 PM
+ * Last modified 02/05/2021, 16:23
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -28,7 +28,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
     override fun parseZip(resolver: ContentResolver, targetUri: Uri): Set<SongDto> {
         mImportDirectory.deleteRecursively()
         mImportDirectory.mkdirs()
-        FileHelper.unzip(resolver, targetUri, mImportDirectory.canonicalPath)
+        FileHelper.unzip(resolver.openInputStream(targetUri)!!, mImportDirectory.canonicalPath)
 
         val fileList1 = mImportDirectory.listFiles() ?: arrayOf()
         val result: MutableSet<SongDto> = mutableSetOf()

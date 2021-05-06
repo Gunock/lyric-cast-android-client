@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 10:34 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:53
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 10:33 PM
+ * Last modified 06/05/2021, 13:49
  */
 
 package pl.gunock.lyriccast.activities
@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mDatabaseViewModel: DatabaseViewModel
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
+    private lateinit var mAdView: AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,9 +82,7 @@ class MainActivity : AppCompatActivity() {
             mainTabLayout.getTabAt(1)?.select()
         }
 
-        val adView = findViewById<AdView>(R.id.adv_main)
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        mAdView = findViewById(R.id.adv_main)
 
         setupListeners()
     }
@@ -91,6 +90,13 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         mDatabaseViewModel.close()
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+        super.onResume()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -226,7 +232,8 @@ class MainActivity : AppCompatActivity() {
             File(exportDir, "setlists.json").writeText(setlistsString)
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
-            FileHelper.zip(contentResolver, uri, exportDir.path)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
@@ -260,7 +267,8 @@ class MainActivity : AppCompatActivity() {
             importDir.deleteRecursively()
             importDir.mkdirs()
 
-            FileHelper.unzip(contentResolver, uri, importDir.path)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.unzip(contentResolver.openInputStream(uri)!!, importDir.path)
             @Suppress("BlockingMethodInNonBlockingContext")
             inputStream.close()
 

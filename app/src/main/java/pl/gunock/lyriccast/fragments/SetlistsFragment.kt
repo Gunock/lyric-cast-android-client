@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/24/21 4:44 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 14:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/24/21 4:28 PM
+ * Last modified 06/05/2021, 14:36
  */
 
 package pl.gunock.lyriccast.fragments
@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
@@ -46,6 +47,8 @@ class SetlistsFragment : Fragment() {
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
     private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
+
+    private var mToast: Toast? = null
 
     private var mActionMenu: Menu? = null
     private var mActionMode: ActionMode? = null
@@ -150,6 +153,7 @@ class SetlistsFragment : Fragment() {
 
     private fun exportSelectedSetlists(uri: Uri): Boolean {
         val activity = requireActivity()
+
         val dialogFragment =
             ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
@@ -202,7 +206,7 @@ class SetlistsFragment : Fragment() {
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
             @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.zip(activity.contentResolver, uri, exportDir.path)
+            FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
@@ -239,12 +243,11 @@ class SetlistsFragment : Fragment() {
         isLongClick: Boolean
     ): Boolean {
         val item = mSetlistItemsAdapter!!.setlistItems[position]
-        if (!isLongClick && mSelectionTracker.count == 0) {
+        return if (!isLongClick && mSelectionTracker.count == 0) {
             pickSetlist(item)
         } else {
-            return selectSetlist(item)
+            selectSetlist(item)
         }
-        return true
     }
 
     private fun setupListeners() {
@@ -262,10 +265,23 @@ class SetlistsFragment : Fragment() {
         }
     }
 
-    private fun pickSetlist(item: SetlistItem) {
+    private fun pickSetlist(item: SetlistItem): Boolean {
+        if (item.setlist.presentation.isEmpty()) {
+            mToast?.cancel()
+            mToast = Toast.makeText(
+                requireContext(),
+                getString(R.string.main_activity_setlist_is_empty),
+                Toast.LENGTH_SHORT
+            )
+            mToast!!.show()
+            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            return false
+        }
+
         val intent = Intent(context, SetlistControlsActivity::class.java)
         intent.putExtra("setlistId", item.setlist.id)
         startActivity(intent)
+        return true
     }
 
     private fun selectSetlist(item: SetlistItem): Boolean {

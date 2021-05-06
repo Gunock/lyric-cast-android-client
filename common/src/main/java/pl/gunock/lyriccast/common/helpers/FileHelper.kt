@@ -1,13 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/9/21 12:12 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/9/21 11:59 AM
+ * Last modified 02/05/2021, 16:32
  */
 
 package pl.gunock.lyriccast.common.helpers
 
-import android.content.ContentResolver
-import android.net.Uri
 import android.util.Log
 import net.lingala.zip4j.io.inputstream.ZipInputStream
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
@@ -15,16 +13,17 @@ import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.CompressionMethod
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 
 
 object FileHelper {
     private const val TAG = "FileHelper"
 
-    fun unzip(resolver: ContentResolver, sourceUri: Uri, targetLocation: String): Boolean {
+    fun unzip(inputStream: InputStream, targetLocation: String): Boolean {
         Log.d(TAG, "Unzipping stream to '$targetLocation'")
 
         createDirectory(targetLocation)
-        val inputStream = resolver.openInputStream(sourceUri) ?: return false
         val zipInputStream = ZipInputStream(inputStream)
 
         while (true) {
@@ -39,17 +38,16 @@ object FileHelper {
             }
         }
         zipInputStream.close()
-        inputStream.close()
         return true
     }
 
-    fun zip(resolver: ContentResolver, targetUri: Uri, sourceLocation: String) {
+    fun zip(outputStream: OutputStream, sourceLocation: String): Boolean {
         Log.d(TAG, "Zipping files from '$sourceLocation'")
         createDirectory(sourceLocation)
 
-        val fileList = File(sourceLocation).listFiles() ?: return
+        val fileList = File(sourceLocation).listFiles() ?: return false
 
-        val zipOut = ZipOutputStream(resolver.openOutputStream(targetUri))
+        val zipOut = ZipOutputStream(outputStream)
         val parameters = ZipParameters()
         parameters.compressionMethod = CompressionMethod.DEFLATE
         parameters.compressionLevel = CompressionLevel.NORMAL
@@ -64,6 +62,7 @@ object FileHelper {
             }
         }
         zipOut.close()
+        return true
     }
 
     private fun zipDirectory(

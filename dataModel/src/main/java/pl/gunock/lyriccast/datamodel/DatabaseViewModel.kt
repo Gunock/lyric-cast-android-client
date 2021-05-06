@@ -1,7 +1,7 @@
-/*
- * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+ /*
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/28/21 9:47 AM
+ * Last modified 05/05/2021, 23:56
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -27,11 +27,12 @@ import java.io.Closeable
 
 class DatabaseViewModel(
     resources: Resources,
-    private val mRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
-        .allowQueriesOnUiThread(true)
-        .allowWritesOnUiThread(true)
-        .build(),
-    private val mRealm: Realm = Realm.getInstance(mRealmConfig)
+    private val mRealm: Realm = Realm.getInstance(
+        RealmConfiguration.Builder()
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
+            .build()
+    )
 ) : ViewModel(), Closeable {
 
     private val mDataTransferProcessor = DataTransferProcessor(resources, mRealm)
@@ -44,6 +45,10 @@ class DatabaseViewModel(
 
     val allCategories: RealmResults<CategoryDocument> =
         mRealm.where<CategoryDocument>().findAllAsync()
+
+    fun clearDatabase() {
+        mRealm.executeTransaction { mRealm.deleteAll() }
+    }
 
     fun getSong(id: ObjectId): SongDocument? {
         return mRealm.where<SongDocument>()
