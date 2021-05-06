@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 14:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 12:52 PM
+ * Last modified 06/05/2021, 14:37
  */
 
 package pl.gunock.lyriccast.fragments
@@ -59,6 +59,8 @@ class SetlistEditorFragment : Fragment() {
     private var mIntentSetlist: SetlistDocument? = null
 
     private lateinit var mSetlistNames: Set<String>
+
+    private var mToast: Toast? = null
 
     private var mActionMenu: Menu? = null
     private var mActionMode: ActionMode? = null
@@ -290,12 +292,14 @@ class SetlistEditorFragment : Fragment() {
         }
 
         if (mSetlistSongs.isEmpty()) {
-            val toast = Toast.makeText(
+            mToast?.cancel()
+            mToast = Toast.makeText(
                 requireContext(),
                 getString(R.string.setlist_editor_empty_warning),
                 Toast.LENGTH_SHORT
             )
-            toast.show()
+            mToast!!.show()
+            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             return false
         }
 
