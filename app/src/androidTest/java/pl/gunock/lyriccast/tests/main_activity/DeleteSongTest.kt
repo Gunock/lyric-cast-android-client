@@ -8,7 +8,7 @@ package pl.gunock.lyriccast.tests.main_activity
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -24,20 +24,17 @@ import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.activities.MainActivity
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import java.lang.Thread.sleep
 
 
 @RunWith(AndroidJUnit4::class)
-class FilterSongsTest {
+class DeleteSongTest {
 
     private companion object {
-        val category = CategoryDocument("TEST CATEGORY", -65536)
-
         const val songTitle = "FilterSongsTest 1"
         val song1 =
-            SongDocument("$songTitle 1", RealmList(), RealmList(), category = category)
+            SongDocument("$songTitle 1", RealmList(), RealmList())
         val song2 = SongDocument("$songTitle 2", RealmList(), RealmList())
         val song3 = SongDocument("FilterSongsTest 2", RealmList(), RealmList())
     }
@@ -54,7 +51,6 @@ class FilterSongsTest {
 
             databaseViewModel.clearDatabase()
 
-            databaseViewModel.upsertCategory(category)
             databaseViewModel.upsertSong(song1)
             databaseViewModel.upsertSong(song2)
             databaseViewModel.upsertSong(song3)
@@ -62,37 +58,44 @@ class FilterSongsTest {
     }
 
     @Test
-    fun songsAreFilteredByTitle() {
+    fun songIsDeleted() {
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
             .check(matches(hasDescendant(withText(song2.title))))
             .check(matches(hasDescendant(withText(song3.title))))
 
-        onView(withId(R.id.tin_song_filter)).perform(replaceText(songTitle))
+        onView(
+            allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
+        ).perform(longClick())
+        onView(withId(R.id.action_menu_delete)).perform(click())
         sleep(200)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
-            .check(matches(hasDescendant(withText(song2.title))))
-            .check(matches(not(hasDescendant(withText(song3.title)))))
+            .check(matches(not(hasDescendant(withText(song2.title)))))
+            .check(matches(hasDescendant(withText(song3.title))))
     }
 
     @Test
-    fun songsAreFilteredByCategory() {
+    fun multipleSongsAreDeleted() {
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
             .check(matches(hasDescendant(withText(song2.title))))
             .check(matches(hasDescendant(withText(song3.title))))
 
-        onView(withId(R.id.spn_category)).perform(click())
-        onView(allOf(withId(R.id.tv_spinner_color_name), withText(category.name))).perform(click())
+        onView(
+            allOf(withId(R.id.item_song), hasDescendant(withText(song1.title)))
+        ).perform(longClick())
+        onView(
+            allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
+        ).perform(click())
+        onView(withId(R.id.action_menu_delete)).perform(click())
         sleep(200)
 
-        val allOfMatcher = allOf(
-            hasDescendant(withText(song1.title)),
-            hasDescendant(withText(category.name))
-        )
-        onView(withId(R.id.rcv_songs)).check(matches(hasDescendant(allOfMatcher)))
+        onView(withId(R.id.rcv_songs))
+            .check(matches(not(hasDescendant(withText(song1.title)))))
+            .check(matches(not(hasDescendant(withText(song2.title)))))
+            .check(matches(hasDescendant(withText(song3.title))))
     }
 
 }
