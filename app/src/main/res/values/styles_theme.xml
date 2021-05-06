@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 5/1/21 12:52 PM
+  ~ Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/28/21 8:39 AM
+  ~ Last modified 02/05/2021, 19:42
   -->
 
 <resources>
@@ -10,7 +10,7 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:navigationBarColor">@color/color_background_primary</item>
+        <item name="android:navigationBarColor">@color/color_primary_dark</item>
 
         <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
         <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
@@ -41,13 +41,6 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/color_background_primary</item>
-    </style>
-
-    <style name="Theme.LyricCast.NoActionBar.Light" parent="Theme.LyricCast.NoActionBar">
-        <item name="colorPrimaryDark">@color/color_secondary</item>
-        <item name="actionModeBackground">@color/color_secondary</item>
-
-        <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout.Light</item>
     </style>
 
     <style name="Theme.LyricCast.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/1/21 8:54 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 3/30/21 9:05 PM
+ * Last modified 03/04/2021, 17:41
  */
 
 package pl.gunock.lyriccast.common.extensions

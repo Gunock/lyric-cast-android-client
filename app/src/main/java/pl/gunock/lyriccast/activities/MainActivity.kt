@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 2:29 PM
+ * Last modified 06/05/2021, 13:39
  */
 
 package pl.gunock.lyriccast.activities
@@ -226,7 +226,8 @@ class MainActivity : AppCompatActivity() {
             File(exportDir, "setlists.json").writeText(setlistsString)
 
             dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
-            FileHelper.zip(contentResolver, uri, exportDir.path)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
             dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
             exportDir.deleteRecursively()
@@ -260,7 +261,8 @@ class MainActivity : AppCompatActivity() {
             importDir.deleteRecursively()
             importDir.mkdirs()
 
-            FileHelper.unzip(contentResolver, uri, importDir.path)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.unzip(contentResolver.openInputStream(uri)!!, importDir.path)
             @Suppress("BlockingMethodInNonBlockingContext")
             inputStream.close()
 

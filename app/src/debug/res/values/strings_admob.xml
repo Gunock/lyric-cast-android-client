@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 5/2/21 1:23 PM
+  ~ Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 5/2/21 1:21 PM
+  ~ Last modified 04/05/2021, 11:44
   -->
 
 <resources>
-    <string name="ads_application_id" translatable="false">ca-app-pub-6869737417853314~7639627116</string>
+    <string name="ads_application_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="ads_uid_main" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="ads_uid_song_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="ads_uid_setlist_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>

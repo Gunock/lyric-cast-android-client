@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 1:51 PM
+ * Last modified 06/05/2021, 13:42
  */
 
 package pl.gunock.lyriccast.activities
@@ -27,7 +27,10 @@ class LaunchActivity : AppCompatActivity() {
     companion object {
         const val TURN_ON_WIFI_RESULT_CODE = 1
         const val PERMISSIONS_REQUEST_CODE = 1
-        val PERMISSIONS = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        val PERMISSIONS = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +88,6 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun turnOnWifi() {
         var buttonClicked = false
-        // TODO: Possible leak
         AlertDialog.Builder(this, R.style.Theme_LyricCast_Dialog_NoTitle)
             .setMessage(getString(R.string.launch_activity_turn_on_wifi))
             .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
