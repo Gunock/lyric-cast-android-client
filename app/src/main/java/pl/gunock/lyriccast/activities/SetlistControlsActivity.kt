@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 09/05/2021, 13:55
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 1:57 PM
+ * Last modified 09/05/2021, 13:41
  */
 
 package pl.gunock.lyriccast.activities
@@ -227,7 +227,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             .indexOfFirst { songTitle -> songTitle == title }
 
         mSongItemsAdapter.songItems.forEachIndexed { index, songItem ->
-            songItem.highlight.value = index == songItemPosition
+            songItem.highlight.postValue(index == songItemPosition)
         }
 
         findViewById<RecyclerView>(R.id.rcv_songs).run {

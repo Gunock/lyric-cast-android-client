@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
+ * Created by Tomasz Kiljanczyk on 09/05/2021, 13:55
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/25/21 1:15 PM
+ * Last modified 09/05/2021, 13:52
  */
 
 package pl.gunock.lyriccast.adapters
@@ -50,6 +50,13 @@ class ControlsSongItemsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(position)
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        songItems[holder.absoluteAdapterPosition].highlight
+            .removeObservers(mLifecycleOwner)
+
+        super.onViewRecycled(holder)
     }
 
     override fun getItemCount() = songItems.size
