@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 09/05/2021, 13:55
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 09/05/2021, 13:52
+ * Last modified 13/05/2021, 10:44
  */
 
 package pl.gunock.lyriccast.adapters
@@ -12,12 +12,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
+import pl.gunock.lyriccast.databinding.ItemControlsSongBinding
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
 import pl.gunock.lyriccast.models.SongItem
@@ -64,8 +63,7 @@ class ControlsSongItemsAdapter(
     inner class ViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
-        private val mItemCardView: CardView = itemView.findViewById(R.id.item_song)
-        private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
+        private val mBinding = ItemControlsSongBinding.bind(itemView)
         private var mCurrentCardColor = mDefaultItemCardColor
 
         fun bind(position: Int) {
@@ -75,7 +73,7 @@ class ControlsSongItemsAdapter(
                 absoluteAdapterPosition + 1,
                 item.song.title
             )
-            mTitleTextView.text = titleText
+            mBinding.tvItemSongTitle.text = titleText
 
             setupListeners()
         }
@@ -85,13 +83,13 @@ class ControlsSongItemsAdapter(
                 .observe(mLifecycleOwner, this::observeHighlight)
 
             if (mOnItemLongClickListener != null) {
-                mItemCardView.setOnLongClickListener { view ->
+                mBinding.root.setOnLongClickListener { view ->
                     mOnItemLongClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
 
             if (mOnItemClickListener != null) {
-                mItemCardView.setOnClickListener { view ->
+                mBinding.root.setOnClickListener { view ->
                     mOnItemClickListener.execute(this, absoluteAdapterPosition, view)
                 }
             }
@@ -109,10 +107,10 @@ class ControlsSongItemsAdapter(
             }
 
             with(ValueAnimator()) {
-                setIntValues(mTitleTextView.currentTextColor, textTo)
+                setIntValues(mBinding.tvItemSongTitle.currentTextColor, textTo)
                 setEvaluator(ArgbEvaluator())
                 addUpdateListener { animator ->
-                    mTitleTextView.setTextColor(animator.animatedValue as Int)
+                    mBinding.tvItemSongTitle.setTextColor(animator.animatedValue as Int)
                 }
 
                 duration = ANIMATION_DURATION
@@ -123,7 +121,7 @@ class ControlsSongItemsAdapter(
                 setIntValues(mCurrentCardColor, cardTo)
                 setEvaluator(ArgbEvaluator())
                 addUpdateListener { animator ->
-                    mItemCardView.setCardBackgroundColor(animator.animatedValue as Int)
+                    mBinding.root.setCardBackgroundColor(animator.animatedValue as Int)
                 }
 
                 duration = ANIMATION_DURATION

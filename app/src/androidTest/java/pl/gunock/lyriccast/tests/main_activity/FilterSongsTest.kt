@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:47
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 00:06
+ * Last modified 13/05/2021, 10:20
  */
 
 package pl.gunock.lyriccast.tests.main_activity
@@ -68,7 +68,7 @@ class FilterSongsTest {
             .check(matches(hasDescendant(withText(song2.title))))
             .check(matches(hasDescendant(withText(song3.title))))
 
-        onView(withId(R.id.tin_song_filter)).perform(replaceText(songTitle))
+        onView(withId(R.id.ed_song_filter)).perform(replaceText(songTitle))
         sleep(200)
 
         onView(withId(R.id.rcv_songs))

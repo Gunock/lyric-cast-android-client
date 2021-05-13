@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 5:14 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 5:14 PM
+ * Last modified 13/05/2021, 23:42
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -11,9 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
 import pl.gunock.lyriccast.models.ColorItem
 
 
@@ -48,13 +47,11 @@ class ColorSpinnerAdapter(
     }
 
     private inner class ViewHolder(itemView: View) {
-        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
-        private val mColorCardView: CardView =
-            itemView.findViewById(R.id.cdv_spinner_category_color)
+        private val mBinding = SpinnerItemColorBinding.bind(itemView)
 
         fun bind(item: ColorItem) {
-            mNameTextView.text = item.name
-            mColorCardView.setCardBackgroundColor(item.value)
+            mBinding.tvSpinnerColorName.text = item.name
+            mBinding.cdvSpinnerCategoryColor.setCardBackgroundColor(item.value)
         }
     }
 

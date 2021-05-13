@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 09/05/2021, 13:55
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 09/05/2021, 13:41
+ * Last modified 14/05/2021, 00:02
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,22 +11,19 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.ControlsSongItemsAdapter
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
+import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
+import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
@@ -40,6 +37,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModel.Factory(resources)
     }
+    private lateinit var mBinding: ContentSetlistControlsBinding
 
     private lateinit var mSessionStartedListener: SessionStartedListener
     private lateinit var mSongItemsAdapter: ControlsSongItemsAdapter
@@ -69,23 +67,22 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_setlist_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_controls))
+        val rootBinding = ActivitySetlistControlsBinding.inflate(layoutInflater)
+        mBinding = rootBinding.contentSetlistControls
+        setContentView(rootBinding.root)
+        setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adView = findViewById<AdView>(R.id.adv_setlist_controls)
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        mBinding.advSetlistControls.loadAd(adRequest)
 
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
         mBlankOnColor = getColor(R.color.green)
         mBlankOffColor = getColor(R.color.red)
 
-        val blankButton: Button = findViewById(R.id.btn_setlist_blank)
-        blankButton.setBackgroundColor(mCurrentBlankColor)
-        blankButton.text = mCurrentBlankText
+        mBinding.btnSetlistBlank.setBackgroundColor(mCurrentBlankColor)
+        mBinding.btnSetlistBlank.text = mCurrentBlankText
 
         mSessionStartedListener = SessionStartedListener {
             sendConfigure()
@@ -162,19 +159,18 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(songs: List<SongDocument>) {
-        val songRecyclerView: RecyclerView = findViewById(R.id.rcv_songs)
-        songRecyclerView.setHasFixedSize(true)
-        songRecyclerView.layoutManager = LinearLayoutManager(baseContext)
+        mBinding.rcvSongs.setHasFixedSize(true)
+        mBinding.rcvSongs.layoutManager = LinearLayoutManager(baseContext)
 
         val onLongClickListener =
             LongClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
-                songRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                mBinding.rcvSongs.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 selectSong(position)
             }
 
         val onClickListener =
             ClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
-                songRecyclerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                mBinding.rcvSongs.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 selectSong(position)
             }
 
@@ -187,21 +183,20 @@ class SetlistControlsActivity : AppCompatActivity() {
             mOnItemClickListener = onClickListener
         )
 
-        songRecyclerView.adapter = mSongItemsAdapter
+        mBinding.rcvSongs.adapter = mSongItemsAdapter
     }
 
     private fun setupListeners() {
-        val buttonBlank: Button = findViewById(R.id.btn_setlist_blank)
-        findViewById<Button>(R.id.btn_setlist_blank).setOnClickListener {
+        mBinding.btnSetlistBlank.setOnClickListener {
             MessageHelper.sendBlank(!MessageHelper.isBlanked.value!!)
         }
 
         MessageHelper.isBlanked.observe(this) {
-            buttonBlank.setBackgroundColor(mCurrentBlankColor)
-            buttonBlank.text = mCurrentBlankText
+            mBinding.btnSetlistBlank.setBackgroundColor(mCurrentBlankColor)
+            mBinding.btnSetlistBlank.text = mCurrentBlankText
         }
 
-        findViewById<ImageButton>(R.id.btn_setlist_prev).setOnClickListener {
+        mBinding.btnSetlistPrev.setOnClickListener {
             if (mCurrentLyricsPosition <= 0) {
                 return@setOnClickListener
             }
@@ -211,7 +206,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<ImageButton>(R.id.btn_setlist_next).setOnClickListener {
+        mBinding.btnSetlistNext.setOnClickListener {
             if (mCurrentLyricsPosition >= mSetlistLyrics.size - 1) {
                 return@setOnClickListener
             }
@@ -230,7 +225,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             songItem.highlight.postValue(index == songItemPosition)
         }
 
-        findViewById<RecyclerView>(R.id.rcv_songs).run {
+        mBinding.rcvSongs.run {
             scrollToPosition(songItemPosition)
             postInvalidate()
         }
@@ -239,14 +234,11 @@ class SetlistControlsActivity : AppCompatActivity() {
     private fun setPreview() {
         if (mSongTitles.containsKey(mCurrentLyricsPosition)) {
             val songTitle = mSongTitles[mCurrentLyricsPosition]!!
-            findViewById<TextView>(R.id.tv_current_song_title).text =
-                songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
-
+            mBinding.tvCurrentSongTitle.text = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
             highlightSong(songTitle)
         }
 
-        findViewById<TextView>(R.id.tv_setlist_slide_preview).text =
-            mSetlistLyrics[mCurrentLyricsPosition]
+        mBinding.tvSetlistSlidePreview.text = mSetlistLyrics[mCurrentLyricsPosition]
     }
 
     private fun selectSong(position: Int): Boolean {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 5:24 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 5:24 PM
+ * Last modified 14/05/2021, 00:06
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -11,10 +11,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.DialogFragmentImportBinding
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
 import pl.gunock.lyriccast.fragments.viewmodels.ImportDialogViewModel
 
@@ -25,11 +26,9 @@ class ImportDialogFragment : DialogFragment() {
         const val TAG = "ImportDialogFragment"
     }
 
-    private lateinit var mImportFormatSpinner: Spinner
-    private lateinit var mDeleteAllCheckBox: CheckBox
-    private lateinit var mReplaceOnConflictCheckBox: CheckBox
-
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
+
+    private lateinit var mBinding: DialogFragmentImportBinding
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -42,28 +41,24 @@ class ImportDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_fragment_import, container, false)
+    ): View {
+        mBinding = DialogFragmentImportBinding.inflate(inflater)
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mImportFormatSpinner = view.findViewById(R.id.spn_import_format)
-        mDeleteAllCheckBox = view.findViewById(R.id.chk_delete_all)
-        mReplaceOnConflictCheckBox = view.findViewById(R.id.chk_replace_on_conflict)
-
-        view.findViewById<TextView>(R.id.tv_dialog_title).text =
-            getString(R.string.main_activity_import_dialog_title)
+        mBinding.tvDialogTitle.text = getString(R.string.main_activity_import_dialog_title)
 
         setupColorSpinner()
         setupListeners(view)
         mImportDialogViewModel.importFormat =
-            ImportFormat.getByName(mImportFormatSpinner.selectedItem as String)
+            ImportFormat.getByName(mBinding.spnImportFormat.selectedItem as String)
     }
 
     private fun setupColorSpinner() {
-        mImportFormatSpinner.adapter = ArrayAdapter.createFromResource(
+        mBinding.spnImportFormat.adapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.import_formats,
             android.R.layout.simple_list_item_1
@@ -71,26 +66,26 @@ class ImportDialogFragment : DialogFragment() {
     }
 
     private fun setupListeners(view: View) {
-        mDeleteAllCheckBox.setOnCheckedChangeListener { _, isChecked ->
+        mBinding.chkDeleteAll.setOnCheckedChangeListener { _, isChecked ->
             mImportDialogViewModel.deleteAll = isChecked
             if (isChecked) {
-                mReplaceOnConflictCheckBox.isChecked = false
-                mReplaceOnConflictCheckBox.isEnabled = false
+                mBinding.chkReplaceOnConflict.isChecked = false
+                mBinding.chkReplaceOnConflict.isEnabled = false
             } else {
-                mReplaceOnConflictCheckBox.isEnabled = true
+                mBinding.chkReplaceOnConflict.isEnabled = true
             }
         }
 
-        view.findViewById<Button>(R.id.btn_import).setOnClickListener {
-            mImportDialogViewModel.deleteAll = mDeleteAllCheckBox.isChecked
-            mImportDialogViewModel.replaceOnConflict = mReplaceOnConflictCheckBox.isChecked
+        mBinding.btnImport.setOnClickListener {
+            mImportDialogViewModel.deleteAll = mBinding.chkDeleteAll.isChecked
+            mImportDialogViewModel.replaceOnConflict = mBinding.chkReplaceOnConflict.isChecked
             mImportDialogViewModel.importFormat =
-                ImportFormat.getByName(mImportFormatSpinner.selectedItem as String)
+                ImportFormat.getByName(mBinding.spnImportFormat.selectedItem as String)
             mImportDialogViewModel.accepted.value = true
             dismiss()
         }
 
-        view.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
+        mBinding.btnCancel.setOnClickListener {
             dismiss()
         }
     }

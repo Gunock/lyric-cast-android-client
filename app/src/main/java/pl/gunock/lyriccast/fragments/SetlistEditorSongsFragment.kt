@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:21 PM
+ * Last modified 13/05/2021, 23:42
  */
 
 package pl.gunock.lyriccast.fragments
@@ -9,20 +9,16 @@ package pl.gunock.lyriccast.fragments
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.Spinner
-import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import org.bson.types.ObjectId
-import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
+import pl.gunock.lyriccast.databinding.FragmentSongsBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
@@ -42,6 +38,7 @@ class SetlistEditorSongsFragment : Fragment() {
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModel.Factory(requireContext().resources)
     }
+    private lateinit var mBinding: FragmentSongsBinding
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
     private var mSelectedSongs: MutableSet<SongDocument> = mutableSetOf()
@@ -54,14 +51,15 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_songs, container, false)
+    ): View {
+        mBinding = FragmentSongsBinding.inflate(inflater)
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupRecyclerView(view)
+        setupRecyclerView()
         setupCategorySpinner()
         setupListeners()
         KeyboardHelper.hideKeyboard(view)
@@ -122,51 +120,45 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
-        val filterEditText: EditText = requireView().findViewById(R.id.tin_song_filter)
-        filterEditText.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSongs(newText, (categorySpinner.selectedItem as CategoryDocument).id)
+        mBinding.edSongFilter.addTextChangedListener(InputTextChangedListener { newText ->
+            filterSongs(newText, (mBinding.spnCategory.selectedItem as CategoryDocument).id)
         })
 
-        filterEditText.setOnFocusChangeListener { view, hasFocus ->
+        mBinding.edSongFilter.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }
         }
 
-        categorySpinner.onItemSelectedListener =
-            ItemSelectedSpinnerListener { _, _ ->
-                filterSongs(
-                    filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as CategoryDocument).id
-                )
-            }
+        mBinding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
+            filterSongs(
+                mBinding.edSongFilter.editableText.toString(),
+                (mBinding.spnCategory.selectedItem as CategoryDocument).id
+            )
+        }
 
-        requireView().findViewById<SwitchCompat>(R.id.swt_selected_songs)
-            .setOnCheckedChangeListener { _, isChecked ->
-                filterSongs(
-                    filterEditText.editableText.toString(),
-                    (categorySpinner.selectedItem as CategoryDocument).id,
-                    isSelected = if (isChecked) true else null
-                )
-            }
+        mBinding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
+            filterSongs(
+                mBinding.edSongFilter.editableText.toString(),
+                (mBinding.spnCategory.selectedItem as CategoryDocument).id,
+                isSelected = if (isChecked) true else null
+            )
+        }
     }
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
 
-        val categorySpinner: Spinner = requireView().findViewById(R.id.spn_category)
-        categorySpinner.adapter = categorySpinnerAdapter
+        mBinding.spnCategory.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.addChangeListener { categories ->
             categorySpinnerAdapter.submitCollection(categories)
         }
     }
 
-    private fun setupRecyclerView(view: View) {
-        val songsRecyclerView: RecyclerView = view.findViewById(R.id.rcv_songs)
-        songsRecyclerView.setHasFixedSize(true)
-        songsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+    private fun setupRecyclerView() {
+        mBinding.rcvSongs.setHasFixedSize(true)
+        mBinding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
 
         val selectionTracker =
             SelectionTracker { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
@@ -188,7 +180,7 @@ class SetlistEditorSongsFragment : Fragment() {
             }
         }
 
-        songsRecyclerView.adapter = mSongItemsAdapter
+        mBinding.rcvSongs.adapter = mSongItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {

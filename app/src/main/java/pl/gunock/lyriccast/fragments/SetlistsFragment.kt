@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 14:38
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 14:36
+ * Last modified 13/05/2021, 10:34
  */
 
 package pl.gunock.lyriccast.fragments
@@ -11,14 +11,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,6 +27,7 @@ import pl.gunock.lyriccast.activities.SetlistControlsActivity
 import pl.gunock.lyriccast.activities.SetlistEditorActivity
 import pl.gunock.lyriccast.adapters.SetlistItemsAdapter
 import pl.gunock.lyriccast.common.helpers.FileHelper
+import pl.gunock.lyriccast.databinding.FragmentSetlistsBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
 import pl.gunock.lyriccast.helpers.KeyboardHelper
@@ -44,8 +43,10 @@ class SetlistsFragment : Fragment() {
     }
 
     private lateinit var mDatabaseViewModel: DatabaseViewModel
+    private lateinit var mBinding: FragmentSetlistsBinding
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
+
     private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
     private var mToast: Toast? = null
@@ -96,8 +97,9 @@ class SetlistsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_setlists, container, false)
+    ): View {
+        mBinding = FragmentSetlistsBinding.inflate(inflater)
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -133,7 +135,7 @@ class SetlistsFragment : Fragment() {
         super.onResume()
 
         resetSelection()
-        requireView().findViewById<EditText>(R.id.tin_setlist_filter).setText("")
+        mBinding.edSetlistFilter.setText("")
     }
 
     override fun onStop() {
@@ -219,9 +221,8 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val recyclerView = requireView().findViewById<RecyclerView>(R.id.rcv_setlists)
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        mBinding.rcvSetlists.setHasFixedSize(true)
+        mBinding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
 
         mSelectionTracker = SelectionTracker(this::onSetlistClick)
         mSetlistItemsAdapter = SetlistItemsAdapter(
@@ -229,7 +230,7 @@ class SetlistsFragment : Fragment() {
             selectionTracker = mSelectionTracker
         )
 
-        recyclerView.adapter = mSetlistItemsAdapter
+        mBinding.rcvSetlists.adapter = mSetlistItemsAdapter
 
         mDatabaseViewModel.allSetlists.addChangeListener { setlists ->
             mSetlistItemsAdapter?.submitCollection(setlists)
@@ -251,14 +252,12 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        val filterEditText: EditText = requireView().findViewById(R.id.tin_setlist_filter)
-
-        filterEditText.addTextChangedListener(InputTextChangedListener { newText ->
+        mBinding.edSetlistFilter.addTextChangedListener(InputTextChangedListener { newText ->
             mSetlistItemsAdapter!!.filterItems(newText)
             resetSelection()
         })
 
-        filterEditText.setOnFocusChangeListener { view, hasFocus ->
+        mBinding.edSetlistFilter.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 KeyboardHelper.hideKeyboard(view)
             }

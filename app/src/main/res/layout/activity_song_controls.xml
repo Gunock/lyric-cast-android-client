@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/25/21 1:33 PM
+  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/25/21 12:42 PM
+  ~ Last modified 11/05/2021, 21:46
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,6 +24,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_song_controls" />
+    <include
+        android:id="@+id/content_song_controls"
+        layout="@layout/content_song_controls" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

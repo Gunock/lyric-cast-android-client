@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
+  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 03/05/2021, 11:10
+  ~ Last modified 14/05/2021, 00:02
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,7 +36,7 @@
         app:layout_constraintTop_toBottomOf="@+id/adv_song_editor">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tv_song_title"
+            android:id="@+id/tin_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:counterEnabled="true"
@@ -47,7 +47,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tin_song_title"
+                android:id="@+id/ed_song_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_song_title"
@@ -63,11 +63,11 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_song_title"
+            app:layout_constraintTop_toBottomOf="@+id/tin_song_title"
             tools:listitem="@layout/spinner_item_color" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tv_section_name"
+            android:id="@+id/tin_section_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -79,7 +79,7 @@
             app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tin_section_name"
+                android:id="@+id/ed_section_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/song_editor_input_section_name"
@@ -91,7 +91,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
-        android:id="@+id/tin_section_lyrics"
+        android:id="@+id/ed_section_lyrics"
         style="@style/Widget.LyricCast.EditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -169,13 +169,11 @@
             app:tabMode="scrollable">
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_chorus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/song_editor_input_new_section" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/editor_button_add" />

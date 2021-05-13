@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:53
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 13:49
+ * Last modified 14/05/2021, 00:02
  */
 
 package pl.gunock.lyriccast.activities
@@ -22,10 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +30,8 @@ import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.common.helpers.FileHelper
+import pl.gunock.lyriccast.databinding.ActivityMainBinding
+import pl.gunock.lyriccast.databinding.ContentMainBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
@@ -59,30 +58,28 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mDatabaseViewModel: DatabaseViewModel
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
-    private lateinit var mAdView: AdView
+    private lateinit var mBinding: ContentMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar_main))
+        val rootBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(rootBinding.root)
+        setSupportActionBar(rootBinding.toolbarMain)
+        mBinding = rootBinding.contentMain
 
         mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
 
         // TODO: Possible leak
         mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
-        findViewById<View>(R.id.cstl_fab_container).visibility = View.GONE
+        mBinding.cstlFabContainer.visibility = View.GONE
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navh_main) as NavHostFragment
         val currentFragment = navHostFragment.childFragmentManager.fragments.first()
         if (currentFragment is SetlistsFragment) {
-            val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
-            mainTabLayout.getTabAt(1)?.select()
+            mBinding.tblMainFragments.getTabAt(1)?.select()
         }
-
-        mAdView = findViewById(R.id.adv_main)
 
         setupListeners()
     }
@@ -94,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+        mBinding.advMain.loadAd(adRequest)
 
         super.onResume()
     }
@@ -144,14 +141,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        val fabAdd: View = findViewById<FloatingActionButton>(R.id.fab_add)
-
-        val mainTabLayout: TabLayout = findViewById(R.id.tbl_main_fragments)
-        mainTabLayout.addOnTabSelectedListener(
+        mBinding.tblMainFragments.addOnTabSelectedListener(
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
-                fabAdd.clearFocus()
+                mBinding.fabAdd.clearFocus()
 
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
@@ -163,17 +157,17 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-        val fabContainer = findViewById<View>(R.id.cstl_fab_container)
-        fabAdd.setOnClickListener {
+        val fabContainer = mBinding.cstlFabContainer
+        mBinding.fabAdd.setOnClickListener {
             if (fabContainer.isVisible) {
                 fabContainer.visibility = View.GONE
-                fabAdd.clearFocus()
+                mBinding.fabAdd.clearFocus()
             } else {
                 fabContainer.visibility = View.VISIBLE
-                fabAdd.requestFocus()
+                mBinding.fabAdd.requestFocus()
             }
         }
-        fabAdd.setOnFocusChangeListener { _, hasFocus ->
+        mBinding.fabAdd.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 fabContainer.visibility = View.VISIBLE
             } else {
@@ -181,16 +175,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.fab_add_setlist).setOnClickListener {
+        mBinding.fabAddSetlist.setOnClickListener {
             val intent = Intent(baseContext, SetlistEditorActivity::class.java)
             startActivity(intent)
-            fabAdd.clearFocus()
+            mBinding.fabAdd.clearFocus()
         }
 
-        findViewById<FloatingActionButton>(R.id.fab_add_song).setOnClickListener {
+        mBinding.fabAddSong.setOnClickListener {
             val intent = Intent(baseContext, SongEditorActivity::class.java)
             startActivity(intent)
-            fabAdd.clearFocus()
+            mBinding.fabAdd.clearFocus()
         }
     }
 

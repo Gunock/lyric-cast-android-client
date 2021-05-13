@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 12:11 AM
+ * Last modified 13/05/2021, 10:39
  */
 
 package pl.gunock.lyriccast.adapters
@@ -11,14 +11,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.databinding.ItemSetlistBinding
 import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
@@ -96,19 +95,18 @@ class SetlistItemsAdapter(
     override fun getItemCount() = mVisibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_setlist)
-        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_item_setlist_name)
+        private val mBinding = ItemSetlistBinding.bind(itemView)
 
         fun bind(position: Int) {
             val item = mVisibleItems.toList()[position]
             selectionTracker?.attach(this)
 
-            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSetlist))
             item.isSelected.observe(mLifecycleOwner) {
-                mCheckBox.isChecked = it
+                mBinding.chkItemSetlist.isChecked = it
             }
 
-            mNameTextView.text = item.setlist.name
+            mBinding.tvItemSetlistName.text = item.setlist.name
         }
     }
 

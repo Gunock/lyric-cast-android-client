@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
+  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 10:22 PM
+  ~ Last modified 14/05/2021, 00:02
   -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,6 +27,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_category_manager" />
+    <include
+        android:id="@+id/content_category_manager"
+        layout="@layout/content_category_manager" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

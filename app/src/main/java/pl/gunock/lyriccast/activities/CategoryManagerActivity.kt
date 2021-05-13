@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 2:40 PM
+ * Last modified 14/05/2021, 00:02
  */
 
 package pl.gunock.lyriccast.activities
@@ -15,12 +15,12 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
+import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
+import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewmodels.EditCategoryDialogViewModel
@@ -32,8 +32,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     private val mDatabaseViewModel: DatabaseViewModel by viewModels {
         DatabaseViewModel.Factory(resources)
     }
-
-    private lateinit var mCategoryItemsRecyclerView: RecyclerView
+    private lateinit var mBinding: ContentCategoryManagerBinding
 
     private lateinit var mEditCategoryDialogViewModel: EditCategoryDialogViewModel
 
@@ -79,14 +78,14 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_category_manager)
-        setSupportActionBar(findViewById(R.id.toolbar_category_manager))
+        val rootBinding = ActivityCategoryManagerBinding.inflate(layoutInflater)
+        mBinding = rootBinding.contentCategoryManager
+        setContentView(rootBinding.root)
+        setSupportActionBar(rootBinding.toolbarCategoryManager)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adView = findViewById<AdView>(R.id.adv_category_manager)
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        mBinding.advCategoryManager.loadAd(adRequest)
 
         // TODO: Possible leak
         mEditCategoryDialogViewModel =
@@ -97,9 +96,8 @@ class CategoryManagerActivity : AppCompatActivity() {
             mEditCategoryDialogViewModel.categoryNames = categoryNames
         }
 
-        mCategoryItemsRecyclerView = findViewById(R.id.rcv_categories)
-        mCategoryItemsRecyclerView.setHasFixedSize(true)
-        mCategoryItemsRecyclerView.layoutManager = LinearLayoutManager(baseContext)
+        mBinding.rcvCategories.setHasFixedSize(true)
+        mBinding.rcvCategories.layoutManager = LinearLayoutManager(baseContext)
 
         setupCategories()
     }
@@ -135,10 +133,10 @@ class CategoryManagerActivity : AppCompatActivity() {
         mSelectionTracker = SelectionTracker(this::onCategoryClick)
 
         mCategoryItemsAdapter = CategoryItemsAdapter(
-            mCategoryItemsRecyclerView.context,
+            mBinding.rcvCategories.context,
             mSelectionTracker = mSelectionTracker
         )
-        mCategoryItemsRecyclerView.adapter = mCategoryItemsAdapter
+        mBinding.rcvCategories.adapter = mCategoryItemsAdapter
 
         mDatabaseViewModel.allCategories.addChangeListener { categories ->
             mCategoryItemsAdapter.submitCollection(categories)

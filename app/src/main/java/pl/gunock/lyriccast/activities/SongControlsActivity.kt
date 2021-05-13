@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 9:25 PM
+ * Last modified 11/05/2021, 21:48
  */
 
 package pl.gunock.lyriccast.activities
@@ -11,25 +11,24 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.cast.SessionStartedListener
+import pl.gunock.lyriccast.databinding.*
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.helpers.MessageHelper
 
 
 class SongControlsActivity : AppCompatActivity() {
+
+    private lateinit var mBinding: ContentSongControlsBinding
 
     private var mSessionStartedListener: SessionStartedListener? = null
     private var mCurrentSlide = 0
@@ -55,14 +54,14 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_song_controls)
-        setSupportActionBar(findViewById(R.id.toolbar_controls))
+        val rootBinding = ActivitySongControlsBinding.inflate(layoutInflater)
+        setContentView(rootBinding.root)
+        setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mBinding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
 
-        val adView = findViewById<AdView>(R.id.adv_song_controls)
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        mBinding.advSongControls.loadAd(adRequest)
 
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
@@ -76,13 +75,12 @@ class SongControlsActivity : AppCompatActivity() {
         val song: SongDocument = databaseViewModel.getSong(songId)!!
         databaseViewModel.close()
 
-        findViewById<TextView>(R.id.tv_controls_song_title).text = song.title
+        mBinding.tvControlsSongTitle.text = song.title
 
         mLyrics = song.lyricsList
 
-        val blankButton: Button = findViewById(R.id.btn_song_blank)
-        blankButton.setBackgroundColor(mCurrentBlankColor)
-        blankButton.text = mCurrentBlankText
+        mBinding.btnSongBlank.setBackgroundColor(mCurrentBlankColor)
+        mBinding.btnSongBlank.text = mCurrentBlankText
 
         setupListeners()
 
@@ -134,17 +132,16 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        val buttonBlank: Button = findViewById(R.id.btn_song_blank)
-        buttonBlank.setOnClickListener {
+        mBinding.btnSongBlank.setOnClickListener {
             MessageHelper.sendBlank(!MessageHelper.isBlanked.value!!)
         }
 
         MessageHelper.isBlanked.observe(this) {
-            buttonBlank.setBackgroundColor(mCurrentBlankColor)
-            buttonBlank.text = mCurrentBlankText
+            mBinding.btnSongBlank.setBackgroundColor(mCurrentBlankColor)
+            mBinding.btnSongBlank.text = mCurrentBlankText
         }
 
-        findViewById<ImageButton>(R.id.btn_song_prev).setOnClickListener {
+        mBinding.btnSongPrev.setOnClickListener {
             if (mCurrentSlide <= 0) {
                 return@setOnClickListener
             }
@@ -154,7 +151,7 @@ class SongControlsActivity : AppCompatActivity() {
             sendSlide()
         }
 
-        findViewById<ImageButton>(R.id.btn_song_next).setOnClickListener {
+        mBinding.btnSongNext.setOnClickListener {
             if (mCurrentSlide >= mLyrics.size - 1) {
                 return@setOnClickListener
             }
@@ -171,10 +168,10 @@ class SongControlsActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setPreview() {
-        findViewById<TextView>(R.id.tv_song_slide_number).text =
+        mBinding.tvSongSlideNumber.text =
             "${mCurrentSlide + 1}/${mLyrics.size}"
 
-        findViewById<TextView>(R.id.tv_slide_preview).text = mLyrics[mCurrentSlide]
+        mBinding.tvSlidePreview.text = mLyrics[mCurrentSlide]
     }
 
     private fun sendSlide() {

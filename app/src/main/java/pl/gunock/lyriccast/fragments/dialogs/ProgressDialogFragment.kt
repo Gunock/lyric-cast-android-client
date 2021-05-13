@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/8/21 1:41 PM
+ * Last modified 14/05/2021, 00:06
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -12,12 +12,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.DialogFragmentProgressBinding
 
 
 class ProgressDialogFragment(messageText: String) : DialogFragment() {
@@ -31,9 +29,7 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         get() = messageLiveData.value!!
         set(value) = messageLiveData.postValue(value)
 
-    private lateinit var mMessageTextView: TextView
-    private lateinit var mProgressBar: ProgressBar
-    private lateinit var mOkButton: Button
+    private lateinit var mBinding: DialogFragmentProgressBinding
 
     private var mDefaultTextColor: Int = Int.MIN_VALUE
     private var mDefaultProgressColor: Int = Int.MIN_VALUE
@@ -43,10 +39,12 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE)
         dialog!!.setCanceledOnTouchOutside(false)
-        return inflater.inflate(R.layout.dialog_fragment_progress, container, false)
+
+        mBinding = DialogFragmentProgressBinding.inflate(inflater)
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,32 +54,29 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         mDefaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
         mErrorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
-        mMessageTextView = view.findViewById(R.id.tv_progress_message)
-        mProgressBar = view.findViewById(R.id.pgb_progress)
-        mOkButton = view.findViewById(R.id.btn_progress_ok)
+        mBinding.tvProgressMessage.text = message
+        mBinding.btnProgressOk.visibility = View.GONE
+        mBinding.btnProgressOk.setOnClickListener { dismiss() }
 
-        mMessageTextView.text = message
-        mOkButton.visibility = View.GONE
-        mOkButton.setOnClickListener { dismiss() }
-
-        messageLiveData.observe(this) { mMessageTextView.text = it }
+        messageLiveData.observe(this) { mBinding.tvProgressMessage.text = it }
     }
 
     fun setErrorColor(errorColor: Boolean) {
         if (errorColor) {
-            mProgressBar.indeterminateTintList = ColorStateList.valueOf(mErrorProgressColor)
-            mOkButton.setTextColor(mErrorProgressColor)
+            mBinding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(mErrorProgressColor)
+            mBinding.btnProgressOk.setTextColor(mErrorProgressColor)
         } else {
-            mProgressBar.indeterminateTintList = ColorStateList.valueOf(mDefaultProgressColor)
-            mOkButton.setTextColor(mDefaultTextColor)
+            mBinding.pgbProgress.indeterminateTintList =
+                ColorStateList.valueOf(mDefaultProgressColor)
+            mBinding.btnProgressOk.setTextColor(mDefaultTextColor)
         }
     }
 
     fun setShowOkButton(showOkButton: Boolean) {
         if (showOkButton) {
-            mOkButton.visibility = View.VISIBLE
+            mBinding.btnProgressOk.visibility = View.VISIBLE
         } else {
-            mOkButton.visibility = View.GONE
+            mBinding.btnProgressOk.visibility = View.GONE
         }
     }
 

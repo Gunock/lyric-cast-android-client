@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 10:45 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:24 PM
+ * Last modified 13/05/2021, 10:20
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -14,16 +14,13 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputLayout
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.ColorSpinnerAdapter
+import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.enums.NameValidationState
@@ -47,9 +44,7 @@ class EditCategoryDialogFragment(
 
     private val mCategoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
 
-    private lateinit var mNameInputLayout: TextInputLayout
-    private lateinit var mNameInput: TextView
-    private lateinit var mColorSpinner: Spinner
+    private lateinit var mBinding: DialogFragmentEditCategoryBinding
 
     private lateinit var mDialogViewModel: EditCategoryDialogViewModel
 
@@ -63,27 +58,25 @@ class EditCategoryDialogFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_fragment_edit_category, container, false)
+    ): View {
+        mBinding = DialogFragmentEditCategoryBinding.inflate(inflater)
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mNameInputLayout = view.findViewById(R.id.tv_category_name)
-        mNameInput = view.findViewById(R.id.tin_category_name)
-        mColorSpinner = view.findViewById(R.id.spn_category_color)
-
-        view.findViewById<TextView>(R.id.tv_dialog_title).text = if (mCategoryItem == null) {
+        mBinding.tvDialogTitle.text = if (mCategoryItem == null) {
             getString(R.string.category_manager_add_category)
         } else {
             getString(R.string.category_manager_edit_category)
         }
 
-        mNameInput.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
+        mBinding.edCategoryName.filters =
+            arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
 
         setupColorSpinner()
-        setupListeners(view)
+        setupListeners()
     }
 
     override fun onDestroy() {
@@ -102,35 +95,36 @@ class EditCategoryDialogFragment(
             requireContext(),
             colors
         )
-        mColorSpinner.adapter = colorSpinnerAdapter
+        mBinding.spnCategoryColor.adapter = colorSpinnerAdapter
 
         if (mCategoryItem?.category?.color != null) {
-            mNameInput.text = mCategoryItem.category.name.toUpperCase(Locale.ROOT)
-            mColorSpinner.setSelection(colorValues.indexOf(mCategoryItem.category.color!!))
+            mBinding.edCategoryName.setText(mCategoryItem.category.name.toUpperCase(Locale.ROOT))
+            mBinding.spnCategoryColor
+                .setSelection(colorValues.indexOf(mCategoryItem.category.color!!))
         }
     }
 
-    private fun setupListeners(view: View) {
-        mNameInput.addTextChangedListener(mCategoryNameTextWatcher)
+    private fun setupListeners() {
+        mBinding.edCategoryName.addTextChangedListener(mCategoryNameTextWatcher)
 
-        view.findViewById<Button>(R.id.btn_save_category).setOnClickListener {
+        mBinding.btnSaveCategory.setOnClickListener {
             saveCategory()
         }
 
-        view.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
+        mBinding.btnCancel.setOnClickListener {
             dismiss()
         }
     }
 
     private fun saveCategory() {
-        val categoryName = mNameInput.text.toString().trim()
+        val categoryName = mBinding.edCategoryName.text.toString().trim()
         if (validateCategoryName(categoryName) != NameValidationState.VALID) {
-            mNameInput.text = categoryName
-            mNameInput.requestFocus()
+            mBinding.edCategoryName.setText(categoryName)
+            mBinding.tinCategoryName.requestFocus()
             return
         }
 
-        val selectedColor = mColorSpinner.selectedItem as ColorItem
+        val selectedColor = mBinding.spnCategoryColor.selectedItem as ColorItem
 
         val categoryId: ObjectId = if (mDialogViewModel.category != null) {
             mDialogViewModel.category!!.id
@@ -174,13 +168,14 @@ class EditCategoryDialogFragment(
 
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {
-                    mNameInputLayout.error = getString(R.string.category_manager_enter_name)
+                    mBinding.tinCategoryName.error = getString(R.string.category_manager_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mNameInputLayout.error = getString(R.string.category_manager_name_already_used)
+                    mBinding.tinCategoryName.error =
+                        getString(R.string.category_manager_name_already_used)
                 }
                 NameValidationState.VALID -> {
-                    mNameInputLayout.error = null
+                    mBinding.tinCategoryName.error = null
                 }
             }
         }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:26 AM
+ * Last modified 13/05/2021, 23:42
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -11,10 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import java.util.*
 
@@ -66,17 +65,15 @@ class CategorySpinnerAdapter(
     }
 
     private inner class ViewHolder(itemView: View) {
-        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_spinner_color_name)
-        private val mColorCardView: CardView =
-            itemView.findViewById(R.id.cdv_spinner_category_color)
+        private val mBinding = SpinnerItemColorBinding.bind(itemView)
 
         fun bind(item: CategoryDocument) {
-            mNameTextView.text = item.name
+            mBinding.tvSpinnerColorName.text = item.name
             if (item.color != null) {
-                mColorCardView.visibility = View.VISIBLE
-                mColorCardView.setCardBackgroundColor(item.color!!)
+                mBinding.cdvSpinnerCategoryColor.visibility = View.VISIBLE
+                mBinding.cdvSpinnerCategoryColor.setCardBackgroundColor(item.color!!)
             } else {
-                mColorCardView.visibility = View.GONE
+                mBinding.cdvSpinnerCategoryColor.visibility = View.GONE
             }
         }
     }

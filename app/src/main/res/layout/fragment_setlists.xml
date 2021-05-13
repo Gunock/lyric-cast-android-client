@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 10:48 PM
+  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 10:14 PM
+  ~ Last modified 13/05/2021, 10:20
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tv_filter_setlists"
+            android:id="@+id/tin_filter_setlists"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tin_setlist_filter"
+                android:id="@+id/ed_setlist_filter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_setlist_name"

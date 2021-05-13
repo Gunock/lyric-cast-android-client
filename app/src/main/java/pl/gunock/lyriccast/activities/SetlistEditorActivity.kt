@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 5/1/21 9:25 PM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 5/1/21 2:40 PM
+ * Last modified 14/05/2021, 00:06
  */
 
 package pl.gunock.lyriccast.activities
@@ -9,20 +9,19 @@ package pl.gunock.lyriccast.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
-import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.ActivitySetlistEditorBinding
 
 class SetlistEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setlist_editor)
+        val binding = ActivitySetlistEditorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setSupportActionBar(findViewById(R.id.toolbar_setlist_editor))
+        setSupportActionBar(binding.toolbarSetlistEditor)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adView = findViewById<AdView>(R.id.adv_setlist_editor)
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        binding.contentSetlistEditor.advSetlistEditor.loadAd(adRequest)
     }
 
 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:09 AM
+ * Last modified 14/05/2021, 00:06
  */
 
 package pl.gunock.lyriccast.adapters
@@ -10,14 +10,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
+import pl.gunock.lyriccast.databinding.ItemCategoryBinding
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
@@ -71,24 +69,25 @@ class CategoryItemsAdapter(
     override fun getItemCount() = mItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_category)
-        private val mNameTextView: TextView = itemView.findViewById(R.id.tv_category_name)
-        private val mColorCardView: CardView = itemView.findViewById(R.id.cdv_category_color)
+        private val mBinding = ItemCategoryBinding.bind(itemView)
 
         fun bind(position: Int) {
             val item: CategoryItem = categoryItems[position]
             mSelectionTracker?.attach(this)
 
-            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mColorCardView, true))
-            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            showCheckBox.observe(
+                mLifecycleOwner,
+                VisibilityObserver(mBinding.cdvCategoryColor, true)
+            )
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemCategory))
             item.isSelected.observe(mLifecycleOwner) {
-                mCheckBox.isChecked = it
+                mBinding.chkItemCategory.isChecked = it
             }
 
-            mNameTextView.text = categoryItems[absoluteAdapterPosition].category.name
+            mBinding.tvCategoryName.text = categoryItems[absoluteAdapterPosition].category.name
 
             if (item.category.color != null) {
-                mColorCardView.setCardBackgroundColor(item.category.color!!)
+                mBinding.cdvCategoryColor.setCardBackgroundColor(item.category.color!!)
             }
 
         }

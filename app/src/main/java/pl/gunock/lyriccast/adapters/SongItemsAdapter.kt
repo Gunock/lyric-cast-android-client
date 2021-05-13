@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 1:30 AM
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 1:27 AM
+ * Last modified 14/05/2021, 00:06
  */
 
 package pl.gunock.lyriccast.adapters
@@ -12,9 +12,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +19,7 @@ import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.misc.SelectionTracker
 import pl.gunock.lyriccast.misc.VisibilityObserver
@@ -123,37 +121,38 @@ class SongItemsAdapter(
     override fun getItemCount() = mVisibleItems.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mCheckBox: CheckBox = itemView.findViewById(R.id.chk_item_song)
-        private val mTitleTextView: TextView = itemView.findViewById(R.id.tv_item_song_title)
-        private val mCategoryTextView: TextView = itemView.findViewById(R.id.tv_song_category)
+        private val mBinding = ItemSongBinding.bind(itemView)
 
         init {
-            mCategoryTextView.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
+            mBinding.tvSongCategory.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
         }
 
         fun bind(position: Int) {
             val item = mVisibleItems.toList()[position]
             mSelectionTracker?.attach(this)
-            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mCheckBox))
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSong))
             item.isSelected.observe(mLifecycleOwner) {
-                mCheckBox.isChecked = it
+                mBinding.chkItemSong.isChecked = it
             }
 
-            mTitleTextView.text = item.song.title
+            mBinding.tvItemSongTitle.text = item.song.title
 
             if (item.song.category != null) {
-                mCategoryTextView.text = item.song.category?.name
-                mCheckBox.buttonTintList =
+                mBinding.tvSongCategory.text = item.song.category?.name
+
+                mBinding.chkItemSong.buttonTintList =
                     ColorStateList.valueOf(this@SongItemsAdapter.mWithCategoryTextColor)
-                mTitleTextView.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
-                (itemView as CardView).setCardBackgroundColor(item.song.category?.color!!)
+
+                mBinding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
+                mBinding.root.setCardBackgroundColor(item.song.category?.color!!)
             } else {
-                mCategoryTextView.text = ""
+                mBinding.tvSongCategory.text = ""
 
-                mCheckBox.buttonTintList = ColorStateList(CHECKBOX_STATES, mCheckBoxColors)
+                mBinding.chkItemSong.buttonTintList =
+                    ColorStateList(CHECKBOX_STATES, mCheckBoxColors)
 
-                mTitleTextView.setTextColor(mNoCategoryTextColor)
-                (itemView as CardView).setCardBackgroundColor(this@SongItemsAdapter.mDefaultItemCardColor)
+                mBinding.tvItemSongTitle.setTextColor(mNoCategoryTextColor)
+                mBinding.root.setCardBackgroundColor(this@SongItemsAdapter.mDefaultItemCardColor)
             }
         }
     }

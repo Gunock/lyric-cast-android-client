@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:47
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 00:07
+ * Last modified 13/05/2021, 10:20
  */
 
 package pl.gunock.lyriccast.tests.category_manager
@@ -69,7 +69,7 @@ class EditCategoryTest {
         onView(withId(R.id.tv_dialog_title))
             .check(matches(withText("Edit category")))
 
-        onView(withId(R.id.tin_category_name)).perform(replaceText(editedCategoryName))
+        onView(withId(R.id.ed_category_name)).perform(replaceText(editedCategoryName))
         onView(withId(R.id.btn_save_category)).perform(click())
 
         sleep(200)
