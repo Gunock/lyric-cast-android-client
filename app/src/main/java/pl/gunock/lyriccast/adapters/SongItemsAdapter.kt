@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 14/05/2021, 18:02
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:06
+ * Last modified 14/05/2021, 18:00
  */
 
 package pl.gunock.lyriccast.adapters
@@ -33,10 +33,6 @@ class SongItemsAdapter(
     private val mSelectionTracker: SelectionTracker<ViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
-    private companion object {
-        val CHECKBOX_STATES = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
-    }
-
     init {
         setHasStableIds(true)
     }
@@ -44,12 +40,10 @@ class SongItemsAdapter(
     private val mLock = Any()
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
 
-    private val mCheckBoxColor = context.getColor(R.color.check_box)
-    private val mCheckBoxHighlightColor = context.getColor(R.color.check_box_highlight)
     private val mDefaultItemCardColor = context.getColor(R.color.window_background_2)
     private val mWithCategoryTextColor = context.getColor(R.color.text_item_with_category)
     private val mNoCategoryTextColor = context.getColor(R.color.text_item_no_category)
-    private val mCheckBoxColors = intArrayOf(mCheckBoxHighlightColor, mCheckBoxColor)
+    private val mCheckBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
     private var mItems: SortedSet<SongItem> = sortedSetOf()
     private var mVisibleItems: Set<SongItem> = setOf()
@@ -148,8 +142,7 @@ class SongItemsAdapter(
             } else {
                 mBinding.tvSongCategory.text = ""
 
-                mBinding.chkItemSong.buttonTintList =
-                    ColorStateList(CHECKBOX_STATES, mCheckBoxColors)
+                mBinding.chkItemSong.buttonTintList = mCheckBoxColors
 
                 mBinding.tvItemSongTitle.setTextColor(mNoCategoryTextColor)
                 mBinding.root.setCardBackgroundColor(this@SongItemsAdapter.mDefaultItemCardColor)

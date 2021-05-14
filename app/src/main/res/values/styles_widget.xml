@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 18:02
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:56 PM
+  ~ Last modified 14/05/2021, 18:00
   -->
 
 <resources>
@@ -61,7 +61,7 @@
     </style>
 
     <style name="Widget.LyricCast.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
-        <item name="buttonTint">@color/check_box</item>
+        <item name="buttonTint">@color/checkbox_state_list</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
