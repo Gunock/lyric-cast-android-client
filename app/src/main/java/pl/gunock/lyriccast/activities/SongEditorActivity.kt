@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,10 +16,13 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.tabs.TabLayout
 import io.realm.RealmList
 import io.realm.RealmResults
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
@@ -99,7 +102,7 @@ class SongEditorActivity : AppCompatActivity() {
             mTabCountMap[sectionName] = 1
         }
 
-        setupCategorySpinner()
+        lifecycleScope.launch(Dispatchers.Main) { setupCategorySpinner() }
         setupListeners()
     }
 
@@ -126,7 +129,7 @@ class SongEditorActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupCategorySpinner() {
+    private suspend fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
         mBinding.spnSongEditorCategory.adapter = categorySpinnerAdapter
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:44
+ * Last modified 15/05/2021, 12:18
  */
 
 package pl.gunock.lyriccast.adapters
@@ -60,9 +60,7 @@ class ControlsSongItemsAdapter(
 
     override fun getItemCount() = songItems.size
 
-    inner class ViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val mBinding = ItemControlsSongBinding.bind(itemView)
         private var mCurrentCardColor = mDefaultItemCardColor
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 15/05/2021, 13:57
  */
 
 package pl.gunock.lyriccast.activities
@@ -19,13 +19,14 @@ import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.cast.framework.CastContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider
@@ -131,12 +132,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Import parameters $mImportDialogViewModel")
                 Log.d(TAG, "Selected file URI: $uri")
                 if (mImportDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
-                    importOpenSong(uri)
+                    lifecycleScope.launch(Dispatchers.Main) { importOpenSong(uri) }
                 } else if (mImportDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
-                    importLyricCast(uri)
+                    lifecycleScope.launch(Dispatchers.Main) { importLyricCast(uri) }
                 }
             }
-            EXPORT_RESULT_CODE -> exportAll(uri)
+            EXPORT_RESULT_CODE -> lifecycleScope.launch(Dispatchers.Main) { exportAll(uri) }
         }
     }
 
@@ -198,7 +199,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun exportAll(uri: Uri) {
+    private suspend fun exportAll(uri: Uri) {
         val dialogFragment =
             ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
         dialogFragment.setStyle(
@@ -209,7 +210,7 @@ class MainActivity : AppCompatActivity() {
 
         val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val exportDir = File(cacheDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
@@ -248,111 +249,112 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun importLyricCast(uri: Uri) {
-        val inputStream = contentResolver.openInputStream(uri) ?: return
+    private suspend fun importLyricCast(uri: Uri) {
         val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
-        CoroutineScope(Dispatchers.IO).launch {
-            val importDir = File(cacheDir.path, ".import")
-            importDir.deleteRecursively()
-            importDir.mkdirs()
 
-            @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.unzip(contentResolver.openInputStream(uri)!!, importDir.path)
-            @Suppress("BlockingMethodInNonBlockingContext")
-            inputStream.close()
+        val transferData: DatabaseTransferData? = withContext(Dispatchers.IO) {
+            getImportData(uri)
+        }
 
-            val songsJson: JSONArray
-            val categoriesJson: JSONArray
-            val setlistsJson: JSONArray?
-            try {
-                songsJson = JSONArray(File(importDir, "songs.json").readText())
-                categoriesJson = JSONArray(File(importDir, "categories.json").readText())
+        if (transferData == null) {
+            dialogFragment.message = getString(R.string.main_activity_import_incorrect_file_format)
+            dialogFragment.setErrorColor(true)
+            dialogFragment.setShowOkButton(true)
+            return
+        }
 
-                val setlistsFile = File(importDir, "setlists.json")
-                setlistsJson = if (setlistsFile.exists()) {
-                    JSONArray(File(importDir, "setlists.json").readText())
-                } else {
-                    null
-                }
-            } catch (exception: Exception) {
-                Log.e(TAG, exception.stackTraceToString())
-                dialogFragment.message =
-                    getString(R.string.main_activity_import_incorrect_file_format)
-                CoroutineScope(Dispatchers.Main).launch {
-                    dialogFragment.setErrorColor(true)
-                    dialogFragment.setShowOkButton(true)
-                }
-                return@launch
+        val importOptions = ImportOptions(
+            mImportDialogViewModel.deleteAll,
+            mImportDialogViewModel.replaceOnConflict
+        )
+
+        mDatabaseViewModel.importSongs(
+            transferData,
+            dialogFragment.messageLiveData,
+            importOptions
+        )
+
+        dialogFragment.dismiss()
+    }
+
+    private fun getImportData(uri: Uri): DatabaseTransferData? {
+        val importDir = File(cacheDir.path, ".import")
+        importDir.deleteRecursively()
+        importDir.mkdirs()
+
+        contentResolver.openInputStream(uri).use { inputStream ->
+            FileHelper.unzip(inputStream!!, importDir.path)
+        }
+
+        try {
+            val songsJson = JSONArray(File(importDir, "songs.json").readText())
+            val categoriesJson = JSONArray(File(importDir, "categories.json").readText())
+
+            val setlistsFile = File(importDir, "setlists.json")
+            val setlistsJson: JSONArray? = if (setlistsFile.exists()) {
+                JSONArray(File(importDir, "setlists.json").readText())
+            } else {
+                null
             }
-            importDir.deleteRecursively()
 
-            val transferData = DatabaseTransferData(
+            return DatabaseTransferData(
                 songDtos = songsJson.toJSONObjectList().map { SongDto(it) },
                 categoryDtos = categoriesJson.toJSONObjectList().map { CategoryDto(it) },
                 setlistDtos = setlistsJson?.toJSONObjectList()?.map { SetlistDto(it) }
             )
-
-            val importOptions = ImportOptions(
-                mImportDialogViewModel.deleteAll,
-                mImportDialogViewModel.replaceOnConflict
-            )
-
-            CoroutineScope(Dispatchers.Main).launch {
-                mDatabaseViewModel.importSongs(
-                    transferData,
-                    dialogFragment.messageLiveData,
-                    importOptions
-                )
-
-                dialogFragment.dismiss()
-            }
+        } catch (exception: Exception) {
+            Log.e(TAG, exception.stackTraceToString())
+            return null
+        } finally {
+            importDir.deleteRecursively()
         }
     }
 
-    private fun importOpenSong(uri: Uri) {
+    private suspend fun importOpenSong(uri: Uri) {
         val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Dialog
         )
         dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
-        CoroutineScope(Dispatchers.IO).launch {
+
+        val importedSongs: Set<SongDto>? = withContext(Dispatchers.IO) {
             val importSongXmlParser =
                 ImportSongXmlParserFactory.create(filesDir, SongXmlParserType.OPEN_SONG)
 
-            val importedSongs: Set<SongDto> = try {
+            return@withContext try {
                 importSongXmlParser.parseZip(contentResolver, uri)
             } catch (exception: Exception) {
                 Log.e(TAG, exception.stackTraceToString())
-                dialogFragment.message =
-                    getString(R.string.main_activity_import_incorrect_file_format)
-                CoroutineScope(Dispatchers.Main).launch {
-                    dialogFragment.setErrorColor(true)
-                    dialogFragment.setShowOkButton(true)
-                }
-                return@launch
-            }
-
-            val colors: IntArray = resources.getIntArray(R.array.category_color_values)
-            val importOptions = ImportOptions(
-                mImportDialogViewModel.deleteAll,
-                mImportDialogViewModel.replaceOnConflict,
-                colors
-            )
-            CoroutineScope(Dispatchers.Main).launch {
-                mDatabaseViewModel.importSongs(
-                    importedSongs,
-                    dialogFragment.messageLiveData,
-                    importOptions
-                )
-                dialogFragment.dismiss()
+                null
             }
         }
+
+        if (importedSongs == null) {
+            dialogFragment.message = getString(R.string.main_activity_import_incorrect_file_format)
+            dialogFragment.setErrorColor(true)
+            dialogFragment.setShowOkButton(true)
+            return
+        }
+
+        val colors: IntArray = resources.getIntArray(R.array.category_color_values)
+        val importOptions = ImportOptions(
+            mImportDialogViewModel.deleteAll,
+            mImportDialogViewModel.replaceOnConflict,
+            colors
+        )
+
+        mDatabaseViewModel.importSongs(
+            importedSongs,
+            dialogFragment.messageLiveData,
+            importOptions
+        )
+        dialogFragment.dismiss()
     }
 
     private fun startImport(): Boolean {

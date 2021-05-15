@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 23:42
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.fragments
@@ -12,9 +12,12 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
@@ -121,7 +124,9 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupListeners() {
         mBinding.edSongFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            filterSongs(newText, (mBinding.spnCategory.selectedItem as CategoryDocument).id)
+            lifecycleScope.launch(Dispatchers.Main) {
+                filterSongs(newText, (mBinding.spnCategory.selectedItem as CategoryDocument).id)
+            }
         })
 
         mBinding.edSongFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -131,18 +136,22 @@ class SetlistEditorSongsFragment : Fragment() {
         }
 
         mBinding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            filterSongs(
-                mBinding.edSongFilter.editableText.toString(),
-                (mBinding.spnCategory.selectedItem as CategoryDocument).id
-            )
+            lifecycleScope.launch(Dispatchers.Main) {
+                filterSongs(
+                    mBinding.edSongFilter.editableText.toString(),
+                    (mBinding.spnCategory.selectedItem as CategoryDocument).id
+                )
+            }
         }
 
         mBinding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
-            filterSongs(
-                mBinding.edSongFilter.editableText.toString(),
-                (mBinding.spnCategory.selectedItem as CategoryDocument).id,
-                isSelected = if (isChecked) true else null
-            )
+            lifecycleScope.launch(Dispatchers.Main) {
+                filterSongs(
+                    mBinding.edSongFilter.editableText.toString(),
+                    (mBinding.spnCategory.selectedItem as CategoryDocument).id,
+                    isSelected = if (isChecked) true else null
+                )
+            }
         }
     }
 
@@ -152,7 +161,9 @@ class SetlistEditorSongsFragment : Fragment() {
         mBinding.spnCategory.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.addChangeListener { categories ->
-            categorySpinnerAdapter.submitCollection(categories)
+            lifecycleScope.launch(Dispatchers.Main) {
+                categorySpinnerAdapter.submitCollection(categories)
+            }
         }
     }
 
@@ -174,9 +185,11 @@ class SetlistEditorSongsFragment : Fragment() {
         )
 
         mDatabaseViewModel.allSongs.addChangeListener { songs ->
-            mSongItemsAdapter!!.submitCollection(songs)
-            mSongItemsAdapter!!.songItems.forEach { item ->
-                item.isSelected.value = mArgs.presentation.contains(item.song.id.toString())
+            lifecycleScope.launch(Dispatchers.Main) {
+                mSongItemsAdapter!!.submitCollection(songs)
+                mSongItemsAdapter!!.songItems.forEach { item ->
+                    item.isSelected.value = mArgs.presentation.contains(item.song.id.toString())
+                }
             }
         }
 
@@ -187,7 +200,7 @@ class SetlistEditorSongsFragment : Fragment() {
         item.isSelected.value = !item.isSelected.value!!
     }
 
-    private fun filterSongs(
+    private suspend fun filterSongs(
         title: String,
         categoryId: ObjectId,
         isSelected: Boolean? = null

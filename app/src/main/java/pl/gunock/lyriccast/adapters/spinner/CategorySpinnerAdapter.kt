@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 23:42
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.adapters.spinner
@@ -11,6 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import io.realm.RealmResults
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
@@ -20,8 +23,6 @@ import java.util.*
 class CategorySpinnerAdapter(
     context: Context
 ) : BaseAdapter() {
-    private val mLock = Any()
-
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mItems: MutableList<CategoryDocument> = mutableListOf()
 
@@ -30,15 +31,16 @@ class CategorySpinnerAdapter(
 
     val categories: List<CategoryDocument> get() = mItems
 
-    fun submitCollection(
-        categories: Collection<CategoryDocument>,
+    suspend fun submitCollection(
+        categories: RealmResults<CategoryDocument>,
         firstCategory: CategoryDocument = mCategoryAll
     ) {
-        synchronized(mLock) {
+        val frozenCategories = categories.freeze()
+        withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(listOf(firstCategory) + categories.toSortedSet())
-            notifyDataSetChanged()
+            mItems.addAll(listOf(firstCategory) + frozenCategories.toSortedSet())
         }
+        notifyDataSetChanged()
     }
 
     override fun getItem(position: Int): Any {
@@ -54,19 +56,20 @@ class CategorySpinnerAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View =
-            convertView ?: mInflater.inflate(R.layout.spinner_item_color, parent, false)
+        val binding = if (convertView != null) {
+            SpinnerItemColorBinding.bind(convertView)
+        } else {
+            SpinnerItemColorBinding.inflate(mInflater)
+        }
 
-        val vh = ViewHolder(view)
+        val viewHolder = ViewHolder(binding)
         val item = this.categories[position]
-        vh.bind(item)
+        viewHolder.bind(item)
 
-        return view
+        return binding.root
     }
 
-    private inner class ViewHolder(itemView: View) {
-        private val mBinding = SpinnerItemColorBinding.bind(itemView)
-
+    private inner class ViewHolder(private val mBinding: SpinnerItemColorBinding) {
         fun bind(item: CategoryDocument) {
             mBinding.tvSpinnerColorName.text = item.name
             if (item.color != null) {

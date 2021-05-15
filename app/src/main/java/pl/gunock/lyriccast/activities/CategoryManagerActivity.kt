@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 15/05/2021, 15:00
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,8 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
@@ -139,7 +142,9 @@ class CategoryManagerActivity : AppCompatActivity() {
         mBinding.rcvCategories.adapter = mCategoryItemsAdapter
 
         mDatabaseViewModel.allCategories.addChangeListener { categories ->
-            mCategoryItemsAdapter.submitCollection(categories)
+            lifecycleScope.launch(Dispatchers.Main) {
+                mCategoryItemsAdapter.submitCollection(categories)
+            }
         }
     }
 

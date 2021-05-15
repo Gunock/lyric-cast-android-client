@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:32 PM
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:31 PM
+ * Last modified 15/05/2021, 12:00
  */
 
 plugins {
@@ -26,10 +26,6 @@ android {
         realm {
             syncEnabled = false
         }
-    }
-
-    buildFeatures {
-        dataBinding true
     }
 
     buildTypes {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:27
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.fragments
@@ -19,11 +19,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.RealmResults
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
@@ -152,17 +153,21 @@ class SongsFragment : Fragment() {
 
         val uri: Uri = data?.data!!
         when (requestCode) {
-            EXPORT_SELECTED_RESULT_CODE -> exportSelectedSongs(uri)
+            EXPORT_SELECTED_RESULT_CODE -> lifecycleScope.launch(Dispatchers.Main) {
+                exportSelectedSongs(uri)
+            }
         }
     }
 
     private fun setupListeners() {
         val filterEditText: EditText = mBinding.edSongFilter
         filterEditText.addTextChangedListener(InputTextChangedListener {
-            filterSongs(
-                filterEditText.editableText.toString(),
-                getSelectedCategoryId(mBinding.spnCategory)
-            )
+            lifecycleScope.launch(Dispatchers.Main) {
+                filterSongs(
+                    filterEditText.editableText.toString(),
+                    getSelectedCategoryId(mBinding.spnCategory)
+                )
+            }
         })
 
         filterEditText.setOnFocusChangeListener { view, hasFocus ->
@@ -173,10 +178,12 @@ class SongsFragment : Fragment() {
 
         mBinding.spnCategory.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->
-                filterSongs(
-                    filterEditText.editableText.toString(),
-                    getSelectedCategoryId(mBinding.spnCategory)
-                )
+                lifecycleScope.launch(Dispatchers.Main) {
+                    filterSongs(
+                        filterEditText.editableText.toString(),
+                        getSelectedCategoryId(mBinding.spnCategory)
+                    )
+                }
             }
     }
 
@@ -187,10 +194,12 @@ class SongsFragment : Fragment() {
         mBinding.spnCategory.adapter = categorySpinnerAdapter
 
         mDatabaseViewModel.allCategories.addChangeListener { categories: RealmResults<CategoryDocument> ->
-            categorySpinnerAdapter.submitCollection(categories)
+            lifecycleScope.launch(Dispatchers.Main) {
+                categorySpinnerAdapter.submitCollection(categories)
 
-            if (categories.isNotEmpty()) {
-                mBinding.spnCategory.setSelection(0)
+                if (categories.isNotEmpty()) {
+                    mBinding.spnCategory.setSelection(0)
+                }
             }
         }
 
@@ -208,7 +217,9 @@ class SongsFragment : Fragment() {
         mBinding.rcvSongs.adapter = mSongItemsAdapter
 
         mDatabaseViewModel.allSongs.addChangeListener { songs ->
-            mSongItemsAdapter?.submitCollection(songs)
+            lifecycleScope.launch(Dispatchers.Main) {
+                mSongItemsAdapter?.submitCollection(songs)
+            }
         }
     }
 
@@ -229,7 +240,7 @@ class SongsFragment : Fragment() {
         return true
     }
 
-    private fun filterSongs(
+    private suspend fun filterSongs(
         title: String,
         categoryId: ObjectId
     ) {
@@ -297,7 +308,7 @@ class SongsFragment : Fragment() {
         return true
     }
 
-    private fun exportSelectedSongs(uri: Uri): Boolean {
+    private suspend fun exportSelectedSongs(uri: Uri): Boolean {
         val activity = requireActivity()
         val dialogFragment =
             ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
@@ -308,7 +319,7 @@ class SongsFragment : Fragment() {
         dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
         val exportData = mDatabaseViewModel.getDatabaseTransferData()
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()

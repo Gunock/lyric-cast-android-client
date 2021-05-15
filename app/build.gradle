@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/05/2021, 13:39
+ * Last modified 15/05/2021, 14:25
  */
 
 apply plugin: 'com.android.application'
@@ -75,7 +75,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.mediarouter:mediarouter:1.2.2'
+    implementation 'androidx.mediarouter:mediarouter:1.2.3'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.0'
 

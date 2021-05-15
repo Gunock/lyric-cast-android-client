@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:39
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.adapters
@@ -14,6 +14,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import io.realm.RealmResults
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
@@ -35,7 +38,6 @@ class SetlistItemsAdapter(
         const val TAG = "SetlistItemsAdapter"
     }
 
-    private val mLock = Any()
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
 
     private var mItems: SortedSet<SetlistItem> = sortedSetOf()
@@ -51,24 +53,27 @@ class SetlistItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    fun submitCollection(setlistWithSongs: Collection<SetlistDocument>) {
-        synchronized(mLock) {
+    suspend fun submitCollection(setlists: RealmResults<SetlistDocument>) {
+        val frozenSetlists = setlists.freeze()
+        withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(setlistWithSongs.map { SetlistItem(it) })
+            mItems.addAll(frozenSetlists.map { SetlistItem(it) })
             mVisibleItems = mItems
-            notifyDataSetChanged()
         }
+        notifyDataSetChanged()
     }
 
-    fun filterItems(setlistName: String) {
-        val normalizedName = setlistName.trim().normalize()
+    suspend fun filterItems(setlistName: String) {
+        withContext(Dispatchers.Default) {
+            val normalizedName = setlistName.trim().normalize()
 
-        val duration = measureTimeMillis {
-            mVisibleItems = mItems.filter { item ->
-                item.normalizedName.contains(normalizedName, ignoreCase = true)
-            }.toSortedSet()
+            val duration = measureTimeMillis {
+                mVisibleItems = mItems.filter { item ->
+                    item.normalizedName.contains(normalizedName, ignoreCase = true)
+                }.toSortedSet()
+            }
+            Log.v(TAG, "Filtering took : ${duration}ms")
         }
-        Log.v(TAG, "Filtering took : ${duration}ms")
         notifyDataSetChanged()
     }
 

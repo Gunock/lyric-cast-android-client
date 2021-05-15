@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 23:42
+ * Last modified 15/05/2021, 15:10
  */
 
 package pl.gunock.lyriccast.fragments
@@ -116,7 +116,6 @@ class SetlistEditorFragment : Fragment() {
 
                     val adapter = recyclerView.adapter as SetlistSongItemsAdapter
                     adapter.moveItem(from, to)
-                    adapter.notifyItemMoved(from, to)
 
                     return true
                 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:44
+ * Last modified 15/05/2021, 15:19
  */
 
 package pl.gunock.lyriccast.adapters
@@ -54,6 +54,7 @@ class SetlistSongItemsAdapter(
     fun moveItem(from: Int, to: Int) {
         val item = mItems.removeAt(from)
         mItems.add(to, item)
+        notifyItemMoved(from, to)
     }
 
     fun duplicateSelectedItem() {
@@ -79,6 +80,7 @@ class SetlistSongItemsAdapter(
             return false
         }
         mItems.removeAt(selectedItemIndex)
+
         notifyItemRemoved(selectedItemIndex)
         return true
     }
@@ -101,9 +103,7 @@ class SetlistSongItemsAdapter(
 
     override fun getItemCount() = mItems.size
 
-    inner class ViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val mBinding = ItemSetlistSongBinding.bind(itemView)
 
         fun bind(position: Int) {

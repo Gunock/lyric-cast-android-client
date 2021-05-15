@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:34
+ * Last modified 15/05/2021, 14:53
  */
 
 package pl.gunock.lyriccast.fragments
@@ -16,10 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
@@ -127,7 +128,9 @@ class SetlistsFragment : Fragment() {
 
         val uri: Uri = data?.data!!
         when (requestCode) {
-            EXPORT_SELECTED_RESULT_CODE -> exportSelectedSetlists(uri)
+            EXPORT_SELECTED_RESULT_CODE -> lifecycleScope.launch(Dispatchers.Main) {
+                exportSelectedSetlists(uri)
+            }
         }
     }
 
@@ -153,7 +156,7 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun exportSelectedSetlists(uri: Uri): Boolean {
+    private suspend fun exportSelectedSetlists(uri: Uri): Boolean {
         val activity = requireActivity()
 
         val dialogFragment =
@@ -166,7 +169,7 @@ class SetlistsFragment : Fragment() {
 
         val exportData = mDatabaseViewModel.getDatabaseTransferData()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
             exportDir.deleteRecursively()
             exportDir.mkdirs()
@@ -233,7 +236,9 @@ class SetlistsFragment : Fragment() {
         mBinding.rcvSetlists.adapter = mSetlistItemsAdapter
 
         mDatabaseViewModel.allSetlists.addChangeListener { setlists ->
-            mSetlistItemsAdapter?.submitCollection(setlists)
+            lifecycleScope.launch(Dispatchers.Main) {
+                mSetlistItemsAdapter?.submitCollection(setlists)
+            }
         }
     }
 
@@ -253,8 +258,10 @@ class SetlistsFragment : Fragment() {
 
     private fun setupListeners() {
         mBinding.edSetlistFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            mSetlistItemsAdapter!!.filterItems(newText)
-            resetSelection()
+            lifecycleScope.launch(Dispatchers.Main) {
+                mSetlistItemsAdapter!!.filterItems(newText)
+                resetSelection()
+            }
         })
 
         mBinding.edSetlistFilter.setOnFocusChangeListener { view, hasFocus ->

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:06
+ * Last modified 15/05/2021, 15:00
  */
 
 package pl.gunock.lyriccast.adapters
@@ -13,6 +13,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import io.realm.RealmResults
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemCategoryBinding
@@ -38,12 +41,13 @@ class CategoryItemsAdapter(
         setHasStableIds(true)
     }
 
-    fun submitCollection(categories: Collection<CategoryDocument>) {
-        synchronized(mLock) {
+    suspend fun submitCollection(categories: RealmResults<CategoryDocument>) {
+        val frozenCategories = categories.freeze()
+        withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(categories.map { CategoryItem(it) })
-            notifyDataSetChanged()
+            mItems.addAll(frozenCategories.map { CategoryItem(it) })
         }
+        notifyDataSetChanged()
     }
 
     fun resetSelection() {
