@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 17:53
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 14:53
+ * Last modified 15/05/2021, 17:53
  */
 
 package pl.gunock.lyriccast.adapters
@@ -9,7 +9,6 @@ package pl.gunock.lyriccast.adapters
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.realm.RealmResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
@@ -83,10 +81,9 @@ class SetlistItemsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val textView: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_setlist, parent, false)
+        val binding = ItemSetlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        return ViewHolder(textView)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -99,8 +96,9 @@ class SetlistItemsAdapter(
 
     override fun getItemCount() = mVisibleItems.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mBinding = ItemSetlistBinding.bind(itemView)
+    inner class ViewHolder(
+        private val mBinding: ItemSetlistBinding
+    ) : RecyclerView.ViewHolder(mBinding.root) {
 
         fun bind(position: Int) {
             val item = mVisibleItems.toList()[position]

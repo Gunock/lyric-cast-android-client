@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 17:53
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 12:18
+ * Last modified 15/05/2021, 17:53
  */
 
 package pl.gunock.lyriccast.adapters
@@ -10,7 +10,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -41,10 +40,9 @@ class ControlsSongItemsAdapter(
     private val mTextHighlightColor = context.getColor(R.color.button_text_2)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_controls_song, parent, false)
-
-        return ViewHolder(view)
+        val binding =
+            ItemControlsSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -60,8 +58,9 @@ class ControlsSongItemsAdapter(
 
     override fun getItemCount() = songItems.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mBinding = ItemControlsSongBinding.bind(itemView)
+    inner class ViewHolder(
+        private val mBinding: ItemControlsSongBinding
+    ) : RecyclerView.ViewHolder(mBinding.root) {
         private var mCurrentCardColor = mDefaultItemCardColor
 
         fun bind(position: Int) {

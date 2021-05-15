@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 15/05/2021, 17:53
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 14:46
+ * Last modified 15/05/2021, 17:53
  */
 
 package pl.gunock.lyriccast.adapters
@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -103,10 +102,8 @@ class SongItemsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_song, parent, false)
-
-        return ViewHolder(view)
+        val binding = ItemSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -119,9 +116,9 @@ class SongItemsAdapter(
 
     override fun getItemCount() = mVisibleItems.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val mBinding = ItemSongBinding.bind(itemView)
-
+    inner class ViewHolder(
+        private val mBinding: ItemSongBinding
+    ) : RecyclerView.ViewHolder(mBinding.root) {
         init {
             mBinding.tvSongCategory.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
         }
