@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:08
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 22:22
+ * Last modified 16/05/2021, 17:08
  */
 
 apply plugin: 'com.android.application'
@@ -25,8 +25,8 @@ android {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 1
-        versionName "0.1.0"
+        versionCode 3
+        versionName "0.1.0-a3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
