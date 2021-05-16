@@ -1,36 +1,37 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:20
+ * Last modified 15/05/2021, 23:35
  */
 
-package pl.gunock.lyriccast.tests.main_activity
+package pl.gunock.lyriccast.tests.integration.setlist_editor
 
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import io.realm.RealmList
+import org.bson.types.ObjectId
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.activities.MainActivity
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.fragments.SetlistEditorSongsFragment
+import pl.gunock.lyriccast.fragments.SetlistEditorSongsFragmentArgs
 import java.lang.Thread.sleep
 
 
 @RunWith(AndroidJUnit4::class)
-class FilterSongsTest {
+class FilterSetlistEditorSongsTest {
 
     private companion object {
         val category = CategoryDocument("TEST CATEGORY", -65536)
@@ -41,9 +42,6 @@ class FilterSongsTest {
         val song2 = SongDocument("$songTitle 2", RealmList(), RealmList())
         val song3 = SongDocument("FilterSongsTest 2", RealmList(), RealmList())
     }
-
-    @get:Rule
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Before
     fun setUp() {
@@ -59,6 +57,17 @@ class FilterSongsTest {
             databaseViewModel.upsertSong(song2)
             databaseViewModel.upsertSong(song3)
         }
+
+        val bundle = SetlistEditorSongsFragmentArgs(
+            setlistId = ObjectId(),
+            setlistName = "",
+            presentation = arrayOf(song2.id.toString())
+        ).toBundle()
+
+        launchFragmentInContainer<SetlistEditorSongsFragment>(
+            bundle,
+            R.style.Theme_LyricCast_DarkActionBar
+        )
     }
 
     @Test
@@ -85,7 +94,10 @@ class FilterSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.spn_category)).perform(click())
-        onView(allOf(withId(R.id.tv_spinner_color_name), withText(category.name))).perform(click())
+        sleep(200)
+        onView(
+            allOf(withId(R.id.tv_spinner_color_name), withText(category.name))
+        ).perform(click())
         sleep(200)
 
         val allOfMatcher = allOf(
@@ -93,6 +105,26 @@ class FilterSongsTest {
             hasDescendant(withText(category.name))
         )
         onView(withId(R.id.rcv_songs)).check(matches(hasDescendant(allOfMatcher)))
+    }
+
+    @Test
+    fun songsAreFilteredBySelection() {
+        onView(withId(R.id.rcv_songs))
+            .check(matches(hasDescendant(withText(song1.title))))
+            .check(
+                matches(
+                    allOf(hasDescendant(withText(song2.title)), hasDescendant(isChecked()))
+                )
+            )
+            .check(matches(hasDescendant(withText(song3.title))))
+
+        onView(withId(R.id.swt_selected_songs)).perform(click())
+        sleep(200)
+
+        onView(withId(R.id.rcv_songs))
+            .check(matches(not(hasDescendant(withText(song1.title)))))
+            .check(matches(hasDescendant(withText(song2.title))))
+            .check(matches(not(hasDescendant(withText(song3.title)))))
     }
 
 }

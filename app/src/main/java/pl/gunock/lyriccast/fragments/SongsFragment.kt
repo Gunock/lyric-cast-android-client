@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 14:53
+ * Last modified 15/05/2021, 22:25
  */
 
 package pl.gunock.lyriccast.fragments
@@ -143,6 +143,7 @@ class SongsFragment : Fragment() {
         mActionMode?.finish()
         super.onStop()
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

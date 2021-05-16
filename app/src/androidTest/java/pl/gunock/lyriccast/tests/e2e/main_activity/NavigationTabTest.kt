@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:20
+ * Last modified 15/05/2021, 22:20
  */
 
-package pl.gunock.lyriccast.tests.main_activity
+package pl.gunock.lyriccast.tests.e2e.main_activity
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click

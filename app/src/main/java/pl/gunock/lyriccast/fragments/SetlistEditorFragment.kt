@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 15:10
+ * Last modified 15/05/2021, 21:38
  */
 
 package pl.gunock.lyriccast.fragments
@@ -151,7 +151,9 @@ class SetlistEditorFragment : Fragment() {
         val intentSetlistPresentation = requireActivity().intent
             .getStringArrayExtra("setlistSongs")
 
-        mBinding.edSetlistName.filters = arrayOf(InputFilter.LengthFilter(30))
+        mBinding.edSetlistName.filters = arrayOf(
+            InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_setlist_name))
+        )
 
         mDatabaseViewModel.allSetlists.addChangeListener { setlists ->
             mSetlistNames = setlists.map { setlist -> setlist.name }.toSet()

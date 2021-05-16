@@ -1,21 +1,22 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:20
+ * Last modified 15/05/2021, 22:30
  */
 
-package pl.gunock.lyriccast.tests.category_manager
+package pl.gunock.lyriccast.tests.e2e.category_manager
 
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import org.hamcrest.Matchers.allOf
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
@@ -23,6 +24,7 @@ import pl.gunock.lyriccast.activities.CategoryManagerActivity
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import java.lang.Thread.sleep
+import java.util.*
 
 
 @RunWith(AndroidJUnit4::class)
@@ -30,11 +32,9 @@ class AddCategoryTest {
 
     private companion object {
         const val newCategoryName = "AddCategoryTest 2"
+        val newCategoryNameUppercase = newCategoryName.uppercase(Locale.getDefault())
         val category1 = CategoryDocument("ADD_CATEGORY_TEST 1", -65536)
     }
-
-    @get:Rule
-    var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
 
     @Before
     fun setUp() {
@@ -46,6 +46,8 @@ class AddCategoryTest {
             databaseViewModel.clearDatabase()
             databaseViewModel.upsertCategory(category1)
         }
+
+        ActivityScenario.launch(CategoryManagerActivity::class.java)
     }
 
     @Test
@@ -59,42 +61,26 @@ class AddCategoryTest {
             .check(matches(withText("Add category")))
 
         onView(withId(R.id.ed_category_name)).perform(replaceText(newCategoryName))
+
+        onView(withId(R.id.spn_category_color)).perform(click())
+        sleep(400)
+
+        val colorName = getInstrumentation().targetContext
+            .resources
+            .getStringArray(R.array.category_color_names)[1]
+
+        onView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)))
+            .inRoot(isPlatformPopup())
+            .perform(click())
+
         onView(withId(R.id.btn_save_category)).perform(click())
 
         sleep(200)
 
         onView(withId(R.id.rcv_categories))
             .check(matches(hasDescendant(withText(category1.name))))
-            .check(matches(hasDescendant(withText(newCategoryName.toUpperCase()))))
-    }
+            .check(matches(hasDescendant(withText(newCategoryNameUppercase))))
 
-    @Test
-    fun categoryNameAlreadyInUse() {
-        onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(category1.name))))
-
-        onView(withId(R.id.menu_add_category)).perform(click())
-
-        onView(withId(R.id.tv_dialog_title))
-            .check(matches(withText("Add category")))
-
-        onView(withId(R.id.ed_category_name)).perform(replaceText(category1.name))
-
-        onView(withId(R.id.tin_category_name))
-            .check(matches(hasDescendant(withText("Category name already in use"))))
-    }
-
-    @Test
-    fun categoryNameIsUpperCase() {
-        onView(withId(R.id.menu_add_category)).perform(click())
-
-        onView(withId(R.id.tv_dialog_title))
-            .check(matches(withText("Add category")))
-
-        onView(withId(R.id.ed_category_name)).perform(replaceText(newCategoryName))
-
-        onView(withId(R.id.ed_category_name))
-            .check(matches(withText(newCategoryName.toUpperCase())))
     }
 
 }

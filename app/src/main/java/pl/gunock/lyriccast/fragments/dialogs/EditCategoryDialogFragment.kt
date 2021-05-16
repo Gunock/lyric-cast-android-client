@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 13/05/2021, 10:20
+ * Last modified 15/05/2021, 21:47
  */
 
 package pl.gunock.lyriccast.fragments.dialogs
@@ -72,8 +72,12 @@ class EditCategoryDialogFragment(
             getString(R.string.category_manager_edit_category)
         }
 
-        mBinding.edCategoryName.filters =
-            arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
+        mBinding.edCategoryName.filters = arrayOf(
+            InputFilter.AllCaps(),
+            InputFilter.LengthFilter(
+                resources.getInteger(R.integer.ed_max_length_category_name)
+            )
+        )
 
         setupColorSpinner()
         setupListeners()
@@ -98,7 +102,11 @@ class EditCategoryDialogFragment(
         mBinding.spnCategoryColor.adapter = colorSpinnerAdapter
 
         if (mCategoryItem?.category?.color != null) {
-            mBinding.edCategoryName.setText(mCategoryItem.category.name.toUpperCase(Locale.ROOT))
+            val categoryNameUppercase = mCategoryItem.category
+                .name
+                .uppercase(Locale.ROOT)
+
+            mBinding.edCategoryName.setText(categoryNameUppercase)
             mBinding.spnCategoryColor
                 .setSelection(colorValues.indexOf(mCategoryItem.category.color!!))
         }

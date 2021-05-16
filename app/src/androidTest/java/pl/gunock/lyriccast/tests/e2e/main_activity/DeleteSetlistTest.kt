@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:47
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 00:06
+ * Last modified 15/05/2021, 22:32
  */
 
-package pl.gunock.lyriccast.tests.main_activity
+package pl.gunock.lyriccast.tests.e2e.main_activity
 
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import io.realm.RealmList
@@ -19,7 +19,6 @@ import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.AllOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
@@ -38,9 +37,6 @@ class DeleteSetlistTest {
         val setlist3 = SetlistDocument("DeleteSetlistTest 3", RealmList())
     }
 
-    @get:Rule
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
-
     @Before
     fun setUp() {
         getInstrumentation().runOnMainSync {
@@ -55,8 +51,10 @@ class DeleteSetlistTest {
             databaseViewModel.upsertSetlist(setlist3)
         }
 
+        ActivityScenario.launch(MainActivity::class.java)
         onView(AllOf.allOf(isDescendantOfA(withId(R.id.tbl_main_fragments)), withText("Setlists")))
             .perform(click())
+
     }
 
     @Test

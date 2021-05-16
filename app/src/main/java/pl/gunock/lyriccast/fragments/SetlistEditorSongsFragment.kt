@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 14:53
+ * Last modified 16/05/2021, 17:06
  */
 
 package pl.gunock.lyriccast.fragments
@@ -18,6 +18,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.adapters.spinner.CategorySpinnerAdapter
@@ -69,11 +70,12 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     override fun onDestroy() {
+        super.onDestroy()
+
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
 
         mDatabaseViewModel.close()
-
         super.onDestroy()
     }
 
@@ -186,10 +188,22 @@ class SetlistEditorSongsFragment : Fragment() {
 
         mDatabaseViewModel.allSongs.addChangeListener { songs ->
             lifecycleScope.launch(Dispatchers.Main) {
-                mSongItemsAdapter!!.submitCollection(songs)
-                mSongItemsAdapter!!.songItems.forEach { item ->
-                    item.isSelected.value = mArgs.presentation.contains(item.song.id.toString())
+                if (mSongItemsAdapter == null) {
+                    return@launch
                 }
+
+                mSongItemsAdapter!!.submitCollection(songs)
+                withContext(Dispatchers.Default) {
+                    mSongItemsAdapter!!.songItems.forEach { item ->
+                        val previousValue = item.isSelected.value
+                        val newValue = mArgs.presentation.contains(item.song.id.toString())
+
+                        if (newValue != previousValue) {
+                            item.isSelected.postValue(newValue)
+                        }
+                    }
+                }
+                println()
             }
         }
 

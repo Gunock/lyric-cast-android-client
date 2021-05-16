@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:47
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 02/05/2021, 22:28
+ * Last modified 15/05/2021, 18:03
  */
 
-package pl.gunock.lyriccast.common
+package pl.gunock.lyriccast.tests.adapters
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -17,7 +17,7 @@ import pl.gunock.lyriccast.common.helpers.FileHelper
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
-class FileHelperTest {
+class SongItemsAdapterTest {
 
     private companion object {
         const val testFileContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"

@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:47
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 13:47
+ * Last modified 15/05/2021, 18:00
  */
 
-package pl.gunock.lyriccast.common
+package pl.gunock.lyriccast.common.tests
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+  ~ Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 13/05/2021, 10:20
+  ~ Last modified 15/05/2021, 21:34
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:counterEnabled="true"
-            app:counterMaxLength="30"
+            app:counterMaxLength="@integer/ed_max_length_setlist_name"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="8dp">
 

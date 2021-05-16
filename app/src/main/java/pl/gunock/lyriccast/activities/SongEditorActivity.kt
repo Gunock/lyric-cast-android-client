@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 14:53
+ * Last modified 15/05/2021, 21:38
  */
 
 package pl.gunock.lyriccast.activities
@@ -76,9 +76,13 @@ class SongEditorActivity : AppCompatActivity() {
 
         mCategoryNone = CategoryDocument(name = baseContext.getString(R.string.category_none))
 
-        mBinding.edSongTitle.filters = arrayOf(InputFilter.LengthFilter(30))
-        mBinding.edSectionName.filters =
-            arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(30))
+        mBinding.edSongTitle.filters = arrayOf(
+            InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_song_title))
+        )
+        mBinding.edSectionName.filters = arrayOf(
+            InputFilter.AllCaps(),
+            InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_section_name))
+        )
 
         mDatabaseViewModel.allSongs.addChangeListener { songs ->
             mSongTitles = songs.map { it.title }.toSet()

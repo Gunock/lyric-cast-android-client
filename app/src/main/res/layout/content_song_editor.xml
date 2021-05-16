@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+  ~ Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 14/05/2021, 00:02
+  ~ Last modified 15/05/2021, 21:34
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -40,7 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:counterEnabled="true"
-            app:counterMaxLength="30"
+            app:counterMaxLength="@integer/ed_max_length_song_title"
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +73,7 @@
             android:layout_marginTop="8dp"
             app:boxBackgroundMode="filled"
             app:counterEnabled="true"
-            app:counterMaxLength="30"
+            app:counterMaxLength="@integer/ed_max_length_section_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spn_song_editor_category">
