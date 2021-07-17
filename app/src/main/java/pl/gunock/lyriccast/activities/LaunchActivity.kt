@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,18 +14,19 @@ import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.extensions.registerForActivityResult
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.models.LyricCastSettings
 
 class LaunchActivity : AppCompatActivity() {
 
     companion object {
-        const val TURN_ON_WIFI_RESULT_CODE = 1
         const val PERMISSIONS_REQUEST_CODE = 1
         val PERMISSIONS = arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -33,15 +34,18 @@ class LaunchActivity : AppCompatActivity() {
         )
     }
 
+    private val mTurnOnWifiManagerResultLauncher =
+        registerForActivityResult(this::handleTurnOnWiFiResult)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(applicationContext) {}
         MessageHelper.initialize(resources)
+        LyricCastSettings.initialize(applicationContext)
 
         setContentView(R.layout.activity_launch)
 
-        val settings = LyricCastSettings(applicationContext)
-        AppCompatDelegate.setDefaultNightMode(settings.appTheme)
+        AppCompatDelegate.setDefaultNightMode(LyricCastSettings.appTheme)
     }
 
     override fun onStart() {
@@ -55,6 +59,8 @@ class LaunchActivity : AppCompatActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (requestCode != PERMISSIONS_REQUEST_CODE) {
             return
         }
@@ -71,18 +77,12 @@ class LaunchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK) {
+    private fun handleTurnOnWiFiResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) {
             return
         }
 
-        when (requestCode) {
-            TURN_ON_WIFI_RESULT_CODE -> {
-                goToMain()
-            }
-        }
+        goToMain()
     }
 
     private fun turnOnWifi() {
@@ -92,7 +92,7 @@ class LaunchActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
                 buttonClicked = true
                 val turnWifiOn = Intent(Settings.ACTION_WIRELESS_SETTINGS)
-                startActivityForResult(turnWifiOn, TURN_ON_WIFI_RESULT_CODE)
+                mTurnOnWifiManagerResultLauncher.launch(turnWifiOn)
             }
             .setNegativeButton(getString(R.string.launch_activity_ignore)) { _, _ ->
                 buttonClicked = true

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.activities
@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.cast.framework.CastContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
@@ -27,6 +26,7 @@ import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.helpers.MessageHelper
 import pl.gunock.lyriccast.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.listeners.LongClickAdapterItemListener
@@ -73,8 +73,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adRequest = AdRequest.Builder().build()
-        mBinding.advSetlistControls.loadAd(adRequest)
+        mBinding.advSetlistControls.loadAd()
 
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
@@ -258,7 +257,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     }
 
     private fun sendConfigure() {
-        MessageHelper.sendConfiguration(baseContext)
+        MessageHelper.sendConfiguration()
     }
 
     private fun goToSettings(): Boolean {

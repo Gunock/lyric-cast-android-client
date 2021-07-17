@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:55 AM
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.helpers
 
-import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -57,8 +56,8 @@ object MessageHelper {
         sendControlMessage(ControlAction.BLANK, blanked)
     }
 
-    fun sendConfiguration(context: Context) {
-        val configurationJson = LyricCastSettings(context).getCastConfigurationJson()
+    fun sendConfiguration() {
+        val configurationJson = LyricCastSettings.getCastConfigurationJson()
 
         sendControlMessage(
             ControlAction.CONFIGURE,

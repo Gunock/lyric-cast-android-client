@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 13:57
+ * Last modified 17/07/2021, 11:19
  */
 
 package pl.gunock.lyriccast.activities
@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
@@ -22,7 +23,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.cast.framework.CastContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +43,8 @@ import pl.gunock.lyriccast.datatransfer.factories.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
+import pl.gunock.lyriccast.extensions.loadAd
+import pl.gunock.lyriccast.extensions.registerForActivityResult
 import pl.gunock.lyriccast.fragments.SetlistsFragment
 import pl.gunock.lyriccast.fragments.dialogs.ImportDialogFragment
 import pl.gunock.lyriccast.fragments.dialogs.ProgressDialogFragment
@@ -53,13 +55,14 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "MainActivity"
-        const val EXPORT_RESULT_CODE = 1
-        const val IMPORT_RESULT_CODE = 2
     }
 
     private lateinit var mDatabaseViewModel: DatabaseViewModel
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
     private lateinit var mBinding: ContentMainBinding
+
+    private val mExportChooserResultLauncher = registerForActivityResult(this::exportAll)
+    private val mImportChooserResultLauncher = registerForActivityResult(this::import)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
 
-        // TODO: Possible leak
         mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         mBinding.cstlFabContainer.visibility = View.GONE
@@ -91,8 +93,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        val adRequest = AdRequest.Builder().build()
-        mBinding.advMain.loadAd(adRequest)
+        mBinding.advMain.loadAd()
 
         super.onResume()
     }
@@ -115,29 +116,6 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_import_songs -> showImportDialog()
             R.id.menu_export_all -> startExport()
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        val uri: Uri = data?.data!!
-        when (requestCode) {
-            IMPORT_RESULT_CODE -> {
-                Log.d(TAG, "Handling import result")
-                Log.d(TAG, "Import parameters $mImportDialogViewModel")
-                Log.d(TAG, "Selected file URI: $uri")
-                if (mImportDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
-                    lifecycleScope.launch(Dispatchers.Main) { importOpenSong(uri) }
-                } else if (mImportDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
-                    lifecycleScope.launch(Dispatchers.Main) { importLyricCast(uri) }
-                }
-            }
-            EXPORT_RESULT_CODE -> lifecycleScope.launch(Dispatchers.Main) { exportAll(uri) }
         }
     }
 
@@ -194,45 +172,71 @@ class MainActivity : AppCompatActivity() {
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
-        startActivityForResult(chooserIntent, EXPORT_RESULT_CODE)
+        mExportChooserResultLauncher.launch(chooserIntent)
 
         return true
     }
 
-    private suspend fun exportAll(uri: Uri) {
-        val dialogFragment =
-            ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
-        dialogFragment.setStyle(
-            DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog
-        )
-        dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+    private fun import(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) {
+            return
+        }
 
-        val exportData = mDatabaseViewModel.getDatabaseTransferData()
+        val uri: Uri = result.data!!.data!!
 
-        withContext(Dispatchers.IO) {
-            val exportDir = File(cacheDir.canonicalPath, ".export")
-            exportDir.deleteRecursively()
-            exportDir.mkdirs()
+        Log.d(TAG, "Handling import result")
+        Log.d(TAG, "Import parameters $mImportDialogViewModel")
+        Log.d(TAG, "Selected file URI: $uri")
+        if (mImportDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
+            lifecycleScope.launch(Dispatchers.Main) { importOpenSong(uri) }
+        } else if (mImportDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
+            lifecycleScope.launch(Dispatchers.Main) { importLyricCast(uri) }
+        }
+    }
+
+    private fun exportAll(result: ActivityResult) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (result.resultCode != Activity.RESULT_OK) {
+                return@launch
+            }
+
+            val uri: Uri = result.data!!.data!!
+
+            val dialogFragment =
+                ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
+            dialogFragment.setStyle(
+                DialogFragment.STYLE_NORMAL,
+                R.style.Theme_LyricCast_Dialog
+            )
+            dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
+
+            val exportData = mDatabaseViewModel.getDatabaseTransferData()
+
+            withContext(Dispatchers.IO) {
+                val exportDir = File(cacheDir.canonicalPath, ".export")
+                exportDir.deleteRecursively()
+                exportDir.mkdirs()
 
 
-            dialogFragment.message = getString(R.string.main_activity_export_saving_json)
-            val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
-            val categoriesString =
-                JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
-            val setlistsString = JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
+                dialogFragment.message = getString(R.string.main_activity_export_saving_json)
+                val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
+                val categoriesString =
+                    JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
+                val setlistsString =
+                    JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
 
-            File(exportDir, "songs.json").writeText(songsString)
-            File(exportDir, "categories.json").writeText(categoriesString)
-            File(exportDir, "setlists.json").writeText(setlistsString)
+                File(exportDir, "songs.json").writeText(songsString)
+                File(exportDir, "categories.json").writeText(categoriesString)
+                File(exportDir, "setlists.json").writeText(setlistsString)
 
-            dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
-            @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
+                dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
+                @Suppress("BlockingMethodInNonBlockingContext")
+                FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-            dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
-            exportDir.deleteRecursively()
-            dialogFragment.dismiss()
+                dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
+                exportDir.deleteRecursively()
+                dialogFragment.dismiss()
+            }
         }
     }
 
@@ -365,7 +369,7 @@ class MainActivity : AppCompatActivity() {
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
-        startActivityForResult(chooserIntent, IMPORT_RESULT_CODE)
+        mImportChooserResultLauncher.launch(chooserIntent)
         return true
     }
 

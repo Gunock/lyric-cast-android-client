@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/05/2021, 21:48
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.activities
@@ -13,7 +13,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
-import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import org.bson.types.ObjectId
@@ -23,6 +22,7 @@ import pl.gunock.lyriccast.cast.SessionStartedListener
 import pl.gunock.lyriccast.databinding.*
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.helpers.MessageHelper
 
 
@@ -60,8 +60,7 @@ class SongControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         mBinding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
 
-        val adRequest = AdRequest.Builder().build()
-        mBinding.advSongControls.loadAd(adRequest)
+        mBinding.advSongControls.loadAd()
 
         mBlankOffText = getString(R.string.controls_off)
         mBlankOnText = getString(R.string.controls_on)
@@ -163,7 +162,7 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun sendConfigure() {
-        MessageHelper.sendConfiguration(baseContext)
+        MessageHelper.sendConfiguration()
     }
 
     @SuppressLint("SetTextI18n")

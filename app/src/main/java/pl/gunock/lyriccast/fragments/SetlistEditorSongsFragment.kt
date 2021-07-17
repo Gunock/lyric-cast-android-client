@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 16/05/2021, 17:06
+ * Last modified 17/05/2021, 20:21
  */
 
 package pl.gunock.lyriccast.fragments
@@ -203,7 +203,6 @@ class SetlistEditorSongsFragment : Fragment() {
                         }
                     }
                 }
-                println()
             }
         }
 

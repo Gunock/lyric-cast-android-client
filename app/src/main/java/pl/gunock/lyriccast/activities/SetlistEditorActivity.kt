@@ -1,15 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:06
+ * Last modified 17/07/2021, 10:43
  */
 
 package pl.gunock.lyriccast.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.ads.AdRequest
 import pl.gunock.lyriccast.databinding.ActivitySetlistEditorBinding
+import pl.gunock.lyriccast.extensions.loadAd
 
 class SetlistEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +20,7 @@ class SetlistEditorActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbarSetlistEditor)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adRequest = AdRequest.Builder().build()
-        binding.contentSetlistEditor.advSetlistEditor.loadAd(adRequest)
+        binding.contentSetlistEditor.advSetlistEditor.loadAd()
     }
 
 }

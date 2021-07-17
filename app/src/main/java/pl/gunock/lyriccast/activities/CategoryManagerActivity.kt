@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 15/05/2021, 15:20
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 15:00
+ * Last modified 17/07/2021, 10:50
  */
 
 package pl.gunock.lyriccast.activities
@@ -16,7 +16,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.ads.AdRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
@@ -25,6 +24,7 @@ import pl.gunock.lyriccast.adapters.CategoryItemsAdapter
 import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
 import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.fragments.dialogs.EditCategoryDialogFragment
 import pl.gunock.lyriccast.fragments.viewmodels.EditCategoryDialogViewModel
 import pl.gunock.lyriccast.misc.SelectionTracker
@@ -87,8 +87,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarCategoryManager)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adRequest = AdRequest.Builder().build()
-        mBinding.advCategoryManager.loadAd(adRequest)
+        mBinding.advCategoryManager.loadAd()
 
         // TODO: Possible leak
         mEditCategoryDialogViewModel =

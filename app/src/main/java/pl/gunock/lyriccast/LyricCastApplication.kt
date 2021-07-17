@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:50 AM
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast
@@ -24,8 +24,7 @@ class LyricCastApplication : Application() {
         CastContext.getSharedInstance()!!
             .sessionManager
             .addSessionManagerListener(SessionStartedListener {
-                val settings = LyricCastSettings(applicationContext)
-                MessageHelper.sendBlank(settings.blankedOnStart)
+                MessageHelper.sendBlank(LyricCastSettings.blankedOnStart)
             })
 
         super.onCreate()

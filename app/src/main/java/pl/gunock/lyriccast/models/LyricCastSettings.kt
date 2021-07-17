@@ -1,46 +1,61 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 11:03 AM
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 10:50 AM
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.models
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
 
-class LyricCastSettings(context: Context) {
-    val blankedOnStart by lazy {
-        mPreferences.getBoolean(mCastBlankKey, false)
-    }
+object LyricCastSettings {
+    val blankedOnStart: Boolean get() = mPreferences.getBoolean(mCastBlankKey, false)
 
-    val appTheme by lazy { mPreferences.getString(mAppThemeKey, mAppThemeKeyDefault)!!.toInt() }
+    val appTheme: Int get() = mPreferences.getString(mAppThemeKey, mAppThemeKeyDefault)!!.toInt()
 
-    private val mPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val enableAds: Boolean get() = mPreferences.getBoolean("preference_ads_enable", true)
 
-    private val mCastBackgroundColorDefault =
-        context.getString(R.string.preference_cast_background_color_default_value)
-    private val mCastFontColorKeyDefault =
-        context.getString(R.string.preference_cast_font_color_default_value)
-    private val mAppThemeKeyDefault = context.getString(R.string.preference_theme_default_value)
+    private lateinit var mAppThemeKey: String
 
-    private val mCastBlankKey = context.getString(R.string.preference_blank_key)
-    private val mCastBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
-    private val mCastFontColorKey = context.getString(R.string.preference_cast_font_color_key)
-    private val mCastMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
+    private lateinit var mCastBackgroundColorDefault: String
+    private lateinit var mCastFontColorKeyDefault: String
+    private lateinit var mAppThemeKeyDefault: String
 
-    private val mAppThemeKey = context.getString(R.string.preference_theme_key)
+    private lateinit var mCastBlankKey: String
+    private lateinit var mCastBackgroundColorKey: String
+    private lateinit var mCastFontColorKey: String
+    private lateinit var mCastMaxFontSizeKey: String
 
-    private val mCastBackgroundColor by lazy {
-        mPreferences.getString(mCastBackgroundColorKey, mCastBackgroundColorDefault)
-    }
-    private val mCastFontColor by lazy {
-        mPreferences.getString(mCastFontColorKey, mCastFontColorKeyDefault)
-    }
-    private val mCastMaxFontSize by lazy {
-        mPreferences.getInt(mCastMaxFontSizeKey, 100)
+    private lateinit var mPreferences: SharedPreferences
+
+    private val mCastBackgroundColor: String?
+        get() = mPreferences.getString(mCastBackgroundColorKey, mCastBackgroundColorDefault)
+
+    private val mCastFontColor: String?
+        get() = mPreferences.getString(mCastFontColorKey, mCastFontColorKeyDefault)
+
+    private val mCastMaxFontSize: Int
+        get() = mPreferences.getInt(mCastMaxFontSizeKey, 100)
+
+    fun initialize(context: Context) {
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+        mAppThemeKey = context.getString(R.string.preference_theme_key)
+
+        mCastBackgroundColorDefault =
+            context.getString(R.string.preference_cast_background_color_default_value)
+        mCastFontColorKeyDefault =
+            context.getString(R.string.preference_cast_font_color_default_value)
+        mAppThemeKeyDefault = context.getString(R.string.preference_theme_default_value)
+
+        mCastBlankKey = context.getString(R.string.preference_blank_key)
+        mCastBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
+        mCastFontColorKey = context.getString(R.string.preference_cast_font_color_key)
+        mCastMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
     }
 
     fun getCastConfigurationJson(): JSONObject {
@@ -50,5 +65,4 @@ class LyricCastSettings(context: Context) {
             put("maxFontSize", mCastMaxFontSize)
         }
     }
-
 }

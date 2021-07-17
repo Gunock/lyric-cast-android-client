@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 21:38
+ * Last modified 17/07/2021, 10:50
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,7 +17,6 @@ import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.AdRequest
 import com.google.android.material.tabs.TabLayout
 import io.realm.RealmList
 import io.realm.RealmResults
@@ -35,6 +34,7 @@ import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
 import pl.gunock.lyriccast.datamodel.documents.SongDocument
 import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.enums.NameValidationState
+import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.listeners.ItemSelectedTabListener
 
@@ -71,8 +71,7 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarMain)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adRequest = AdRequest.Builder().build()
-        mBinding.advSongEditor.loadAd(adRequest)
+        mBinding.advSongEditor.loadAd()
 
         mCategoryNone = CategoryDocument(name = baseContext.getString(R.string.category_none))
 

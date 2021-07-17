@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 14/05/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 17/07/2021, 11:19
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 14/05/2021, 00:02
+ * Last modified 17/07/2021, 11:05
  */
 
 package pl.gunock.lyriccast.activities
@@ -17,9 +17,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.google.android.gms.ads.AdRequest
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivitySettingsBinding
+import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.models.LyricCastSettings
 
 
@@ -28,8 +28,7 @@ class SettingsActivity : AppCompatActivity() {
     private var mPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == "appTheme") {
-                val settings = LyricCastSettings(baseContext)
-                AppCompatDelegate.setDefaultNightMode(settings.appTheme)
+                AppCompatDelegate.setDefaultNightMode(LyricCastSettings.appTheme)
             }
         }
 
@@ -41,9 +40,8 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbarSettings)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val adRequest = AdRequest.Builder().build()
-        binding.contentSettings.advSettings1.loadAd(adRequest)
-        binding.contentSettings.advSettings1.loadAd(adRequest)
+        binding.contentSettings.advSettings1.loadAd()
+        binding.contentSettings.advSettings2.loadAd()
 
         if (savedInstanceState == null) {
             supportFragmentManager
