@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 13:05
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
@@ -10,9 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.models.SongDto
-import java.io.Closeable
 
-interface DataTransferRepository : Closeable {
+interface DataTransferRepository {
 
     fun clearDatabase()
 

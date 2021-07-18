@@ -1,16 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 20:10
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
 
 import io.reactivex.Flowable
 import pl.gunock.lyriccast.datamodel.models.Category
-import java.io.Closeable
 
-interface CategoriesRepository : Closeable {
+interface CategoriesRepository {
 
     fun getAllCategories(): Flowable<List<Category>>
 

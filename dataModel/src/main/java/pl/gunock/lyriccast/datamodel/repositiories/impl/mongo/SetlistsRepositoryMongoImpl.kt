@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:34
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -56,10 +56,6 @@ internal class SetlistsRepositoryMongoImpl(
                 .findFirst()
                 ?.deleteFromRealm()
         }
-    }
-
-    override fun close() {
-        mRealm.close()
     }
 
 }

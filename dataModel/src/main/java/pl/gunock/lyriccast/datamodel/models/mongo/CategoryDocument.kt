@@ -1,37 +1,31 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 20:10
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.models.mongo
 
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Category
-import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 
 internal open class CategoryDocument(
     @field:Required
-    var name: String,
+    var name: String = "",
     var color: Int? = null,
     @field:PrimaryKey
     var id: ObjectId = ObjectId()
 ) : RealmObject(), Comparable<CategoryDocument> {
+    // TODO: Verify if comparable is still needed
 
-    @Ignore
-    val idLong: Long = id.hashCode().toLong()
-
-    constructor() : this("", null, ObjectId())
-
-    constructor(dto: CategoryDto) : this(dto.name, dto.color, ObjectId())
-
-    constructor(document: CategoryDocument, id: ObjectId) : this(document.name, document.color, id)
-
-    constructor(category: Category) : this(category.name, category.color, ObjectId(category.id))
+    constructor(category: Category) : this(
+        id = if (category.id.isNotBlank()) ObjectId(category.id) else ObjectId(),
+        name = category.name,
+        color = category.color
+    )
 
     fun toGenericModel(): Category {
         return Category(
@@ -39,10 +33,6 @@ internal open class CategoryDocument(
             name = name,
             color = color
         )
-    }
-
-    fun toDto(): CategoryDto {
-        return CategoryDto(name, color)
     }
 
     override fun compareTo(other: CategoryDocument): Int {

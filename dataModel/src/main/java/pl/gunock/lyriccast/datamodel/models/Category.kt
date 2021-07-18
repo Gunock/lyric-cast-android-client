@@ -1,14 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 20:14
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.models
 
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 
-open class Category(
+data class Category(
     var name: String,
     var color: Int? = null,
     var id: String = ""
@@ -17,8 +17,6 @@ open class Category(
     val idLong: Long = id.hashCode().toLong()
 
     constructor(dto: CategoryDto) : this(dto.name, dto.color, "")
-
-    constructor(document: Category, id: String) : this(document.name, document.color, id)
 
     fun toDto(): CategoryDto {
         return CategoryDto(name, color)

@@ -1,16 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 19:35
+ * Last modified 19/07/2021, 00:22
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
 
 import io.reactivex.Flowable
 import pl.gunock.lyriccast.datamodel.models.Setlist
-import java.io.Closeable
 
-interface SetlistsRepository : Closeable {
+interface SetlistsRepository {
 
     fun getAllSetlists(): Flowable<List<Setlist>>
 
