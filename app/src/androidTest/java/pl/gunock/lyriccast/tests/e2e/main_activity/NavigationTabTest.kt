@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 22:20
+ * Last modified 17/07/2021, 11:25
  */
 
 package pl.gunock.lyriccast.tests.e2e.main_activity
@@ -17,7 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.activities.MainActivity
+import pl.gunock.lyriccast.ui.main.MainActivity
 
 @RunWith(AndroidJUnit4::class)
 class NavigationTabTest {

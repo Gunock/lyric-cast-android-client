@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 16/05/2021, 17:06
+ * Last modified 18/07/2021, 12:19
  */
 
 package pl.gunock.lyriccast.tests.e2e.category_manager
@@ -20,9 +20,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.activities.CategoryManagerActivity
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 import java.lang.Thread.sleep
 
 

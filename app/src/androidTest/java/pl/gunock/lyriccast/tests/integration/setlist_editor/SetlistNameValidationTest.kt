@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 16/05/2021, 17:06
+ * Last modified 17/07/2021, 11:30
  */
 
 package pl.gunock.lyriccast.tests.integration.setlist_editor
@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
-import pl.gunock.lyriccast.fragments.SetlistEditorFragment
+import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorFragment
 
 @RunWith(AndroidJUnit4::class)
 class SetlistNameValidationTest {
