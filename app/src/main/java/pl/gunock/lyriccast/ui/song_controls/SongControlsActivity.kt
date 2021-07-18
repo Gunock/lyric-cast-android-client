@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:42
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -15,19 +15,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
-import org.bson.types.ObjectId
+import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.*
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
-import pl.gunock.lyriccast.extensions.loadAd
+import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.cast.SessionStartedListener
+import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SongControlsActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var songsRepository: SongsRepository
 
     private lateinit var mBinding: ContentSongControlsBinding
 
@@ -68,12 +72,9 @@ class SongControlsActivity : AppCompatActivity() {
         mBlankOnColor = getColor(R.color.green)
         mBlankOffColor = getColor(R.color.red)
 
-        val songId: ObjectId = intent.getSerializableExtra("songId")!! as ObjectId
+        val songId: String = intent.getStringExtra("songId")!!
 
-        val databaseViewModel =
-            DatabaseViewModel.Factory(resources).create(DatabaseViewModel::class.java)
-        val song: SongDocument = databaseViewModel.getSong(songId)!!
-        databaseViewModel.close()
+        val song: Song = songsRepository.getSong(songId)!!
 
         mBinding.tvControlsSongTitle.text = song.title
 

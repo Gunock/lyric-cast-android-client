@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.cast.framework.CastContext
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,9 +33,9 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.ActivityMainBinding
 import pl.gunock.lyriccast.databinding.ContentMainBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
+import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
 import pl.gunock.lyriccast.datatransfer.enums.SongXmlParserType
 import pl.gunock.lyriccast.datatransfer.extensions.toJSONObjectList
@@ -42,9 +43,9 @@ import pl.gunock.lyriccast.datatransfer.factories.ImportSongXmlParserFactory
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
-import pl.gunock.lyriccast.extensions.loadAd
-import pl.gunock.lyriccast.extensions.registerForActivityResult
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
+import pl.gunock.lyriccast.shared.extensions.loadAd
+import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
@@ -52,13 +53,17 @@ import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "MainActivity"
     }
 
-    private lateinit var mDatabaseViewModel: DatabaseViewModel
+    @Inject
+    lateinit var dataTransferRepository: DataTransferRepository
+
     private lateinit var mImportDialogViewModel: ImportDialogViewModel
     private lateinit var mBinding: ContentMainBinding
 
@@ -72,8 +77,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarMain)
         mBinding = rootBinding.contentMain
 
-        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
-
         mImportDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         mBinding.cstlFabContainer.visibility = View.GONE
@@ -86,11 +89,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupListeners()
-    }
-
-    override fun onDestroy() {
-        mDatabaseViewModel.close()
-        super.onDestroy()
     }
 
     override fun onResume() {
@@ -211,7 +209,7 @@ class MainActivity : AppCompatActivity() {
             )
             dialogFragment.show(supportFragmentManager, ProgressDialogFragment.TAG)
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
+            val exportData = dataTransferRepository.getDatabaseTransferData()
 
             withContext(Dispatchers.IO) {
                 val exportDir = File(cacheDir.canonicalPath, ".export")
@@ -278,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             mImportDialogViewModel.replaceOnConflict
         )
 
-        mDatabaseViewModel.importSongs(
+        dataTransferRepository.importSongs(
             transferData,
             dialogFragment.messageLiveData,
             importOptions
@@ -354,7 +352,7 @@ class MainActivity : AppCompatActivity() {
             colors
         )
 
-        mDatabaseViewModel.importSongs(
+        dataTransferRepository.importSongs(
             importedSongs,
             dialogFragment.messageLiveData,
             importOptions

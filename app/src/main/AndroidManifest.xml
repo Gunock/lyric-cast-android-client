@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 12:31
+  ~ Last modified 18/07/2021, 20:33
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,7 +26,7 @@
 
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="pl.gunock.lyriccast.cast.CastOptionsProvider" />
+            android:value="pl.gunock.lyriccast.shared.cast.CastOptionsProvider" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

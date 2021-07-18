@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:41
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -14,40 +14,43 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
-import io.realm.RealmList
-import io.realm.RealmResults
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
 import pl.gunock.lyriccast.databinding.ActivitySongEditorBinding
 import pl.gunock.lyriccast.databinding.ContentSongEditorBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
-import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
-import pl.gunock.lyriccast.extensions.loadAd
+import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.shared.enums.NameValidationState
+import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SongEditorActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "SongEditorActivity"
     }
 
-    private var mIntentSong: SongDocument? = null
+    @Inject
+    lateinit var songsRepository: SongsRepository
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(resources)
-    }
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
+
+    private var mIntentSong: Song? = null
+
     private lateinit var mBinding: ContentSongEditorBinding
 
     private lateinit var mSelectedTab: TabLayout.Tab
@@ -61,7 +64,10 @@ class SongEditorActivity : AppCompatActivity() {
 
     private var mNewSectionCount = 1
 
-    private lateinit var mCategoryNone: CategoryDocument
+    private lateinit var mCategoryNone: Category
+
+    private var mSongsSubscription: Disposable? = null
+    private var mCategoriesSubscription: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +79,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         mBinding.advSongEditor.loadAd()
 
-        mCategoryNone = CategoryDocument(name = baseContext.getString(R.string.category_none))
+        mCategoryNone = Category(name = baseContext.getString(R.string.category_none))
 
         mBinding.edSongTitle.filters = arrayOf(
             InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_song_title))
@@ -83,13 +89,9 @@ class SongEditorActivity : AppCompatActivity() {
             InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_section_name))
         )
 
-        mDatabaseViewModel.allSongs.addChangeListener { songs ->
-            mSongTitles = songs.map { it.title }.toSet()
-        }
-
-        val intentSongId: ObjectId? = intent.getSerializableExtra("songId") as ObjectId?
+        val intentSongId: String? = intent.getStringExtra("songId")
         if (intentSongId != null) {
-            mIntentSong = mDatabaseViewModel.getSong(intentSongId)!!
+            mIntentSong = songsRepository.getSong(intentSongId)!!
         }
 
         Log.v(TAG, "Received song : $mIntentSong")
@@ -109,9 +111,30 @@ class SongEditorActivity : AppCompatActivity() {
         setupListeners()
     }
 
-    override fun onDestroy() {
-        mDatabaseViewModel.close()
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+
+        mSongsSubscription = songsRepository.getAllSongs().subscribe { songs ->
+            mSongTitles = songs.map { it.title }.toSet()
+        }
+
+        mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
+            lifecycleScope.launch {
+                val categorySpinnerAdapter =
+                    mBinding.spnSongEditorCategory.adapter as CategorySpinnerAdapter
+                categorySpinnerAdapter.submitCollection(categories, mCategoryNone)
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        mSongsSubscription?.dispose()
+        mSongsSubscription = null
+
+        mCategoriesSubscription?.dispose()
+        mCategoriesSubscription = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -132,13 +155,9 @@ class SongEditorActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun setupCategorySpinner() {
+    private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
         mBinding.spnSongEditorCategory.adapter = categorySpinnerAdapter
-
-        val categories: RealmResults<CategoryDocument> = mDatabaseViewModel.allCategories
-
-        categorySpinnerAdapter.submitCollection(categories, mCategoryNone)
 
         if (mIntentSong != null) {
             val categoryIndex =
@@ -252,30 +271,29 @@ class SongEditorActivity : AppCompatActivity() {
             presentation.add(tab.text.toString().trim())
         }
 
-        var selectedCategory: CategoryDocument? =
-            mBinding.spnSongEditorCategory.selectedItem as CategoryDocument?
+        var selectedCategory: Category? =
+            mBinding.spnSongEditorCategory.selectedItem as Category?
         if (selectedCategory?.name == getString(R.string.category_none)) {
             selectedCategory = null
         }
 
         val lyricsSections = mSectionLyrics.filter { mapEntry -> mapEntry.key != addText }
-            .map { LyricsSectionDocument(it.key, it.value) }
-            .toTypedArray()
+            .map { Song.LyricsSection(it.key, it.value) }
 
-        val song = SongDocument(
+        val song = Song(
+            mIntentSong?.id ?: "",
             title,
-            RealmList(*lyricsSections),
-            RealmList(*presentation.toTypedArray()),
-            selectedCategory,
-            mIntentSong?.id ?: ObjectId()
+            lyricsSections,
+            presentation,
+            selectedCategory
         )
 
-        mDatabaseViewModel.upsertSong(song)
+        songsRepository.upsertSong(song)
 
         return true
     }
 
-    private fun loadSongData(song: SongDocument) {
+    private fun loadSongData(song: Song) {
         mBinding.edSongTitle.setText(song.title)
 
         mBinding.tblSongSection.removeAllTabs()

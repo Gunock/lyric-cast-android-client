@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 21:06
  */
 
 package pl.gunock.lyriccast.ui.settings
@@ -20,7 +20,7 @@ import androidx.preference.PreferenceManager
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.databinding.ActivitySettingsBinding
-import pl.gunock.lyriccast.extensions.loadAd
+import pl.gunock.lyriccast.shared.extensions.loadAd
 
 
 class SettingsActivity : AppCompatActivity() {

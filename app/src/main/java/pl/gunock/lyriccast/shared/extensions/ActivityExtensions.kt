@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 17/07/2021, 11:20
+ * Last modified 18/07/2021, 21:06
  */
 
-package pl.gunock.lyriccast.extensions
+package pl.gunock.lyriccast.shared.extensions
 
 import android.content.Intent
 import androidx.activity.ComponentActivity

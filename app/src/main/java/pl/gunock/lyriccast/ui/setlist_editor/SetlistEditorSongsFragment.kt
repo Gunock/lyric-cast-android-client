@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:37
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -10,42 +10,51 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.extensions.hideKeyboard
+import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SetlistEditorSongsFragment : Fragment() {
     private companion object {
         const val TAG = "SetlistEditorSongsFg"
     }
 
+    @Inject
+    lateinit var songsRepository: SongsRepository
+
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
+
     private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(requireContext().resources)
-    }
+
     private lateinit var mBinding: FragmentSongsBinding
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
-    private var mSelectedSongs: MutableSet<SongDocument> = mutableSetOf()
+    private var mSelectedSongs: MutableSet<Song> = mutableSetOf()
+
+    private var mSongsSubscription: Disposable? = null
+    private var mCategoriesSubscription: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +84,51 @@ class SetlistEditorSongsFragment : Fragment() {
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
 
-        mDatabaseViewModel.close()
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        mSongsSubscription = songsRepository.getAllSongs().subscribe { songs ->
+            lifecycleScope.launch {
+                if (mSongItemsAdapter == null) {
+                    return@launch
+                }
+
+                mSongItemsAdapter!!.submitCollection(songs)
+                withContext(Dispatchers.Default) {
+                    mSongItemsAdapter!!.songItems.forEach { item ->
+                        val previousValue = item.isSelected.value
+                        val newValue = mArgs.presentation.contains(item.song.id)
+
+                        if (newValue != previousValue) {
+                            item.isSelected.postValue(newValue)
+                        }
+                    }
+                }
+            }
+        }
+
+        mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                val categorySpinnerAdapter =
+                    mBinding.spnCategory.adapter as CategorySpinnerAdapter
+                categorySpinnerAdapter.submitCollection(categories)
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
+
         requireView().hideKeyboard()
+
+        mSongsSubscription?.dispose()
+        mSongsSubscription = null
+
+        mCategoriesSubscription?.dispose()
+        mCategoriesSubscription = null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,7 +140,7 @@ class SetlistEditorSongsFragment : Fragment() {
                     .distinct()
                     .toMutableList()
 
-                val selectedSongIds = mSelectedSongs.map { it.id.toString() }
+                val selectedSongIds = mSelectedSongs.map { it.id }
 
                 val removedSongIds =
                     setlistSongIds.filter { songId -> !selectedSongIds.contains(songId) }
@@ -127,7 +174,7 @@ class SetlistEditorSongsFragment : Fragment() {
     private fun setupListeners() {
         mBinding.edSongFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(newText, (mBinding.spnCategory.selectedItem as CategoryDocument).id)
+                filterSongs(newText, (mBinding.spnCategory.selectedItem as Category).id)
             }
         })
 
@@ -141,7 +188,7 @@ class SetlistEditorSongsFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 filterSongs(
                     mBinding.edSongFilter.editableText.toString(),
-                    (mBinding.spnCategory.selectedItem as CategoryDocument).id
+                    (mBinding.spnCategory.selectedItem as Category).id
                 )
             }
         }
@@ -150,7 +197,7 @@ class SetlistEditorSongsFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 filterSongs(
                     mBinding.edSongFilter.editableText.toString(),
-                    (mBinding.spnCategory.selectedItem as CategoryDocument).id,
+                    (mBinding.spnCategory.selectedItem as Category).id,
                     isSelected = if (isChecked) true else null
                 )
             }
@@ -159,14 +206,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
-
         mBinding.spnCategory.adapter = categorySpinnerAdapter
-
-        mDatabaseViewModel.allCategories.addChangeListener { categories ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                categorySpinnerAdapter.submitCollection(categories)
-            }
-        }
     }
 
     private fun setupRecyclerView() {
@@ -186,26 +226,6 @@ class SetlistEditorSongsFragment : Fragment() {
             mSelectionTracker = selectionTracker
         )
 
-        mDatabaseViewModel.allSongs.addChangeListener { songs ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                if (mSongItemsAdapter == null) {
-                    return@launch
-                }
-
-                mSongItemsAdapter!!.submitCollection(songs)
-                withContext(Dispatchers.Default) {
-                    mSongItemsAdapter!!.songItems.forEach { item ->
-                        val previousValue = item.isSelected.value
-                        val newValue = mArgs.presentation.contains(item.song.id.toString())
-
-                        if (newValue != previousValue) {
-                            item.isSelected.postValue(newValue)
-                        }
-                    }
-                }
-            }
-        }
-
         mBinding.rcvSongs.adapter = mSongItemsAdapter
     }
 
@@ -215,7 +235,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private suspend fun filterSongs(
         title: String,
-        categoryId: ObjectId,
+        categoryId: String,
         isSelected: Boolean? = null
     ) {
         Log.d(TAG, "filterSongs invoked")

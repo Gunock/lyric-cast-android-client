@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 14:32
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -13,13 +13,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import io.realm.RealmResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
-import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
@@ -51,11 +50,10 @@ class SetlistItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    suspend fun submitCollection(setlists: RealmResults<SetlistDocument>) {
-        val frozenSetlists = setlists.freeze()
+    suspend fun submitCollection(setlists: Iterable<Setlist>) {
         withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(frozenSetlists.map { SetlistItem(it) })
+            mItems.addAll(setlists.map { SetlistItem(it) })
             mVisibleItems = mItems
         }
         notifyDataSetChanged()

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:41
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -11,32 +11,33 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
-import org.bson.types.ObjectId
+import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.datamodel.models.Setlist
+import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.extensions.loadAd
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.cast.SessionStartedListener
+import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.listeners.LongClickAdapterItemListener
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SetlistControlsActivity : AppCompatActivity() {
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(resources)
-    }
+    @Inject
+    lateinit var setlistsRepository: SetlistsRepository
+
     private lateinit var mBinding: ContentSetlistControlsBinding
 
     private lateinit var mSessionStartedListener: SessionStartedListener
@@ -92,7 +93,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             mSessionStartedListener
         )
 
-        val setlist: SetlistDocument = setupLyrics()
+        val setlist: Setlist = setupLyrics()
 
         setupRecyclerView(setlist.presentation)
 
@@ -113,7 +114,6 @@ class SetlistControlsActivity : AppCompatActivity() {
         )
 
         CastMessageHelper.isBlanked.removeObservers(this)
-        mDatabaseViewModel.close()
 
         super.onDestroy()
     }
@@ -135,13 +135,14 @@ class SetlistControlsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupLyrics(): SetlistDocument {
-        val setlistId: ObjectId = intent.getSerializableExtra("setlistId")!! as ObjectId
-        val setlist: SetlistDocument = mDatabaseViewModel.getSetlist(setlistId)!!
+    private fun setupLyrics(): Setlist {
+        val setlistId: String = intent.getStringExtra("setlistId")!!
+
+        val setlist: Setlist = setlistsRepository.getSetlist(setlistId)!!
 
         var setlistLyricsIndex = 0
         mSetlistLyrics = setlist.presentation
-            .flatMapIndexed { index: Int, song: SongDocument ->
+            .flatMapIndexed { index: Int, song: Song ->
                 val lyrics = song.lyricsList
 
                 val indexedTitle = "[$index] ${song.title}"
@@ -157,7 +158,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         return setlist
     }
 
-    private fun setupRecyclerView(songs: List<SongDocument>) {
+    private fun setupRecyclerView(songs: List<Song>) {
         mBinding.rcvSongs.setHasFixedSize(true)
         mBinding.rcvSongs.layoutManager = LinearLayoutManager(baseContext)
 

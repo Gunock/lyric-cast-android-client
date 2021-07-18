@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.ui.launch
@@ -21,8 +21,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.LyricCastSettings
-import pl.gunock.lyriccast.extensions.registerForActivityResult
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
+import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.main.MainActivity
 
 class LaunchActivity : AppCompatActivity() {

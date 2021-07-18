@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:37
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.EditText
 import android.widget.Spinner
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
@@ -22,20 +21,22 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.realm.RealmResults
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.extensions.hideKeyboard
-import pl.gunock.lyriccast.extensions.registerForActivityResult
+import pl.gunock.lyriccast.shared.extensions.hideKeyboard
+import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
@@ -47,14 +48,23 @@ import pl.gunock.lyriccast.ui.song_controls.SongControlsActivity
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class SongsFragment : Fragment() {
     private companion object {
         const val TAG = "SongsFragment"
     }
 
-    private lateinit var mDatabaseViewModel: DatabaseViewModel
+    @Inject
+    lateinit var dataTransferRepository: DataTransferRepository
+
+    @Inject
+    lateinit var songsRepository: SongsRepository
+
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
     private lateinit var mBinding: FragmentSongsBinding
@@ -102,10 +112,8 @@ class SongsFragment : Fragment() {
 
     private val mExportChooserResultLauncher = registerForActivityResult(this::exportSelectedSongs)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
-        super.onCreate(savedInstanceState)
-    }
+    private var mSongsSubscription: Disposable? = null
+    private var mCategoriesSubscription: Disposable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -126,8 +134,6 @@ class SongsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        mDatabaseViewModel.close()
-
         mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
         mBinding.spnCategory.adapter = null
@@ -137,8 +143,33 @@ class SongsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        resetSelection()
         mBinding.edSongFilter.setText("")
+
+        mSongsSubscription = songsRepository.getAllSongs()
+            .subscribe { songs ->
+                lifecycleScope.launch(Dispatchers.Default) {
+                    mSongItemsAdapter?.submitCollection(songs)
+                }
+            }
+
+        mCategoriesSubscription =
+            categoriesRepository.getAllCategories().subscribe { categories: List<Category> ->
+                lifecycleScope.launch(Dispatchers.Default) {
+                    val categorySpinnerAdapter =
+                        mBinding.spnCategory.adapter as CategorySpinnerAdapter
+                    categorySpinnerAdapter.submitCollection(categories)
+                }
+            }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        mSongsSubscription?.dispose()
+        mSongsSubscription = null
+
+        mCategoriesSubscription?.dispose()
+        mCategoriesSubscription = null
     }
 
     override fun onStop() {
@@ -147,17 +178,13 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        val filterEditText: EditText = mBinding.edSongFilter
-        filterEditText.addTextChangedListener(InputTextChangedListener {
-            lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(
-                    filterEditText.editableText.toString(),
-                    getSelectedCategoryId(mBinding.spnCategory)
-                )
+        mBinding.edSongFilter.addTextChangedListener(InputTextChangedListener {
+            lifecycleScope.launch(Dispatchers.Default) {
+                filterSongs()
             }
         })
 
-        filterEditText.setOnFocusChangeListener { view, hasFocus ->
+        mBinding.edSongFilter.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 view.hideKeyboard()
             }
@@ -165,11 +192,8 @@ class SongsFragment : Fragment() {
 
         mBinding.spnCategory.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    filterSongs(
-                        filterEditText.editableText.toString(),
-                        getSelectedCategoryId(mBinding.spnCategory)
-                    )
+                lifecycleScope.launch(Dispatchers.Default) {
+                    filterSongs()
                 }
             }
     }
@@ -179,17 +203,6 @@ class SongsFragment : Fragment() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
 
         mBinding.spnCategory.adapter = categorySpinnerAdapter
-
-        mDatabaseViewModel.allCategories.addChangeListener { categories: RealmResults<CategoryDocument> ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                categorySpinnerAdapter.submitCollection(categories)
-
-                if (categories.isNotEmpty()) {
-                    mBinding.spnCategory.setSelection(0)
-                }
-            }
-        }
-
     }
 
     private fun setupRecyclerView() {
@@ -202,12 +215,6 @@ class SongsFragment : Fragment() {
         mBinding.rcvSongs.setHasFixedSize(true)
         mBinding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
         mBinding.rcvSongs.adapter = mSongItemsAdapter
-
-        mDatabaseViewModel.allSongs.addChangeListener { songs ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                mSongItemsAdapter?.submitCollection(songs)
-            }
-        }
     }
 
     private fun onSongClick(
@@ -227,11 +234,10 @@ class SongsFragment : Fragment() {
         return true
     }
 
-    private suspend fun filterSongs(
-        title: String,
-        categoryId: ObjectId
-    ) {
+    private suspend fun filterSongs() {
         Log.v(TAG, "filterSongs invoked")
+        val title: String = mBinding.edSongFilter.editableText.toString()
+        val categoryId: String? = getSelectedCategoryId(mBinding.spnCategory)
 
         mSongItemsAdapter!!.filterItems(title, categoryId = categoryId)
         resetSelection()
@@ -296,7 +302,7 @@ class SongsFragment : Fragment() {
     }
 
     private fun exportSelectedSongs(result: ActivityResult) =
-        lifecycleScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Default) {
             if (result.resultCode != Activity.RESULT_OK) {
                 return@launch
             }
@@ -312,7 +318,7 @@ class SongsFragment : Fragment() {
             )
             dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
+            val exportData = dataTransferRepository.getDatabaseTransferData()
             withContext(Dispatchers.IO) {
                 val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
                 exportDir.deleteRecursively()
@@ -355,7 +361,7 @@ class SongsFragment : Fragment() {
     private fun addSetlist(): Boolean {
         val setlistSongs = mSongItemsAdapter!!.songItems
             .filter { it.isSelected.value == true }
-            .map { item -> item.song.id.toString() }
+            .map { item -> item.song.id }
             .toTypedArray()
 
         val intent = Intent(context, SetlistEditorActivity::class.java)
@@ -372,7 +378,7 @@ class SongsFragment : Fragment() {
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.song.id }
 
-        mDatabaseViewModel.deleteSongs(selectedSongs)
+        songsRepository.deleteSongs(selectedSongs)
 
         resetSelection()
 
@@ -398,9 +404,9 @@ class SongsFragment : Fragment() {
         mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
     }
 
-    private fun getSelectedCategoryId(categorySpinner: Spinner): ObjectId {
-        categorySpinner.selectedItem ?: return ObjectId(Date(0), 0)
+    private fun getSelectedCategoryId(categorySpinner: Spinner): String? {
+        categorySpinner.selectedItem ?: return null
 
-        return (categorySpinner.selectedItem as CategoryDocument).id
+        return (categorySpinner.selectedItem as Category).id
     }
 }

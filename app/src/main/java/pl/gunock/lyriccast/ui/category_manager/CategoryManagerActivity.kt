@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 22:51
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -9,29 +9,31 @@ package pl.gunock.lyriccast.ui.category_manager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
 import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
-import pl.gunock.lyriccast.extensions.loadAd
+import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CategoryManagerActivity : AppCompatActivity() {
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(resources)
-    }
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
+
     private lateinit var mBinding: ContentCategoryManagerBinding
 
     private lateinit var mEditCategoryDialogViewModel: EditCategoryDialogViewModel
@@ -90,20 +92,32 @@ class CategoryManagerActivity : AppCompatActivity() {
         mEditCategoryDialogViewModel =
             ViewModelProvider(this).get(EditCategoryDialogViewModel::class.java)
 
-        mDatabaseViewModel.allCategories.addChangeListener { categories ->
-            val categoryNames: Set<String> = categories.map { it.name }.toSet()
-            mEditCategoryDialogViewModel.categoryNames = categoryNames
-        }
-
         mBinding.rcvCategories.setHasFixedSize(true)
         mBinding.rcvCategories.layoutManager = LinearLayoutManager(baseContext)
 
         setupCategories()
     }
 
-    override fun onDestroy() {
-        mDatabaseViewModel.close()
-        super.onDestroy()
+    private var mCategoriesSubscription: Disposable? = null
+
+    override fun onResume() {
+        super.onResume()
+
+        mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                mCategoryItemsAdapter.submitCollection(categories)
+
+                val categoryNames: Set<String> = categories.map { it.name }.toSet()
+                mEditCategoryDialogViewModel.categoryNames = categoryNames
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        mCategoriesSubscription?.dispose()
+        mCategoriesSubscription = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -136,12 +150,6 @@ class CategoryManagerActivity : AppCompatActivity() {
             mSelectionTracker = mSelectionTracker
         )
         mBinding.rcvCategories.adapter = mCategoryItemsAdapter
-
-        mDatabaseViewModel.allCategories.addChangeListener { categories ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                mCategoryItemsAdapter.submitCollection(categories)
-            }
-        }
     }
 
     private fun onCategoryClick(
@@ -160,11 +168,11 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun deleteSelectedCategories(): Boolean {
-        val selectedCategoryIds: List<ObjectId> = mCategoryItemsAdapter.categoryItems
+        val selectedCategoryIds: List<String> = mCategoryItemsAdapter.categoryItems
             .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }
 
-        mDatabaseViewModel.deleteCategories(selectedCategoryIds)
+        categoriesRepository.deleteCategories(selectedCategoryIds)
         resetSelection()
 
         return true

@@ -1,26 +1,27 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 22:39
  */
 
 package pl.gunock.lyriccast.application
 
 import android.app.Application
 import com.google.android.gms.cast.framework.CastContext
-import io.realm.Realm
+import dagger.hilt.android.HiltAndroidApp
+import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.SessionStartedListener
 
 @Suppress("unused")
+@HiltAndroidApp
 class LyricCastApplication : Application() {
     override fun onCreate() {
         // Initializes MongoDB Realm
-        Realm.init(applicationContext)
+        RepositoryFactory.initialize(applicationContext, RepositoryFactory.Provider.MONGO)
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext)
-        CastContext.getSharedInstance()!!
             .sessionManager
             .addSessionManagerListener(SessionStartedListener {
                 CastMessageHelper.sendBlank(LyricCastSettings.blankedOnStart)

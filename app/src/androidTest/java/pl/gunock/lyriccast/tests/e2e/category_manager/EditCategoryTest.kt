@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.tests.e2e.category_manager
@@ -19,8 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 import java.lang.Thread.sleep
 
@@ -38,9 +37,9 @@ class EditCategoryTest {
     @Before
     fun setUp() {
         getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                getInstrumentation().context.resources
-            ).create()
+//            val databaseViewModel = DatabaseViewModel.Factory(
+//                getInstrumentation().context.resources
+//            ).create()
 
             databaseViewModel.clearDatabase()
             databaseViewModel.upsertCategory(category1)

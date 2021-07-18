@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 02/05/2021, 16:23
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -17,7 +17,6 @@ import pl.gunock.lyriccast.datatransfer.models.OpenSongDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 import java.io.File
 import java.io.InputStream
-import java.util.*
 
 internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir) {
 
@@ -78,7 +77,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
             title = song.title,
             presentation = presentationList,
             lyrics = song.lyricsMap,
-            category = category.trim().toUpperCase(Locale.getDefault())
+            category = category.trim().uppercase()
         )
     }
 

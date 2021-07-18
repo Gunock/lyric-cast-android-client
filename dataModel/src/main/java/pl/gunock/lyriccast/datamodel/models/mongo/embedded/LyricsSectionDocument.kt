@@ -1,14 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:27 PM
+ * Last modified 18/07/2021, 14:04
  */
 
-package pl.gunock.lyriccast.datamodel.documents.embedded
+package pl.gunock.lyriccast.datamodel.models.mongo.embedded
 
 import io.realm.RealmObject
 import io.realm.annotations.RealmClass
 import io.realm.annotations.Required
+import pl.gunock.lyriccast.datamodel.models.Song
 
 @RealmClass(embedded = true)
 open class LyricsSectionDocument(
@@ -19,6 +20,15 @@ open class LyricsSectionDocument(
 ) : RealmObject() {
 
     constructor() : this("", "")
+
+    constructor(lyricsSection: Song.LyricsSection) : this(lyricsSection.name, lyricsSection.text)
+
+    fun toGenericModel(): Song.LyricsSection {
+        return Song.LyricsSection(
+            name = name,
+            text = text
+        )
+    }
 
     override fun toString(): String {
         return "LyricsSectionDocument(name='$name', text='$text')"

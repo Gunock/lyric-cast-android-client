@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 19:54
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -12,12 +12,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import io.realm.RealmResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemCategoryBinding
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
@@ -38,11 +37,10 @@ class CategoryItemsAdapter(
         setHasStableIds(true)
     }
 
-    suspend fun submitCollection(categories: RealmResults<CategoryDocument>) {
-        val frozenCategories = categories.freeze()
+    suspend fun submitCollection(categories: List<Category>) {
         withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(frozenCategories.map { CategoryItem(it) })
+            mItems.addAll(categories.map { CategoryItem(it) })
         }
         notifyDataSetChanged()
     }

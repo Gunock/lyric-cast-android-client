@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 12:38
  */
 
 package pl.gunock.lyriccast.tests.e2e.main_activity
@@ -23,7 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
 import pl.gunock.lyriccast.ui.main.MainActivity
 import java.lang.Thread.sleep
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -14,20 +14,19 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import io.realm.RealmResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.databinding.ItemSongBinding
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
+import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.main.SetlistItemsAdapter
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
 import java.util.*
+import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.system.measureTimeMillis
 
 class SongItemsAdapter(
@@ -47,8 +46,8 @@ class SongItemsAdapter(
     private val mNoCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val mCheckBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
-    private var mItems: SortedSet<SongItem> = sortedSetOf()
-    private var mVisibleItems: Set<SongItem> = setOf()
+    private val mItems: SortedSet<SongItem> = sortedSetOf()
+    private val mVisibleItems = ConcurrentSkipListSet<SongItem>()
     val songItems: List<SongItem> get() = mVisibleItems.toList()
 
     fun removeObservers() {
@@ -56,19 +55,26 @@ class SongItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    suspend fun submitCollection(songs: RealmResults<SongDocument>) {
-        val frozenSongs = songs.freeze()
-        withContext(Dispatchers.Default) {
-            mItems.clear()
-            mItems.addAll(frozenSongs.map { SongItem(it) })
-            mVisibleItems = mItems
+    suspend fun submitCollection(songs: Iterable<Song>) {
+        try {
+            withContext(Dispatchers.Default) {
+                mItems.clear()
+                mItems.addAll(songs.map { SongItem(it) })
+
+                mVisibleItems.clear()
+                mVisibleItems.addAll(mItems)
+            }
+            withContext(Dispatchers.Main) {
+                notifyDataSetChanged()
+            }
+        } catch (ignore: NullPointerException) {
+            return
         }
-        notifyDataSetChanged()
     }
 
     suspend fun filterItems(
         songTitle: String,
-        categoryId: ObjectId = ObjectId(Date(0), 0),
+        categoryId: String? = null,
         isSelected: Boolean? = null
     ) {
         withContext(Dispatchers.Default) {
@@ -78,7 +84,7 @@ class SongItemsAdapter(
                 predicates.add { songItem -> songItem.isSelected.value!! }
             }
 
-            if (categoryId != ObjectId(Date(0), 0)) {
+            if (!categoryId.isNullOrBlank()) {
                 predicates.add { songItem -> songItem.song.category?.id == categoryId }
             }
 
@@ -88,17 +94,22 @@ class SongItemsAdapter(
             }
 
             val duration = measureTimeMillis {
-                mVisibleItems = mItems.filter { songItem ->
+                val filteredItems = mItems.filter { songItem ->
                     predicates.all { predicate -> predicate(songItem) }
                 }.toSortedSet()
+
+                mVisibleItems.clear()
+                mVisibleItems.addAll(filteredItems)
             }
             Log.v(SetlistItemsAdapter.TAG, "Filtering took : ${duration}ms")
         }
-        notifyDataSetChanged()
+        withContext(Dispatchers.Main) {
+            notifyDataSetChanged()
+        }
     }
 
     fun resetSelection() {
-        mVisibleItems.forEach { it.isSelected.value = false }
+        mVisibleItems.forEach { it.isSelected.postValue(false) }
         mSelectionTracker?.reset()
     }
 

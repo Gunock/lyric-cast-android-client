@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:18
+ * Last modified 18/07/2021, 14:32
  */
 
 package pl.gunock.lyriccast.domain.models
 
 import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.common.extensions.normalize
-import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.Setlist
 
 data class SetlistItem(
-    val setlist: SetlistDocument
+    val setlist: Setlist
 ) : Comparable<SetlistItem> {
 
     val normalizedName by lazy { setlist.name.normalize() }

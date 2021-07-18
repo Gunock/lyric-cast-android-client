@@ -1,67 +1,78 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:27 PM
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:27 PM
+ * Last modified 18/07/2021, 22:34
  */
 
-package pl.gunock.lyriccast.datamodel
+package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
 import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.realm.Realm
-import io.realm.RealmList
+import io.realm.RealmConfiguration
 import io.realm.RealmResults
 import io.realm.kotlin.where
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
-import pl.gunock.lyriccast.datamodel.documents.SetlistDocument
-import pl.gunock.lyriccast.datamodel.documents.SongDocument
-import pl.gunock.lyriccast.datamodel.documents.embedded.LyricsSectionDocument
+import pl.gunock.lyriccast.datamodel.R
+import pl.gunock.lyriccast.datamodel.extentions.toRealmList
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
+import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.embedded.LyricsSectionDocument
+import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal class DataTransferProcessor(
+internal class DataTransferRepositoryMongoImpl(
     private val mResources: Resources,
-    private val mRealm: Realm
-) {
+    private val mRealm: Realm = Realm.getInstance(
+        RealmConfiguration.Builder()
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
+            .build()
+    )
+) : DataTransferRepository {
+
     private companion object {
-        const val TAG = "DataTransferProcessor"
+        const val TAG = "DataTransferRepository"
     }
 
-    fun importSongs(
+    override fun clearDatabase() {
+        mRealm.executeTransaction { mRealm.deleteAll() }
+    }
+
+    override fun importSongs(
         data: DatabaseTransferData,
         message: MutableLiveData<String>,
         options: ImportOptions
     ) {
-        if (options.deleteAll) {
-            mRealm.deleteAll()
+        mRealm.executeTransaction {
+            executeDataImport(data, message, options)
         }
-
-        val removeConflicts: Boolean = !options.deleteAll && !options.replaceOnConflict
-
-        if (data.categoryDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_categories))
-            importCategories(data.categoryDtos, options, removeConflicts)
-        }
-
-        if (data.songDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_songs))
-            importSongs(data.songDtos, options, removeConflicts)
-        }
-
-        if (data.setlistDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_setlists))
-            importSetlists(data.setlistDtos, options, removeConflicts)
-        }
-
-        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
-        Log.d(TAG, "Finished import")
     }
 
-    fun getDatabaseTransferData(): DatabaseTransferData {
+    override fun importSongs(
+        songDtoSet: Set<SongDto>,
+        message: MutableLiveData<String>,
+        options: ImportOptions
+    ) {
+        val categoryDtos: List<CategoryDto> = songDtoSet.map { songDto -> songDto.category }
+            .distinct()
+            .mapIndexedNotNull { index, categoryName ->
+                CategoryDto(
+                    name = categoryName?.take(30) ?: return@mapIndexedNotNull null,
+                    color = options.colors[index % options.colors.size]
+                )
+            }
+
+        val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
+        importSongs(data, message, options)
+    }
+
+    override fun getDatabaseTransferData(): DatabaseTransferData {
         val songs: RealmResults<SongDocument> = mRealm.where<SongDocument>().findAll()
         val categories: RealmResults<CategoryDocument> = mRealm.where<CategoryDocument>().findAll()
         val setlists: RealmResults<SetlistDocument> = mRealm.where<SetlistDocument>().findAll()
@@ -77,7 +88,42 @@ internal class DataTransferProcessor(
         )
     }
 
-    private fun importCategories(
+    override fun close() {
+        mRealm.close()
+    }
+
+
+    private fun executeDataImport(
+        data: DatabaseTransferData,
+        message: MutableLiveData<String>,
+        options: ImportOptions
+    ) {
+        if (options.deleteAll) {
+            mRealm.deleteAll()
+        }
+
+        val removeConflicts: Boolean = !options.deleteAll && !options.replaceOnConflict
+
+        if (data.categoryDtos != null) {
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_categories))
+            executeCategoryImport(data.categoryDtos, options, removeConflicts)
+        }
+
+        if (data.songDtos != null) {
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_songs))
+            executeSongImport(data.songDtos, options, removeConflicts)
+        }
+
+        if (data.setlistDtos != null) {
+            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_setlists))
+            executeSetlistImport(data.setlistDtos, options, removeConflicts)
+        }
+
+        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
+        Log.d(TAG, "Finished import")
+    }
+
+    private fun executeCategoryImport(
         categoryDtos: List<CategoryDto>,
         options: ImportOptions,
         removeConflicts: Boolean
@@ -106,7 +152,7 @@ internal class DataTransferProcessor(
         mRealm.insertOrUpdate(categories)
     }
 
-    private fun importSongs(
+    private fun executeSongImport(
         songDtos: List<SongDto>,
         options: ImportOptions,
         removeConflicts: Boolean
@@ -118,13 +164,12 @@ internal class DataTransferProcessor(
 
         val songs: MutableList<SongDocument> = songDtos
             .map { dto ->
-                val lyricsSections: Array<LyricsSectionDocument> = dto.lyrics
+                val lyricsSections: List<LyricsSectionDocument> = dto.lyrics
                     .map { LyricsSectionDocument(name = it.key, text = it.value) }
-                    .toTypedArray()
 
                 val song = SongDocument(dto, categoryMap[dto.category])
-                song.lyrics = RealmList(*lyricsSections)
-                song.presentation = RealmList(*dto.presentation.toTypedArray())
+                song.lyrics = lyricsSections.toRealmList()
+                song.presentation = dto.presentation.toRealmList()
 
                 return@map song
             }.toMutableList()
@@ -151,7 +196,7 @@ internal class DataTransferProcessor(
         mRealm.insertOrUpdate(songs)
     }
 
-    private fun importSetlists(
+    private fun executeSetlistImport(
         setlistDtos: List<SetlistDto>,
         options: ImportOptions,
         removeConflicts: Boolean
@@ -185,13 +230,13 @@ internal class DataTransferProcessor(
             .toMap()
         val setlistDtoNameMap = setlistDtos.map { it.name to it.songs }.toMap()
         setlists.forEach { setlist ->
-            val presentation: Array<SongDocument> = setlistDtoNameMap[setlist.name]!!
+            val presentation: List<SongDocument> = setlistDtoNameMap[setlist.name]!!
                 .map { songTitleMap[it]!! }
-                .toTypedArray()
 
-            setlist.presentation = RealmList(*presentation)
+            setlist.presentation = presentation.toRealmList()
         }
 
         mRealm.insertOrUpdate(setlists)
     }
+
 }

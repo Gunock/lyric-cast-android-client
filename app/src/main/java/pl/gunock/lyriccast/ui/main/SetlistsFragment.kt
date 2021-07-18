@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 23:10
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -19,6 +19,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,20 +29,28 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.FragmentSetlistsBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
+import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.domain.models.SetlistItem
-import pl.gunock.lyriccast.extensions.hideKeyboard
-import pl.gunock.lyriccast.extensions.registerForActivityResult
+import pl.gunock.lyriccast.shared.extensions.hideKeyboard
+import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import java.io.File
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SetlistsFragment : Fragment() {
-    private lateinit var mDatabaseViewModel: DatabaseViewModel
+
+    @Inject
+    lateinit var dataTransferRepository: DataTransferRepository
+
+    @Inject
+    lateinit var setlistsRepository: SetlistsRepository
+
     private lateinit var mBinding: FragmentSetlistsBinding
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
@@ -90,11 +100,6 @@ class SetlistsFragment : Fragment() {
     private val mExportChooserResultLauncher =
         registerForActivityResult(this::exportSelectedSetlists)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        mDatabaseViewModel = DatabaseViewModel.Factory(resources).create()
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -114,16 +119,30 @@ class SetlistsFragment : Fragment() {
         mSetlistItemsAdapter!!.removeObservers()
         mSetlistItemsAdapter = null
 
-        mDatabaseViewModel.close()
-
         super.onDestroyView()
     }
+
+    private var mSetlistSubscription: Disposable? = null
 
     override fun onResume() {
         super.onResume()
 
-        resetSelection()
-        mBinding.edSetlistFilter.setText("")
+//        resetSelection()
+//        mBinding.edSetlistFilter.setText("")
+
+        mSetlistSubscription = setlistsRepository.getAllSetlists()
+            .subscribe { setlists ->
+                lifecycleScope.launch(Dispatchers.Main) {
+                    mSetlistItemsAdapter?.submitCollection(setlists)
+                }
+            }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        mSetlistSubscription?.dispose()
+        mSetlistSubscription = null
     }
 
     override fun onStop() {
@@ -158,7 +177,7 @@ class SetlistsFragment : Fragment() {
             )
             dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
-            val exportData = mDatabaseViewModel.getDatabaseTransferData()
+            val exportData = dataTransferRepository.getDatabaseTransferData()
 
             withContext(Dispatchers.IO) {
                 val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
@@ -223,12 +242,6 @@ class SetlistsFragment : Fragment() {
         )
 
         mBinding.rcvSetlists.adapter = mSetlistItemsAdapter
-
-        mDatabaseViewModel.allSetlists.addChangeListener { setlists ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                mSetlistItemsAdapter?.submitCollection(setlists)
-            }
-        }
     }
 
     private fun onSetlistClick(
@@ -323,7 +336,7 @@ class SetlistsFragment : Fragment() {
             .filter { item -> item.isSelected.value!! }
             .map { item -> item.setlist.id }
 
-        mDatabaseViewModel.deleteSetlists(selectedSetlists)
+        setlistsRepository.deleteSetlists(selectedSetlists)
         resetSelection()
 
         return true

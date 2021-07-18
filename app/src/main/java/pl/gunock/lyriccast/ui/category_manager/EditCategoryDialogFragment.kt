@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 18/07/2021, 22:51
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -15,19 +15,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import org.bson.types.ObjectId
+import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.documents.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.ColorItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
 import java.util.*
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class EditCategoryDialogFragment(
     private val mCategoryItem: CategoryItem? = null
 ) : DialogFragment() {
@@ -36,9 +36,8 @@ class EditCategoryDialogFragment(
         const val TAG = "EditCategoryDialogFragment"
     }
 
-    private val mDatabaseViewModel: DatabaseViewModel by viewModels {
-        DatabaseViewModel.Factory(resources)
-    }
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
 
     private val mCategoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
 
@@ -79,11 +78,6 @@ class EditCategoryDialogFragment(
 
         setupColorSpinner()
         setupListeners()
-    }
-
-    override fun onDestroy() {
-        mDatabaseViewModel.close()
-        super.onDestroy()
     }
 
     private fun setupColorSpinner() {
@@ -132,16 +126,17 @@ class EditCategoryDialogFragment(
 
         val selectedColor = mBinding.spnCategoryColor.selectedItem as ColorItem
 
-        val categoryId: ObjectId = if (mDialogViewModel.category != null) {
+        // TODO: Handle new category
+        val categoryId: String = if (mDialogViewModel.category != null) {
             mDialogViewModel.category!!.id
         } else {
-            ObjectId()
+            ""
         }
 
-        val categoryDocument =
-            CategoryDocument(name = categoryName, color = selectedColor.value, id = categoryId)
+        val category =
+            Category(name = categoryName, color = selectedColor.value, id = categoryId)
 
-        mDatabaseViewModel.upsertCategory(categoryDocument)
+        categoriesRepository.upsertCategory(category)
         mDialogViewModel.category = null
         dismiss()
     }
