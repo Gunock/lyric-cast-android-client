@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:37
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -27,6 +27,7 @@ import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
@@ -96,7 +97,8 @@ class SetlistEditorSongsFragment : Fragment() {
                     return@launch
                 }
 
-                mSongItemsAdapter!!.submitCollection(songs)
+                val songItems = songs.map { SongItem(it) }
+                mSongItemsAdapter!!.submitCollection(songItems)
                 withContext(Dispatchers.Default) {
                     mSongItemsAdapter!!.songItems.forEach { item ->
                         val previousValue = item.isSelected.value
@@ -214,7 +216,7 @@ class SetlistEditorSongsFragment : Fragment() {
         mBinding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
 
         val selectionTracker =
-            SelectionTracker { _: SongItemsAdapter.ViewHolder, position: Int, _: Boolean ->
+            SelectionTracker { _: BaseViewHolder, position: Int, _: Boolean ->
                 val item: SongItem = mSongItemsAdapter!!.songItems[position]
                 selectSong(item)
                 return@SelectionTracker true
@@ -223,14 +225,14 @@ class SetlistEditorSongsFragment : Fragment() {
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
             showCheckBox = MutableLiveData(true),
-            mSelectionTracker = selectionTracker
+            selectionTracker = selectionTracker
         )
 
         mBinding.rcvSongs.adapter = mSongItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {
-        item.isSelected.value = !item.isSelected.value!!
+        item.isSelected.postValue(!item.isSelected.value!!)
     }
 
     private suspend fun filterSongs(
@@ -241,7 +243,8 @@ class SetlistEditorSongsFragment : Fragment() {
         Log.d(TAG, "filterSongs invoked")
 
         updateSelectedSongs()
-        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
+        // TODO: Add filtering in viewModel
+//        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
     }
 
     private fun updateSelectedSongs() {

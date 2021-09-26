@@ -1,15 +1,15 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:16
+ * Last modified 26/09/2021, 13:48
  */
 
 package pl.gunock.lyriccast.ui.shared.misc
 
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 
-class SelectionTracker<T : RecyclerView.ViewHolder>(
+class SelectionTracker<T : BaseViewHolder>(
     private val mOnSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
 ) {
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+  ~ Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 11:30
+  ~ Last modified 24/08/2021, 20:07
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,7 +12,7 @@
 
     <fragment
         android:id="@+id/Songs"
-        android:name="pl.gunock.lyriccast.ui.main.SongsFragment"
+        android:name="pl.gunock.lyriccast.ui.main.songs.SongsFragment"
         android:label="@string/title_songs"
         tools:layout="@layout/fragment_songs">
 
@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/Setlists"
-        android:name="pl.gunock.lyriccast.ui.main.SetlistsFragment"
+        android:name="pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment"
         android:label="@string/title_setlists"
         tools:layout="@layout/fragment_setlists">
         <action

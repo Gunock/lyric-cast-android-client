@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:28
+ * Last modified 24/08/2021, 20:11
  */
 
 package pl.gunock.lyriccast.datamodel
@@ -20,41 +20,41 @@ import pl.gunock.lyriccast.datamodel.repositiories.impl.mongo.SongsRepositoryMon
 
 object RepositoryFactory {
 
-    fun initialize(context: Context, provider: Provider) {
+    fun initialize(context: Context, provider: RepositoryProvider) {
         return when (provider) {
-            Provider.MONGO -> Realm.init(context)
+            RepositoryProvider.MONGO -> Realm.init(context)
         }
     }
 
-    fun createSongsRepository(provider: Provider): SongsRepository {
+    fun createSongsRepository(provider: RepositoryProvider): SongsRepository {
         return when (provider) {
-            Provider.MONGO -> SongsRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> SongsRepositoryMongoImpl()
         }
     }
 
-    fun createSetlistsRepository(provider: Provider): SetlistsRepository {
+    fun createSetlistsRepository(provider: RepositoryProvider): SetlistsRepository {
         return when (provider) {
-            Provider.MONGO -> SetlistsRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> SetlistsRepositoryMongoImpl()
         }
     }
 
-    fun createCategoriesRepository(provider: Provider): CategoriesRepository {
+    fun createCategoriesRepository(provider: RepositoryProvider): CategoriesRepository {
         return when (provider) {
-            Provider.MONGO -> CategoriesRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> CategoriesRepositoryMongoImpl()
         }
     }
 
     fun createDataTransferRepository(
         resources: Resources,
-        provider: Provider
+        provider: RepositoryProvider
     ): DataTransferRepository {
         return when (provider) {
-            Provider.MONGO -> DataTransferRepositoryMongoImpl(resources)
+            RepositoryProvider.MONGO -> DataTransferRepositoryMongoImpl(resources)
         }
     }
 
 
-    enum class Provider {
+    enum class RepositoryProvider {
         MONGO
     }
 

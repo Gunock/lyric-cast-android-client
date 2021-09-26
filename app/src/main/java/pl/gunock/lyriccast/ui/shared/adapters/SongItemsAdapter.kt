@@ -1,14 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:28
+ * Last modified 26/09/2021, 17:28
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -18,21 +17,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.databinding.ItemSongBinding
-import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.ui.main.SetlistItemsAdapter
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
 import java.util.*
-import java.util.concurrent.ConcurrentSkipListSet
-import kotlin.system.measureTimeMillis
 
 class SongItemsAdapter(
     context: Context,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    private val mSelectionTracker: SelectionTracker<ViewHolder>?
+    private val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
     init {
@@ -47,70 +41,31 @@ class SongItemsAdapter(
     private val mCheckBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
     private val mItems: SortedSet<SongItem> = sortedSetOf()
-    private val mVisibleItems = ConcurrentSkipListSet<SongItem>()
-    val songItems: List<SongItem> get() = mVisibleItems.toList()
+    val songItems: List<SongItem>
+        get() {
+            return try {
+                mItems.toList()
+            } catch (e: ConcurrentModificationException) {
+                listOf()
+            }
+        }
 
     fun removeObservers() {
         showCheckBox.removeObservers(mLifecycleOwner)
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    suspend fun submitCollection(songs: Iterable<Song>) {
-        try {
-            withContext(Dispatchers.Default) {
-                mItems.clear()
-                mItems.addAll(songs.map { SongItem(it) })
-
-                mVisibleItems.clear()
-                mVisibleItems.addAll(mItems)
-            }
-            withContext(Dispatchers.Main) {
-                notifyDataSetChanged()
-            }
-        } catch (ignore: NullPointerException) {
-            return
+    suspend fun submitCollection(songs: Iterable<SongItem>) {
+        withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(0, mItems.size)
         }
-    }
-
-    suspend fun filterItems(
-        songTitle: String,
-        categoryId: String? = null,
-        isSelected: Boolean? = null
-    ) {
         withContext(Dispatchers.Default) {
-            val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
-
-            if (isSelected != null) {
-                predicates.add { songItem -> songItem.isSelected.value!! }
-            }
-
-            if (!categoryId.isNullOrBlank()) {
-                predicates.add { songItem -> songItem.song.category?.id == categoryId }
-            }
-
-            val normalizedTitle = songTitle.trim().normalize()
-            predicates.add { item ->
-                item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
-            }
-
-            val duration = measureTimeMillis {
-                val filteredItems = mItems.filter { songItem ->
-                    predicates.all { predicate -> predicate(songItem) }
-                }.toSortedSet()
-
-                mVisibleItems.clear()
-                mVisibleItems.addAll(filteredItems)
-            }
-            Log.v(SetlistItemsAdapter.TAG, "Filtering took : ${duration}ms")
+            mItems.clear()
+            mItems.addAll(songs)
         }
         withContext(Dispatchers.Main) {
-            notifyDataSetChanged()
+            notifyItemRangeRemoved(0, mItems.size)
         }
-    }
-
-    fun resetSelection() {
-        mVisibleItems.forEach { it.isSelected.postValue(false) }
-        mSelectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -123,21 +78,26 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return mVisibleItems.toList()[position].song.idLong
+        val songs = songItems
+
+        if (songs.isEmpty()) {
+            return -1L
+        }
+
+        return songItems[position].song.idLong
     }
 
-    override fun getItemCount() = mVisibleItems.size
+    override fun getItemCount() = mItems.size
 
     inner class ViewHolder(
         private val mBinding: ItemSongBinding
-    ) : RecyclerView.ViewHolder(mBinding.root) {
+    ) : BaseViewHolder(mBinding.root, selectionTracker) {
         init {
             mBinding.tvSongCategory.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
         }
 
-        fun bind(position: Int) {
-            val item = mVisibleItems.toList()[position]
-            mSelectionTracker?.attach(this)
+        override fun setUpViewHolder(position: Int) {
+            val item = songItems[position]
             showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSong))
             item.isSelected.observe(mLifecycleOwner) {
                 mBinding.chkItemSong.isChecked = it

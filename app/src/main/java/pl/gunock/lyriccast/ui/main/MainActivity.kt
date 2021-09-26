@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:28
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -47,6 +47,7 @@ import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
+import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
@@ -246,7 +247,7 @@ class MainActivity : AppCompatActivity() {
             R.style.Theme_LyricCast_Dialog_NoTitle
         )
 
-        mImportDialogViewModel.accepted.value = false
+        mImportDialogViewModel.accepted.postValue(false)
         mImportDialogViewModel.accepted.observe(this) { if (it) startImport() }
         dialogFragment.show(supportFragmentManager, ImportDialogFragment.TAG)
         return true

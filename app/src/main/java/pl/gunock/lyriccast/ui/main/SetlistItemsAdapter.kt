@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 14:32
+ * Last modified 26/09/2021, 16:53
  */
 
 package pl.gunock.lyriccast.ui.main
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -16,19 +15,17 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
-import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
-import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.domain.models.SetlistItem
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
 import java.util.*
-import kotlin.system.measureTimeMillis
 
 class SetlistItemsAdapter(
     context: Context,
     var showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    val selectionTracker: SelectionTracker<ViewHolder>?
+    val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
 
     companion object {
@@ -38,7 +35,6 @@ class SetlistItemsAdapter(
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
 
     private var mItems: SortedSet<SetlistItem> = sortedSetOf()
-    private var mVisibleItems: Set<SetlistItem> = setOf()
     val setlistItems: List<SetlistItem> get() = mItems.toList()
 
     init {
@@ -50,32 +46,17 @@ class SetlistItemsAdapter(
         mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
-    suspend fun submitCollection(setlists: Iterable<Setlist>) {
+    suspend fun submitCollection(setlists: Iterable<SetlistItem>) {
+        withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(0, mItems.size)
+        }
         withContext(Dispatchers.Default) {
             mItems.clear()
-            mItems.addAll(setlists.map { SetlistItem(it) })
-            mVisibleItems = mItems
+            mItems.addAll(setlists)
         }
-        notifyDataSetChanged()
-    }
-
-    suspend fun filterItems(setlistName: String) {
-        withContext(Dispatchers.Default) {
-            val normalizedName = setlistName.trim().normalize()
-
-            val duration = measureTimeMillis {
-                mVisibleItems = mItems.filter { item ->
-                    item.normalizedName.contains(normalizedName, ignoreCase = true)
-                }.toSortedSet()
-            }
-            Log.v(TAG, "Filtering took : ${duration}ms")
+        withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(0, mItems.size)
         }
-        notifyDataSetChanged()
-    }
-
-    fun resetSelection() {
-        mVisibleItems.forEach { it.isSelected.value = false }
-        selectionTracker?.reset()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -89,18 +70,21 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return mVisibleItems.toList()[position].setlist.idLong
+        return try {
+            setlistItems[position].setlist.idLong
+        } catch (e: ConcurrentModificationException) {
+            -1L
+        }
     }
 
-    override fun getItemCount() = mVisibleItems.size
+    override fun getItemCount() = mItems.size
 
     inner class ViewHolder(
         private val mBinding: ItemSetlistBinding
-    ) : RecyclerView.ViewHolder(mBinding.root) {
+    ) : BaseViewHolder(mBinding.root, selectionTracker) {
 
-        fun bind(position: Int) {
-            val item = mVisibleItems.toList()[position]
-            selectionTracker?.attach(this)
+        override fun setUpViewHolder(position: Int) {
+            val item = mItems.toList()[position]
 
             showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSetlist))
             item.isSelected.observe(mLifecycleOwner) {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemSetlistSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
@@ -24,7 +25,7 @@ class SetlistSongItemsAdapter(
     context: Context,
     private val mItems: MutableList<SongItem>,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    private val mSelectionTracker: SelectionTracker<ViewHolder>?,
+    private val mSelectionTracker: SelectionTracker<BaseViewHolder>?,
     private val mOnHandleTouchListener: TouchAdapterItemListener<ViewHolder>? = null
 ) : RecyclerView.Adapter<SetlistSongItemsAdapter.ViewHolder>() {
 
@@ -45,7 +46,7 @@ class SetlistSongItemsAdapter(
     }
 
     fun resetSelection() {
-        mItems.forEach { it.isSelected.value = false }
+        mItems.forEach { it.isSelected.postValue(false) }
         mSelectionTracker?.reset()
     }
 
@@ -60,7 +61,7 @@ class SetlistSongItemsAdapter(
         val selectedItem = mItems[selectedItemIndex].copy()
         selectedItem.id = availableId++
 
-        selectedItem.isSelected.value = false
+        selectedItem.isSelected.postValue(false)
 
         mItems.add(selectedItemIndex + 1, selectedItem)
         notifyItemInserted(selectedItemIndex + 1)
@@ -103,11 +104,10 @@ class SetlistSongItemsAdapter(
 
     inner class ViewHolder(
         private val mBinding: ItemSetlistSongBinding
-    ) : RecyclerView.ViewHolder(mBinding.root) {
+    ) : BaseViewHolder(mBinding.root, mSelectionTracker) {
 
-        fun bind(position: Int) {
+        override fun setUpViewHolder(position: Int) {
             val item = mItems[position]
-            mSelectionTracker?.attach(this)
             setupListeners()
 
             item.isSelected.observe(mLifecycleOwner) {

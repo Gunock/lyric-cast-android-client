@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:20
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -80,7 +80,7 @@ class ImportDialogFragment : DialogFragment() {
             mImportDialogViewModel.replaceOnConflict = mBinding.chkReplaceOnConflict.isChecked
             mImportDialogViewModel.importFormat =
                 ImportFormat.getByName(mBinding.spnImportFormat.selectedItem as String)
-            mImportDialogViewModel.accepted.value = true
+            mImportDialogViewModel.accepted.postValue(true)
             dismiss()
         }
 

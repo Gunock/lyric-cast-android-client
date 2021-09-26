@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:51
+ * Last modified 24/08/2021, 20:11
  */
 
 package pl.gunock.lyriccast.di
@@ -26,28 +26,28 @@ object AppModule {
     fun provideDataTransferRepository(@ApplicationContext context: Context): DataTransferRepository {
         return RepositoryFactory.createDataTransferRepository(
             context.resources,
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideSongsRepository(): SongsRepository {
         return RepositoryFactory.createSongsRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideSetlistsRepository(): SetlistsRepository {
         return RepositoryFactory.createSetlistsRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideCategoriesRepository(): CategoriesRepository {
         return RepositoryFactory.createCategoriesRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:39
+ * Last modified 24/08/2021, 20:11
  */
 
 package pl.gunock.lyriccast.application
@@ -18,7 +18,7 @@ import pl.gunock.lyriccast.shared.cast.SessionStartedListener
 class LyricCastApplication : Application() {
     override fun onCreate() {
         // Initializes MongoDB Realm
-        RepositoryFactory.initialize(applicationContext, RepositoryFactory.Provider.MONGO)
+        RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext)

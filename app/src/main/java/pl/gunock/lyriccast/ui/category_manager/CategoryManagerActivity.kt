@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:51
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -25,6 +25,7 @@ import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.shared.extensions.loadAd
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     private lateinit var mEditCategoryDialogViewModel: EditCategoryDialogViewModel
 
     private lateinit var mCategoryItemsAdapter: CategoryItemsAdapter
-    private lateinit var mSelectionTracker: SelectionTracker<CategoryItemsAdapter.ViewHolder>
+    private lateinit var mSelectionTracker: SelectionTracker<BaseViewHolder>
 
     private var mActionMenu: Menu? = null
     private var mActionMode: ActionMode? = null
@@ -103,21 +104,21 @@ class CategoryManagerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                mCategoryItemsAdapter.submitCollection(categories)
+        mCategoriesSubscription = categoriesRepository.getAllCategories()
+            .subscribe { categories ->
+                lifecycleScope.launch(Dispatchers.Default) {
+                    mCategoryItemsAdapter.submitCollection(categories)
 
-                val categoryNames: Set<String> = categories.map { it.name }.toSet()
-                mEditCategoryDialogViewModel.categoryNames = categoryNames
+                    val categoryNames: Set<String> = categories.map { it.name }.toSet()
+                    mEditCategoryDialogViewModel.categoryNames = categoryNames
+                }
             }
-        }
     }
 
     override fun onPause() {
         super.onPause()
 
         mCategoriesSubscription?.dispose()
-        mCategoriesSubscription = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -154,7 +155,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun onCategoryClick(
         @Suppress("UNUSED_PARAMETER")
-        holder: CategoryItemsAdapter.ViewHolder,
+        holder: BaseViewHolder,
         position: Int,
         isLongClick: Boolean
     ): Boolean {
@@ -208,7 +209,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun selectCategory(item: CategoryItem): Boolean {
-        item.isSelected.value = !item.isSelected.value!!
+        item.isSelected.postValue(!item.isSelected.value!!)
 
         when (mSelectionTracker.countAfter) {
             0 -> {
@@ -217,7 +218,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             }
             1 -> {
                 if (!mCategoryItemsAdapter.showCheckBox.value!!) {
-                    mCategoryItemsAdapter.showCheckBox.value = true
+                    mCategoryItemsAdapter.showCheckBox.postValue(true)
                 }
 
                 if (mActionMode == null) {
@@ -234,7 +235,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun resetSelection() {
         if (mCategoryItemsAdapter.showCheckBox.value!!) {
-            mCategoryItemsAdapter.showCheckBox.value = false
+            mCategoryItemsAdapter.showCheckBox.postValue(false)
         }
         mCategoryItemsAdapter.resetSelection()
     }

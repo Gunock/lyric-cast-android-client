@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:41
+ * Last modified 26/09/2021, 17:19
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -33,6 +33,7 @@ import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import javax.inject.Inject
@@ -58,7 +59,7 @@ class SetlistEditorFragment : Fragment() {
     private var mSetlistId: String = ""
     private lateinit var mSetlistSongs: List<SongItem>
     private var mSongItemsAdapter: SetlistSongItemsAdapter? = null
-    private lateinit var mSelectionTracker: SelectionTracker<SetlistSongItemsAdapter.ViewHolder>
+    private lateinit var mSelectionTracker: SelectionTracker<BaseViewHolder>
 
     private var mIntentSetlist: Setlist? = null
 
@@ -272,7 +273,7 @@ class SetlistEditorFragment : Fragment() {
 
     private fun onSetlistClick(
         @Suppress("UNUSED_PARAMETER")
-        holder: SetlistSongItemsAdapter.ViewHolder,
+        holder: BaseViewHolder,
         position: Int,
         isLongClick: Boolean
     ): Boolean {
@@ -330,19 +331,19 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun selectSong(item: SongItem): Boolean {
-        item.isSelected.value = !item.isSelected.value!!
+        item.isSelected.postValue(!item.isSelected.value!!)
 
         when (mSelectionTracker.countAfter) {
             0 -> {
                 if (mSongItemsAdapter!!.showCheckBox.value!!) {
-                    mSongItemsAdapter!!.showCheckBox.value = false
+                    mSongItemsAdapter!!.showCheckBox.postValue(false)
                 }
                 mActionMode?.finish()
                 return false
             }
             1 -> {
                 if (!mSongItemsAdapter!!.showCheckBox.value!!) {
-                    mSongItemsAdapter!!.showCheckBox.value = true
+                    mSongItemsAdapter!!.showCheckBox.postValue(true)
                 }
 
                 if (mActionMode == null) {
@@ -380,7 +381,7 @@ class SetlistEditorFragment : Fragment() {
 
     private fun resetSelection() {
         if (mSongItemsAdapter!!.showCheckBox.value!!) {
-            mSongItemsAdapter!!.showCheckBox.value = false
+            mSongItemsAdapter!!.showCheckBox.postValue(false)
         }
         mSongItemsAdapter!!.resetSelection()
         showMenuActions(showDelete = false, showDuplicate = false)

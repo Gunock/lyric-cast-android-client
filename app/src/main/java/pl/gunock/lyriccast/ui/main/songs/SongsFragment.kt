@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:37
+ * Last modified 26/09/2021, 17:19
  */
 
-package pl.gunock.lyriccast.ui.main
+package pl.gunock.lyriccast.ui.main.songs
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,6 @@ import pl.gunock.lyriccast.databinding.FragmentSongsBinding
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
-import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
@@ -43,7 +43,6 @@ import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.song_controls.SongControlsActivity
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.File
@@ -57,19 +56,16 @@ class SongsFragment : Fragment() {
         const val TAG = "SongsFragment"
     }
 
-    @Inject
-    lateinit var dataTransferRepository: DataTransferRepository
+    private val viewModel: SongsViewModel by activityViewModels()
 
     @Inject
-    lateinit var songsRepository: SongsRepository
+    lateinit var dataTransferRepository: DataTransferRepository
 
     @Inject
     lateinit var categoriesRepository: CategoriesRepository
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
     private lateinit var mBinding: FragmentSongsBinding
-
-    private lateinit var mSelectionTracker: SelectionTracker<SongItemsAdapter.ViewHolder>
 
     private var mActionMenu: Menu? = null
     private var mActionMode: ActionMode? = null
@@ -88,7 +84,11 @@ class SongsFragment : Fragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             val result = when (item.itemId) {
-                R.id.action_menu_delete -> deleteSelectedSongs()
+                R.id.action_menu_delete -> {
+                    viewModel.deleteSelected()
+                    resetSelection()
+                    true
+                }
                 R.id.action_menu_export_selected -> startExport()
                 R.id.action_menu_edit -> editSelectedSong()
                 R.id.action_menu_add_setlist -> addSetlist()
@@ -107,12 +107,11 @@ class SongsFragment : Fragment() {
             mActionMenu = null
             resetSelection()
         }
-
     }
 
     private val mExportChooserResultLauncher = registerForActivityResult(this::exportSelectedSongs)
 
-    private var mSongsSubscription: Disposable? = null
+    //    private var mSongsSubscription: Disposable? = null
     private var mCategoriesSubscription: Disposable? = null
 
     override fun onCreateView(
@@ -127,6 +126,9 @@ class SongsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mBinding.swtSelectedSongs.visibility = View.GONE
+
+        viewModel.pickedItem.observe(viewLifecycleOwner, this::onPickSong)
+        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSong)
 
         setupCategorySpinner()
         setupRecyclerView()
@@ -145,13 +147,6 @@ class SongsFragment : Fragment() {
 
         mBinding.edSongFilter.setText("")
 
-        mSongsSubscription = songsRepository.getAllSongs()
-            .subscribe { songs ->
-                lifecycleScope.launch(Dispatchers.Default) {
-                    mSongItemsAdapter?.submitCollection(songs)
-                }
-            }
-
         mCategoriesSubscription =
             categoriesRepository.getAllCategories().subscribe { categories: List<Category> ->
                 lifecycleScope.launch(Dispatchers.Default) {
@@ -164,9 +159,6 @@ class SongsFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-
-        mSongsSubscription?.dispose()
-        mSongsSubscription = null
 
         mCategoriesSubscription?.dispose()
         mCategoriesSubscription = null
@@ -206,32 +198,20 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        mSelectionTracker = SelectionTracker(this::onSongClick)
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
-            mSelectionTracker = mSelectionTracker
+            selectionTracker = viewModel.selectionTracker
         )
 
         mBinding.rcvSongs.setHasFixedSize(true)
         mBinding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
         mBinding.rcvSongs.adapter = mSongItemsAdapter
-    }
 
-    private fun onSongClick(
-        @Suppress("UNUSED_PARAMETER")
-        holder: SongItemsAdapter.ViewHolder,
-        position: Int,
-        isLongClick: Boolean
-    ): Boolean {
-        val item = mSongItemsAdapter!!.songItems[position]
-
-        if (!isLongClick && mSelectionTracker.count == 0) {
-            pickSong(item)
-        } else {
-            return selectSong(item)
+        viewModel.songs.observe(viewLifecycleOwner) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                mSongItemsAdapter?.submitCollection(it)
+            }
         }
-
-        return true
     }
 
     private suspend fun filterSongs() {
@@ -239,11 +219,11 @@ class SongsFragment : Fragment() {
         val title: String = mBinding.edSongFilter.editableText.toString()
         val categoryId: String? = getSelectedCategoryId(mBinding.spnCategory)
 
-        mSongItemsAdapter!!.filterItems(title, categoryId = categoryId)
+        viewModel.filter(title, categoryId = categoryId)
         resetSelection()
     }
 
-    private fun pickSong(item: SongItem) {
+    private fun onPickSong(item: SongItem) {
         resetSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
@@ -251,17 +231,15 @@ class SongsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun selectSong(item: SongItem): Boolean {
-        item.isSelected.value = !item.isSelected.value!!
-
-        when (mSelectionTracker.countAfter) {
+    private fun onSelectSong(numberOfSelectedItems: Int): Boolean {
+        when (numberOfSelectedItems) {
             0 -> {
                 mActionMode?.finish()
                 return false
             }
             1 -> {
                 if (!mSongItemsAdapter!!.showCheckBox.value!!) {
-                    mSongItemsAdapter!!.showCheckBox.value = true
+                    mSongItemsAdapter!!.showCheckBox.postValue(true)
                 }
 
                 if (mActionMode == null) {
@@ -373,24 +351,12 @@ class SongsFragment : Fragment() {
         return true
     }
 
-    private fun deleteSelectedSongs(): Boolean {
-        val selectedSongs = mSongItemsAdapter!!.songItems
-            .filter { item -> item.isSelected.value!! }
-            .map { item -> item.song.id }
-
-        songsRepository.deleteSongs(selectedSongs)
-
-        resetSelection()
-
-        return true
-    }
-
     private fun resetSelection() {
         if (mSongItemsAdapter!!.showCheckBox.value!!) {
-            mSongItemsAdapter!!.showCheckBox.value = false
+            mSongItemsAdapter!!.showCheckBox.postValue(false)
         }
 
-        mSongItemsAdapter!!.resetSelection()
+        viewModel.resetSelection()
     }
 
     private fun showMenuActions(

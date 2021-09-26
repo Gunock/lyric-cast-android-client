@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 14:32
+ * Last modified 26/09/2021, 15:57
  */
 
 package pl.gunock.lyriccast.domain.models
@@ -16,7 +16,7 @@ data class SongItem(
 
     var id: Long = 0
 
-    val normalizedTitle by lazy { song.title.normalize() }
+    val normalizedTitle: String = song.title.normalize()
     val highlight: MutableLiveData<Boolean> = MutableLiveData(false)
     val isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
 

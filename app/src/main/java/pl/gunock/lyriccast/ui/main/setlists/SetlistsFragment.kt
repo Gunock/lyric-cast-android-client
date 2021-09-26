@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:10
+ * Last modified 26/09/2021, 17:19
  */
 
-package pl.gunock.lyriccast.ui.main
+package pl.gunock.lyriccast.ui.main.setlists
 
 import android.app.Activity
 import android.content.Intent
@@ -17,10 +17,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,33 +29,23 @@ import org.json.JSONObject
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.FragmentSetlistsBinding
-import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
-import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
+import pl.gunock.lyriccast.ui.main.SetlistItemsAdapter
 import pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SetlistsFragment : Fragment() {
-
-    @Inject
-    lateinit var dataTransferRepository: DataTransferRepository
-
-    @Inject
-    lateinit var setlistsRepository: SetlistsRepository
+    private val viewModel: SetlistsViewModel by activityViewModels()
 
     private lateinit var mBinding: FragmentSetlistsBinding
 
     private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
-
-    private lateinit var mSelectionTracker: SelectionTracker<SetlistItemsAdapter.ViewHolder>
 
     private var mToast: Toast? = null
 
@@ -77,7 +67,11 @@ class SetlistsFragment : Fragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             val result = when (item.itemId) {
-                R.id.action_menu_delete -> deleteSelectedSetlists()
+                R.id.action_menu_delete -> {
+                    viewModel.deleteSelected()
+                    resetSelection()
+                    true
+                }
                 R.id.action_menu_export_selected -> startExport()
                 R.id.action_menu_edit -> editSelectedSetlist()
                 else -> false
@@ -111,6 +105,9 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.pickedItem.observe(viewLifecycleOwner, this::onPickSetlist)
+        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSetlist)
+
         setupRecyclerView()
         setupListeners()
     }
@@ -120,29 +117,6 @@ class SetlistsFragment : Fragment() {
         mSetlistItemsAdapter = null
 
         super.onDestroyView()
-    }
-
-    private var mSetlistSubscription: Disposable? = null
-
-    override fun onResume() {
-        super.onResume()
-
-//        resetSelection()
-//        mBinding.edSetlistFilter.setText("")
-
-        mSetlistSubscription = setlistsRepository.getAllSetlists()
-            .subscribe { setlists ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    mSetlistItemsAdapter?.submitCollection(setlists)
-                }
-            }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        mSetlistSubscription?.dispose()
-        mSetlistSubscription = null
     }
 
     override fun onStop() {
@@ -177,7 +151,7 @@ class SetlistsFragment : Fragment() {
             )
             dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
 
-            val exportData = dataTransferRepository.getDatabaseTransferData()
+            val exportData = viewModel.dataTransferRepository.getDatabaseTransferData()
 
             withContext(Dispatchers.IO) {
                 val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
@@ -232,36 +206,27 @@ class SetlistsFragment : Fragment() {
         }
 
     private fun setupRecyclerView() {
-        mBinding.rcvSetlists.setHasFixedSize(true)
-        mBinding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
-
-        mSelectionTracker = SelectionTracker(this::onSetlistClick)
         mSetlistItemsAdapter = SetlistItemsAdapter(
             requireContext(),
-            selectionTracker = mSelectionTracker
+            selectionTracker = viewModel.selectionTracker
         )
 
+        mBinding.rcvSetlists.setHasFixedSize(true)
+        mBinding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
         mBinding.rcvSetlists.adapter = mSetlistItemsAdapter
-    }
 
-    private fun onSetlistClick(
-        @Suppress("UNUSED_PARAMETER")
-        holder: SetlistItemsAdapter.ViewHolder,
-        position: Int,
-        isLongClick: Boolean
-    ): Boolean {
-        val item = mSetlistItemsAdapter!!.setlistItems[position]
-        return if (!isLongClick && mSelectionTracker.count == 0) {
-            pickSetlist(item)
-        } else {
-            selectSetlist(item)
+        viewModel.setlists.observe(viewLifecycleOwner) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                mSetlistItemsAdapter?.submitCollection(it)
+            }
         }
     }
+
 
     private fun setupListeners() {
         mBinding.edSetlistFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Main) {
-                mSetlistItemsAdapter!!.filterItems(newText)
+                viewModel.filter(newText)
                 resetSelection()
             }
         })
@@ -273,7 +238,7 @@ class SetlistsFragment : Fragment() {
         }
     }
 
-    private fun pickSetlist(item: SetlistItem): Boolean {
+    private fun onPickSetlist(item: SetlistItem): Boolean {
         if (item.setlist.presentation.isEmpty()) {
             mToast?.cancel()
             mToast = Toast.makeText(
@@ -292,16 +257,15 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun selectSetlist(item: SetlistItem): Boolean {
-        item.isSelected.value = !item.isSelected.value!!
-        when (mSelectionTracker.countAfter) {
+    private fun onSelectSetlist(numberOfSelectedItems: Int): Boolean {
+        when (numberOfSelectedItems) {
             0 -> {
                 mActionMode?.finish()
                 return false
             }
             1 -> {
                 if (!mSetlistItemsAdapter!!.showCheckBox.value!!) {
-                    mSetlistItemsAdapter!!.showCheckBox.value = true
+                    mSetlistItemsAdapter!!.showCheckBox.postValue(true)
                 }
 
                 if (mActionMode == null) {
@@ -331,17 +295,6 @@ class SetlistsFragment : Fragment() {
         return true
     }
 
-    private fun deleteSelectedSetlists(): Boolean {
-        val selectedSetlists = mSetlistItemsAdapter!!.setlistItems
-            .filter { item -> item.isSelected.value!! }
-            .map { item -> item.setlist.id }
-
-        setlistsRepository.deleteSetlists(selectedSetlists)
-        resetSelection()
-
-        return true
-    }
-
     private fun showMenuActions(
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
@@ -354,10 +307,10 @@ class SetlistsFragment : Fragment() {
 
     private fun resetSelection() {
         if (mSetlistItemsAdapter!!.showCheckBox.value!!) {
-            mSetlistItemsAdapter!!.showCheckBox.value = false
+            mSetlistItemsAdapter!!.showCheckBox.postValue(false)
         }
 
-        mSetlistItemsAdapter!!.resetSelection()
+        viewModel.resetSelection()
     }
 
 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 19:54
+ * Last modified 26/09/2021, 17:28
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -18,6 +18,7 @@ import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemCategoryBinding
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.domain.models.CategoryItem
+import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
 import java.util.*
@@ -25,7 +26,7 @@ import java.util.*
 class CategoryItemsAdapter(
     context: Context,
     val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
-    private val mSelectionTracker: SelectionTracker<ViewHolder>?
+    private val mSelectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
     private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
@@ -38,15 +39,20 @@ class CategoryItemsAdapter(
     }
 
     suspend fun submitCollection(categories: List<Category>) {
+        withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(0, mItems.size)
+        }
         withContext(Dispatchers.Default) {
             mItems.clear()
             mItems.addAll(categories.map { CategoryItem(it) })
         }
-        notifyDataSetChanged()
+        withContext(Dispatchers.Main) {
+            notifyItemRangeInserted(0, mItems.size)
+        }
     }
 
     fun resetSelection() {
-        mItems.forEach { it.isSelected.value = false }
+        mItems.forEach { it.isSelected.postValue(false) }
         mSelectionTracker?.reset()
     }
 
@@ -62,17 +68,20 @@ class CategoryItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return categoryItems[position].category.idLong
+        return try {
+            categoryItems[position].category.idLong
+        } catch (e: ConcurrentModificationException) {
+            -1L
+        }
     }
 
     override fun getItemCount() = mItems.size
 
     inner class ViewHolder(
         private val mBinding: ItemCategoryBinding
-    ) : RecyclerView.ViewHolder(mBinding.root) {
-        fun bind(position: Int) {
+    ) : BaseViewHolder(mBinding.root, mSelectionTracker) {
+        override fun setUpViewHolder(position: Int) {
             val item: CategoryItem = categoryItems[position]
-            mSelectionTracker?.attach(this)
 
             showCheckBox.observe(
                 mLifecycleOwner,
