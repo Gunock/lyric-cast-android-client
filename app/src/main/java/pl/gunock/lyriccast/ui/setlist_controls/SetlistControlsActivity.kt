@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:41
+ * Last modified 03/10/2021, 10:52
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -222,7 +222,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             .indexOfFirst { songTitle -> songTitle == title }
 
         mSongItemsAdapter.songItems.forEachIndexed { index, songItem ->
-            songItem.highlight.postValue(index == songItemPosition)
+            songItem.highlight = index == songItemPosition
         }
 
         mBinding.rcvSongs.run {

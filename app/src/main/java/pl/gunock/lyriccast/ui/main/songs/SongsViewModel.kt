@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 11:35
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -47,11 +47,16 @@ class SongsViewModel @Inject constructor(
     private val _pickedItem: MutableLiveData<SongItem> = MutableLiveData()
 
 
-    val numberOfSelectedItems: LiveData<Int>
+    val numberOfSelectedItems: LiveData<Pair<Int, Int>>
         get() = _numberOfSelectedItems
 
-    private val _numberOfSelectedItems: MutableLiveData<Int> = MutableLiveData(0)
+    private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
+        MutableLiveData(Pair(0, 0))
 
+    val selectedItemPosition: LiveData<Int>
+        get() = _selectedItemPosition
+
+    private val _selectedItemPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     private var allSongs: Iterable<SongItem> = listOf()
 
@@ -66,7 +71,7 @@ class SongsViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.Default) {
                     val songItems = it.map { song -> SongItem(song) }
                     allSongs = songItems
-                    _songs.postValue(songItems)
+                    _songs.postValue(songItems.sorted())
                 }
             }
     }
@@ -77,7 +82,7 @@ class SongsViewModel @Inject constructor(
     }
 
     fun deleteSelected() {
-        val selectedSongs = allSongs.filter { item -> item.isSelected.value!! }
+        val selectedSongs = allSongs.filter { item -> item.isSelected }
             .map { item -> item.song.id }
 
         songsRepository.deleteSongs(selectedSongs)
@@ -93,7 +98,7 @@ class SongsViewModel @Inject constructor(
             val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
             if (isSelected != null) {
-                predicates.add { songItem -> songItem.isSelected.value!! }
+                predicates.add { songItem -> songItem.isSelected }
             }
 
             if (!categoryId.isNullOrBlank()) {
@@ -110,7 +115,7 @@ class SongsViewModel @Inject constructor(
                     predicates.all { predicate -> predicate(songItem) }
                 }.toSortedSet().toList()
 
-                _songs.postValue(filteredItems)
+                _songs.postValue(filteredItems.sorted())
             }
             Log.v(TAG, "Filtering took : ${duration}ms")
         }
@@ -127,15 +132,24 @@ class SongsViewModel @Inject constructor(
         if (!isLongClick && selectionTracker.count == 0) {
             _pickedItem.postValue(item)
         } else {
-            item.isSelected.postValue(!item.isSelected.value!!)
-            _numberOfSelectedItems.postValue(selectionTracker.countAfter)
+            item.isSelected = !item.isSelected
+
+            if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
+                _songs.value!!.forEach { it.hasCheckbox = true }
+            } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
+                _songs.value!!.forEach { it.hasCheckbox = false }
+            }
+
+            val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
+            _numberOfSelectedItems.postValue(countPair)
+            _selectedItemPosition.postValue(position)
         }
 
         return true
     }
 
     fun resetSelection() {
-        _songs.value?.forEach { it.isSelected.postValue(false) }
+        _songs.value!!.forEach { it.isSelected = false }
         selectionTracker.reset()
     }
 

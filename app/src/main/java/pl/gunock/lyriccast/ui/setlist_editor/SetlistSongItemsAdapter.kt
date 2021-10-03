@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 10:52
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -42,11 +42,10 @@ class SetlistSongItemsAdapter(
 
     fun removeObservers() {
         showCheckBox.removeObservers(mLifecycleOwner)
-        items.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
     }
 
     fun resetSelection() {
-        mItems.forEach { it.isSelected.postValue(false) }
+        mItems.forEach { it.isSelected = false }
         mSelectionTracker?.reset()
     }
 
@@ -57,11 +56,11 @@ class SetlistSongItemsAdapter(
     }
 
     fun duplicateSelectedItem() {
-        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected }
         val selectedItem = mItems[selectedItemIndex].copy()
         selectedItem.id = availableId++
 
-        selectedItem.isSelected.postValue(false)
+        selectedItem.isSelected = false
 
         mItems.add(selectedItemIndex + 1, selectedItem)
         notifyItemInserted(selectedItemIndex + 1)
@@ -74,7 +73,7 @@ class SetlistSongItemsAdapter(
     }
 
     private fun deleteSelectedItem(): Boolean {
-        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected.value!! }
+        val selectedItemIndex = mItems.indexOfFirst { item -> item.isSelected }
         if (selectedItemIndex == -1) {
             return false
         }
@@ -110,12 +109,9 @@ class SetlistSongItemsAdapter(
             val item = mItems[position]
             setupListeners()
 
-            item.isSelected.observe(mLifecycleOwner) {
-                mBinding.chkItemSong.isChecked = it
-            }
+            mBinding.chkItemSong.isChecked = item.isSelected
 
-            showCheckBox
-                .observe(mLifecycleOwner, VisibilityObserver(mBinding.imvHandle, true))
+            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.imvHandle, true))
             showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSong))
 
             mBinding.tvItemSongTitle.text = item.song.title

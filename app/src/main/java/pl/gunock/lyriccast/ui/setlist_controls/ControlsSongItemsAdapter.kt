@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 03/10/2021, 10:54
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -11,10 +11,8 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemControlsSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
@@ -32,8 +30,6 @@ class ControlsSongItemsAdapter(
         const val ANIMATION_DURATION: Long = 400L
     }
 
-    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
-
     private val mCardHighlightColor = context.getColor(R.color.accent)
     private val mDefaultItemCardColor = context.getColor(R.color.window_background_2)
     private val mTextDefaultColor = context.getColor(R.color.text)
@@ -47,13 +43,6 @@ class ControlsSongItemsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(position)
-    }
-
-    override fun onViewRecycled(holder: ViewHolder) {
-        songItems[holder.absoluteAdapterPosition].highlight
-            .removeObservers(mLifecycleOwner)
-
-        super.onViewRecycled(holder)
     }
 
     override fun getItemCount() = songItems.size
@@ -72,13 +61,12 @@ class ControlsSongItemsAdapter(
             )
             mBinding.tvItemSongTitle.text = titleText
 
+            applyHighlight(songItems[absoluteAdapterPosition].highlight)
+
             setupListeners()
         }
 
         private fun setupListeners() {
-            songItems[absoluteAdapterPosition].highlight
-                .observe(mLifecycleOwner, this::observeHighlight)
-
             if (mOnItemLongClickListener != null) {
                 mBinding.root.setOnLongClickListener { view ->
                     mOnItemLongClickListener.execute(this, absoluteAdapterPosition, view)
@@ -92,7 +80,7 @@ class ControlsSongItemsAdapter(
             }
         }
 
-        private fun observeHighlight(value: Boolean) {
+        private fun applyHighlight(value: Boolean) {
             val cardTo: Int
             val textTo: Int
             if (value) {

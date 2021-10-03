@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 10:52
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -331,7 +331,7 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun selectSong(item: SongItem): Boolean {
-        item.isSelected.postValue(!item.isSelected.value!!)
+        item.isSelected = !item.isSelected
 
         when (mSelectionTracker.countAfter) {
             0 -> {

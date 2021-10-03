@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:28
+ * Last modified 03/10/2021, 11:37
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -9,23 +9,19 @@ package pl.gunock.lyriccast.ui.shared.adapters
 import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.common.extensions.getLifecycleOwner
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
-import pl.gunock.lyriccast.ui.shared.misc.VisibilityObserver
 import java.util.*
 
 class SongItemsAdapter(
     context: Context,
-    val showCheckBox: MutableLiveData<Boolean> = MutableLiveData(false),
     private val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
@@ -33,38 +29,26 @@ class SongItemsAdapter(
         setHasStableIds(true)
     }
 
-    private val mLifecycleOwner: LifecycleOwner = context.getLifecycleOwner()!!
+    private val defaultItemCardColor = context.getColor(R.color.window_background_2)
+    private val withCategoryTextColor = context.getColor(R.color.text_item_with_category)
+    private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
+    private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
-    private val mDefaultItemCardColor = context.getColor(R.color.window_background_2)
-    private val mWithCategoryTextColor = context.getColor(R.color.text_item_with_category)
-    private val mNoCategoryTextColor = context.getColor(R.color.text_item_no_category)
-    private val mCheckBoxColors = context.getColorStateList(R.color.checkbox_state_list)
+    val items: List<SongItem>
+        get() = _items
 
-    private val mItems: SortedSet<SongItem> = sortedSetOf()
-    val songItems: List<SongItem>
-        get() {
-            return try {
-                mItems.toList()
-            } catch (e: ConcurrentModificationException) {
-                listOf()
-            }
-        }
+    private val _items: MutableList<SongItem> = mutableListOf()
 
-    fun removeObservers() {
-        showCheckBox.removeObservers(mLifecycleOwner)
-        mItems.forEach { it.isSelected.removeObservers(mLifecycleOwner) }
-    }
-
-    suspend fun submitCollection(songs: Iterable<SongItem>) {
+    suspend fun submitCollection(songs: List<SongItem>) {
         withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, mItems.size)
+            notifyItemRangeRemoved(0, _items.size)
         }
         withContext(Dispatchers.Default) {
-            mItems.clear()
-            mItems.addAll(songs)
+            _items.clear()
+            _items.addAll(songs)
         }
         withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, mItems.size)
+            notifyItemRangeRemoved(0, _items.size)
         }
     }
 
@@ -78,48 +62,51 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val songs = songItems
+        val songs = items
 
         if (songs.isEmpty()) {
             return -1L
         }
 
-        return songItems[position].song.idLong
+        return items[position].song.idLong
     }
 
-    override fun getItemCount() = mItems.size
+    override fun getItemCount() = _items.size
 
     inner class ViewHolder(
-        private val mBinding: ItemSongBinding
-    ) : BaseViewHolder(mBinding.root, selectionTracker) {
+        private val binding: ItemSongBinding
+    ) : BaseViewHolder(binding.root, selectionTracker) {
         init {
-            mBinding.tvSongCategory.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
+            binding.tvSongCategory.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
         }
 
         override fun setUpViewHolder(position: Int) {
-            val item = songItems[position]
-            showCheckBox.observe(mLifecycleOwner, VisibilityObserver(mBinding.chkItemSong))
-            item.isSelected.observe(mLifecycleOwner) {
-                mBinding.chkItemSong.isChecked = it
+            val item = items[position]
+
+            if (item.hasCheckbox) {
+                binding.chkItemSong.visibility = View.VISIBLE
+                binding.chkItemSong.isChecked = item.isSelected
+            } else {
+                binding.chkItemSong.visibility = View.GONE
             }
 
-            mBinding.tvItemSongTitle.text = item.song.title
+            binding.tvItemSongTitle.text = item.song.title
 
             if (item.song.category != null) {
-                mBinding.tvSongCategory.text = item.song.category?.name
+                binding.tvSongCategory.text = item.song.category?.name
 
-                mBinding.chkItemSong.buttonTintList =
-                    ColorStateList.valueOf(this@SongItemsAdapter.mWithCategoryTextColor)
+                binding.chkItemSong.buttonTintList =
+                    ColorStateList.valueOf(this@SongItemsAdapter.withCategoryTextColor)
 
-                mBinding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.mWithCategoryTextColor)
-                mBinding.root.setCardBackgroundColor(item.song.category?.color!!)
+                binding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
+                binding.root.setCardBackgroundColor(item.song.category?.color!!)
             } else {
-                mBinding.tvSongCategory.text = ""
+                binding.tvSongCategory.text = ""
 
-                mBinding.chkItemSong.buttonTintList = mCheckBoxColors
+                binding.chkItemSong.buttonTintList = checkBoxColors
 
-                mBinding.tvItemSongTitle.setTextColor(mNoCategoryTextColor)
-                mBinding.root.setCardBackgroundColor(this@SongItemsAdapter.mDefaultItemCardColor)
+                binding.tvItemSongTitle.setTextColor(noCategoryTextColor)
+                binding.root.setCardBackgroundColor(this@SongItemsAdapter.defaultItemCardColor)
             }
         }
     }

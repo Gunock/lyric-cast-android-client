@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 11:32
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -82,7 +81,6 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        mSongItemsAdapter!!.removeObservers()
         mSongItemsAdapter = null
 
         super.onDestroy()
@@ -100,12 +98,12 @@ class SetlistEditorSongsFragment : Fragment() {
                 val songItems = songs.map { SongItem(it) }
                 mSongItemsAdapter!!.submitCollection(songItems)
                 withContext(Dispatchers.Default) {
-                    mSongItemsAdapter!!.songItems.forEach { item ->
-                        val previousValue = item.isSelected.value
+                    mSongItemsAdapter!!.items.forEach { item ->
+                        val previousValue = item.isSelected
                         val newValue = mArgs.presentation.contains(item.song.id)
 
                         if (newValue != previousValue) {
-                            item.isSelected.postValue(newValue)
+                            item.isSelected = newValue
                         }
                     }
                 }
@@ -217,14 +215,14 @@ class SetlistEditorSongsFragment : Fragment() {
 
         val selectionTracker =
             SelectionTracker { _: BaseViewHolder, position: Int, _: Boolean ->
-                val item: SongItem = mSongItemsAdapter!!.songItems[position]
+                val item: SongItem = mSongItemsAdapter!!.items[position]
                 selectSong(item)
                 return@SelectionTracker true
             }
 
         mSongItemsAdapter = SongItemsAdapter(
             requireContext(),
-            showCheckBox = MutableLiveData(true),
+//            showCheckBox = MutableLiveData(true),
             selectionTracker = selectionTracker
         )
 
@@ -232,7 +230,7 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun selectSong(item: SongItem) {
-        item.isSelected.postValue(!item.isSelected.value!!)
+        item.isSelected = !item.isSelected
     }
 
     private suspend fun filterSongs(
@@ -248,8 +246,8 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun updateSelectedSongs() {
-        for (item in mSongItemsAdapter!!.songItems) {
-            if (item.isSelected.value!!) {
+        for (item in mSongItemsAdapter!!.items) {
+            if (item.isSelected) {
                 mSelectedSongs.add(item.song)
             } else {
                 mSelectedSongs.remove(item.song)
