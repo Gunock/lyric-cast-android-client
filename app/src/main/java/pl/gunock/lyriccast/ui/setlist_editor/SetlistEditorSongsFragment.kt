@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:54
+ * Last modified 03/10/2021, 19:47
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -48,7 +48,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
 
-    private lateinit var mBinding: FragmentSongsBinding
+    private lateinit var binding: FragmentSongsBinding
 
     private var mSongItemsAdapter: SongItemsAdapter? = null
     private var mSelectedSongs: MutableSet<Song> = mutableSetOf()
@@ -65,8 +65,8 @@ class SetlistEditorSongsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBinding = FragmentSongsBinding.inflate(inflater)
-        return mBinding.root
+        binding = FragmentSongsBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,7 +113,7 @@ class SetlistEditorSongsFragment : Fragment() {
         mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
             lifecycleScope.launch(Dispatchers.Main) {
                 val categorySpinnerAdapter =
-                    mBinding.spnCategory.adapter as CategorySpinnerAdapter
+                    binding.spnCategory.adapter as CategorySpinnerAdapter
 //                categorySpinnerAdapter.submitCollection(categories)
             }
         }
@@ -172,32 +172,32 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        mBinding.edSongFilter.addTextChangedListener(InputTextChangedListener { newText ->
+        binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(newText, (mBinding.spnCategory.selectedItem as Category).id)
+                filterSongs(newText, (binding.spnCategory.selectedItem as Category).id)
             }
         })
 
-        mBinding.edSongFilter.setOnFocusChangeListener { view, hasFocus ->
+        binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 view.hideKeyboard()
             }
         }
 
-        mBinding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
+        binding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             lifecycleScope.launch(Dispatchers.Main) {
                 filterSongs(
-                    mBinding.edSongFilter.editableText.toString(),
-                    (mBinding.spnCategory.selectedItem as Category).id
+                    binding.edSongTitleFilter.editableText.toString(),
+                    (binding.spnCategory.selectedItem as Category).id
                 )
             }
         }
 
-        mBinding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
+        binding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
             lifecycleScope.launch(Dispatchers.Main) {
                 filterSongs(
-                    mBinding.edSongFilter.editableText.toString(),
-                    (mBinding.spnCategory.selectedItem as Category).id,
+                    binding.edSongTitleFilter.editableText.toString(),
+                    (binding.spnCategory.selectedItem as Category).id,
                     isSelected = if (isChecked) true else null
                 )
             }
@@ -206,12 +206,12 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
-        mBinding.spnCategory.adapter = categorySpinnerAdapter
+        binding.spnCategory.adapter = categorySpinnerAdapter
     }
 
     private fun setupRecyclerView() {
-        mBinding.rcvSongs.setHasFixedSize(true)
-        mBinding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcvSongs.setHasFixedSize(true)
+        binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
 
         val selectionTracker =
             SelectionTracker { _: BaseViewHolder, position: Int, _: Boolean ->
@@ -226,7 +226,7 @@ class SetlistEditorSongsFragment : Fragment() {
             selectionTracker = selectionTracker
         )
 
-        mBinding.rcvSongs.adapter = mSongItemsAdapter
+        binding.rcvSongs.adapter = mSongItemsAdapter
     }
 
     private fun selectSong(item: SongItem) {

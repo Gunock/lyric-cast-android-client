@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/08/2021, 20:11
+ * Last modified 03/10/2021, 22:32
  */
 
 package pl.gunock.lyriccast.datamodel
 
 import android.content.Context
-import android.content.res.Resources
 import io.realm.Realm
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
@@ -45,11 +44,10 @@ object RepositoryFactory {
     }
 
     fun createDataTransferRepository(
-        resources: Resources,
         provider: RepositoryProvider
     ): DataTransferRepository {
         return when (provider) {
-            RepositoryProvider.MONGO -> DataTransferRepositoryMongoImpl(resources)
+            RepositoryProvider.MONGO -> DataTransferRepositoryMongoImpl()
         }
     }
 

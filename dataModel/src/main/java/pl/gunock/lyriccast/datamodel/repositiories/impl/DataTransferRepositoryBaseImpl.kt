@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 03/10/2021, 20:13
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl
 
-import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.datamodel.R
@@ -17,9 +16,7 @@ import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal abstract class DataTransferRepositoryBaseImpl(
-    private val mResources: Resources
-) : DataTransferRepository {
+internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository {
 
     private companion object {
         const val TAG = "DataTransferRepository"
@@ -27,17 +24,17 @@ internal abstract class DataTransferRepositoryBaseImpl(
 
     final override fun importSongs(
         data: DatabaseTransferData,
-        message: MutableLiveData<String>,
+        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
     ) {
         executeTransaction {
-            executeDataImport(data, message, options)
+            executeDataImport(data, messageResourceId, options)
         }
     }
 
     final override fun importSongs(
         songDtoSet: Set<SongDto>,
-        message: MutableLiveData<String>,
+        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
     ) {
         val categoryDtos: List<CategoryDto> = songDtoSet.map { songDto -> songDto.category }
@@ -50,7 +47,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
             }
 
         val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
-        importSongs(data, message, options)
+        importSongs(data, messageResourceId, options)
     }
 
     final override fun getDatabaseTransferData(): DatabaseTransferData {
@@ -85,7 +82,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
 
     private fun executeDataImport(
         data: DatabaseTransferData,
-        message: MutableLiveData<String>,
+        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
     ) {
         if (options.deleteAll) {
@@ -95,21 +92,21 @@ internal abstract class DataTransferRepositoryBaseImpl(
         val removeConflicts: Boolean = !options.deleteAll && !options.replaceOnConflict
 
         if (data.categoryDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_categories))
+            messageResourceId.postValue(R.string.data_transfer_processor_importing_categories)
             executeCategoryImport(data.categoryDtos, options, removeConflicts)
         }
 
         if (data.songDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_songs))
+            messageResourceId.postValue(R.string.data_transfer_processor_importing_songs)
             executeSongImport(data.songDtos, options, removeConflicts)
         }
 
         if (data.setlistDtos != null) {
-            message.postValue(mResources.getString(R.string.data_transfer_processor_importing_setlists))
+            messageResourceId.postValue(R.string.data_transfer_processor_importing_setlists)
             executeSetlistImport(data.setlistDtos, options, removeConflicts)
         }
 
-        message.postValue(mResources.getString(R.string.data_transfer_processor_finishing_import))
+        messageResourceId.postValue(R.string.data_transfer_processor_finishing_import)
         Log.d(TAG, "Finished import")
     }
 

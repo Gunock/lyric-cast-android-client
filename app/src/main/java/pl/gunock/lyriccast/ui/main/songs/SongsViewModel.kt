@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 12:02
+ * Last modified 03/10/2021, 22:38
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -16,7 +16,11 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.common.helpers.FileHelper
+import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
@@ -24,6 +28,8 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import java.io.File
+import java.io.OutputStream
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
@@ -31,42 +37,35 @@ import kotlin.system.measureTimeMillis
 class SongsViewModel @Inject constructor(
     categoriesRepository: CategoriesRepository,
     private val songsRepository: SongsRepository,
-    val dataTransferRepository: DataTransferRepository
+    private val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
     private companion object {
         const val TAG: String = "SongsViewModel"
     }
 
     val songs: LiveData<List<SongItem>> get() = _songs
-
     private val _songs: MutableLiveData<List<SongItem>> = MutableLiveData(listOf())
+    private var allSongs: List<SongItem> = listOf()
+
 
     val pickedItem: LiveData<SongItem> get() = _pickedItem
-
     private val _pickedItem: MutableLiveData<SongItem> = MutableLiveData()
 
     val numberOfSelectedItems: LiveData<Pair<Int, Int>> get() = _numberOfSelectedItems
-
     private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(0, 0))
 
     val selectedItemPosition: LiveData<Int> get() = _selectedItemPosition
-
     private val _selectedItemPosition: MutableLiveData<Int> = MutableLiveData(0)
 
-    private var allSongs: List<SongItem> = listOf()
-
-
     val categories: LiveData<List<CategoryItem>> get() = _categories
-
     private val _categories: MutableLiveData<List<CategoryItem>> = MutableLiveData(listOf())
 
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
-        SelectionTracker(this::onItemSelection)
+        SelectionTracker(this::onSongSelection)
 
     private var songsSubscription: Disposable? = null
-
     private var categoriesSubscription: Disposable? = null
 
     init {
@@ -94,7 +93,13 @@ class SongsViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun deleteSelectedItems() {
+    fun getSelectedSongIds(): List<String> {
+        return songs.value!!
+            .filter { it.isSelected }
+            .map { item -> item.song.id }
+    }
+
+    fun deleteSelectedSongs() {
         val selectedSongs = allSongs.filter { item -> item.isSelected }
             .map { item -> item.song.id }
 
@@ -102,7 +107,7 @@ class SongsViewModel @Inject constructor(
     }
 
     // TODO: Move filter to separate class (functional interface?)
-    suspend fun filterItems(
+    suspend fun filterSongs(
         songTitle: String,
         categoryId: String? = null,
         isSelected: Boolean? = null
@@ -134,12 +139,60 @@ class SongsViewModel @Inject constructor(
         }
     }
 
-    fun resetSelection() {
-        _songs.value!!.forEach { it.isSelected = false }
+    fun resetSongSelection() {
+        _songs.value!!.forEach {
+            it.isSelected = false
+            it.hasCheckbox = false
+        }
         selectionTracker.reset()
     }
 
-    private fun onItemSelection(
+    suspend fun exportSelectedSongs(
+        cacheDir: String,
+        outputStream: OutputStream,
+        messageResourceId: MutableLiveData<Int>
+    ) {
+        val exportData: DatabaseTransferData = withContext(Dispatchers.Main) {
+            dataTransferRepository.getDatabaseTransferData()
+        }
+
+        withContext(Dispatchers.IO) {
+            val exportDir = File(cacheDir, ".export")
+            exportDir.deleteRecursively()
+            exportDir.mkdirs()
+
+            val selectedSongs = allSongs.filter { it.isSelected }
+
+            val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
+            val categoryNames: Set<String> =
+                selectedSongs.mapNotNull { it.song.category?.name }.toSet()
+
+
+            val songJsons = exportData.songDtos!!
+                .filter { it.title in songTitles }
+                .map { it.toJson() }
+
+            val categoryJsons = exportData.categoryDtos!!
+                .filter { it.name in categoryNames }
+                .map { it.toJson() }
+
+            messageResourceId.postValue(R.string.main_activity_export_saving_json)
+
+            val songsString = JSONArray(songJsons).toString()
+            val categoriesString = JSONArray(categoryJsons).toString()
+            File(exportDir, "songs.json").writeText(songsString)
+            File(exportDir, "categories.json").writeText(categoriesString)
+
+            messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+            FileHelper.zip(outputStream, exportDir.path)
+
+            messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+            exportDir.deleteRecursively()
+            resetSongSelection()
+        }
+    }
+
+    private fun onSongSelection(
         @Suppress("UNUSED_PARAMETER")
         holder: BaseViewHolder,
         position: Int,

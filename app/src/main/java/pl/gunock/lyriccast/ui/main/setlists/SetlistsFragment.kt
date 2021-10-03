@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 19:57
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -143,8 +143,8 @@ class SetlistsFragment : Fragment() {
             val uri: Uri = result.data!!.data!!
             val activity = requireActivity()
 
-            val dialogFragment =
-                ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
+            val dialogFragment = ProgressDialogFragment()
+            dialogFragment.setMessage(R.string.main_activity_export_preparing_data)
             dialogFragment.setStyle(
                 DialogFragment.STYLE_NORMAL,
                 R.style.Theme_LyricCast_Dialog
@@ -185,7 +185,7 @@ class SetlistsFragment : Fragment() {
                 val setlistJsons = exportSetlists.filter { it.name in setlistNames }
                     .map { it.toJson() }
 
-                dialogFragment.message = getString(R.string.main_activity_export_saving_json)
+                dialogFragment.setMessage(R.string.main_activity_export_saving_json)
                 val songsString = JSONArray(songJsons).toString()
                 val categoriesString = JSONArray(categoryJsons).toString()
                 val setlistsString = JSONArray(setlistJsons).toString()
@@ -193,11 +193,11 @@ class SetlistsFragment : Fragment() {
                 File(exportDir, "categories.json").writeText(categoriesString)
                 File(exportDir, "setlists.json").writeText(setlistsString)
 
-                dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
+                dialogFragment.setMessage(R.string.main_activity_export_saving_zip)
                 @Suppress("BlockingMethodInNonBlockingContext")
                 FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-                dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
+                dialogFragment.setMessage(R.string.main_activity_export_deleting_temp)
                 exportDir.deleteRecursively()
                 dialogFragment.dismiss()
             }

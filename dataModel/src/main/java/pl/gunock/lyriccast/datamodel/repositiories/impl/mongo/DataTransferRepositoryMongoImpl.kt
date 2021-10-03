@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 03/10/2021, 20:13
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import android.content.res.Resources
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.kotlin.where
@@ -19,14 +18,13 @@ import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
 import pl.gunock.lyriccast.datamodel.repositiories.impl.DataTransferRepositoryBaseImpl
 
 internal class DataTransferRepositoryMongoImpl(
-    mResources: Resources,
     private val mRealm: Realm = Realm.getInstance(
         RealmConfiguration.Builder()
             .allowQueriesOnUiThread(true)
             .allowWritesOnUiThread(true)
             .build()
     )
-) : DataTransferRepositoryBaseImpl(mResources) {
+) : DataTransferRepositoryBaseImpl() {
 
     override fun executeTransaction(transaction: () -> Unit) {
         mRealm.executeTransaction {

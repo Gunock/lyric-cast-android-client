@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 03/10/2021, 20:13
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -202,8 +202,8 @@ class MainActivity : AppCompatActivity() {
 
             val uri: Uri = result.data!!.data!!
 
-            val dialogFragment =
-                ProgressDialogFragment(getString(R.string.main_activity_export_preparing_data))
+            val dialogFragment = ProgressDialogFragment()
+            dialogFragment.setMessage(R.string.main_activity_export_preparing_data)
             dialogFragment.setStyle(
                 DialogFragment.STYLE_NORMAL,
                 R.style.Theme_LyricCast_Dialog
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity() {
                 exportDir.mkdirs()
 
 
-                dialogFragment.message = getString(R.string.main_activity_export_saving_json)
+                dialogFragment.setMessage(R.string.main_activity_export_saving_json)
                 val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
                 val categoriesString =
                     JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
@@ -229,11 +229,11 @@ class MainActivity : AppCompatActivity() {
                 File(exportDir, "categories.json").writeText(categoriesString)
                 File(exportDir, "setlists.json").writeText(setlistsString)
 
-                dialogFragment.message = getString(R.string.main_activity_export_saving_zip)
+                dialogFragment.setMessage(R.string.main_activity_export_saving_zip)
                 @Suppress("BlockingMethodInNonBlockingContext")
                 FileHelper.zip(contentResolver.openOutputStream(uri)!!, exportDir.path)
 
-                dialogFragment.message = getString(R.string.main_activity_export_deleting_temp)
+                dialogFragment.setMessage(R.string.main_activity_export_deleting_temp)
                 exportDir.deleteRecursively()
                 dialogFragment.dismiss()
             }
@@ -254,7 +254,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun importLyricCast(uri: Uri) {
-        val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
+        val dialogFragment = ProgressDialogFragment()
+        dialogFragment.setMessage(R.string.main_activity_loading_file)
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Dialog
@@ -266,7 +267,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (transferData == null) {
-            dialogFragment.message = getString(R.string.main_activity_import_incorrect_file_format)
+            dialogFragment.setMessage(R.string.main_activity_import_incorrect_file_format)
             dialogFragment.setErrorColor(true)
             dialogFragment.setShowOkButton(true)
             return
@@ -279,7 +280,7 @@ class MainActivity : AppCompatActivity() {
 
         dataTransferRepository.importSongs(
             transferData,
-            dialogFragment.messageLiveData,
+            dialogFragment.messageResourceId,
             importOptions
         )
 
@@ -320,7 +321,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun importOpenSong(uri: Uri) {
-        val dialogFragment = ProgressDialogFragment(getString(R.string.main_activity_loading_file))
+        val dialogFragment = ProgressDialogFragment()
+        dialogFragment.setMessage(R.string.main_activity_loading_file)
         dialogFragment.setStyle(
             DialogFragment.STYLE_NORMAL,
             R.style.Theme_LyricCast_Dialog
@@ -340,7 +342,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (importedSongs == null) {
-            dialogFragment.message = getString(R.string.main_activity_import_incorrect_file_format)
+            dialogFragment.setMessage(R.string.main_activity_import_incorrect_file_format)
             dialogFragment.setErrorColor(true)
             dialogFragment.setShowOkButton(true)
             return
@@ -355,7 +357,7 @@ class MainActivity : AppCompatActivity() {
 
         dataTransferRepository.importSongs(
             importedSongs,
-            dialogFragment.messageLiveData,
+            dialogFragment.messageResourceId,
             importOptions
         )
         dialogFragment.dismiss()

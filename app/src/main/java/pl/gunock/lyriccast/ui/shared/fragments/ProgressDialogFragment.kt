@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:16
+ * Last modified 03/10/2021, 22:38
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -18,16 +18,14 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentProgressBinding
 
 
-class ProgressDialogFragment(messageText: String) : DialogFragment() {
+class ProgressDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "ProgressDialogFragment"
     }
 
-    val messageLiveData = MutableLiveData(messageText)
-    var message: String
-        get() = messageLiveData.value!!
-        set(value) = messageLiveData.postValue(value)
+    val messageResourceId = MutableLiveData(0)
+    val message = MutableLiveData("")
 
     private lateinit var mBinding: DialogFragmentProgressBinding
 
@@ -54,11 +52,16 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         mDefaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
         mErrorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
-        mBinding.tvProgressMessage.text = message
+        mBinding.tvProgressMessage.text = message.value!!
         mBinding.btnProgressOk.visibility = View.GONE
         mBinding.btnProgressOk.setOnClickListener { dismiss() }
 
-        messageLiveData.observe(this) { mBinding.tvProgressMessage.text = it }
+        message.observe(viewLifecycleOwner) { mBinding.tvProgressMessage.text = it }
+        messageResourceId.observe(viewLifecycleOwner) { message.postValue(getString(it)) }
+    }
+
+    fun setMessage(stringResourceId: Int) {
+        message.postValue(getString(stringResourceId))
     }
 
     fun setErrorColor(errorColor: Boolean) {
