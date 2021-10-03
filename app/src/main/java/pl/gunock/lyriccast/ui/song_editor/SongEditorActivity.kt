@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:41
+ * Last modified 03/10/2021, 11:55
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -122,7 +122,7 @@ class SongEditorActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val categorySpinnerAdapter =
                     mBinding.spnSongEditorCategory.adapter as CategorySpinnerAdapter
-                categorySpinnerAdapter.submitCollection(categories, mCategoryNone)
+//                categorySpinnerAdapter.submitCollection(categories, mCategoryNone)
             }
         }
     }
@@ -161,8 +161,8 @@ class SongEditorActivity : AppCompatActivity() {
 
         if (mIntentSong != null) {
             val categoryIndex =
-                (mBinding.spnSongEditorCategory.adapter as CategorySpinnerAdapter).categories
-                    .map { category -> category.name }
+                (mBinding.spnSongEditorCategory.adapter as CategorySpinnerAdapter).items
+                    .map { category -> category.category.name }
                     .indexOf(mIntentSong!!.category?.name)
 
             mBinding.spnSongEditorCategory.setSelection(categoryIndex)

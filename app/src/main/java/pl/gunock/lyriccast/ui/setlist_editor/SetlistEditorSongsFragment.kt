@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:32
+ * Last modified 03/10/2021, 11:54
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -114,7 +114,7 @@ class SetlistEditorSongsFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 val categorySpinnerAdapter =
                     mBinding.spnCategory.adapter as CategorySpinnerAdapter
-                categorySpinnerAdapter.submitCollection(categories)
+//                categorySpinnerAdapter.submitCollection(categories)
             }
         }
     }

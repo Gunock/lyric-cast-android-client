@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:37
+ * Last modified 03/10/2021, 11:54
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -34,8 +34,7 @@ class SongItemsAdapter(
     private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
-    val items: List<SongItem>
-        get() = _items
+    val items: List<SongItem> get() = _items
 
     private val _items: MutableList<SongItem> = mutableListOf()
 

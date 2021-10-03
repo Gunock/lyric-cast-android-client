@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:35
+ * Last modified 03/10/2021, 12:02
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -20,6 +20,7 @@ import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
@@ -28,7 +29,7 @@ import kotlin.system.measureTimeMillis
 
 @HiltViewModel
 class SongsViewModel @Inject constructor(
-    val categoriesRepository: CategoriesRepository,
+    categoriesRepository: CategoriesRepository,
     private val songsRepository: SongsRepository,
     val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
@@ -36,52 +37,64 @@ class SongsViewModel @Inject constructor(
         const val TAG: String = "SongsViewModel"
     }
 
-    val songs: LiveData<List<SongItem>>
-        get() = _songs
+    val songs: LiveData<List<SongItem>> get() = _songs
 
     private val _songs: MutableLiveData<List<SongItem>> = MutableLiveData(listOf())
 
-    val pickedItem: LiveData<SongItem>
-        get() = _pickedItem
+    val pickedItem: LiveData<SongItem> get() = _pickedItem
 
     private val _pickedItem: MutableLiveData<SongItem> = MutableLiveData()
 
-
-    val numberOfSelectedItems: LiveData<Pair<Int, Int>>
-        get() = _numberOfSelectedItems
+    val numberOfSelectedItems: LiveData<Pair<Int, Int>> get() = _numberOfSelectedItems
 
     private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(0, 0))
 
-    val selectedItemPosition: LiveData<Int>
-        get() = _selectedItemPosition
+    val selectedItemPosition: LiveData<Int> get() = _selectedItemPosition
 
     private val _selectedItemPosition: MutableLiveData<Int> = MutableLiveData(0)
 
-    private var allSongs: Iterable<SongItem> = listOf()
+    private var allSongs: List<SongItem> = listOf()
+
+
+    val categories: LiveData<List<CategoryItem>> get() = _categories
+
+    private val _categories: MutableLiveData<List<CategoryItem>> = MutableLiveData(listOf())
+
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onItemSelection)
 
     private var songsSubscription: Disposable? = null
 
+    private var categoriesSubscription: Disposable? = null
+
     init {
         songsSubscription = songsRepository.getAllSongs()
             .subscribe {
                 viewModelScope.launch(Dispatchers.Default) {
                     val songItems = it.map { song -> SongItem(song) }
-                    allSongs = songItems
-                    _songs.postValue(songItems.sorted())
+                    allSongs = songItems.sorted()
+                    _songs.postValue(allSongs)
+                }
+            }
+
+        categoriesSubscription = categoriesRepository.getAllCategories()
+            .subscribe {
+                viewModelScope.launch(Dispatchers.Default) {
+                    val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
+                    _categories.postValue(categoryItems)
                 }
             }
     }
 
     override fun onCleared() {
         songsSubscription?.dispose()
+        categoriesSubscription?.dispose()
         super.onCleared()
     }
 
-    fun deleteSelected() {
+    fun deleteSelectedItems() {
         val selectedSongs = allSongs.filter { item -> item.isSelected }
             .map { item -> item.song.id }
 
@@ -89,7 +102,7 @@ class SongsViewModel @Inject constructor(
     }
 
     // TODO: Move filter to separate class (functional interface?)
-    suspend fun filter(
+    suspend fun filterItems(
         songTitle: String,
         categoryId: String? = null,
         isSelected: Boolean? = null
@@ -115,10 +128,15 @@ class SongsViewModel @Inject constructor(
                     predicates.all { predicate -> predicate(songItem) }
                 }.toSortedSet().toList()
 
-                _songs.postValue(filteredItems.sorted())
+                _songs.postValue(filteredItems)
             }
             Log.v(TAG, "Filtering took : ${duration}ms")
         }
+    }
+
+    fun resetSelection() {
+        _songs.value!!.forEach { it.isSelected = false }
+        selectionTracker.reset()
     }
 
     private fun onItemSelection(
@@ -146,11 +164,6 @@ class SongsViewModel @Inject constructor(
         }
 
         return true
-    }
-
-    fun resetSelection() {
-        _songs.value!!.forEach { it.isSelected = false }
-        selectionTracker.reset()
     }
 
 }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:29
+ * Last modified 03/10/2021, 12:03
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -23,7 +23,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,9 +30,8 @@ import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
-import pl.gunock.lyriccast.datamodel.models.Category
-import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
+import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
@@ -61,57 +59,14 @@ class SongsFragment : Fragment() {
     @Inject
     lateinit var dataTransferRepository: DataTransferRepository
 
-    @Inject
-    lateinit var categoriesRepository: CategoriesRepository
-
     private lateinit var songItemsAdapter: SongItemsAdapter
     private lateinit var binding: FragmentSongsBinding
 
     private var actionMenu: Menu? = null
     private var actionMode: ActionMode? = null
-    private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
-        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-            mode.menuInflater.inflate(R.menu.action_menu_main, menu)
-            mode.title = ""
-            actionMenu = menu
-            return true
-        }
-
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            showMenuActions(showGroupActions = false, showEdit = false)
-            return false
-        }
-
-        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val result = when (item.itemId) {
-                R.id.action_menu_delete -> {
-                    viewModel.deleteSelected()
-                    viewModel.resetSelection()
-                    true
-                }
-                R.id.action_menu_export_selected -> startExport()
-                R.id.action_menu_edit -> editSelectedSong()
-                R.id.action_menu_add_setlist -> addSetlist()
-                else -> false
-            }
-
-            if (result) {
-                mode.finish()
-            }
-
-            return result
-        }
-
-        override fun onDestroyActionMode(mode: ActionMode) {
-            actionMode = null
-            actionMenu = null
-            viewModel.resetSelection()
-        }
-    }
+    private val actionModeCallback: ActionMode.Callback = SongsActionModeCallback()
 
     private val exportChooserResultLauncher = registerForActivityResult(this::exportSelectedSongs)
-
-    private var categoriesSubscription: Disposable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -138,31 +93,10 @@ class SongsFragment : Fragment() {
         setupListeners()
     }
 
-    override fun onDestroyView() {
-        binding.spnCategory.adapter = null
-        super.onDestroyView()
-    }
-
     override fun onResume() {
         super.onResume()
 
         binding.edSongFilter.setText("")
-
-        categoriesSubscription =
-            categoriesRepository.getAllCategories().subscribe { categories: List<Category> ->
-                lifecycleScope.launch(Dispatchers.Default) {
-                    val categorySpinnerAdapter =
-                        binding.spnCategory.adapter as CategorySpinnerAdapter
-                    categorySpinnerAdapter.submitCollection(categories)
-                }
-            }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        categoriesSubscription?.dispose()
-        categoriesSubscription = null
     }
 
     override fun onStop() {
@@ -196,6 +130,12 @@ class SongsFragment : Fragment() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
 
         binding.spnCategory.adapter = categorySpinnerAdapter
+
+        viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
+            lifecycleScope.launch(Dispatchers.Default) {
+                categorySpinnerAdapter.submitCollection(categories)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -220,7 +160,7 @@ class SongsFragment : Fragment() {
         val title: String = binding.edSongFilter.editableText.toString()
         val categoryId: String? = getSelectedCategoryId(binding.spnCategory)
 
-        viewModel.filter(title, categoryId = categoryId)
+        viewModel.filterItems(title, categoryId = categoryId)
         viewModel.resetSelection()
     }
 
@@ -368,6 +308,48 @@ class SongsFragment : Fragment() {
     private fun getSelectedCategoryId(categorySpinner: Spinner): String? {
         categorySpinner.selectedItem ?: return null
 
-        return (categorySpinner.selectedItem as Category).id
+        return (categorySpinner.selectedItem as CategoryItem).category.id
     }
+
+
+    private inner class SongsActionModeCallback : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.action_menu_main, menu)
+            mode.title = ""
+            actionMenu = menu
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            showMenuActions(showGroupActions = false, showEdit = false)
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val result = when (item.itemId) {
+                R.id.action_menu_delete -> {
+                    viewModel.deleteSelectedItems()
+                    viewModel.resetSelection()
+                    true
+                }
+                R.id.action_menu_export_selected -> startExport()
+                R.id.action_menu_edit -> editSelectedSong()
+                R.id.action_menu_add_setlist -> addSetlist()
+                else -> false
+            }
+
+            if (result) {
+                mode.finish()
+            }
+
+            return result
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            actionMenu = null
+            viewModel.resetSelection()
+        }
+    }
+
 }
