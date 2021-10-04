@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 04/10/2021, 18:29
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -74,7 +74,7 @@ class SetlistsViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun deleteSelected() {
+    suspend fun deleteSelected() {
         val selectedSetlists = allSetlists.filter { item -> item.isSelected.value!! }
             .map { item -> item.setlist.id }
 

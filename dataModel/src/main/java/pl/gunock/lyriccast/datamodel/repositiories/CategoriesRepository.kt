@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 04/10/2021, 16:37
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
@@ -13,8 +13,8 @@ interface CategoriesRepository {
 
     fun getAllCategories(): Flowable<List<Category>>
 
-    fun upsertCategory(category: Category)
+    suspend fun upsertCategory(category: Category)
 
-    fun deleteCategories(categoryIds: Collection<String>)
+    suspend fun deleteCategories(categoryIds: Collection<String>)
 
 }

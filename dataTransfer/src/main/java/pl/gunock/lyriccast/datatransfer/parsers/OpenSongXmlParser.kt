@@ -1,13 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:28
+ * Last modified 03/10/2021, 23:50
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
 
-import android.content.ContentResolver
-import android.net.Uri
 import android.util.Log
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
@@ -24,10 +22,10 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
         const val TAG = "OpenSongXmlParser"
     }
 
-    override fun parseZip(resolver: ContentResolver, targetUri: Uri): Set<SongDto> {
+    override fun parseZip(inputStream: InputStream): Set<SongDto> {
         mImportDirectory.deleteRecursively()
         mImportDirectory.mkdirs()
-        FileHelper.unzip(resolver.openInputStream(targetUri)!!, mImportDirectory.canonicalPath)
+        FileHelper.unzip(inputStream, mImportDirectory.canonicalPath)
 
         val fileList1 = mImportDirectory.listFiles() ?: arrayOf()
         val result: MutableSet<SongDto> = mutableSetOf()

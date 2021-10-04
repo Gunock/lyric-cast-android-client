@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 20:13
+ * Last modified 04/10/2021, 17:56
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl
@@ -22,17 +22,15 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         const val TAG = "DataTransferRepository"
     }
 
-    final override fun importSongs(
+    final override suspend fun importSongs(
         data: DatabaseTransferData,
         messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
     ) {
-        executeTransaction {
-            executeDataImport(data, messageResourceId, options)
-        }
+        executeDataImport(data, messageResourceId, options)
     }
 
-    final override fun importSongs(
+    final override suspend fun importSongs(
         songDtoSet: Set<SongDto>,
         messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
@@ -66,21 +64,19 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         )
     }
 
-    protected abstract fun executeTransaction(transaction: () -> Unit)
-
     protected abstract fun getAllSongs(): List<Song>
 
     protected abstract fun getAllSetlists(): List<Setlist>
 
     protected abstract fun getAllCategories(): List<Category>
 
-    protected abstract fun upsertSongs(songs: Iterable<Song>)
+    protected abstract suspend fun upsertSongs(songs: Iterable<Song>)
 
-    protected abstract fun upsertSetlists(setlists: Iterable<Setlist>)
+    protected abstract suspend fun upsertSetlists(setlists: Iterable<Setlist>)
 
-    protected abstract fun upsertCategories(categories: Iterable<Category>)
+    protected abstract suspend fun upsertCategories(categories: Iterable<Category>)
 
-    private fun executeDataImport(
+    private suspend fun executeDataImport(
         data: DatabaseTransferData,
         messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
@@ -110,7 +106,7 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         Log.d(TAG, "Finished import")
     }
 
-    private fun executeCategoryImport(
+    private suspend fun executeCategoryImport(
         categoryDtos: List<CategoryDto>,
         options: ImportOptions,
         removeConflicts: Boolean
@@ -139,7 +135,7 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         upsertCategories(categories)
     }
 
-    private fun executeSongImport(
+    private suspend fun executeSongImport(
         songDtos: List<SongDto>,
         options: ImportOptions,
         removeConflicts: Boolean
@@ -180,7 +176,7 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         upsertSongs(songs)
     }
 
-    private fun executeSetlistImport(
+    private suspend fun executeSetlistImport(
         setlistDtos: List<SetlistDto>,
         options: ImportOptions,
         removeConflicts: Boolean

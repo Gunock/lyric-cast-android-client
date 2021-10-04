@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 10:52
+ * Last modified 04/10/2021, 18:29
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import io.realm.RealmList
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistEditorBinding
 import pl.gunock.lyriccast.datamodel.models.Setlist
@@ -325,7 +326,7 @@ class SetlistEditorFragment : Fragment() {
 
         val setlist = Setlist(setlistName, RealmList(*presentation), mSetlistId)
 
-        setlistsRepository.upsertSetlist(setlist)
+        runBlocking { setlistsRepository.upsertSetlist(setlist) }
         Log.i(TAG, "Created setlist: $setlist")
         return true
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 22:38
+ * Last modified 04/10/2021, 18:25
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -69,8 +69,8 @@ class SongsViewModel @Inject constructor(
     private var categoriesSubscription: Disposable? = null
 
     init {
-        songsSubscription = songsRepository.getAllSongs()
-            .subscribe {
+        songsSubscription =
+            songsRepository.getAllSongs().subscribe {
                 viewModelScope.launch(Dispatchers.Default) {
                     val songItems = it.map { song -> SongItem(song) }
                     allSongs = songItems.sorted()
@@ -78,8 +78,8 @@ class SongsViewModel @Inject constructor(
                 }
             }
 
-        categoriesSubscription = categoriesRepository.getAllCategories()
-            .subscribe {
+        categoriesSubscription =
+            categoriesRepository.getAllCategories().subscribe {
                 viewModelScope.launch(Dispatchers.Default) {
                     val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
                     _categories.postValue(categoryItems)
@@ -93,13 +93,17 @@ class SongsViewModel @Inject constructor(
         super.onCleared()
     }
 
+    fun getSelectedSong(): SongItem {
+        return _songs.value!!.first { songItem -> songItem.isSelected }
+    }
+
     fun getSelectedSongIds(): List<String> {
         return songs.value!!
             .filter { it.isSelected }
             .map { item -> item.song.id }
     }
 
-    fun deleteSelectedSongs() {
+    suspend fun deleteSelectedSongs() {
         val selectedSongs = allSongs.filter { item -> item.isSelected }
             .map { item -> item.song.id }
 
@@ -145,6 +149,10 @@ class SongsViewModel @Inject constructor(
             it.hasCheckbox = false
         }
         selectionTracker.reset()
+    }
+
+    fun resetPickedItem() {
+        _pickedItem.postValue(null)
     }
 
     suspend fun exportSelectedSongs(

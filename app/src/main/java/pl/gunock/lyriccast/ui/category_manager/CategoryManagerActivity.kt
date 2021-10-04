@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/09/2021, 17:19
+ * Last modified 04/10/2021, 18:29
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -58,17 +58,19 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val result = when (item.itemId) {
-                R.id.action_menu_delete -> deleteSelectedCategories()
-                R.id.action_menu_edit -> editSelectedCategory()
-                else -> false
+            lifecycleScope.launch(Dispatchers.Main) {
+                val result = when (item.itemId) {
+                    R.id.action_menu_delete -> deleteSelectedCategories()
+                    R.id.action_menu_edit -> editSelectedCategory()
+                    else -> false
+                }
+
+                if (result) {
+                    mode.finish()
+                }
             }
 
-            if (result) {
-                mode.finish()
-            }
-
-            return result
+            return true
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
@@ -104,8 +106,8 @@ class CategoryManagerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        mCategoriesSubscription = categoriesRepository.getAllCategories()
-            .subscribe { categories ->
+        mCategoriesSubscription =
+            categoriesRepository.getAllCategories().subscribe { categories ->
                 lifecycleScope.launch(Dispatchers.Default) {
                     mCategoryItemsAdapter.submitCollection(categories)
 
@@ -168,7 +170,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         return false
     }
 
-    private fun deleteSelectedCategories(): Boolean {
+    private suspend fun deleteSelectedCategories(): Boolean {
         val selectedCategoryIds: List<String> = mCategoryItemsAdapter.categoryItems
             .filter { item -> item.isSelected.value!! }
             .map { items -> items.category.id }

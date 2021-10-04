@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:51
+ * Last modified 04/10/2021, 16:06
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
 import pl.gunock.lyriccast.datamodel.models.Category
@@ -136,7 +137,7 @@ class EditCategoryDialogFragment(
         val category =
             Category(name = categoryName, color = selectedColor.value, id = categoryId)
 
-        categoriesRepository.upsertCategory(category)
+        runBlocking { categoriesRepository.upsertCategory(category) }
         mDialogViewModel.category = null
         dismiss()
     }

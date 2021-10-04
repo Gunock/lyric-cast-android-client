@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 04/10/2021, 18:29
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -9,41 +9,37 @@ package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 import io.reactivex.Flowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmResults
+import io.realm.kotlin.executeTransactionAwait
 import io.realm.kotlin.where
+import kotlinx.coroutines.Dispatchers
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 
-internal class CategoriesRepositoryMongoImpl(
-    private val mRealm: Realm = Realm.getInstance(
-        RealmConfiguration.Builder()
-            .allowQueriesOnUiThread(true)
-            .allowWritesOnUiThread(true)
-            .build()
-    )
-) : CategoriesRepository {
+internal class CategoriesRepositoryMongoImpl : CategoriesRepository {
 
-    private val allCategories: RealmResults<CategoryDocument> =
-        mRealm.where<CategoryDocument>().findAllAsync()
+    private val realm: Realm =
+        Realm.getInstance(RealmConfiguration.Builder().build())
 
     override fun getAllCategories(): Flowable<List<Category>> {
-        return allCategories.asFlowable()
+        return realm.where<CategoryDocument>().findAllAsync()
+            .asFlowable()
             .map { songDocuments ->
-                songDocuments.map { it.toGenericModel() }
+                songDocuments.freeze().map { it.toGenericModel() }
             }
     }
 
-    override fun upsertCategory(category: Category) {
+    override suspend fun upsertCategory(category: Category) {
         val categoryDocument = CategoryDocument(category)
-        mRealm.executeTransaction { mRealm.insertOrUpdate(categoryDocument) }
+        realm.executeTransactionAwait(Dispatchers.IO) { realm.insertOrUpdate(categoryDocument) }
     }
 
-    override fun deleteCategories(categoryIds: Collection<String>) {
-        mRealm.executeTransaction {
+    override suspend fun deleteCategories(categoryIds: Collection<String>) {
+        realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
             for (id in categoryIds) {
-                allCategories.where()
+                transactionRealm.where<CategoryDocument>().findAllAsync()
+                    .where()
                     .equalTo("id", ObjectId(id))
                     .findFirst()
                     ?.deleteFromRealm()

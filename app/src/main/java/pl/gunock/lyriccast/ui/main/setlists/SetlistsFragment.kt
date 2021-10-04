@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 19:57
+ * Last modified 04/10/2021, 18:29
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -66,22 +66,24 @@ class SetlistsFragment : Fragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val result = when (item.itemId) {
-                R.id.action_menu_delete -> {
-                    viewModel.deleteSelected()
-                    resetSelection()
-                    true
+            lifecycleScope.launch(Dispatchers.Main) {
+                val result = when (item.itemId) {
+                    R.id.action_menu_delete -> {
+                        viewModel.deleteSelected()
+                        resetSelection()
+                        true
+                    }
+                    R.id.action_menu_export_selected -> startExport()
+                    R.id.action_menu_edit -> editSelectedSetlist()
+                    else -> false
                 }
-                R.id.action_menu_export_selected -> startExport()
-                R.id.action_menu_edit -> editSelectedSetlist()
-                else -> false
+
+                if (result) {
+                    mode.finish()
+                }
             }
 
-            if (result) {
-                mode.finish()
-            }
-
-            return result
+            return true
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
@@ -149,7 +151,7 @@ class SetlistsFragment : Fragment() {
                 DialogFragment.STYLE_NORMAL,
                 R.style.Theme_LyricCast_Dialog
             )
-            dialogFragment.show(activity.supportFragmentManager, ProgressDialogFragment.TAG)
+            dialogFragment.show(childFragmentManager, ProgressDialogFragment.TAG)
 
             val exportData = viewModel.dataTransferRepository.getDatabaseTransferData()
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 22:35
+ * Last modified 04/10/2021, 18:25
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -17,7 +17,6 @@ import android.widget.Spinner
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -31,10 +30,10 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
+import pl.gunock.lyriccast.shared.utils.DialogFragmentUtils
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
-import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.ui.song_controls.SongControlsActivity
@@ -63,6 +62,7 @@ class SongsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSongsBinding.inflate(inflater)
+        viewModel // Initializes view model
         return binding.root
     }
 
@@ -155,7 +155,12 @@ class SongsFragment : Fragment() {
         viewModel.resetSongSelection()
     }
 
-    private fun onPickSong(item: SongItem) {
+    private fun onPickSong(item: SongItem?) {
+        if (item == null) {
+            return
+        }
+
+        viewModel.resetPickedItem()
         viewModel.resetSongSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
@@ -189,8 +194,7 @@ class SongsFragment : Fragment() {
     }
 
     private fun editSelectedSong(): Boolean {
-        val selectedItem =
-            songItemsAdapter.items.first { songItem -> songItem.isSelected }
+        val selectedItem = viewModel.getSelectedSong()
 
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
@@ -220,18 +224,21 @@ class SongsFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.Default) {
             val uri: Uri = result.data!!.data!!
 
-            val dialogFragment = ProgressDialogFragment().apply {
-                setMessage(R.string.main_activity_export_preparing_data)
-                setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog)
-                show(requireActivity().supportFragmentManager, ProgressDialogFragment.TAG)
-            }
+            val dialogFragment =
+                DialogFragmentUtils.createProgressDialogFragment(
+                    childFragmentManager,
+                    R.string.main_activity_export_preparing_data
+                )
 
-            viewModel.exportSelectedSongs(
-                requireActivity().cacheDir.canonicalPath,
-                @Suppress("BlockingMethodInNonBlockingContext")
-                requireActivity().contentResolver.openOutputStream(uri)!!,
-                dialogFragment.messageResourceId
-            )
+            @Suppress("BlockingMethodInNonBlockingContext")
+            requireActivity().contentResolver.openOutputStream(uri)!!
+                .use { outputStream ->
+                    viewModel.exportSelectedSongs(
+                        requireActivity().cacheDir.canonicalPath,
+                        outputStream,
+                        dialogFragment.messageResourceId
+                    )
+                }
 
             dialogFragment.dismiss()
         }
@@ -280,23 +287,25 @@ class SongsFragment : Fragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val result = when (item.itemId) {
-                R.id.action_menu_delete -> {
-                    viewModel.deleteSelectedSongs()
-                    viewModel.resetSongSelection()
-                    true
+            lifecycleScope.launch(Dispatchers.Main) {
+                val result = when (item.itemId) {
+                    R.id.action_menu_delete -> {
+                        viewModel.deleteSelectedSongs()
+                        viewModel.resetSongSelection()
+                        true
+                    }
+                    R.id.action_menu_export_selected -> startExport()
+                    R.id.action_menu_edit -> editSelectedSong()
+                    R.id.action_menu_add_setlist -> addSetlist()
+                    else -> false
                 }
-                R.id.action_menu_export_selected -> startExport()
-                R.id.action_menu_edit -> editSelectedSong()
-                R.id.action_menu_add_setlist -> addSetlist()
-                else -> false
+
+                if (result) {
+                    mode.finish()
+                }
             }
 
-            if (result) {
-                mode.finish()
-            }
-
-            return result
+            return true
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:55
+ * Last modified 04/10/2021, 18:09
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
@@ -288,7 +289,7 @@ class SongEditorActivity : AppCompatActivity() {
             selectedCategory
         )
 
-        songsRepository.upsertSong(song)
+        runBlocking { songsRepository.upsertSong(song) }
 
         return true
     }

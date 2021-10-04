@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 20:13
+ * Last modified 04/10/2021, 17:56
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
@@ -13,15 +13,15 @@ import pl.gunock.lyriccast.datatransfer.models.SongDto
 
 interface DataTransferRepository {
 
-    fun clearDatabase()
+    suspend fun clearDatabase()
 
-    fun importSongs(
+    suspend fun importSongs(
         data: DatabaseTransferData,
         messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
     )
 
-    fun importSongs(
+    suspend fun importSongs(
         songDtoSet: Set<SongDto>,
         messageResourceId: MutableLiveData<Int>,
         options: ImportOptions

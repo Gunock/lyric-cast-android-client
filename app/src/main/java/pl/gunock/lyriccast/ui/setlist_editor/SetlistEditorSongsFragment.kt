@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 19:47
+ * Last modified 04/10/2021, 16:37
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor
@@ -98,25 +98,26 @@ class SetlistEditorSongsFragment : Fragment() {
                 val songItems = songs.map { SongItem(it) }
                 mSongItemsAdapter!!.submitCollection(songItems)
                 withContext(Dispatchers.Default) {
-                    mSongItemsAdapter!!.items.forEach { item ->
-                        val previousValue = item.isSelected
-                        val newValue = mArgs.presentation.contains(item.song.id)
-
-                        if (newValue != previousValue) {
-                            item.isSelected = newValue
-                        }
-                    }
+//                    mSongItemsAdapter!!.items.forEach { item ->
+//                        val previousValue = item.isSelected
+//                        val newValue = mArgs.presentation.contains(item.song.id)
+//
+//                        if (newValue != previousValue) {
+//                            item.isSelected = newValue
+//                        }
+//                    }
                 }
             }
         }
 
-        mCategoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                val categorySpinnerAdapter =
-                    binding.spnCategory.adapter as CategorySpinnerAdapter
+        mCategoriesSubscription =
+            categoriesRepository.getAllCategories().subscribe { categories ->
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val categorySpinnerAdapter =
+                        binding.spnCategory.adapter as CategorySpinnerAdapter
 //                categorySpinnerAdapter.submitCollection(categories)
+                }
             }
-        }
     }
 
     override fun onPause() {
@@ -215,8 +216,8 @@ class SetlistEditorSongsFragment : Fragment() {
 
         val selectionTracker =
             SelectionTracker { _: BaseViewHolder, position: Int, _: Boolean ->
-                val item: SongItem = mSongItemsAdapter!!.items[position]
-                selectSong(item)
+//                val item: SongItem = mSongItemsAdapter!!.items[position]
+//                selectSong(item)
                 return@SelectionTracker true
             }
 
@@ -246,12 +247,12 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun updateSelectedSongs() {
-        for (item in mSongItemsAdapter!!.items) {
-            if (item.isSelected) {
-                mSelectedSongs.add(item.song)
-            } else {
-                mSelectedSongs.remove(item.song)
-            }
-        }
+//        for (item in mSongItemsAdapter!!.items) {
+//            if (item.isSelected) {
+//                mSelectedSongs.add(item.song)
+//            } else {
+//                mSelectedSongs.remove(item.song)
+//            }
+//        }
     }
 }

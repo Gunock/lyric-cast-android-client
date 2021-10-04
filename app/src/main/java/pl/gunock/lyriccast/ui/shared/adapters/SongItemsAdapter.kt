@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:54
+ * Last modified 03/10/2021, 23:08
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -34,8 +34,6 @@ class SongItemsAdapter(
     private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
-    val items: List<SongItem> get() = _items
-
     private val _items: MutableList<SongItem> = mutableListOf()
 
     suspend fun submitCollection(songs: List<SongItem>) {
@@ -61,13 +59,13 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val songs = items
+        val songs = _items
 
         if (songs.isEmpty()) {
             return -1L
         }
 
-        return items[position].song.idLong
+        return _items[position].song.idLong
     }
 
     override fun getItemCount() = _items.size
@@ -80,7 +78,7 @@ class SongItemsAdapter(
         }
 
         override fun setUpViewHolder(position: Int) {
-            val item = items[position]
+            val item = _items[position]
 
             if (item.hasCheckbox) {
                 binding.chkItemSong.visibility = View.VISIBLE
