@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/08/2021, 20:07
+ * Last modified 04/10/2021, 18:53
  */
 
 package pl.gunock.lyriccast.tests.integration.main_activity
@@ -62,7 +62,7 @@ class FilterSetlistsTest {
             .check(matches(hasDescendant(withText(setlist2.name))))
             .check(matches(hasDescendant(withText(setlist3.name))))
 
-        onView(withId(R.id.ed_setlist_filter)).perform(replaceText(setlistName))
+        onView(withId(R.id.ed_setlist_name_filter)).perform(replaceText(setlistName))
 
         sleep(200)
 

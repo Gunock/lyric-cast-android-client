@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:25
+ * Last modified 04/10/2021, 19:29
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -71,9 +71,9 @@ class SongsFragment : Fragment() {
 
         binding.swtSelectedSongs.visibility = View.GONE
 
-        viewModel.pickedItem.observe(viewLifecycleOwner, this::onPickSong)
+        viewModel.pickedSong.observe(viewLifecycleOwner, this::onPickSong)
         viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSong)
-        viewModel.selectedItemPosition.observe(viewLifecycleOwner) {
+        viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
             songItemsAdapter.notifyItemChanged(it)
             binding.tinSongTitleFilter.clearFocus()
         }
@@ -156,11 +156,8 @@ class SongsFragment : Fragment() {
     }
 
     private fun onPickSong(item: SongItem?) {
-        if (item == null) {
-            return
-        }
-
-        viewModel.resetPickedItem()
+        item ?: return
+        viewModel.resetPickedSong()
         viewModel.resetSongSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
@@ -241,6 +238,7 @@ class SongsFragment : Fragment() {
                 }
 
             dialogFragment.dismiss()
+            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
         }
     }
 

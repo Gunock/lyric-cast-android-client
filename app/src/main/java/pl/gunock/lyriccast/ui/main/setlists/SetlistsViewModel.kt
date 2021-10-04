@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:29
+ * Last modified 04/10/2021, 19:19
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -16,12 +16,19 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.normalize
+import pl.gunock.lyriccast.common.helpers.FileHelper
+import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import java.io.File
+import java.io.OutputStream
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
@@ -39,22 +46,25 @@ class SetlistsViewModel @Inject constructor(
 
     private val _setlists: MutableLiveData<List<SetlistItem>> = MutableLiveData(listOf())
 
-    val pickedItem: LiveData<SetlistItem>
-        get() = _pickedItem
+    val pickedSetlist: LiveData<SetlistItem>
+        get() = _pickedSetlist
 
-    private val _pickedItem: MutableLiveData<SetlistItem> = MutableLiveData()
+    private val _pickedSetlist: MutableLiveData<SetlistItem> = MutableLiveData()
 
 
-    val numberOfSelectedItems: LiveData<Int>
+    val numberOfSelectedItems: LiveData<Pair<Int, Int>>
         get() = _numberOfSelectedItems
 
-    private val _numberOfSelectedItems: MutableLiveData<Int> = MutableLiveData(0)
+    private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
+        MutableLiveData(Pair(0, 0))
 
+    val selectedSetlistPosition: LiveData<Int> get() = _selectedSetlistPosition
+    private val _selectedSetlistPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     private var allSetlists: Iterable<SetlistItem> = listOf()
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
-        SelectionTracker(this::onItemSelection)
+        SelectionTracker(this::onSetlistSelection)
 
     private var setlistsSubscription: Disposable? = null
 
@@ -62,7 +72,7 @@ class SetlistsViewModel @Inject constructor(
         setlistsSubscription = setlistsRepository.getAllSetlists()
             .subscribe {
                 viewModelScope.launch(Dispatchers.Default) {
-                    val setlistItems = it.map { setlist -> SetlistItem(setlist) }
+                    val setlistItems = it.map { setlist -> SetlistItem(setlist) }.sorted()
                     allSetlists = setlistItems
                     _setlists.postValue(setlistItems)
                 }
@@ -74,21 +84,21 @@ class SetlistsViewModel @Inject constructor(
         super.onCleared()
     }
 
-    suspend fun deleteSelected() {
-        val selectedSetlists = allSetlists.filter { item -> item.isSelected.value!! }
+    suspend fun deleteSelectedSetlists() {
+        val selectedSetlists = allSetlists.filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
 
         setlistsRepository.deleteSetlists(selectedSetlists)
     }
 
     // TODO: Move filter to separate class (functional interface?)
-    suspend fun filter(setlistName: String) {
+    suspend fun filterSetlists(setlistName: String) {
         withContext(Dispatchers.Default) {
             val normalizedTitle = setlistName.trim().normalize()
             val duration = measureTimeMillis {
                 val filteredItems = allSetlists.filter { setlistItem ->
                     setlistItem.normalizedName.contains(normalizedTitle, ignoreCase = true)
-                }.toSortedSet().toList()
+                }
 
                 _setlists.postValue(filteredItems)
             }
@@ -96,7 +106,78 @@ class SetlistsViewModel @Inject constructor(
         }
     }
 
-    private fun onItemSelection(
+
+    fun resetSetlistSelection() {
+        _setlists.value?.forEach {
+            it.isSelected = false
+            it.hasCheckbox = false
+        }
+        selectionTracker.reset()
+    }
+
+    fun resetPickedSetlist() {
+        _pickedSetlist.postValue(null)
+    }
+
+    suspend fun exportSelectedSetlists(
+        cacheDir: String,
+        outputStream: OutputStream,
+        messageResourceId: MutableLiveData<Int>
+    ) {
+        val exportData: DatabaseTransferData = withContext(Dispatchers.Main) {
+            dataTransferRepository.getDatabaseTransferData()
+        }
+
+        withContext(Dispatchers.IO) {
+            val exportDir = File(cacheDir, ".export")
+            exportDir.deleteRecursively()
+            exportDir.mkdirs()
+
+            val selectedSongs = allSetlists.filter { it.isSelected }
+
+            val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
+
+
+            val exportSetlists = exportData.setlistDtos!!
+                .filter { it.name in setlistNames }
+
+            val songTitles: Set<String> = exportSetlists.flatMap { it.songs }.toSet()
+
+            val categoryNames: Set<String> = exportData.songDtos!!
+                .filter { it.title in songTitles }
+                .mapNotNull { it.category }
+                .toSet()
+
+            val songJsons: List<JSONObject> = exportData.songDtos!!
+                .filter { it.title in songTitles }
+                .map { it.toJson() }
+
+            val categoryJsons = exportData.categoryDtos!!
+                .filter { it.name in categoryNames }
+                .map { it.toJson() }
+
+            val setlistJsons = exportSetlists.filter { it.name in setlistNames }
+                .map { it.toJson() }
+
+            messageResourceId.postValue(R.string.main_activity_export_saving_json)
+            val songsString = JSONArray(songJsons).toString()
+            val categoriesString = JSONArray(categoryJsons).toString()
+            val setlistsString = JSONArray(setlistJsons).toString()
+            File(exportDir, "songs.json").writeText(songsString)
+            File(exportDir, "categories.json").writeText(categoriesString)
+            File(exportDir, "setlists.json").writeText(setlistsString)
+
+            messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+            @Suppress("BlockingMethodInNonBlockingContext")
+            FileHelper.zip(outputStream, exportDir.path)
+
+            messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+            exportDir.deleteRecursively()
+            resetSetlistSelection()
+        }
+    }
+
+    private fun onSetlistSelection(
         @Suppress("UNUSED_PARAMETER")
         holder: BaseViewHolder,
         position: Int,
@@ -105,17 +186,22 @@ class SetlistsViewModel @Inject constructor(
         val item = _setlists.value!![position]
 
         if (!isLongClick && selectionTracker.count == 0) {
-            _pickedItem.postValue(item)
+            _pickedSetlist.postValue(item)
         } else {
-            item.isSelected.postValue(!item.isSelected.value!!)
-            _numberOfSelectedItems.postValue(selectionTracker.countAfter)
+            item.isSelected = !item.isSelected
+
+            if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
+                _setlists.value!!.forEach { it.hasCheckbox = true }
+            } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
+                _setlists.value!!.forEach { it.hasCheckbox = false }
+            }
+
+            val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
+            _numberOfSelectedItems.postValue(countPair)
+            _selectedSetlistPosition.postValue(position)
         }
 
         return true
     }
 
-    fun resetSelection() {
-        _setlists.value?.forEach { it.isSelected.postValue(false) }
-        selectionTracker.reset()
-    }
 }

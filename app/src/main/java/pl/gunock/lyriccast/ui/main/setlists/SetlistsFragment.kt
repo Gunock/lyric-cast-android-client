@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:29
+ * Last modified 04/10/2021, 19:30
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -10,12 +10,12 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,40 +23,211 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONObject
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.databinding.FragmentSetlistsBinding
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
-import pl.gunock.lyriccast.ui.main.SetlistItemsAdapter
+import pl.gunock.lyriccast.shared.utils.DialogFragmentUtils
 import pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
-import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
-import java.io.File
 
 @AndroidEntryPoint
 class SetlistsFragment : Fragment() {
+    private companion object {
+        const val TAG = "SetlistsFragment"
+    }
+
     private val viewModel: SetlistsViewModel by activityViewModels()
 
-    private lateinit var mBinding: FragmentSetlistsBinding
+    private lateinit var binding: FragmentSetlistsBinding
 
-    private var mSetlistItemsAdapter: SetlistItemsAdapter? = null
+    private lateinit var setlistItemsAdapter: SetlistItemsAdapter
 
-    private var mToast: Toast? = null
+    private var toast: Toast? = null
 
-    private var mActionMenu: Menu? = null
-    private var mActionMode: ActionMode? = null
-    private val mActionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
+    private var actionMenu: Menu? = null
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback: ActionMode.Callback = SetlistsActionModeCallback()
+
+    private val exportChooserResultLauncher =
+        registerForActivityResult(this::exportSelectedSetlists)
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSetlistsBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.pickedSetlist.observe(viewLifecycleOwner, this::onPickSetlist)
+        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSetlist)
+        viewModel.selectedSetlistPosition.observe(viewLifecycleOwner) {
+            setlistItemsAdapter.notifyItemChanged(it)
+            binding.tinSetlistNameFilter.clearFocus()
+        }
+
+        setupRecyclerView()
+        setupListeners()
+    }
+
+    override fun onStop() {
+        actionMode?.finish()
+        super.onStop()
+    }
+
+    private fun startExport(): Boolean {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.type = "application/zip"
+
+        val chooserIntent = Intent.createChooser(intent, "Choose a directory")
+        exportChooserResultLauncher.launch(chooserIntent)
+
+        return true
+    }
+
+    private fun exportSelectedSetlists(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.Default) {
+            val uri: Uri = result.data!!.data!!
+
+            val dialogFragment =
+                DialogFragmentUtils.createProgressDialogFragment(
+                    childFragmentManager,
+                    R.string.main_activity_export_preparing_data
+                )
+
+            @Suppress("BlockingMethodInNonBlockingContext")
+            requireActivity().contentResolver.openOutputStream(uri)!!
+                .use { outputStream ->
+                    viewModel.exportSelectedSetlists(
+                        requireActivity().cacheDir.canonicalPath,
+                        outputStream,
+                        dialogFragment.messageResourceId
+                    )
+                }
+
+            dialogFragment.dismiss()
+            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
+        }
+    }
+
+    private fun setupRecyclerView() {
+        setlistItemsAdapter = SetlistItemsAdapter(viewModel.selectionTracker)
+
+        binding.rcvSetlists.setHasFixedSize(true)
+        binding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcvSetlists.adapter = setlistItemsAdapter
+
+        viewModel.setlists.observe(viewLifecycleOwner) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                setlistItemsAdapter.submitCollection(it)
+            }
+        }
+    }
+
+
+    private fun setupListeners() {
+        binding.edSetlistNameFilter.addTextChangedListener(InputTextChangedListener { newText ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                viewModel.filterSetlists(newText)
+                viewModel.resetSetlistSelection()
+            }
+        })
+
+        binding.edSetlistNameFilter.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                view.hideKeyboard()
+            }
+        }
+    }
+
+    private fun onPickSetlist(item: SetlistItem?) {
+        item ?: return
+        viewModel.resetPickedSetlist()
+        viewModel.resetSetlistSelection()
+
+        if (item.setlist.presentation.isEmpty()) {
+            toast?.cancel()
+            toast = Toast.makeText(
+                requireContext(),
+                getString(R.string.main_activity_setlist_is_empty),
+                Toast.LENGTH_SHORT
+            )
+            toast!!.show()
+            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            return
+        }
+
+        val intent = Intent(context, SetlistControlsActivity::class.java)
+        intent.putExtra("setlistId", item.setlist.id)
+        startActivity(intent)
+    }
+
+    private fun onSelectSetlist(numberOfSelectedItems: Pair<Int, Int>): Boolean {
+        val (countBefore: Int, countAfter: Int) = numberOfSelectedItems
+
+        if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
+            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
+        }
+
+        when (countAfter) {
+            0 -> {
+                actionMode?.finish()
+                return false
+            }
+            1 -> {
+                if (actionMode == null) {
+                    actionMode = (requireActivity() as AppCompatActivity)
+                        .startSupportActionMode(actionModeCallback)
+                }
+
+                showMenuActions()
+            }
+            2 -> showMenuActions(showEdit = false)
+        }
+
+        return true
+    }
+
+    private fun editSelectedSetlist(): Boolean {
+        val selectedItem = viewModel.setlists.value!!
+            .first { setlistItem -> setlistItem.isSelected }
+
+        Log.v(TAG, "Editing setlist : ${selectedItem.setlist}")
+        val intent = Intent(context, SetlistEditorActivity::class.java)
+        intent.putExtra("setlistId", selectedItem.setlist.id)
+        startActivity(intent)
+
+        viewModel.resetSetlistSelection()
+
+        return true
+    }
+
+    private fun showMenuActions(
+        showGroupActions: Boolean = true,
+        showEdit: Boolean = true
+    ) {
+        actionMenu ?: return
+        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
+    }
+
+    private inner class SetlistsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
             menu.findItem(R.id.action_menu_add_setlist).isVisible = false
             mode.title = ""
-            mActionMenu = menu
+            actionMenu = menu
             return true
         }
 
@@ -69,8 +240,8 @@ class SetlistsFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
-                        viewModel.deleteSelected()
-                        resetSelection()
+                        viewModel.deleteSelectedSetlists()
+                        viewModel.resetSetlistSelection()
                         true
                     }
                     R.id.action_menu_export_selected -> startExport()
@@ -87,232 +258,10 @@ class SetlistsFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
-            mActionMode = null
-            mActionMenu = null
-            resetSelection()
+            actionMode = null
+            actionMenu = null
+            viewModel.resetSetlistSelection()
         }
-    }
-
-    private val mExportChooserResultLauncher =
-        registerForActivityResult(this::exportSelectedSetlists)
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = FragmentSetlistsBinding.inflate(inflater)
-        return mBinding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.pickedItem.observe(viewLifecycleOwner, this::onPickSetlist)
-        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSetlist)
-
-        setupRecyclerView()
-        setupListeners()
-    }
-
-    override fun onDestroyView() {
-        mSetlistItemsAdapter!!.removeObservers()
-        mSetlistItemsAdapter = null
-
-        super.onDestroyView()
-    }
-
-    override fun onStop() {
-        mActionMode?.finish()
-        super.onStop()
-    }
-
-    private fun startExport(): Boolean {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.type = "application/zip"
-
-        val chooserIntent = Intent.createChooser(intent, "Choose a directory")
-        mExportChooserResultLauncher.launch(chooserIntent)
-
-        return true
-    }
-
-    private fun exportSelectedSetlists(result: ActivityResult) =
-        lifecycleScope.launch(Dispatchers.Main) {
-            if (result.resultCode != Activity.RESULT_OK) {
-                return@launch
-            }
-
-            val uri: Uri = result.data!!.data!!
-            val activity = requireActivity()
-
-            val dialogFragment = ProgressDialogFragment()
-            dialogFragment.setMessage(R.string.main_activity_export_preparing_data)
-            dialogFragment.setStyle(
-                DialogFragment.STYLE_NORMAL,
-                R.style.Theme_LyricCast_Dialog
-            )
-            dialogFragment.show(childFragmentManager, ProgressDialogFragment.TAG)
-
-            val exportData = viewModel.dataTransferRepository.getDatabaseTransferData()
-
-            withContext(Dispatchers.IO) {
-                val exportDir = File(requireActivity().cacheDir.canonicalPath, ".export")
-                exportDir.deleteRecursively()
-                exportDir.mkdirs()
-
-                val selectedSongs = mSetlistItemsAdapter!!.setlistItems
-                    .filter { it.isSelected.value!! }
-
-                val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
-
-
-                val exportSetlists = exportData.setlistDtos!!
-                    .filter { it.name in setlistNames }
-
-                val songTitles: Set<String> = exportSetlists.flatMap { it.songs }.toSet()
-
-                val categoryNames: Set<String> = exportData.songDtos!!
-                    .filter { it.title in songTitles }
-                    .mapNotNull { it.category }
-                    .toSet()
-
-                val songJsons: List<JSONObject> = exportData.songDtos!!
-                    .filter { it.title in songTitles }
-                    .map { it.toJson() }
-
-                val categoryJsons = exportData.categoryDtos!!
-                    .filter { it.name in categoryNames }
-                    .map { it.toJson() }
-
-                val setlistJsons = exportSetlists.filter { it.name in setlistNames }
-                    .map { it.toJson() }
-
-                dialogFragment.setMessage(R.string.main_activity_export_saving_json)
-                val songsString = JSONArray(songJsons).toString()
-                val categoriesString = JSONArray(categoryJsons).toString()
-                val setlistsString = JSONArray(setlistJsons).toString()
-                File(exportDir, "songs.json").writeText(songsString)
-                File(exportDir, "categories.json").writeText(categoriesString)
-                File(exportDir, "setlists.json").writeText(setlistsString)
-
-                dialogFragment.setMessage(R.string.main_activity_export_saving_zip)
-                @Suppress("BlockingMethodInNonBlockingContext")
-                FileHelper.zip(activity.contentResolver.openOutputStream(uri)!!, exportDir.path)
-
-                dialogFragment.setMessage(R.string.main_activity_export_deleting_temp)
-                exportDir.deleteRecursively()
-                dialogFragment.dismiss()
-            }
-
-            resetSelection()
-        }
-
-    private fun setupRecyclerView() {
-        mSetlistItemsAdapter = SetlistItemsAdapter(
-            requireContext(),
-            selectionTracker = viewModel.selectionTracker
-        )
-
-        mBinding.rcvSetlists.setHasFixedSize(true)
-        mBinding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
-        mBinding.rcvSetlists.adapter = mSetlistItemsAdapter
-
-        viewModel.setlists.observe(viewLifecycleOwner) {
-            lifecycleScope.launch(Dispatchers.Default) {
-                mSetlistItemsAdapter?.submitCollection(it)
-            }
-        }
-    }
-
-
-    private fun setupListeners() {
-        mBinding.edSetlistFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                viewModel.filter(newText)
-                resetSelection()
-            }
-        })
-
-        mBinding.edSetlistFilter.setOnFocusChangeListener { view, hasFocus ->
-            if (!hasFocus) {
-                view.hideKeyboard()
-            }
-        }
-    }
-
-    private fun onPickSetlist(item: SetlistItem): Boolean {
-        if (item.setlist.presentation.isEmpty()) {
-            mToast?.cancel()
-            mToast = Toast.makeText(
-                requireContext(),
-                getString(R.string.main_activity_setlist_is_empty),
-                Toast.LENGTH_SHORT
-            )
-            mToast!!.show()
-            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-            return false
-        }
-
-        val intent = Intent(context, SetlistControlsActivity::class.java)
-        intent.putExtra("setlistId", item.setlist.id)
-        startActivity(intent)
-        return true
-    }
-
-    private fun onSelectSetlist(numberOfSelectedItems: Int): Boolean {
-        when (numberOfSelectedItems) {
-            0 -> {
-                mActionMode?.finish()
-                return false
-            }
-            1 -> {
-                if (!mSetlistItemsAdapter!!.showCheckBox.value!!) {
-                    mSetlistItemsAdapter!!.showCheckBox.postValue(true)
-                }
-
-                if (mActionMode == null) {
-                    mActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                        mActionModeCallback
-                    )
-                }
-
-                showMenuActions()
-            }
-            2 -> showMenuActions(showEdit = false)
-        }
-
-        return true
-    }
-
-    private fun editSelectedSetlist(): Boolean {
-        val selectedItem = mSetlistItemsAdapter!!.setlistItems
-            .first { setlistItem -> setlistItem.isSelected.value!! }
-
-        val intent = Intent(context, SetlistEditorActivity::class.java)
-        intent.putExtra("setlistId", selectedItem.setlist.id)
-        startActivity(intent)
-
-        resetSelection()
-
-        return true
-    }
-
-    private fun showMenuActions(
-        showGroupActions: Boolean = true,
-        showEdit: Boolean = true
-    ) {
-        mActionMenu ?: return
-        mActionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
-        mActionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
-        mActionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
-    }
-
-    private fun resetSelection() {
-        if (mSetlistItemsAdapter!!.showCheckBox.value!!) {
-            mSetlistItemsAdapter!!.showCheckBox.postValue(false)
-        }
-
-        viewModel.resetSelection()
     }
 
 }

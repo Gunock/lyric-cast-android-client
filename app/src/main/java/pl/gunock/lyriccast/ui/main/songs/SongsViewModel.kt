@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:25
+ * Last modified 04/10/2021, 19:10
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -48,15 +48,15 @@ class SongsViewModel @Inject constructor(
     private var allSongs: List<SongItem> = listOf()
 
 
-    val pickedItem: LiveData<SongItem> get() = _pickedItem
-    private val _pickedItem: MutableLiveData<SongItem> = MutableLiveData()
+    val pickedSong: LiveData<SongItem> get() = _pickedSong
+    private val _pickedSong: MutableLiveData<SongItem> = MutableLiveData()
 
     val numberOfSelectedItems: LiveData<Pair<Int, Int>> get() = _numberOfSelectedItems
     private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(0, 0))
 
-    val selectedItemPosition: LiveData<Int> get() = _selectedItemPosition
-    private val _selectedItemPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedSongPosition: LiveData<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     val categories: LiveData<List<CategoryItem>> get() = _categories
     private val _categories: MutableLiveData<List<CategoryItem>> = MutableLiveData(listOf())
@@ -151,8 +151,8 @@ class SongsViewModel @Inject constructor(
         selectionTracker.reset()
     }
 
-    fun resetPickedItem() {
-        _pickedItem.postValue(null)
+    fun resetPickedSong() {
+        _pickedSong.postValue(null)
     }
 
     suspend fun exportSelectedSongs(
@@ -209,7 +209,7 @@ class SongsViewModel @Inject constructor(
         val item = _songs.value!![position]
 
         if (!isLongClick && selectionTracker.count == 0) {
-            _pickedItem.postValue(item)
+            _pickedSong.postValue(item)
         } else {
             item.isSelected = !item.isSelected
 
@@ -221,7 +221,7 @@ class SongsViewModel @Inject constructor(
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
             _numberOfSelectedItems.postValue(countPair)
-            _selectedItemPosition.postValue(position)
+            _selectedSongPosition.postValue(position)
         }
 
         return true

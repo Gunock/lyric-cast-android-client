@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 19:47
+ * Last modified 04/10/2021, 18:53
  */
 
 package pl.gunock.lyriccast.tests.e2e.main_activity
@@ -32,7 +32,7 @@ class NavigationTabTest {
         onView(allOf(isDescendantOfA(withId(R.id.tbl_main_fragments)), withText("Setlists")))
             .perform(click())
 
-        onView(withId(R.id.ed_setlist_filter))
+        onView(withId(R.id.ed_setlist_name_filter))
             .check(matches(isDisplayed()))
 
         onView(allOf(isDescendantOfA(withId(R.id.tbl_main_fragments)), withText("Songs")))
