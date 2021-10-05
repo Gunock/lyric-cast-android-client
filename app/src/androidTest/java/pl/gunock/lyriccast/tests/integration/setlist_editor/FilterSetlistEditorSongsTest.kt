@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 19:47
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.tests.integration.setlist_editor
@@ -25,8 +25,8 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
-import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorSongsFragment
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorSongsFragmentArgs
+import pl.gunock.lyriccast.ui.setlist_editor.songs.SetlistEditorSongsFragment
 import java.lang.Thread.sleep
 
 

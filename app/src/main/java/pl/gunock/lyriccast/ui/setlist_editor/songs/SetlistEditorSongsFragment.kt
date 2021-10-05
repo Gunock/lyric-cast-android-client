@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 16:37
+ * Last modified 05/10/2021, 18:43
  */
 
-package pl.gunock.lyriccast.ui.setlist_editor
+package pl.gunock.lyriccast.ui.setlist_editor.songs
 
 import android.os.Bundle
 import android.util.Log

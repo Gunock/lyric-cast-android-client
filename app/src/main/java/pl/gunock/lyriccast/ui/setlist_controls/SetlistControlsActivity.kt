@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 11:38
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 10:52
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -51,7 +51,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private var mBlankOnColor: Int = Int.MIN_VALUE
     private var mBlankOffColor: Int = Int.MIN_VALUE
     private val mCurrentBlankColor: Int
-        get() = if (CastMessageHelper.isBlanked.value!!) {
+        get() = if (CastMessageHelper.isBlanked) {
             mBlankOffColor
         } else {
             mBlankOnColor
@@ -60,7 +60,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var mBlankOffText: String
     private lateinit var mBlankOnText: String
     private val mCurrentBlankText: String
-        get() = if (CastMessageHelper.isBlanked.value!!) {
+        get() = if (CastMessageHelper.isBlanked) {
             mBlankOffText
         } else {
             mBlankOnText
@@ -113,7 +113,7 @@ class SetlistControlsActivity : AppCompatActivity() {
             mSessionStartedListener
         )
 
-        CastMessageHelper.isBlanked.removeObservers(this)
+//        CastMessageHelper.isBlanked.removeObservers(this)
 
         super.onDestroy()
     }
@@ -188,13 +188,13 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         mBinding.btnSetlistBlank.setOnClickListener {
-            CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked.value!!)
+            CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked)
         }
 
-        CastMessageHelper.isBlanked.observe(this) {
-            mBinding.btnSetlistBlank.setBackgroundColor(mCurrentBlankColor)
-            mBinding.btnSetlistBlank.text = mCurrentBlankText
-        }
+//        CastMessageHelper.isBlanked.observe(this) {
+//            mBinding.btnSetlistBlank.setBackgroundColor(mCurrentBlankColor)
+//            mBinding.btnSetlistBlank.text = mCurrentBlankText
+//        }
 
         mBinding.btnSetlistPrev.setOnClickListener {
             if (mCurrentLyricsPosition <= 0) {

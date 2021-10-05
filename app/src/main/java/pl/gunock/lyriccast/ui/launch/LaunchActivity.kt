@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 09:44
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.launch
@@ -18,10 +18,8 @@ import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.gms.ads.MobileAds
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.LyricCastSettings
-import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.main.MainActivity
 
@@ -40,9 +38,6 @@ class LaunchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MobileAds.initialize(applicationContext) {}
-        CastMessageHelper.initialize(resources)
-        LyricCastSettings.initialize(applicationContext)
 
         setContentView(R.layout.activity_launch)
 

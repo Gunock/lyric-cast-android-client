@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 08:44
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,10 @@ class SongItemsAdapter(
     context: Context,
     private val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
+
+    private companion object {
+        const val TAG: String = "SongItemsAdapter"
+    }
 
     init {
         setHasStableIds(true)
@@ -76,7 +81,12 @@ class SongItemsAdapter(
         }
 
         override fun setUpViewHolder(position: Int) {
-            val item = _items[position]
+            val item = try {
+                _items[position]
+            } catch (e: IndexOutOfBoundsException) {
+                Log.w(TAG, e)
+                return
+            }
 
             if (item.hasCheckbox) {
                 binding.chkItemSong.visibility = View.VISIBLE

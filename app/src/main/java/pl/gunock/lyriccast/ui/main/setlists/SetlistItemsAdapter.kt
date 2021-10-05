@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 08:44
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,7 +68,12 @@ class SetlistItemsAdapter(
     ) : BaseViewHolder(binding.root, selectionTracker) {
 
         override fun setUpViewHolder(position: Int) {
-            val item = _items.toList()[position]
+            val item = try {
+                _items[position]
+            } catch (e: IndexOutOfBoundsException) {
+                Log.w(TAG, e)
+                return
+            }
 
             if (item.hasCheckbox) {
                 binding.chkItemSetlist.visibility = View.VISIBLE

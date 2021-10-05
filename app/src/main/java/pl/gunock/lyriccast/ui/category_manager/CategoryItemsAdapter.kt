@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 09:02
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.category_manager
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,10 @@ import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 class CategoryItemsAdapter(
     private val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
+
+    private companion object {
+        const val TAG: String = "CategoryItemsAdapter"
+    }
 
     private var _items: MutableList<CategoryItem> = mutableListOf()
 
@@ -65,7 +70,12 @@ class CategoryItemsAdapter(
         private val binding: ItemCategoryBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
         override fun setUpViewHolder(position: Int) {
-            val item: CategoryItem = _items[position]
+            val item: CategoryItem = try {
+                _items[position]
+            } catch (e: IndexOutOfBoundsException) {
+                Log.w(TAG, e)
+                return
+            }
 
             if (item.hasCheckbox) {
                 binding.chkItemCategory.visibility = View.VISIBLE

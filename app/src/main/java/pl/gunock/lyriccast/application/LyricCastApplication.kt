@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/08/2021, 20:11
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.application
 
 import android.app.Application
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.HiltAndroidApp
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
@@ -26,6 +27,10 @@ class LyricCastApplication : Application() {
             .addSessionManagerListener(SessionStartedListener {
                 CastMessageHelper.sendBlank(LyricCastSettings.blankedOnStart)
             })
+
+        MobileAds.initialize(applicationContext) {}
+        CastMessageHelper.initialize(resources)
+        LyricCastSettings.initialize(applicationContext)
 
         super.onCreate()
     }

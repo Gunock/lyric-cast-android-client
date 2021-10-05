@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 21:06
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.ui.settings
@@ -25,7 +25,7 @@ import pl.gunock.lyriccast.shared.extensions.loadAd
 
 class SettingsActivity : AppCompatActivity() {
 
-    private var mPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
+    private var preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == "appTheme") {
                 AppCompatDelegate.setDefaultNightMode(LyricCastSettings.appTheme)
@@ -53,11 +53,11 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .registerOnSharedPreferenceChangeListener(mPreferenceChangeListener)
+            .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     override fun onDestroy() {
-        mPreferenceChangeListener = null
+        preferenceChangeListener = null
         super.onDestroy()
     }
 
