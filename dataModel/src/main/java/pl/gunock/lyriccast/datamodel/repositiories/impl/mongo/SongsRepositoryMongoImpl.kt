@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:07
+ * Last modified 05/10/2021, 09:54
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -39,6 +39,7 @@ internal class SongsRepositoryMongoImpl : SongsRepository {
 
     override suspend fun upsertSong(song: Song) {
         val songDocument = SongDocument(song)
+
         realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
             transactionRealm.insertOrUpdate(songDocument)
         }
@@ -47,7 +48,7 @@ internal class SongsRepositoryMongoImpl : SongsRepository {
     override suspend fun deleteSongs(songIds: Collection<String>) {
         realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
             for (id in songIds) {
-                transactionRealm.where<SongDocument>().findAllAsync()
+                transactionRealm.where<SongDocument>().findAll()
                     .where()
                     .equalTo("id", ObjectId(id))
                     .findFirst()

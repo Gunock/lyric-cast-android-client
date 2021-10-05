@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 19:19
+ * Last modified 05/10/2021, 10:02
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -52,10 +52,10 @@ class SetlistsViewModel @Inject constructor(
     private val _pickedSetlist: MutableLiveData<SetlistItem> = MutableLiveData()
 
 
-    val numberOfSelectedItems: LiveData<Pair<Int, Int>>
-        get() = _numberOfSelectedItems
+    val numberOfSelectedSetlists: LiveData<Pair<Int, Int>>
+        get() = _numberOfSelectedSetlists
 
-    private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
+    private val _numberOfSelectedSetlists: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(0, 0))
 
     val selectedSetlistPosition: LiveData<Int> get() = _selectedSetlistPosition
@@ -197,7 +197,7 @@ class SetlistsViewModel @Inject constructor(
             }
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedItems.postValue(countPair)
+            _numberOfSelectedSetlists.postValue(countPair)
             _selectedSetlistPosition.postValue(position)
         }
 

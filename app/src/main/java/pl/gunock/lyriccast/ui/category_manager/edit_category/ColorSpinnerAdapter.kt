@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 05/10/2021, 09:41
  */
 
-package pl.gunock.lyriccast.ui.category_manager
+package pl.gunock.lyriccast.ui.category_manager.edit_category
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -17,13 +17,13 @@ import pl.gunock.lyriccast.domain.models.ColorItem
 
 class ColorSpinnerAdapter(
     context: Context,
-    private val mColors: Array<ColorItem>
+    private val colors: Array<ColorItem>
 ) : BaseAdapter() {
 
-    private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getItem(position: Int): Any {
-        return mColors[position]
+        return colors[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -31,27 +31,27 @@ class ColorSpinnerAdapter(
     }
 
     override fun getCount(): Int {
-        return mColors.size
+        return colors.size
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val binding = if (convertView != null) {
             SpinnerItemColorBinding.bind(convertView)
         } else {
-            SpinnerItemColorBinding.inflate(mInflater)
+            SpinnerItemColorBinding.inflate(inflater)
         }
 
-        val item = mColors[position]
+        val item = colors[position]
         val viewHolder = ViewHolder(binding)
         viewHolder.bind(item)
 
         return binding.root
     }
 
-    private inner class ViewHolder(private val mBinding: SpinnerItemColorBinding) {
+    private inner class ViewHolder(private val binding: SpinnerItemColorBinding) {
         fun bind(item: ColorItem) {
-            mBinding.tvSpinnerColorName.text = item.name
-            mBinding.cdvSpinnerCategoryColor.setCardBackgroundColor(item.value)
+            binding.tvSpinnerColorName.text = item.name
+            binding.cdvSpinnerCategoryColor.setCardBackgroundColor(item.value)
         }
     }
 

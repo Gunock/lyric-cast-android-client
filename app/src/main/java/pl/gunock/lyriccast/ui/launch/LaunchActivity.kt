@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:28
+ * Last modified 05/10/2021, 09:44
  */
 
 package pl.gunock.lyriccast.ui.launch
@@ -35,7 +35,7 @@ class LaunchActivity : AppCompatActivity() {
         )
     }
 
-    private val mTurnOnWifiManagerResultLauncher =
+    private val turnOnWifiManagerResultLauncher =
         registerForActivityResult(this::handleTurnOnWiFiResult)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +93,7 @@ class LaunchActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
                 buttonClicked = true
                 val turnWifiOn = Intent(Settings.ACTION_WIRELESS_SETTINGS)
-                mTurnOnWifiManagerResultLauncher.launch(turnWifiOn)
+                turnOnWifiManagerResultLauncher.launch(turnWifiOn)
             }
             .setNegativeButton(getString(R.string.launch_activity_ignore)) { _, _ ->
                 buttonClicked = true

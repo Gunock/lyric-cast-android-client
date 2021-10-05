@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 19:24
+ * Last modified 05/10/2021, 08:44
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -54,12 +54,9 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val setlists = _items
-
-        if (setlists.isEmpty()) {
+        if (_items.isEmpty()) {
             return -1L
         }
-
         return _items[position].setlist.idLong
     }
 

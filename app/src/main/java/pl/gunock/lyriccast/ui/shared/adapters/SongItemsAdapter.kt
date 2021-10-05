@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 23:08
+ * Last modified 05/10/2021, 08:44
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -59,9 +59,7 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        val songs = _items
-
-        if (songs.isEmpty()) {
+        if (_items.isEmpty()) {
             return -1L
         }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 19:29
+ * Last modified 05/10/2021, 10:03
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -72,7 +72,7 @@ class SongsFragment : Fragment() {
         binding.swtSelectedSongs.visibility = View.GONE
 
         viewModel.pickedSong.observe(viewLifecycleOwner, this::onPickSong)
-        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSong)
+        viewModel.numberOfSelectedSongs.observe(viewLifecycleOwner, this::onSelectSong)
         viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
             songItemsAdapter.notifyItemChanged(it)
             binding.tinSongTitleFilter.clearFocus()
@@ -151,8 +151,8 @@ class SongsFragment : Fragment() {
         val title: String = binding.edSongTitleFilter.editableText.toString()
         val categoryId: String? = getSelectedCategoryId(binding.spnCategory)
 
-        viewModel.filterSongs(title, categoryId = categoryId)
         viewModel.resetSongSelection()
+        viewModel.filterSongs(title, categoryId = categoryId)
     }
 
     private fun onPickSong(item: SongItem?) {
@@ -165,8 +165,8 @@ class SongsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun onSelectSong(numberOfSelectedItems: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedItems
+    private fun onSelectSong(numberOfSelectedSongs: Pair<Int, Int>): Boolean {
+        val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
             songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
@@ -198,7 +198,7 @@ class SongsFragment : Fragment() {
         intent.putExtra("songId", selectedItem.song.id)
         startActivity(intent)
 
-        viewModel.resetSongSelection()
+        resetSelection()
 
         return true
     }
@@ -248,7 +248,7 @@ class SongsFragment : Fragment() {
         intent.putExtra("setlistSongs", setlistSongs)
         startActivity(intent)
 
-        viewModel.resetSongSelection()
+        resetSelection()
         return true
     }
 
@@ -256,7 +256,6 @@ class SongsFragment : Fragment() {
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
     ) {
-        actionMenu ?: return
         actionMenu?.apply {
             findItem(R.id.action_menu_delete).isVisible = showGroupActions
             findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
@@ -270,6 +269,10 @@ class SongsFragment : Fragment() {
         return (categorySpinner.selectedItem as CategoryItem).category.id
     }
 
+    private fun resetSelection() {
+        viewModel.resetSongSelection()
+        songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
+    }
 
     private inner class SongsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -289,7 +292,6 @@ class SongsFragment : Fragment() {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
                         viewModel.deleteSelectedSongs()
-                        viewModel.resetSongSelection()
                         true
                     }
                     R.id.action_menu_export_selected -> startExport()
@@ -309,7 +311,7 @@ class SongsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            viewModel.resetSongSelection()
+            resetSelection()
         }
     }
 

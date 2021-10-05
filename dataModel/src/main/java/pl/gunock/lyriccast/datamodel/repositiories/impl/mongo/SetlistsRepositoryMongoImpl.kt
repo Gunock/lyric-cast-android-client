@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:07
+ * Last modified 05/10/2021, 09:54
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -48,7 +48,7 @@ internal class SetlistsRepositoryMongoImpl : SetlistsRepository {
     override suspend fun deleteSetlists(setlistIds: Collection<String>) {
         realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
             for (id in setlistIds) {
-                transactionRealm.where<SetlistDocument>().findAllAsync()
+                transactionRealm.where<SetlistDocument>().findAll()
                     .where()
                     .equalTo("id", id)
                     .findFirst()

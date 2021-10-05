@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 19:10
+ * Last modified 05/10/2021, 09:02
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -51,8 +51,8 @@ class SongsViewModel @Inject constructor(
     val pickedSong: LiveData<SongItem> get() = _pickedSong
     private val _pickedSong: MutableLiveData<SongItem> = MutableLiveData()
 
-    val numberOfSelectedItems: LiveData<Pair<Int, Int>> get() = _numberOfSelectedItems
-    private val _numberOfSelectedItems: MutableLiveData<Pair<Int, Int>> =
+    val numberOfSelectedSongs: LiveData<Pair<Int, Int>> get() = _numberOfSelectedSongs
+    private val _numberOfSelectedSongs: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(0, 0))
 
     val selectedSongPosition: LiveData<Int> get() = _selectedSongPosition
@@ -220,7 +220,7 @@ class SongsViewModel @Inject constructor(
             }
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedItems.postValue(countPair)
+            _numberOfSelectedSongs.postValue(countPair)
             _selectedSongPosition.postValue(position)
         }
 

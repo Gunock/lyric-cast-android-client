@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 19:30
+ * Last modified 05/10/2021, 10:02
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -66,7 +66,7 @@ class SetlistsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.pickedSetlist.observe(viewLifecycleOwner, this::onPickSetlist)
-        viewModel.numberOfSelectedItems.observe(viewLifecycleOwner, this::onSelectSetlist)
+        viewModel.numberOfSelectedSetlists.observe(viewLifecycleOwner, this::onSelectSetlist)
         viewModel.selectedSetlistPosition.observe(viewLifecycleOwner) {
             setlistItemsAdapter.notifyItemChanged(it)
             binding.tinSetlistNameFilter.clearFocus()
@@ -138,8 +138,8 @@ class SetlistsFragment : Fragment() {
     private fun setupListeners() {
         binding.edSetlistNameFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Main) {
-                viewModel.filterSetlists(newText)
                 viewModel.resetSetlistSelection()
+                viewModel.filterSetlists(newText)
             }
         })
 
@@ -172,8 +172,8 @@ class SetlistsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun onSelectSetlist(numberOfSelectedItems: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedItems
+    private fun onSelectSetlist(numberOfSelectedSetlists: Pair<Int, Int>): Boolean {
+        val (countBefore: Int, countAfter: Int) = numberOfSelectedSetlists
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
             setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
@@ -207,7 +207,7 @@ class SetlistsFragment : Fragment() {
         intent.putExtra("setlistId", selectedItem.setlist.id)
         startActivity(intent)
 
-        viewModel.resetSetlistSelection()
+        resetSelection()
 
         return true
     }
@@ -216,10 +216,16 @@ class SetlistsFragment : Fragment() {
         showGroupActions: Boolean = true,
         showEdit: Boolean = true
     ) {
-        actionMenu ?: return
-        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
-        actionMenu!!.findItem(R.id.action_menu_edit).isVisible = showEdit
+        actionMenu?.apply {
+            findItem(R.id.action_menu_delete).isVisible = showGroupActions
+            findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
+            findItem(R.id.action_menu_edit).isVisible = showEdit
+        }
+    }
+
+    private fun resetSelection() {
+        viewModel.resetSetlistSelection()
+        setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
     }
 
     private inner class SetlistsActionModeCallback : ActionMode.Callback {
@@ -241,7 +247,6 @@ class SetlistsFragment : Fragment() {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
                         viewModel.deleteSelectedSetlists()
-                        viewModel.resetSetlistSelection()
                         true
                     }
                     R.id.action_menu_export_selected -> startExport()
@@ -260,7 +265,7 @@ class SetlistsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            viewModel.resetSetlistSelection()
+            resetSelection()
         }
     }
 
