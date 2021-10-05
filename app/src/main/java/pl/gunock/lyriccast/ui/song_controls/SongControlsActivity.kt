@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 05/10/2021, 19:17
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -58,6 +58,7 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.sendConfiguration()
+        viewModel.sendSlide()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,17 +80,9 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.btnSongBlank.setOnClickListener {
-            viewModel.sendBlank()
-        }
-
-        binding.btnSongPrev.setOnClickListener {
-            viewModel.previousSlide()
-        }
-
-        binding.btnSongNext.setOnClickListener {
-            viewModel.nextSlide()
-        }
+        binding.btnSongBlank.setOnClickListener { viewModel.sendBlank() }
+        binding.btnSongPrev.setOnClickListener { viewModel.previousSlide() }
+        binding.btnSongNext.setOnClickListener { viewModel.nextSlide() }
     }
 
     private fun goToSettings(): Boolean {

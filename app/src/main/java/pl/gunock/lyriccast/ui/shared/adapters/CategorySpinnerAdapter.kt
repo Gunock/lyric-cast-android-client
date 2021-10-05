@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 12:04
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 11:54
+ * Last modified 05/10/2021, 19:46
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -21,9 +21,10 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 class CategorySpinnerAdapter(
     context: Context
 ) : BaseAdapter() {
-    private val mInflater: LayoutInflater = LayoutInflater.from(context)
 
-    private val mCategoryAll: CategoryItem =
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+
+    private val categoryAll: CategoryItem =
         CategoryItem(Category(name = context.getString(R.string.category_all), id = ""))
 
     val items: List<CategoryItem> get() = _items
@@ -32,7 +33,7 @@ class CategorySpinnerAdapter(
 
     suspend fun submitCollection(
         categories: List<CategoryItem>,
-        firstCategory: CategoryItem = mCategoryAll
+        firstCategory: CategoryItem = categoryAll
     ) {
         withContext(Dispatchers.Default) {
             _items.clear()
@@ -44,39 +45,41 @@ class CategorySpinnerAdapter(
     }
 
     override fun getItem(position: Int): Any {
-        return this.items[position]
+        return _items[position]
     }
 
     override fun getItemId(position: Int): Long {
-        return this.items[position].category.idLong
+        if (_items.isEmpty()) {
+            return -1L
+        }
+
+        return _items[position].category.idLong
     }
 
-    override fun getCount(): Int {
-        return this.items.size
-    }
+    override fun getCount(): Int = _items.size
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val binding = if (convertView != null) {
             SpinnerItemColorBinding.bind(convertView)
         } else {
-            SpinnerItemColorBinding.inflate(mInflater)
+            SpinnerItemColorBinding.inflate(inflater)
         }
 
         val viewHolder = ViewHolder(binding)
-        val item = this.items[position]
+        val item = _items[position]
         viewHolder.bind(item.category)
 
         return binding.root
     }
 
-    private inner class ViewHolder(private val mBinding: SpinnerItemColorBinding) {
+    private inner class ViewHolder(private val binding: SpinnerItemColorBinding) {
         fun bind(category: Category) {
-            mBinding.tvSpinnerColorName.text = category.name
+            binding.tvSpinnerColorName.text = category.name
             if (category.color != null) {
-                mBinding.cdvSpinnerCategoryColor.visibility = View.VISIBLE
-                mBinding.cdvSpinnerCategoryColor.setCardBackgroundColor(category.color!!)
+                binding.cdvSpinnerCategoryColor.visibility = View.VISIBLE
+                binding.cdvSpinnerCategoryColor.setCardBackgroundColor(category.color!!)
             } else {
-                mBinding.cdvSpinnerCategoryColor.visibility = View.GONE
+                binding.cdvSpinnerCategoryColor.visibility = View.GONE
             }
         }
     }

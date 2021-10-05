@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 05/10/2021, 19:17
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -55,9 +55,10 @@ class SongControlsViewModel @Inject constructor(
     private val _currentBlankTextAndColor: MutableLiveData<Pair<Int, Int>> =
         MutableLiveData(Pair(currentBlankText, currentBlankColor))
 
-    private var sessionStartedListener: SessionStartedListener? = null
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
+
+    private val sessionStartedListener: SessionStartedListener
 
     init {
         sessionStartedListener = SessionStartedListener {
@@ -66,7 +67,7 @@ class SongControlsViewModel @Inject constructor(
         }
 
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(sessionStartedListener!!)
+        sessionsManager.addSessionManagerListener(sessionStartedListener)
 
         if (sessionsManager.currentSession?.isConnected == true) {
             sendConfiguration()
@@ -76,7 +77,7 @@ class SongControlsViewModel @Inject constructor(
 
     override fun onCleared() {
         CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(sessionStartedListener!!)
+            .removeSessionManagerListener(sessionStartedListener)
 
         super.onCleared()
     }
@@ -118,9 +119,9 @@ class SongControlsViewModel @Inject constructor(
         CastMessageHelper.sendConfiguration()
     }
 
-    private fun sendSlide() {
-        postSlide()
+    fun sendSlide() {
         CastMessageHelper.sendContentMessage(lyrics[currentSlide])
+        postSlide()
     }
 
     private fun postSlide() {
