@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 09:54
+ * Last modified 06/10/2021, 20:03
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -24,8 +24,8 @@ internal class CategoriesRepositoryMongoImpl : CategoriesRepository {
     override fun getAllCategories(): Flowable<List<Category>> {
         return realm.where<CategoryDocument>().findAllAsync()
             .asFlowable()
-            .map { songDocuments ->
-                songDocuments.freeze().map { it.toGenericModel() }
+            .map { categoryDocuments ->
+                categoryDocuments.map { it.toGenericModel() }
             }
     }
 

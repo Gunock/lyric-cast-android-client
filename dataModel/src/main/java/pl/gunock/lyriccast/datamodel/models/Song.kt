@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 06/10/2021, 17:45
  */
 
 package pl.gunock.lyriccast.datamodel.models
@@ -27,7 +27,13 @@ data class Song(
 
     val lyricsList: List<String> = presentation.map { lyricsMap[it]!! }
 
-    constructor(dto: SongDto, category: Category?) : this(
+    constructor() : this(
+        title = "", lyrics = listOf(),
+        presentation = listOf(),
+        category = null
+    )
+
+    internal constructor(dto: SongDto, category: Category?) : this(
         id = "",
         title = dto.title,
         lyrics = listOf(),

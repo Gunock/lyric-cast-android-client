@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 06/10/2021, 20:13
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -42,14 +42,13 @@ class SongItemsAdapter(
     private val _items: MutableList<SongItem> = mutableListOf()
 
     suspend fun submitCollection(songs: List<SongItem>) {
-        withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, _items.size)
-        }
+        val previousSize = itemCount
         withContext(Dispatchers.Default) {
             _items.clear()
             _items.addAll(songs)
         }
         withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(0, previousSize)
             notifyItemRangeRemoved(0, _items.size)
         }
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:23
+ * Last modified 06/10/2021, 17:40
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -62,7 +62,6 @@ class SongsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSongsBinding.inflate(inflater)
-        viewModel // Initializes view model
         return binding.root
     }
 

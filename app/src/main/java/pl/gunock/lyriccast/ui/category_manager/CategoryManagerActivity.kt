@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 06/10/2021, 19:56
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -105,8 +105,6 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun editSelectedCategory(): Boolean {
         val categoryItem = viewModel.getSelectedCategory()
-
-//        editCategoryDialogViewModel.category = categoryItem.category
 
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog_NoTitle)

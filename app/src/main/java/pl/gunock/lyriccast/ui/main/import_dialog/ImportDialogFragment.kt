@@ -1,5 +1,5 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
  * Copyright (c) 2021 . All rights reserved.
  * Last modified 06/10/2021, 12:51
  */
@@ -29,9 +29,9 @@ class ImportDialogFragment : DialogFragment() {
 
     private val viewModel: ImportDialogModel by activityViewModels()
 
-    val isAccepted: MutableLiveData<Boolean> = MutableLiveData(false)
-
     private lateinit var binding: DialogFragmentImportBinding
+
+    val isAccepted: MutableLiveData<Boolean> = MutableLiveData(false)
 
 
     override fun onCreateView(
