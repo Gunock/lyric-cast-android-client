@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 19:44
+ * Last modified 06/10/2021, 12:48
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -22,7 +22,7 @@ import pl.gunock.lyriccast.shared.cast.SessionStartedListener
 import javax.inject.Inject
 
 @HiltViewModel
-class SetlistControlsViewModel @Inject constructor(
+class SetlistControlsModel @Inject constructor(
     val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
     private companion object {

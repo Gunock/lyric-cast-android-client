@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 09:02
+ * Last modified 06/10/2021, 12:23
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -34,7 +34,7 @@ import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
 @HiltViewModel
-class SongsViewModel @Inject constructor(
+class SongsModel @Inject constructor(
     categoriesRepository: CategoriesRepository,
     private val songsRepository: SongsRepository,
     private val dataTransferRepository: DataTransferRepository

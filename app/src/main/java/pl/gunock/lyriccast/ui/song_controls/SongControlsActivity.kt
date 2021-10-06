@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 19:17
+ * Last modified 06/10/2021, 12:48
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -25,7 +25,7 @@ import pl.gunock.lyriccast.ui.settings.SettingsActivity
 @AndroidEntryPoint
 class SongControlsActivity : AppCompatActivity() {
 
-    private val viewModel: SongControlsViewModel by viewModels()
+    private val viewModel: SongControlsModel by viewModels()
 
     private lateinit var binding: ContentSongControlsBinding
 

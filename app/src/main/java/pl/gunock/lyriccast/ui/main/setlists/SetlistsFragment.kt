@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 10:02
+ * Last modified 06/10/2021, 12:23
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -39,7 +39,7 @@ class SetlistsFragment : Fragment() {
         const val TAG = "SetlistsFragment"
     }
 
-    private val viewModel: SetlistsViewModel by activityViewModels()
+    private val viewModel: SetlistsModel by activityViewModels()
 
     private lateinit var binding: FragmentSetlistsBinding
 
@@ -64,6 +64,7 @@ class SetlistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel // Initializes viewModel
 
         viewModel.pickedSetlist.observe(viewLifecycleOwner, this::onPickSetlist)
         viewModel.numberOfSelectedSetlists.observe(viewLifecycleOwner, this::onSelectSetlist)

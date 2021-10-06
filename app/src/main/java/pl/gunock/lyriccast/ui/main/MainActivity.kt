@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 15:48
+ * Last modified 06/10/2021, 12:51
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -40,6 +39,8 @@ import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.shared.utils.DialogFragmentUtils
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
+import pl.gunock.lyriccast.ui.main.import_dialog.ImportDialogFragment
+import pl.gunock.lyriccast.ui.main.import_dialog.ImportDialogModel
 import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
@@ -53,26 +54,26 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "MainActivity"
     }
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainModel by viewModels()
+    private val importDialogModel: ImportDialogModel by viewModels()
 
     @Inject
     lateinit var dataTransferRepository: DataTransferRepository
 
-    private lateinit var importDialogViewModel: ImportDialogViewModel
     private lateinit var binding: ContentMainBinding
 
     private val exportChooserResultLauncher = registerForActivityResult(this::exportAll)
     private val importChooserResultLauncher = registerForActivityResult(this::import)
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel // Initializes view model
+
         val rootBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(rootBinding.root)
         setSupportActionBar(rootBinding.toolbarMain)
         binding = rootBinding.contentMain
-        viewModel // Initializes view model
-
-        importDialogViewModel = ViewModelProvider(this).get(ImportDialogViewModel::class.java)
 
         binding.cstlFabContainer.visibility = View.GONE
 
@@ -182,11 +183,11 @@ class MainActivity : AppCompatActivity() {
         val uri: Uri = result.data!!.data!!
 
         Log.d(TAG, "Handling import result")
-        Log.d(TAG, "Import parameters $importDialogViewModel")
+        Log.d(TAG, "Import parameters $importDialogModel")
         Log.d(TAG, "Selected file URI: $uri")
-        if (importDialogViewModel.importFormat == ImportFormat.OPEN_SONG) {
+        if (importDialogModel.importFormat == ImportFormat.OPEN_SONG) {
             importOpenSong(uri)
-        } else if (importDialogViewModel.importFormat == ImportFormat.LYRIC_CAST) {
+        } else if (importDialogModel.importFormat == ImportFormat.LYRIC_CAST) {
             importLyricCast(uri)
         }
     }
@@ -229,7 +230,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         importDialog.isAccepted
-            .observe(importDialog.viewLifecycleOwner) { if (it) startImport() }
+            .observe(importDialog.viewLifecycleOwner) {
+                if (it) {
+                    startImport()
+                }
+            }
     }
 
     private fun importLyricCast(uri: Uri) {
@@ -241,8 +246,8 @@ class MainActivity : AppCompatActivity() {
                 )
 
             val importOptions = ImportOptions(
-                importDialogViewModel.deleteAll,
-                importDialogViewModel.replaceOnConflict
+                deleteAll = importDialogModel.deleteAll,
+                replaceOnConflict = importDialogModel.replaceOnConflict
             )
 
             @Suppress("BlockingMethodInNonBlockingContext")
@@ -272,9 +277,9 @@ class MainActivity : AppCompatActivity() {
 
             val colors: IntArray = resources.getIntArray(R.array.category_color_values)
             val importOptions = ImportOptions(
-                importDialogViewModel.deleteAll,
-                importDialogViewModel.replaceOnConflict,
-                colors
+                deleteAll = importDialogModel.deleteAll,
+                replaceOnConflict = importDialogModel.replaceOnConflict,
+                colors = colors
             )
 
             @Suppress("BlockingMethodInNonBlockingContext")

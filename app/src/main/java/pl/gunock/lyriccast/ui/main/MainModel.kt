@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 18:29
+ * Last modified 06/10/2021, 12:23
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -30,7 +30,7 @@ import java.io.OutputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class MainModel @Inject constructor(
     private val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
     private companion object {

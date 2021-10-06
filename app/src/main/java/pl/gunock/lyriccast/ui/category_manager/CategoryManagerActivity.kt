@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 10:03
+ * Last modified 06/10/2021, 12:48
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -27,7 +27,7 @@ import pl.gunock.lyriccast.ui.category_manager.edit_category.EditCategoryDialogF
 @AndroidEntryPoint
 class CategoryManagerActivity : AppCompatActivity() {
 
-    private val viewModel: CategoryManagerViewModel by viewModels()
+    private val viewModel: CategoryManagerModel by viewModels()
 
     private lateinit var binding: ContentCategoryManagerBinding
 

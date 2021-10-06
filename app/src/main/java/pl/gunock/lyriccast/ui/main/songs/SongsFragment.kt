@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 10:03
+ * Last modified 06/10/2021, 12:23
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -46,7 +46,7 @@ class SongsFragment : Fragment() {
         const val TAG = "SongsFragment"
     }
 
-    private val viewModel: SongsViewModel by activityViewModels()
+    private val viewModel: SongsModel by activityViewModels()
 
     private lateinit var songItemsAdapter: SongItemsAdapter
     private lateinit var binding: FragmentSongsBinding
@@ -68,6 +68,7 @@ class SongsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel // Initializes viewModel
 
         binding.swtSelectedSongs.visibility = View.GONE
 
