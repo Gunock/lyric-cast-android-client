@@ -23,7 +23,7 @@ class CategoryItemsAdapter(
 ) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
 
     private companion object {
-        const val TAG: String = "CategoryItemsAdapter"
+        const val TAG = "CategoryItemsAdapter"
     }
 
     private var _items: MutableList<CategoryItem> = mutableListOf()

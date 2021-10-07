@@ -38,7 +38,7 @@ class SetlistsModel @Inject constructor(
     val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
     private companion object {
-        const val TAG: String = "SetlistsViewModel"
+        const val TAG = "SetlistsViewModel"
     }
 
     val setlists: LiveData<List<SetlistItem>>

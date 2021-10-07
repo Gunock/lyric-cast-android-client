@@ -40,7 +40,7 @@ class SongsModel @Inject constructor(
     private val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
     private companion object {
-        const val TAG: String = "SongsViewModel"
+        const val TAG = "SongsViewModel"
     }
 
     val songs: LiveData<List<SongItem>> get() = _songs
@@ -72,8 +72,8 @@ class SongsModel @Inject constructor(
         songsSubscription =
             songsRepository.getAllSongs().subscribe {
                 viewModelScope.launch(Dispatchers.Default) {
-                    val songItems = it.map { song -> SongItem(song) }
-                    allSongs = songItems.sorted()
+                    val songItems = it.map { song -> SongItem(song) }.sorted()
+                    allSongs = songItems
                     _songs.postValue(allSongs)
                 }
             }
@@ -113,15 +113,10 @@ class SongsModel @Inject constructor(
     // TODO: Move filter to separate class (functional interface?)
     suspend fun filterSongs(
         songTitle: String,
-        categoryId: String? = null,
-        isSelected: Boolean? = null
+        categoryId: String? = null
     ) {
         withContext(Dispatchers.Default) {
             val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
-
-            if (isSelected != null) {
-                predicates.add { songItem -> songItem.isSelected }
-            }
 
             if (!categoryId.isNullOrBlank()) {
                 predicates.add { songItem -> songItem.song.category?.id == categoryId }

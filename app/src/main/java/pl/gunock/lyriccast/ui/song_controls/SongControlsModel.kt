@@ -58,21 +58,14 @@ class SongControlsModel @Inject constructor(
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
 
-    private val sessionStartedListener: SessionStartedListener
+    private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
+        sendConfiguration()
+        sendSlide()
+    }
 
     init {
-        sessionStartedListener = SessionStartedListener {
-            sendConfiguration()
-            sendSlide()
-        }
-
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
         sessionsManager.addSessionManagerListener(sessionStartedListener)
-
-        if (sessionsManager.currentSession?.isConnected == true) {
-            sendConfiguration()
-            sendSlide()
-        }
     }
 
     override fun onCleared() {

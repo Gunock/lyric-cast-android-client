@@ -10,7 +10,7 @@ import android.view.View
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 
 class SelectionTracker<T : BaseViewHolder>(
-    private val mOnSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
+    private val onSelect: (holder: T, position: Int, isLongClick: Boolean) -> Boolean
 ) {
 
     var count: Int = 0
@@ -24,19 +24,19 @@ class SelectionTracker<T : BaseViewHolder>(
     var countAfter: Int = 0
         private set
 
-    private val mSelectedItemIds: MutableSet<Long> = mutableSetOf()
+    private val selectedItemIds: MutableSet<Long> = mutableSetOf()
 
     fun reset() {
         countAfter = 0
         count = 0
-        mSelectedItemIds.clear()
+        selectedItemIds.clear()
     }
 
     fun attach(holder: T) {
         holder.itemView.setOnLongClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (mOnSelect(holder, holder.absoluteAdapterPosition, true)) {
+            if (onSelect(holder, holder.absoluteAdapterPosition, true)) {
                 view.requestFocus()
                 count = countItems(holder, modifySelectedItems = true)
             }
@@ -47,7 +47,7 @@ class SelectionTracker<T : BaseViewHolder>(
         holder.itemView.setOnClickListener { view ->
             focus(view)
             countAfter = countItems(holder, modifySelectedItems = false)
-            if (mOnSelect(holder, holder.absoluteAdapterPosition, false)) {
+            if (onSelect(holder, holder.absoluteAdapterPosition, false)) {
                 view.requestFocus()
                 count = countItems(holder, modifySelectedItems = true)
             }
@@ -57,14 +57,14 @@ class SelectionTracker<T : BaseViewHolder>(
 
     private fun countItems(holder: T, modifySelectedItems: Boolean = true): Int {
         var updatedCount: Int = count
-        if (mSelectedItemIds.contains(holder.itemId)) {
+        if (holder.itemId in selectedItemIds) {
             if (modifySelectedItems) {
-                mSelectedItemIds.remove(holder.itemId)
+                selectedItemIds.remove(holder.itemId)
             }
             updatedCount--
         } else {
             if (modifySelectedItems) {
-                mSelectedItemIds.add(holder.itemId)
+                selectedItemIds.add(holder.itemId)
             }
             updatedCount++
         }

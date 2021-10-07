@@ -138,7 +138,7 @@ class EditCategoryDialogFragment(
             return NameValidationState.VALID
         }
 
-        if (viewModel.categoryNames.contains(name)) {
+        if (name in viewModel.categoryNames) {
             return NameValidationState.ALREADY_IN_USE
         }
 

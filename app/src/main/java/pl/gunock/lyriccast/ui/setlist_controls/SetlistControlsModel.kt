@@ -75,21 +75,14 @@ class SetlistControlsModel @Inject constructor(
 
     private var previousSongTitle: String = ""
 
-    private val sessionStartedListener: SessionStartedListener
+    private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
+        sendConfiguration()
+        sendSlide()
+    }
 
     init {
-        sessionStartedListener = SessionStartedListener {
-            sendConfiguration()
-            sendSlide()
-        }
-
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
         sessionsManager.addSessionManagerListener(sessionStartedListener)
-
-        if (sessionsManager.currentSession?.isConnected == true) {
-            sendConfiguration()
-            sendSlide()
-        }
     }
 
     override fun onCleared() {

@@ -36,8 +36,7 @@ class SetlistEditorModel @Inject constructor(
     val songs: List<SetlistSongItem> get() = _songs
     private var _songs: MutableList<SetlistSongItem> = mutableListOf()
 
-    val setlistNames: Set<String> get() = _setlistNames
-    private var _setlistNames: Set<String> = setOf()
+    private var setlistNames: Set<String> = setOf()
 
     var setlistName: String = ""
 
@@ -64,7 +63,7 @@ class SetlistEditorModel @Inject constructor(
 
     init {
         setlistsSubscription = setlistsRepository.getAllSetlists().subscribe { setlists ->
-            _setlistNames = setlists.map { setlist -> setlist.name }.toSet()
+            setlistNames = setlists.map { setlist -> setlist.name }.toSet()
         }
     }
 
@@ -155,8 +154,7 @@ class SetlistEditorModel @Inject constructor(
             return NameValidationState.EMPTY
         }
 
-        val isAlreadyInUse = editedSetlist?.name != name
-                && setlistNames.contains(name)
+        val isAlreadyInUse = editedSetlist?.name != name && name in setlistNames
 
         return if (isAlreadyInUse) {
             NameValidationState.ALREADY_IN_USE

@@ -27,7 +27,7 @@ class SongItemsAdapter(
 ) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
 
     private companion object {
-        const val TAG: String = "SongItemsAdapter"
+        const val TAG = "SongItemsAdapter"
     }
 
     init {

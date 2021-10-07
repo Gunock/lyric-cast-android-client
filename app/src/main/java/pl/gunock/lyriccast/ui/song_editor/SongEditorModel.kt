@@ -107,7 +107,7 @@ class SongEditorModel @Inject constructor(
             return NameValidationState.EMPTY
         }
 
-        val alreadyInUse = editedSong?.title != songTitle && songTitles.contains(songTitle)
+        val alreadyInUse = editedSong?.title != songTitle && songTitle in songTitles
 
         return if (alreadyInUse) {
             NameValidationState.ALREADY_IN_USE

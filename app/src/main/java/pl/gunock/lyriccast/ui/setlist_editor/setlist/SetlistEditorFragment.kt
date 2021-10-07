@@ -117,9 +117,7 @@ class SetlistEditorFragment : Fragment() {
         binding.edSetlistName.addTextChangedListener(setlistNameTextWatcher)
 
         binding.edSetlistName.setOnFocusChangeListener { view_, hasFocus ->
-            if (!hasFocus) {
-                view_.hideKeyboard()
-            }
+            if (!hasFocus) view_.hideKeyboard()
         }
 
         binding.btnPickSetlistSongs.setOnClickListener {
@@ -170,7 +168,6 @@ class SetlistEditorFragment : Fragment() {
 
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
     }
-
 
     private suspend fun saveSetlist(): Boolean {
         if (viewModel.validateSetlistName(viewModel.setlistName) != NameValidationState.VALID) {

@@ -7,54 +7,35 @@
 package pl.gunock.lyriccast.ui.setlist_editor.songs
 
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
-import pl.gunock.lyriccast.datamodel.models.Category
-import pl.gunock.lyriccast.datamodel.models.Song
-import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
-import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
-import pl.gunock.lyriccast.domain.models.SongItem
+import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SetlistEditorSongsFragment : Fragment() {
-    private companion object {
-        const val TAG = "SetlistEditorSongsFg"
-    }
 
-    @Inject
-    lateinit var songsRepository: SongsRepository
-
-    @Inject
-    lateinit var categoriesRepository: CategoriesRepository
-
-    private val mArgs: SetlistEditorSongsFragmentArgs by navArgs()
-
+    private val args: SetlistEditorSongsFragmentArgs by navArgs()
+    private val viewModel: SetlistEditorSongsModel by activityViewModels()
     private lateinit var binding: FragmentSongsBinding
 
-    private var mSongItemsAdapter: SongItemsAdapter? = null
-    private var mSelectedSongs: MutableSet<Song> = mutableSetOf()
-
-    private var mSongsSubscription: Disposable? = null
-    private var mCategoriesSubscription: Disposable? = null
+    private lateinit var songItemsAdapter: SongItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +52,12 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel // Initializes viewModel
+
+        viewModel.setlistSongIds = args.presentation.toList()
+        lifecycleScope.launch(Dispatchers.Default) {
+            viewModel.updateSongs()
+        }
 
         setupRecyclerView()
         setupCategorySpinner()
@@ -78,94 +65,16 @@ class SetlistEditorSongsFragment : Fragment() {
         view.hideKeyboard()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        mSongItemsAdapter = null
-
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        mSongsSubscription = songsRepository.getAllSongs().subscribe { songs ->
-            lifecycleScope.launch {
-                if (mSongItemsAdapter == null) {
-                    return@launch
-                }
-
-                val songItems = songs.map { SongItem(it) }
-                mSongItemsAdapter!!.submitCollection(songItems)
-                withContext(Dispatchers.Default) {
-//                    mSongItemsAdapter!!.items.forEach { item ->
-//                        val previousValue = item.isSelected
-//                        val newValue = mArgs.presentation.contains(item.song.id)
-//
-//                        if (newValue != previousValue) {
-//                            item.isSelected = newValue
-//                        }
-//                    }
-                }
-            }
-        }
-
-        mCategoriesSubscription =
-            categoriesRepository.getAllCategories().subscribe { categories ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    val categorySpinnerAdapter =
-                        binding.spnCategory.adapter as CategorySpinnerAdapter
-//                categorySpinnerAdapter.submitCollection(categories)
-                }
-            }
-    }
-
     override fun onPause() {
         super.onPause()
 
         requireView().hideKeyboard()
-
-        mSongsSubscription?.dispose()
-        mSongsSubscription = null
-
-        mCategoriesSubscription?.dispose()
-        mCategoriesSubscription = null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                updateSelectedSongs()
-
-                val setlistSongIds = mArgs.presentation
-                    .distinct()
-                    .toMutableList()
-
-                val selectedSongIds = mSelectedSongs.map { it.id }
-
-                val removedSongIds =
-                    setlistSongIds.filter { songId -> !selectedSongIds.contains(songId) }
-                val addedSongIds =
-                    selectedSongIds.filter { songId -> !setlistSongIds.contains(songId) }
-
-                setlistSongIds.removeAll(removedSongIds)
-                setlistSongIds.addAll(addedSongIds)
-
-                val presentation: MutableList<String> = mArgs.presentation.toMutableList()
-                presentation.removeAll { songId ->
-                    !setlistSongIds.contains(songId)
-                }
-
-                presentation.addAll(addedSongIds)
-
-                val action = SetlistEditorSongsFragmentDirections
-                    .actionSetlistEditorSongsToSetlistEditor(
-                        setlistId = mArgs.setlistId,
-                        presentation = presentation.toTypedArray(),
-                        setlistName = mArgs.setlistName
-                    )
-
-                findNavController().navigate(action)
+                goToSetlistFragment()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
@@ -174,8 +83,9 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(newText, (binding.spnCategory.selectedItem as Category).id)
+            lifecycleScope.launch(Dispatchers.Default) {
+                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
+                viewModel.filterSongs(newText, categoryItem)
             }
         })
 
@@ -186,21 +96,20 @@ class SetlistEditorSongsFragment : Fragment() {
         }
 
         binding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(
-                    binding.edSongTitleFilter.editableText.toString(),
-                    (binding.spnCategory.selectedItem as Category).id
-                )
+            lifecycleScope.launch(Dispatchers.Default) {
+                val songTitle = binding.edSongTitleFilter.editableText.toString()
+                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
+                viewModel.filterSongs(songTitle, categoryItem)
             }
         }
 
         binding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                filterSongs(
-                    binding.edSongTitleFilter.editableText.toString(),
-                    (binding.spnCategory.selectedItem as Category).id,
-                    isSelected = if (isChecked) true else null
-                )
+            lifecycleScope.launch(Dispatchers.Default) {
+                val songTitle = binding.edSongTitleFilter.editableText.toString()
+                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
+                val isSelected = if (isChecked) true else null
+
+                viewModel.filterSongs(songTitle, categoryItem, isSelected)
             }
         }
     }
@@ -208,51 +117,46 @@ class SetlistEditorSongsFragment : Fragment() {
     private fun setupCategorySpinner() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
         binding.spnCategory.adapter = categorySpinnerAdapter
+
+        viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
+            lifecycleScope.launch(Dispatchers.Default) {
+                categorySpinnerAdapter.submitCollection(categories)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
-        binding.rcvSongs.setHasFixedSize(true)
-        binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
-
-        val selectionTracker =
-            SelectionTracker { _: BaseViewHolder, position: Int, _: Boolean ->
-//                val item: SongItem = mSongItemsAdapter!!.items[position]
-//                selectSong(item)
-                return@SelectionTracker true
-            }
-
-        mSongItemsAdapter = SongItemsAdapter(
+        songItemsAdapter = SongItemsAdapter(
             requireContext(),
-//            showCheckBox = MutableLiveData(true),
-            selectionTracker = selectionTracker
+            selectionTracker = viewModel.selectionTracker
         )
 
-        binding.rcvSongs.adapter = mSongItemsAdapter
+        binding.rcvSongs.setHasFixedSize(true)
+        binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcvSongs.adapter = songItemsAdapter
+
+        viewModel.songs.observe(viewLifecycleOwner) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                songItemsAdapter.submitCollection(it)
+            }
+        }
+
+        viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
+            songItemsAdapter.notifyItemChanged(it)
+        }
     }
 
-    private fun selectSong(item: SongItem) {
-        item.isSelected = !item.isSelected
+    private fun goToSetlistFragment() {
+        val presentation = viewModel.updatePresentation(args.presentation)
+
+        val action = SetlistEditorSongsFragmentDirections
+            .actionSetlistEditorSongsToSetlistEditor(
+                setlistId = args.setlistId,
+                presentation = presentation.toTypedArray(),
+                setlistName = args.setlistName
+            )
+
+        findNavController().navigate(action)
     }
 
-    private suspend fun filterSongs(
-        title: String,
-        categoryId: String,
-        isSelected: Boolean? = null
-    ) {
-        Log.d(TAG, "filterSongs invoked")
-
-        updateSelectedSongs()
-        // TODO: Add filtering in viewModel
-//        mSongItemsAdapter!!.filterItems(title, categoryId, isSelected)
-    }
-
-    private fun updateSelectedSongs() {
-//        for (item in mSongItemsAdapter!!.items) {
-//            if (item.isSelected) {
-//                mSelectedSongs.add(item.song)
-//            } else {
-//                mSelectedSongs.remove(item.song)
-//            }
-//        }
-    }
 }
