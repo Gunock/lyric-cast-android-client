@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:38
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.tests.integration.setlist_editor
@@ -25,8 +25,8 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
-import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorSongsFragment
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorSongsFragmentArgs
+import pl.gunock.lyriccast.ui.setlist_editor.songs.SetlistEditorSongsFragment
 import java.lang.Thread.sleep
 
 
@@ -77,7 +77,7 @@ class FilterSetlistEditorSongsTest {
             .check(matches(hasDescendant(withText(song2.title))))
             .check(matches(hasDescendant(withText(song3.title))))
 
-        onView(withId(R.id.ed_song_filter)).perform(replaceText(songTitle))
+        onView(withId(R.id.ed_song_title_filter)).perform(replaceText(songTitle))
         sleep(200)
 
         onView(withId(R.id.rcv_songs))

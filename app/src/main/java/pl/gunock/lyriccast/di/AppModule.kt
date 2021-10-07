@@ -1,16 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:51
+ * Last modified 03/10/2021, 22:33
  */
 
 package pl.gunock.lyriccast.di
 
-import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
@@ -23,31 +21,30 @@ import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 object AppModule {
 
     @Provides
-    fun provideDataTransferRepository(@ApplicationContext context: Context): DataTransferRepository {
+    fun provideDataTransferRepository(): DataTransferRepository {
         return RepositoryFactory.createDataTransferRepository(
-            context.resources,
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideSongsRepository(): SongsRepository {
         return RepositoryFactory.createSongsRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideSetlistsRepository(): SetlistsRepository {
         return RepositoryFactory.createSetlistsRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 
     @Provides
     fun provideCategoriesRepository(): CategoriesRepository {
         return RepositoryFactory.createCategoriesRepository(
-            RepositoryFactory.Provider.MONGO
+            RepositoryFactory.RepositoryProvider.MONGO
         )
     }
 

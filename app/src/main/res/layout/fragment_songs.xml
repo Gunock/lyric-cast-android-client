@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+  ~ Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 11:30
+  ~ Last modified 03/10/2021, 19:47
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,7 +10,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.SongsFragment">
+    tools:context=".ui.main.songs.SongsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ConstraintLayout2"
@@ -31,11 +31,11 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toStartOf="@+id/swt_selected_songs"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tin_filter_songs"
+            app:layout_constraintTop_toBottomOf="@+id/tin_song_title_filter"
             tools:listitem="@layout/spinner_item_color" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tin_filter_songs"
+            android:id="@+id/tin_song_title_filter"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +43,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ed_song_filter"
+                android:id="@+id/ed_song_title_filter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_song_title"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+  ~ Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 11:30
+  ~ Last modified 04/10/2021, 18:53
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,7 +10,7 @@
     android:id="@+id/ConstraintLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.SetlistsFragment">
+    tools:context=".ui.main.setlists.SetlistsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ConstraintLayout2"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tin_filter_setlists"
+            android:id="@+id/tin_setlist_name_filter"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ed_setlist_filter"
+                android:id="@+id/ed_setlist_name_filter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_setlist_name"

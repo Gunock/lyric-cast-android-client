@@ -1,24 +1,22 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 14:32
+ * Last modified 05/10/2021, 19:17
  */
 
 package pl.gunock.lyriccast.domain.models
 
-import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.datamodel.models.Song
 
 data class SongItem(
-    val song: Song
+    val song: Song,
+    var hasCheckbox: Boolean = false,
+    var isSelected: Boolean = false
 ) : Comparable<SongItem> {
 
-    var id: Long = 0
-
-    val normalizedTitle by lazy { song.title.normalize() }
-    val highlight: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isSelected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val normalizedTitle: String = song.title.normalize()
+    var isHighlighted: Boolean = false
 
     override fun compareTo(other: SongItem): Int {
         return song.title.compareTo(other.song.title)

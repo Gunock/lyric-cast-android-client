@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+  ~ Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 11:30
+  ~ Last modified 24/08/2021, 20:07
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,7 +9,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.SetlistsFragment">
+    tools:context=".ui.main.setlists.SetlistsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"

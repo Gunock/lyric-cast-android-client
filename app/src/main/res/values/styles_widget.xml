@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 14/05/2021, 18:02
+  ~ Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 14/05/2021, 18:00
+  ~ Last modified 26/09/2021, 17:28
   -->
 
 <resources>
@@ -97,6 +97,18 @@
     <style name="Widget.LyricCast.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="tint">@color/white</item>
         <item name="android:tint">@color/white</item>
+    </style>
+
+    <style name="Widget.LyricCast.ActionButton" parent="Widget.AppCompat.ActionButton">
+        <item name="tint">@color/white</item>
+        <item name="android:tint">@color/white</item>
+
+        <item name="android:minWidth">30dp</item>
+        <item name="android:maxWidth">48dp</item>
+        <item name="android:width">38dp</item>
+        <item name="android:minHeight">30dp</item>
+        <item name="android:maxHeight">48dp</item>
+        <item name="android:height">38dp</item>
     </style>
 
     <style name="Widget.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">

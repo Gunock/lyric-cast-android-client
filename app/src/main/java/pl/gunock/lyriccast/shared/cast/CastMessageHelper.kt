@@ -1,14 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:19
+ * Last modified 05/10/2021, 18:43
  */
 
 package pl.gunock.lyriccast.shared.cast
 
 import android.content.res.Resources
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
@@ -18,7 +17,7 @@ import pl.gunock.lyriccast.shared.enums.ControlAction
 object CastMessageHelper {
     private const val TAG = "MessageHelper"
 
-    val isBlanked: MutableLiveData<Boolean> = MutableLiveData(false)
+    var isBlanked: Boolean = false
 
     private var CONTENT_NAMESPACE: String = ""
     private var CONTROL_NAMESPACE: String = ""
@@ -52,7 +51,7 @@ object CastMessageHelper {
     }
 
     fun sendBlank(blanked: Boolean) {
-        isBlanked.postValue(blanked)
+        isBlanked = blanked
         sendControlMessage(ControlAction.BLANK, blanked)
     }
 

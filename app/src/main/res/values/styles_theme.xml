@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
+  ~ Created by Tomasz Kiljanczyk on 26/09/2021, 17:29
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 02/05/2021, 19:42
+  ~ Last modified 24/08/2021, 19:39
   -->
 
 <resources>
@@ -33,6 +33,10 @@
         </item>
         <item name="android:actionOverflowButtonStyle">
             @style/Widget.LyricCast.ActionButton.Overflow
+        </item>
+        <item name="actionModeCloseDrawable">@drawable/baseline_close_black_24dp</item>
+        <item name="actionModeCloseButtonStyle">
+            @style/Widget.LyricCast.ActionButton
         </item>
     </style>
 

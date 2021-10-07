@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 19:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:38
+ * Last modified 04/10/2021, 18:53
  */
 
 package pl.gunock.lyriccast.tests.integration.main_activity
@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
-import pl.gunock.lyriccast.ui.main.SetlistsFragment
+import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
 import java.lang.Thread.sleep
 
 @RunWith(AndroidJUnit4::class)
@@ -62,7 +62,7 @@ class FilterSetlistsTest {
             .check(matches(hasDescendant(withText(setlist2.name))))
             .check(matches(hasDescendant(withText(setlist3.name))))
 
-        onView(withId(R.id.ed_setlist_filter)).perform(replaceText(setlistName))
+        onView(withId(R.id.ed_setlist_name_filter)).perform(replaceText(setlistName))
 
         sleep(200)
 

@@ -1,12 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 22:51
+ * Last modified 06/10/2021, 12:48
  */
 
-package pl.gunock.lyriccast.ui.category_manager
+package pl.gunock.lyriccast.ui.category_manager.edit_category
 
-import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -15,66 +14,64 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
-import pl.gunock.lyriccast.datamodel.models.Category
-import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.ColorItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
+import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditCategoryDialogFragment(
-    private val mCategoryItem: CategoryItem? = null
+    private val categoryItem: CategoryItem? = null
 ) : DialogFragment() {
 
     companion object {
         const val TAG = "EditCategoryDialogFragment"
     }
 
-    @Inject
-    lateinit var categoriesRepository: CategoriesRepository
+    private val viewModel: EditCategoryDialogModel by viewModels()
 
-    private val mCategoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
+    private val categoryNameTextWatcher: CategoryNameTextWatcher = CategoryNameTextWatcher()
 
-    private lateinit var mBinding: DialogFragmentEditCategoryBinding
+    private lateinit var binding: DialogFragmentEditCategoryBinding
 
-    private lateinit var mDialogViewModel: EditCategoryDialogViewModel
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        mDialogViewModel =
-            ViewModelProvider(requireActivity()).get(EditCategoryDialogViewModel::class.java)
-        return super.onCreateDialog(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBinding = DialogFragmentEditCategoryBinding.inflate(inflater)
-        return mBinding.root
+        binding = DialogFragmentEditCategoryBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mBinding.tvDialogTitle.text = if (mCategoryItem == null) {
+        viewModel.categoryId = categoryItem?.category?.id ?: ""
+
+        binding.tvDialogTitle.text = if (categoryItem == null) {
             getString(R.string.category_manager_add_category)
         } else {
             getString(R.string.category_manager_edit_category)
         }
 
-        mBinding.edCategoryName.filters = arrayOf(
+        binding.edCategoryName.filters = arrayOf(
             InputFilter.AllCaps(),
             InputFilter.LengthFilter(
                 resources.getInteger(R.integer.ed_max_length_category_name)
             )
         )
+        binding.edCategoryName.addTextChangedListener(InputTextChangedListener {
+            viewModel.categoryName = it
+        })
 
         setupColorSpinner()
         setupListeners()
@@ -91,53 +88,44 @@ class EditCategoryDialogFragment(
             requireContext(),
             colors
         )
-        mBinding.spnCategoryColor.adapter = colorSpinnerAdapter
+        binding.spnCategoryColor.adapter = colorSpinnerAdapter
 
-        if (mCategoryItem?.category?.color != null) {
-            val categoryNameUppercase = mCategoryItem.category
+        if (categoryItem?.category?.color != null) {
+            val categoryNameUppercase = categoryItem.category
                 .name
                 .uppercase(Locale.ROOT)
 
-            mBinding.edCategoryName.setText(categoryNameUppercase)
-            mBinding.spnCategoryColor
-                .setSelection(colorValues.indexOf(mCategoryItem.category.color!!))
+            binding.edCategoryName.setText(categoryNameUppercase)
+            binding.spnCategoryColor
+                .setSelection(colorValues.indexOf(categoryItem.category.color!!))
         }
     }
 
     private fun setupListeners() {
-        mBinding.edCategoryName.addTextChangedListener(mCategoryNameTextWatcher)
+        binding.edCategoryName.addTextChangedListener(categoryNameTextWatcher)
 
-        mBinding.btnSaveCategory.setOnClickListener {
-            saveCategory()
+        binding.btnSaveCategory.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.Main) {
+                saveCategory()
+            }
         }
 
-        mBinding.btnCancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             dismiss()
         }
     }
 
-    private fun saveCategory() {
-        val categoryName = mBinding.edCategoryName.text.toString().trim()
+    private suspend fun saveCategory() {
+        val categoryName = binding.edCategoryName.text.toString().trim()
         if (validateCategoryName(categoryName) != NameValidationState.VALID) {
-            mBinding.edCategoryName.setText(categoryName)
-            mBinding.tinCategoryName.requestFocus()
+            binding.edCategoryName.setText(categoryName)
+            binding.tinCategoryName.requestFocus()
             return
         }
 
-        val selectedColor = mBinding.spnCategoryColor.selectedItem as ColorItem
+        viewModel.categoryColor = binding.spnCategoryColor.selectedItem as ColorItem
 
-        // TODO: Handle new category
-        val categoryId: String = if (mDialogViewModel.category != null) {
-            mDialogViewModel.category!!.id
-        } else {
-            ""
-        }
-
-        val category =
-            Category(name = categoryName, color = selectedColor.value, id = categoryId)
-
-        categoriesRepository.upsertCategory(category)
-        mDialogViewModel.category = null
+        viewModel.saveCategory()
         dismiss()
     }
 
@@ -146,11 +134,11 @@ class EditCategoryDialogFragment(
             return NameValidationState.EMPTY
         }
 
-        if (mCategoryItem != null && mCategoryItem.category.name == name) {
+        if (categoryItem != null && categoryItem.category.name == name) {
             return NameValidationState.VALID
         }
 
-        if (mDialogViewModel.categoryNames.contains(name)) {
+        if (name in viewModel.categoryNames) {
             return NameValidationState.ALREADY_IN_USE
         }
 
@@ -169,14 +157,14 @@ class EditCategoryDialogFragment(
 
             when (validateCategoryName(newText)) {
                 NameValidationState.EMPTY -> {
-                    mBinding.tinCategoryName.error = getString(R.string.category_manager_enter_name)
+                    binding.tinCategoryName.error = getString(R.string.category_manager_enter_name)
                 }
                 NameValidationState.ALREADY_IN_USE -> {
-                    mBinding.tinCategoryName.error =
+                    binding.tinCategoryName.error =
                         getString(R.string.category_manager_name_already_used)
                 }
                 NameValidationState.VALID -> {
-                    mBinding.tinCategoryName.error = null
+                    binding.tinCategoryName.error = null
                 }
             }
         }

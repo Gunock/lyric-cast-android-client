@@ -1,61 +1,33 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+ * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 23:42
+ * Last modified 06/10/2021, 12:48
  */
 
 package pl.gunock.lyriccast.ui.song_controls
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import com.google.android.gms.cast.framework.CastContext
-import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.databinding.*
-import pl.gunock.lyriccast.datamodel.models.Song
-import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
-import pl.gunock.lyriccast.shared.cast.CastMessageHelper
+import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
+import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
-import pl.gunock.lyriccast.shared.cast.SessionStartedListener
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SongControlsActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var songsRepository: SongsRepository
+    private val viewModel: SongControlsModel by viewModels()
 
-    private lateinit var mBinding: ContentSongControlsBinding
-
-    private var mSessionStartedListener: SessionStartedListener? = null
-    private var mCurrentSlide = 0
-    private lateinit var mLyrics: List<String>
-
-    private var mBlankOnColor: Int = Int.MIN_VALUE
-    private var mBlankOffColor: Int = Int.MIN_VALUE
-    private val mCurrentBlankColor: Int
-        get() = if (CastMessageHelper.isBlanked.value!!) {
-            mBlankOffColor
-        } else {
-            mBlankOnColor
-        }
-
-    private lateinit var mBlankOffText: String
-    private lateinit var mBlankOnText: String
-    private val mCurrentBlankText: String
-        get() = if (CastMessageHelper.isBlanked.value!!) {
-            mBlankOffText
-        } else {
-            mBlankOnText
-        }
+    private lateinit var binding: ContentSongControlsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,55 +35,30 @@ class SongControlsActivity : AppCompatActivity() {
         setContentView(rootBinding.root)
         setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        mBinding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
 
-        mBinding.advSongControls.loadAd()
-
-        mBlankOffText = getString(R.string.controls_off)
-        mBlankOnText = getString(R.string.controls_on)
-        mBlankOnColor = getColor(R.color.green)
-        mBlankOffColor = getColor(R.color.red)
+        binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
+        binding.advSongControls.loadAd()
 
         val songId: String = intent.getStringExtra("songId")!!
+        viewModel.loadSong(songId)
+        binding.tvControlsSongTitle.text = viewModel.songTitle
 
-        val song: Song = songsRepository.getSong(songId)!!
+        viewModel.currentBlankTextAndColor.observe(this) {
+            val (blankText: Int, blankColor: Int) = it
+            binding.btnSongBlank.setBackgroundColor(getColor(blankColor))
+            binding.btnSongBlank.text = getString(blankText)
+        }
 
-        mBinding.tvControlsSongTitle.text = song.title
-
-        mLyrics = song.lyricsList
-
-        mBinding.btnSongBlank.setBackgroundColor(mCurrentBlankColor)
-        mBinding.btnSongBlank.text = mCurrentBlankText
+        viewModel.currentSlideText.observe(this) { binding.tvSlidePreview.text = it }
+        viewModel.currentSlideNumber.observe(this) { binding.tvSongSlideNumber.text = it }
 
         setupListeners()
-
-        mSessionStartedListener = SessionStartedListener {
-            sendConfigure()
-            sendSlide()
-        }
-
-        val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(mSessionStartedListener!!)
-
-        if (sessionsManager.currentSession?.isConnected == true) {
-            sendConfigure()
-            sendSlide()
-        }
-        setPreview()
     }
 
     override fun onResume() {
         super.onResume()
-
-        sendConfigure()
-    }
-
-    override fun onDestroy() {
-        CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(mSessionStartedListener!!)
-
-        CastMessageHelper.isBlanked.removeObservers(this)
-        super.onDestroy()
+        viewModel.sendConfiguration()
+        viewModel.sendSlide()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -133,56 +80,15 @@ class SongControlsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        mBinding.btnSongBlank.setOnClickListener {
-            CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked.value!!)
-        }
-
-        CastMessageHelper.isBlanked.observe(this) {
-            mBinding.btnSongBlank.setBackgroundColor(mCurrentBlankColor)
-            mBinding.btnSongBlank.text = mCurrentBlankText
-        }
-
-        mBinding.btnSongPrev.setOnClickListener {
-            if (mCurrentSlide <= 0) {
-                return@setOnClickListener
-            }
-            mCurrentSlide--
-
-            setPreview()
-            sendSlide()
-        }
-
-        mBinding.btnSongNext.setOnClickListener {
-            if (mCurrentSlide >= mLyrics.size - 1) {
-                return@setOnClickListener
-            }
-            mCurrentSlide++
-
-            setPreview()
-            sendSlide()
-        }
-    }
-
-    private fun sendConfigure() {
-        CastMessageHelper.sendConfiguration()
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun setPreview() {
-        mBinding.tvSongSlideNumber.text =
-            "${mCurrentSlide + 1}/${mLyrics.size}"
-
-        mBinding.tvSlidePreview.text = mLyrics[mCurrentSlide]
-    }
-
-    private fun sendSlide() {
-        CastMessageHelper.sendContentMessage(mLyrics[mCurrentSlide])
+        binding.btnSongBlank.setOnClickListener { viewModel.sendBlank() }
+        binding.btnSongPrev.setOnClickListener { viewModel.previousSlide() }
+        binding.btnSongNext.setOnClickListener { viewModel.nextSlide() }
     }
 
     private fun goToSettings(): Boolean {
         val intent = Intent(baseContext, SettingsActivity::class.java)
         startActivity(intent)
-        sendConfigure()
+        viewModel.sendConfiguration()
         return true
     }
 

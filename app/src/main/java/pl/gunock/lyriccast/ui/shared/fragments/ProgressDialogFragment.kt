@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 18/07/2021, 12:16
+ * Last modified 04/10/2021, 15:11
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -18,18 +18,17 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentProgressBinding
 
 
-class ProgressDialogFragment(messageText: String) : DialogFragment() {
+class ProgressDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "ProgressDialogFragment"
     }
 
-    val messageLiveData = MutableLiveData(messageText)
-    var message: String
-        get() = messageLiveData.value!!
-        set(value) = messageLiveData.postValue(value)
+    val messageResourceId = MutableLiveData(0)
+    val message = MutableLiveData("")
+    val isError = MutableLiveData(false)
 
-    private lateinit var mBinding: DialogFragmentProgressBinding
+    private lateinit var binding: DialogFragmentProgressBinding
 
     private var mDefaultTextColor: Int = Int.MIN_VALUE
     private var mDefaultProgressColor: Int = Int.MIN_VALUE
@@ -43,8 +42,8 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE)
         dialog!!.setCanceledOnTouchOutside(false)
 
-        mBinding = DialogFragmentProgressBinding.inflate(inflater)
-        return mBinding.root
+        binding = DialogFragmentProgressBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,29 +53,42 @@ class ProgressDialogFragment(messageText: String) : DialogFragment() {
         mDefaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
         mErrorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
-        mBinding.tvProgressMessage.text = message
-        mBinding.btnProgressOk.visibility = View.GONE
-        mBinding.btnProgressOk.setOnClickListener { dismiss() }
+        binding.tvProgressMessage.text = message.value!!
+        binding.btnProgressOk.visibility = View.GONE
+        binding.btnProgressOk.setOnClickListener { dismiss() }
 
-        messageLiveData.observe(this) { mBinding.tvProgressMessage.text = it }
-    }
-
-    fun setErrorColor(errorColor: Boolean) {
-        if (errorColor) {
-            mBinding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(mErrorProgressColor)
-            mBinding.btnProgressOk.setTextColor(mErrorProgressColor)
-        } else {
-            mBinding.pgbProgress.indeterminateTintList =
-                ColorStateList.valueOf(mDefaultProgressColor)
-            mBinding.btnProgressOk.setTextColor(mDefaultTextColor)
+        message.observe(viewLifecycleOwner) { binding.tvProgressMessage.text = it }
+        messageResourceId.observe(viewLifecycleOwner) { setMessage(it) }
+        isError.observe(viewLifecycleOwner) {
+            setErrorColor(it)
+            setShowOkButton(it)
         }
     }
 
-    fun setShowOkButton(showOkButton: Boolean) {
-        if (showOkButton) {
-            mBinding.btnProgressOk.visibility = View.VISIBLE
+    fun setMessage(stringResourceId: Int) {
+        if (stringResourceId == 0) {
+            return
+        }
+
+        message.postValue(getString(stringResourceId))
+    }
+
+    private fun setErrorColor(errorColor: Boolean) {
+        if (errorColor) {
+            binding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(mErrorProgressColor)
+            binding.btnProgressOk.setTextColor(mErrorProgressColor)
         } else {
-            mBinding.btnProgressOk.visibility = View.GONE
+            binding.pgbProgress.indeterminateTintList =
+                ColorStateList.valueOf(mDefaultProgressColor)
+            binding.btnProgressOk.setTextColor(mDefaultTextColor)
+        }
+    }
+
+    private fun setShowOkButton(showOkButton: Boolean) {
+        if (showOkButton) {
+            binding.btnProgressOk.visibility = View.VISIBLE
+        } else {
+            binding.btnProgressOk.visibility = View.GONE
         }
     }
 
