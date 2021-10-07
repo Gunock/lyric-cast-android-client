@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/SetlistEditor"
-        android:name="pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorFragment"
+        android:name="pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment"
         android:label="@string/title_songs"
         tools:layout="@layout/fragment_setlist_editor">
 
@@ -46,7 +46,8 @@
         <argument
             android:name="setlistId"
             app:argType="string"
-            app:nullable="true" />
+            app:nullable="true"
+            android:defaultValue="@null" />
         <argument
             android:name="presentation"
             android:defaultValue="@null"

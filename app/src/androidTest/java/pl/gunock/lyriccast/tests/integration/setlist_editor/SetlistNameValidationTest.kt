@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.DatabaseViewModel
 import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
-import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorFragment
+import pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment
 
 @RunWith(AndroidJUnit4::class)
 class SetlistNameValidationTest {

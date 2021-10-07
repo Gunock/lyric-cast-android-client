@@ -8,9 +8,11 @@ package pl.gunock.lyriccast.ui.setlist_editor
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.databinding.ActivitySetlistEditorBinding
 import pl.gunock.lyriccast.shared.extensions.loadAd
 
+@AndroidEntryPoint
 class SetlistEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
