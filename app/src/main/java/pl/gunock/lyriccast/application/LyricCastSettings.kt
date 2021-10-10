@@ -7,55 +7,58 @@
 package pl.gunock.lyriccast.application
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
 
 object LyricCastSettings {
-    val blankedOnStart: Boolean get() = preferences.getBoolean(castBlankKey, false)
+    var appTheme: Int = 0
+        private set
 
-    val appTheme: Int get() = preferences.getString(appThemeKey, appThemeKeyDefault)!!.toInt()
+    var controlsButtonHeight: Float = 88f
+        private set
 
-    val enableAds: Boolean get() = preferences.getBoolean("preference_ads_enable", true)
+    var blankedOnStart: Boolean = false
+        private set
 
-    private lateinit var appThemeKey: String
+    var enableAds: Boolean = true
+        private set
 
-    private lateinit var castBackgroundColorDefault: String
-    private lateinit var castFontColorKeyDefault: String
-    private lateinit var appThemeKeyDefault: String
-
-    private lateinit var castBlankKey: String
-    private lateinit var castBackgroundColorKey: String
-    private lateinit var castFontColorKey: String
-    private lateinit var castMaxFontSizeKey: String
-
-    private lateinit var preferences: SharedPreferences
-
-    private val castBackgroundColor: String?
-        get() = preferences.getString(castBackgroundColorKey, castBackgroundColorDefault)
-
-    private val castFontColor: String?
-        get() = preferences.getString(castFontColorKey, castFontColorKeyDefault)
-
-    private val castMaxFontSize: Int
-        get() = preferences.getInt(castMaxFontSizeKey, 100)
+    private var castBackgroundColor: String? = null
+    private var castFontColor: String? = null
+    private var castMaxFontSize: Int = 100
 
     fun initialize(context: Context) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-        appThemeKey = context.getString(R.string.preference_theme_key)
+        val appThemeKey = context.getString(R.string.preference_theme_key)
+        val appThemeKeyDefault = context.getString(R.string.preference_theme_default_value)
+        appTheme = preferences.getString(appThemeKey, appThemeKeyDefault)!!.toInt()
 
-        castBackgroundColorDefault =
+        val controlsButtonHeightKey =
+            context.getString(R.string.preference_controls_button_height_key)
+        controlsButtonHeight = preferences.getString(controlsButtonHeightKey, "88")!!.toFloat()
+
+        val blankKey = context.getString(R.string.preference_blank_key)
+        blankedOnStart = preferences.getBoolean(blankKey, false)
+
+        val enableAdsKey = context.getString(R.string.preference_enable_ads_key)
+        enableAds = preferences.getBoolean(enableAdsKey, true)
+
+        val castBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
+        val castBackgroundColorDefault =
             context.getString(R.string.preference_cast_background_color_default_value)
-        castFontColorKeyDefault =
-            context.getString(R.string.preference_cast_font_color_default_value)
-        appThemeKeyDefault = context.getString(R.string.preference_theme_default_value)
+        castBackgroundColor =
+            preferences.getString(castBackgroundColorKey, castBackgroundColorDefault)
 
-        castBlankKey = context.getString(R.string.preference_blank_key)
-        castBackgroundColorKey = context.getString(R.string.preference_cast_background_key)
-        castFontColorKey = context.getString(R.string.preference_cast_font_color_key)
-        castMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
+        val castFontColorKeyDefault =
+            context.getString(R.string.preference_cast_font_color_default_value)
+
+        val castFontColorKey = context.getString(R.string.preference_cast_font_color_key)
+        castFontColor = preferences.getString(castFontColorKey, castFontColorKeyDefault)
+
+        val castMaxFontSizeKey = context.getString(R.string.preference_cast_max_font_size_key)
+        castMaxFontSize = preferences.getInt(castMaxFontSizeKey, 100)
     }
 
     fun getCastConfigurationJson(): JSONObject {

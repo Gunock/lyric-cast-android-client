@@ -8,6 +8,7 @@ package pl.gunock.lyriccast.ui.song_controls
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -16,6 +17,7 @@ import androidx.core.view.MenuItemCompat
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
@@ -57,6 +59,15 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val params = binding.songControlsButtonContainer.layoutParams
+        params.height = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            LyricCastSettings.controlsButtonHeight,
+            resources.displayMetrics
+        ).toInt()
+        binding.songControlsButtonContainer.layoutParams = params
+
         viewModel.sendConfiguration()
         viewModel.sendSlide()
     }
