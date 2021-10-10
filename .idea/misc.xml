@@ -3,9 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/activity_main.xml" value="0.346875" />
+        <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/drawable/color.xml" value="0.5369791666666667" />
+        <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/activity_main.xml" value="0.5" />
         <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/activity_setlist_controls.xml" value="0.5" />
-        <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/content_main.xml" value="0.346875" />
+        <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/content_main.xml" value="0.33" />
         <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/content_setlist_controls.xml" value="0.33" />
         <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/content_song_controls.xml" value="0.33" />
         <entry key="..\:/Projects/lyric-cast-android-client/app/src/main/res/layout/fragment_songs.xml" value="0.346875" />

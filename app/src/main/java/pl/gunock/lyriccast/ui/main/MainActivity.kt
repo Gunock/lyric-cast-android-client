@@ -145,8 +145,10 @@ class MainActivity : AppCompatActivity() {
         binding.fabAdd.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 fabContainer.visibility = View.VISIBLE
+                binding.imvMainDimm.visibility = View.VISIBLE
             } else {
                 fabContainer.visibility = View.GONE
+                binding.imvMainDimm.visibility = View.GONE
             }
         }
 
