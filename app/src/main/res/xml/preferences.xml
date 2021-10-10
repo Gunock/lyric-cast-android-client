@@ -16,6 +16,14 @@
             app:key="@string/preference_theme_key"
             app:title="@string/preference_theme_title"
             app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:id="@+id/pref_controls_button_height"
+            android:defaultValue="@string/preference_controls_buttons_height_default_value"
+            android:entries="@array/control_buttons_height_entries"
+            android:entryValues="@array/control_buttons_height_values"
+            android:key="@string/preference_controls_button_height_key"
+            android:title="@string/preference_controls_button_height_title"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/preference_section_chromecast">
@@ -27,19 +35,19 @@
         <ListPreference
             android:id="@+id/pref_background_color"
             app:defaultValue="@string/preference_cast_background_color_default_value"
-            app:key="@string/preference_cast_background_key"
-            app:title="@string/preference_cast_background_title"
             app:entries="@array/color_entries"
             app:entryValues="@array/color_values"
+            app:key="@string/preference_cast_background_key"
+            app:title="@string/preference_cast_background_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
             android:id="@+id/pref_font_color"
             app:defaultValue="@string/preference_cast_font_color_default_value"
-            app:key="@string/preference_cast_font_color_key"
-            app:title="@string/preference_cast_font_color_title"
             app:entries="@array/color_entries"
             app:entryValues="@array/color_values"
+            app:key="@string/preference_cast_font_color_key"
+            app:title="@string/preference_cast_font_color_title"
             app:useSimpleSummaryProvider="true" />
 
         <SeekBarPreference

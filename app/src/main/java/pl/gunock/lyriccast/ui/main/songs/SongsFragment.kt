@@ -75,19 +75,11 @@ class SongsFragment : Fragment() {
         viewModel.numberOfSelectedSongs.observe(viewLifecycleOwner, this::onSelectSong)
         viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
             songItemsAdapter.notifyItemChanged(it)
-            binding.tinSongTitleFilter.clearFocus()
         }
 
         setupCategorySpinner()
         setupRecyclerView()
         setupListeners()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        binding.edSongTitleFilter.setText("")
-        binding.tinSongTitleFilter.clearFocus()
     }
 
     override fun onStop() {

@@ -56,6 +56,11 @@ class SettingsActivity : AppCompatActivity() {
             .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
+    override fun onPause() {
+        LyricCastSettings.initialize(applicationContext)
+        super.onPause()
+    }
+
     override fun onDestroy() {
         preferenceChangeListener = null
         super.onDestroy()

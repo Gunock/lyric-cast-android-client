@@ -49,7 +49,7 @@
     <TextView
         android:id="@+id/tv_setlist_slide_preview"
         android:layout_width="0dp"
-        android:layout_height="256dp"
+        android:layout_height="196dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
@@ -73,7 +73,7 @@
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout7"
+        app:layout_constraintBottom_toTopOf="@+id/setlist_controls_button_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +83,7 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout7"
+        android:id="@+id/setlist_controls_button_container"
         android:layout_width="match_parent"
         android:layout_height="88dp"
         android:background="@color/window_background_1"

@@ -8,6 +8,7 @@ package pl.gunock.lyriccast.ui.setlist_controls
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
@@ -70,6 +72,14 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val params = binding.setlistControlsButtonContainer.layoutParams
+        params.height = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            LyricCastSettings.controlsButtonHeight,
+            resources.displayMetrics
+        ).toInt()
+        binding.setlistControlsButtonContainer.layoutParams = params
 
         viewModel.sendConfiguration()
         viewModel.sendSlide()

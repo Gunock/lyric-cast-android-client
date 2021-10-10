@@ -122,8 +122,6 @@ class MainActivity : AppCompatActivity() {
             ItemSelectedTabListener { tab ->
                 tab ?: return@ItemSelectedTabListener
 
-                binding.fabAdd.clearFocus()
-
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
                     Log.d(TAG, "Switching to song list")
