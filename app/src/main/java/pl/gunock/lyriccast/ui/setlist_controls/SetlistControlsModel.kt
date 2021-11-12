@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 12/11/2021, 18:03
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SetlistControlsModel @Inject constructor(
-    val setlistsRepository: SetlistsRepository
+    private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green

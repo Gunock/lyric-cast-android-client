@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 15:11
+ * Last modified 12/11/2021, 18:03
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -25,14 +25,13 @@ class ProgressDialogFragment : DialogFragment() {
     }
 
     val messageResourceId = MutableLiveData(0)
-    val message = MutableLiveData("")
     val isError = MutableLiveData(false)
 
     private lateinit var binding: DialogFragmentProgressBinding
 
-    private var mDefaultTextColor: Int = Int.MIN_VALUE
-    private var mDefaultProgressColor: Int = Int.MIN_VALUE
-    private var mErrorProgressColor: Int = Int.MIN_VALUE
+    private var defaultTextColor: Int = Int.MIN_VALUE
+    private var defaultProgressColor: Int = Int.MIN_VALUE
+    private var errorProgressColor: Int = Int.MIN_VALUE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,15 +48,13 @@ class ProgressDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mDefaultTextColor = requireContext().getColor(R.color.dialog_button)
-        mDefaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
-        mErrorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
+        defaultTextColor = requireContext().getColor(R.color.dialog_button)
+        defaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
+        errorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
-        binding.tvProgressMessage.text = message.value!!
         binding.btnProgressOk.visibility = View.GONE
         binding.btnProgressOk.setOnClickListener { dismiss() }
 
-        message.observe(viewLifecycleOwner) { binding.tvProgressMessage.text = it }
         messageResourceId.observe(viewLifecycleOwner) { setMessage(it) }
         isError.observe(viewLifecycleOwner) {
             setErrorColor(it)
@@ -70,17 +67,17 @@ class ProgressDialogFragment : DialogFragment() {
             return
         }
 
-        message.postValue(getString(stringResourceId))
+        binding.tvProgressMessage.text = getString(stringResourceId)
     }
 
     private fun setErrorColor(errorColor: Boolean) {
         if (errorColor) {
-            binding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(mErrorProgressColor)
-            binding.btnProgressOk.setTextColor(mErrorProgressColor)
+            binding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(errorProgressColor)
+            binding.btnProgressOk.setTextColor(errorProgressColor)
         } else {
             binding.pgbProgress.indeterminateTintList =
-                ColorStateList.valueOf(mDefaultProgressColor)
-            binding.btnProgressOk.setTextColor(mDefaultTextColor)
+                ColorStateList.valueOf(defaultProgressColor)
+            binding.btnProgressOk.setTextColor(defaultTextColor)
         }
     }
 

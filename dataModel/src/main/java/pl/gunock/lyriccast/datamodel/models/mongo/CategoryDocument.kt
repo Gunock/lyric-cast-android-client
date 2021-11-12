@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/07/2021, 00:22
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/07/2021, 00:22
+ * Last modified 12/11/2021, 17:59
  */
 
 package pl.gunock.lyriccast.datamodel.models.mongo
@@ -19,7 +19,6 @@ internal open class CategoryDocument(
     @field:PrimaryKey
     var id: ObjectId = ObjectId()
 ) : RealmObject(), Comparable<CategoryDocument> {
-    // TODO: Verify if comparable is still needed
 
     constructor(category: Category) : this(
         id = if (category.id.isNotBlank()) ObjectId(category.id) else ObjectId(),
