@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 12/12/2021, 00:06
  */
 
 package pl.gunock.lyriccast.ui.settings
@@ -17,8 +17,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.LyricCastSettings
+import pl.gunock.lyriccast.application.settingsDataStore
 import pl.gunock.lyriccast.databinding.ActivitySettingsBinding
 import pl.gunock.lyriccast.shared.extensions.loadAd
 
@@ -26,9 +27,55 @@ import pl.gunock.lyriccast.shared.extensions.loadAd
 class SettingsActivity : AppCompatActivity() {
 
     private var preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "appTheme") {
-                AppCompatDelegate.setDefaultNightMode(LyricCastSettings.appTheme)
+        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            var preferenceValue: String
+            try {
+                preferenceValue = sharedPreferences.getString(key, "")!!
+            } catch (e: ClassCastException) {
+                val exceptionMessage = e.toString()
+
+                preferenceValue = when {
+                    exceptionMessage.contains("java.lang.Integer") -> {
+                        sharedPreferences.getInt(key, 0).toString()
+                    }
+                    exceptionMessage.contains("java.lang.Float") -> {
+                        sharedPreferences.getFloat(key, 0.0f).toString()
+                    }
+                    exceptionMessage.contains("java.lang.Boolean") -> {
+                        sharedPreferences.getBoolean(key, false).toString()
+                    }
+                    else -> throw e
+                }
+            }
+
+            if (preferenceValue.isBlank()) {
+                return@OnSharedPreferenceChangeListener
+            }
+
+            runBlocking {
+                applicationContext.settingsDataStore.updateData { settings ->
+                    val settingsBuilder = settings.toBuilder()
+                    when (key) {
+                        "appTheme" -> {
+                            val appThemeValue = preferenceValue.toInt()
+                            settingsBuilder.appTheme = appThemeValue
+                            AppCompatDelegate.setDefaultNightMode(appThemeValue)
+                        }
+                        "controlsButtonHeight" -> {
+                            settingsBuilder.controlButtonsHeight = preferenceValue.toFloat()
+                        }
+                        "backgroundColor" -> {
+                            settingsBuilder.backgroundColor = preferenceValue
+                        }
+                        "fontColor" -> {
+                            settingsBuilder.fontColor = preferenceValue
+                        }
+                        "fontMaxSize" -> {
+                            settingsBuilder.maxFontSize = preferenceValue.toInt()
+                        }
+                    }
+                    settingsBuilder.build()
+                }
             }
         }
 
@@ -54,11 +101,6 @@ class SettingsActivity : AppCompatActivity() {
 
         PreferenceManager.getDefaultSharedPreferences(baseContext)
             .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-    }
-
-    override fun onPause() {
-        LyricCastSettings.initialize(applicationContext)
-        super.onPause()
     }
 
     override fun onDestroy() {

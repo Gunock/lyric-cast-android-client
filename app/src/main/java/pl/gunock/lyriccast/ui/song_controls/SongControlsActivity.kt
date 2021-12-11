@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 11/12/2021, 23:38
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -17,10 +17,10 @@ import androidx.core.view.MenuItemCompat
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
+import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 
@@ -41,6 +41,8 @@ class SongControlsActivity : AppCompatActivity() {
         binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
         binding.advSongControls.loadAd()
 
+        viewModel.settings = applicationContext.getSettings()
+
         val songId: String = intent.getStringExtra("songId")!!
         viewModel.loadSong(songId)
         binding.tvControlsSongTitle.text = viewModel.songTitle
@@ -60,10 +62,13 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        val settings = applicationContext.getSettings()
+        viewModel.settings = settings
+
         val params = binding.songControlsButtonContainer.layoutParams
         params.height = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            LyricCastSettings.controlsButtonHeight,
+            settings.controlButtonsHeight,
             resources.displayMetrics
         ).toInt()
         binding.songControlsButtonContainer.layoutParams = params

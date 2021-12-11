@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 15:19
+ * Last modified 12/12/2021, 00:03
  */
 
 package pl.gunock.lyriccast.shared.utils
@@ -23,7 +23,7 @@ object DialogFragmentUtils {
             show(fragmentManager, ProgressDialogFragment.TAG)
         }
 
-        while (!dialogFragment.isAdded) {
+        while (!dialogFragment.hasBinding()) {
             delay(10)
         }
         dialogFragment.setMessage(messageResourceId)

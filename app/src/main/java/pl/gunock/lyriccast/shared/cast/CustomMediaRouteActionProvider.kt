@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 17/07/2021, 12:26
+ * Last modified 12/11/2021, 17:59
  */
 
 package pl.gunock.lyriccast.shared.cast
@@ -14,7 +14,7 @@ import androidx.mediarouter.app.MediaRouteDialogFactory
 
 class CustomMediaRouteActionProvider(context: Context) : MediaRouteActionProvider(context) {
 
-    private var mFactory: MediaRouteDialogFactory = CustomMediaRouteDialogFactory()
+    private var factory: MediaRouteDialogFactory = CustomMediaRouteDialogFactory()
 
     init {
         setAlwaysVisible(true)
@@ -27,11 +27,11 @@ class CustomMediaRouteActionProvider(context: Context) : MediaRouteActionProvide
     }
 
     override fun getDialogFactory(): MediaRouteDialogFactory {
-        return mFactory
+        return factory
     }
 
     override fun setDialogFactory(factory: MediaRouteDialogFactory) {
-        mFactory = factory
+        this.factory = factory
     }
 
 }

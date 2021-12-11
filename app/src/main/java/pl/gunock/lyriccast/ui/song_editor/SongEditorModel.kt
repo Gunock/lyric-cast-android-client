@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 20:28
+ * Last modified 12/11/2021, 18:07
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -24,19 +24,7 @@ import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
 import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.MutableMap
-import kotlin.collections.Set
-import kotlin.collections.any
-import kotlin.collections.last
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
-import kotlin.collections.setOf
-import kotlin.collections.sum
-import kotlin.collections.toList
-import kotlin.collections.toSet
 
 @HiltViewModel
 class SongEditorModel @Inject constructor(
@@ -52,7 +40,7 @@ class SongEditorModel @Inject constructor(
     val isEditingSong: Boolean get() = _isEditingSong
     private var _isEditingSong: Boolean = false
 
-    var songId: String? = null
+    private var songId: String? = null
     var songTitle: String = ""
     var category: Category? = null
     var presentation: List<String>? = null

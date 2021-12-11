@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 07/10/2021, 11:16
+ * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 07/10/2021, 11:08
+ * Last modified 12/11/2021, 18:03
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -42,8 +42,7 @@ class SetlistEditorModel @Inject constructor(
 
     var setlistId: String = ""
 
-    val editedSetlist: Setlist? get() = _editedSetlist
-    private var _editedSetlist: Setlist? = null
+    private var editedSetlist: Setlist? = null
 
     val numberOfSelectedSongs: LiveData<Pair<Int, Int>> get() = _numberOfSelectedSongs
     private val _numberOfSelectedSongs: MutableLiveData<Pair<Int, Int>> =
@@ -91,7 +90,7 @@ class SetlistEditorModel @Inject constructor(
 
     fun loadEditedSetlist(setlistId: String) {
         this.setlistId = setlistId
-        _editedSetlist = setlistsRepository.getSetlist(setlistId)!!.also { setlist ->
+        editedSetlist = setlistsRepository.getSetlist(setlistId)!!.also { setlist ->
             _songs = setlist.presentation.map { SetlistSongItem(it, availableId++) }.toMutableList()
             setlistName = setlist.name
         }

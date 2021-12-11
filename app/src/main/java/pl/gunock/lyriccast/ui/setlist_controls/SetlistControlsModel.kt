@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 11/12/2021, 23:38
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -13,6 +13,8 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.Settings
+import pl.gunock.lyriccast.application.getCastConfigurationJson
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -23,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SetlistControlsModel @Inject constructor(
-    val setlistsRepository: SetlistsRepository
+    private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green
@@ -44,6 +46,8 @@ class SetlistControlsModel @Inject constructor(
                 blankOnText
             }
     }
+
+    var settings: Settings? = null
 
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
@@ -76,7 +80,9 @@ class SetlistControlsModel @Inject constructor(
     private var previousSongTitle: String = ""
 
     private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
-        sendConfiguration()
+        settings?.let {
+            sendConfiguration()
+        }
         sendSlide()
     }
 
@@ -152,7 +158,7 @@ class SetlistControlsModel @Inject constructor(
     }
 
     fun sendConfiguration() {
-        CastMessageHelper.sendConfiguration()
+        CastMessageHelper.sendConfiguration(settings!!.getCastConfigurationJson())
     }
 
     fun selectSong(position: Int) {
