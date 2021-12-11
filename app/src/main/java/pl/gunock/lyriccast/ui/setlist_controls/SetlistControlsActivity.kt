@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 11/12/2021, 23:38
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -19,10 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
+import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
@@ -46,6 +46,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         binding.advSetlistControls.loadAd()
+
+        viewModel.settings = applicationContext.getSettings()
 
         val setlistId: String = intent.getStringExtra("setlistId")!!
         viewModel.loadSetlist(setlistId)
@@ -73,10 +75,13 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        val settings = applicationContext.getSettings()
+        viewModel.settings = settings
+
         val params = binding.setlistControlsButtonContainer.layoutParams
         params.height = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            LyricCastSettings.controlsButtonHeight,
+            settings.controlButtonsHeight,
             resources.displayMetrics
         ).toInt()
         binding.setlistControlsButtonContainer.layoutParams = params

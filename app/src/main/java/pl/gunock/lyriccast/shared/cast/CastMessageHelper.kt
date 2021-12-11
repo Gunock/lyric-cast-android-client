@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 12/12/2021, 00:05
  */
 
 package pl.gunock.lyriccast.shared.cast
@@ -11,7 +11,6 @@ import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.LyricCastSettings
 import pl.gunock.lyriccast.shared.enums.ControlAction
 
 object CastMessageHelper {
@@ -55,9 +54,7 @@ object CastMessageHelper {
         sendControlMessage(ControlAction.BLANK, blanked)
     }
 
-    fun sendConfiguration() {
-        val configurationJson = LyricCastSettings.getCastConfigurationJson()
-
+    fun sendConfiguration(configurationJson: JSONObject) {
         sendControlMessage(
             ControlAction.CONFIGURE,
             configurationJson

@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 11/12/2021, 23:12
  */
 
 package pl.gunock.lyriccast.ui.launch
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -19,7 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.LyricCastSettings
+import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.main.MainActivity
 
@@ -36,12 +37,14 @@ class LaunchActivity : AppCompatActivity() {
     private val turnOnWifiManagerResultLauncher =
         registerForActivityResult(this::handleTurnOnWiFiResult)
 
+    // TODO: Resolve this problem
+    @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_launch)
 
-        AppCompatDelegate.setDefaultNightMode(LyricCastSettings.appTheme)
+        AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)
     }
 
     override fun onStart() {

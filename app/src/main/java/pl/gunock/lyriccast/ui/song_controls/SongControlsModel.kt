@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 11/12/2021, 23:38
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -13,6 +13,8 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.Settings
+import pl.gunock.lyriccast.application.getCastConfigurationJson
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
@@ -45,6 +47,8 @@ class SongControlsModel @Inject constructor(
 
     var songTitle: String = ""
 
+    var settings: Settings? = null
+
     val currentSlideText: LiveData<String> get() = _currentSlideText
     private val _currentSlideText: MutableLiveData<String> = MutableLiveData("")
 
@@ -59,7 +63,9 @@ class SongControlsModel @Inject constructor(
     private lateinit var lyrics: List<String>
 
     private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
-        sendConfiguration()
+        settings?.let {
+            sendConfiguration()
+        }
         sendSlide()
     }
 
@@ -109,7 +115,7 @@ class SongControlsModel @Inject constructor(
     }
 
     fun sendConfiguration() {
-        CastMessageHelper.sendConfiguration()
+        CastMessageHelper.sendConfiguration(settings!!.getCastConfigurationJson())
     }
 
     fun sendSlide() {

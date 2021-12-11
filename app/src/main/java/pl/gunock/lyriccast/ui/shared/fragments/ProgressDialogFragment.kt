@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/11/2021, 18:03
+ * Last modified 12/12/2021, 00:03
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -68,6 +68,10 @@ class ProgressDialogFragment : DialogFragment() {
         }
 
         binding.tvProgressMessage.text = getString(stringResourceId)
+    }
+
+    fun hasBinding(): Boolean {
+        return this::binding.isInitialized
     }
 
     private fun setErrorColor(errorColor: Boolean) {
