@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
+  ~ Created by Tomasz Kiljanczyk on 12/12/2021, 12:22
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 18/07/2021, 20:33
+  ~ Last modified 12/12/2021, 12:16
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,6 +34,7 @@
 
         <activity
             android:name=".ui.launch.LaunchActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"

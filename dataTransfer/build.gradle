@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:08
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 12:22
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 16/05/2021, 17:08
+ * Last modified 12/12/2021, 12:12
  */
 
 plugins {
@@ -10,12 +10,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
 
         consumerProguardFiles "consumer-rules.pro"
     }
