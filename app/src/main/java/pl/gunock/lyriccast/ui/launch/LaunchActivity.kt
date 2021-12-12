@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 12/12/2021, 12:57
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/12/2021, 23:12
+ * Last modified 12/12/2021, 12:56
  */
 
 package pl.gunock.lyriccast.ui.launch
@@ -18,9 +18,7 @@ import android.provider.Settings
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
 import pl.gunock.lyriccast.ui.main.MainActivity
 
@@ -43,8 +41,6 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_launch)
-
-        AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)
     }
 
     override fun onStart() {
