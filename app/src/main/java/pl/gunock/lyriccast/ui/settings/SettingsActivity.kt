@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 00:06
+ * Last modified 19/12/2021, 19:49
  */
 
 package pl.gunock.lyriccast.ui.settings
@@ -63,6 +63,9 @@ class SettingsActivity : AppCompatActivity() {
                         }
                         "controlsButtonHeight" -> {
                             settingsBuilder.controlButtonsHeight = preferenceValue.toFloat()
+                        }
+                        "blankedOnStart" -> {
+                            settingsBuilder.blankOnStart = preferenceValue.toBooleanStrict()
                         }
                         "backgroundColor" -> {
                             settingsBuilder.backgroundColor = preferenceValue

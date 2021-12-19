@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/12/2021, 23:38
+ * Last modified 19/12/2021, 20:01
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SetlistControlsModel @Inject constructor(
-    private val setlistsRepository: SetlistsRepository
+        private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green
@@ -66,7 +66,7 @@ class SetlistControlsModel @Inject constructor(
 
     val currentBlankTextAndColor: LiveData<Pair<Int, Int>> get() = _currentBlankTextAndColor
     private val _currentBlankTextAndColor: MutableLiveData<Pair<Int, Int>> =
-        MutableLiveData(Pair(currentBlankText, currentBlankColor))
+            MutableLiveData(Pair(currentBlankText, currentBlankColor))
 
 
     private lateinit var setlistLyrics: List<String>
@@ -80,7 +80,8 @@ class SetlistControlsModel @Inject constructor(
     private var previousSongTitle: String = ""
 
     private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
-        settings?.let {
+        postBlankColor()
+        if (settings != null) {
             sendConfiguration()
         }
         sendSlide()
@@ -93,7 +94,7 @@ class SetlistControlsModel @Inject constructor(
 
     override fun onCleared() {
         CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(sessionStartedListener)
+                .removeSessionManagerListener(sessionStartedListener)
 
         super.onCleared()
     }
@@ -103,18 +104,18 @@ class SetlistControlsModel @Inject constructor(
 
         var setlistLyricsIndex = 0
         setlistLyrics = setlist.presentation
-            .flatMapIndexed { index: Int, song: Song ->
-                val lyrics = song.lyricsList
+                .flatMapIndexed { index: Int, song: Song ->
+                    val lyrics = song.lyricsList
 
-                val indexedTitle = "[$index] ${song.title}"
-                songTitles[setlistLyricsIndex] = indexedTitle
-                songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
-                songStartPoints[indexedTitle] = setlistLyricsIndex
+                    val indexedTitle = "[$index] ${song.title}"
+                    songTitles[setlistLyricsIndex] = indexedTitle
+                    songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
+                    songStartPoints[indexedTitle] = setlistLyricsIndex
 
-                setlistLyricsIndex += lyrics.size
+                    setlistLyricsIndex += lyrics.size
 
-                return@flatMapIndexed lyrics
-            }
+                    return@flatMapIndexed lyrics
+                }
 
         _songs.clear()
 
@@ -149,12 +150,7 @@ class SetlistControlsModel @Inject constructor(
 
     fun sendBlank() {
         CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked)
-
-        val textAndColor = Pair(
-            currentBlankText,
-            currentBlankColor
-        )
-        _currentBlankTextAndColor.postValue(textAndColor)
+        postBlankColor()
     }
 
     fun sendConfiguration() {
@@ -176,8 +172,8 @@ class SetlistControlsModel @Inject constructor(
 
     private fun postSlide() {
         if (
-            songTitles.containsKey(currentLyricsPosition)
-            && songTitles[currentLyricsPosition]!! != previousSongTitle
+                songTitles.containsKey(currentLyricsPosition)
+                && songTitles[currentLyricsPosition]!! != previousSongTitle
         ) {
             val songTitle = songTitles[currentLyricsPosition]!!
             val songTitleWithoutNumber = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
@@ -198,13 +194,18 @@ class SetlistControlsModel @Inject constructor(
         }
 
         val songItemPosition: Int = songStartPoints.keys
-            .indexOfFirst { songTitle -> songTitle == title }
+                .indexOfFirst { songTitle -> songTitle == title }
 
         _songs[songItemPosition].isHighlighted = isHighlighted
         _changedSongPosition.value = songItemPosition
         if (isCurrent) {
             _currentSongPosition.postValue(songItemPosition)
         }
+    }
+
+    private fun postBlankColor() {
+        val textAndColor = Pair(currentBlankText, currentBlankColor)
+        _currentBlankTextAndColor.postValue(textAndColor)
     }
 
 }

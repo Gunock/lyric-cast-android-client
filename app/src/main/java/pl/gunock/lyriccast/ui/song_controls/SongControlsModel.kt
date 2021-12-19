@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/12/2021, 23:38
+ * Last modified 19/12/2021, 20:01
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongControlsModel @Inject constructor(
-    val songsRepository: SongsRepository
+        val songsRepository: SongsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green
@@ -57,13 +57,14 @@ class SongControlsModel @Inject constructor(
 
     val currentBlankTextAndColor: LiveData<Pair<Int, Int>> get() = _currentBlankTextAndColor
     private val _currentBlankTextAndColor: MutableLiveData<Pair<Int, Int>> =
-        MutableLiveData(Pair(currentBlankText, currentBlankColor))
+            MutableLiveData(Pair(currentBlankText, currentBlankColor))
 
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
 
     private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
-        settings?.let {
+        postBlankColor()
+        if (settings != null) {
             sendConfiguration()
         }
         sendSlide()
@@ -76,7 +77,7 @@ class SongControlsModel @Inject constructor(
 
     override fun onCleared() {
         CastContext.getSharedInstance()!!.sessionManager
-            .removeSessionManagerListener(sessionStartedListener)
+                .removeSessionManagerListener(sessionStartedListener)
 
         super.onCleared()
     }
@@ -109,9 +110,7 @@ class SongControlsModel @Inject constructor(
 
     fun sendBlank() {
         CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked)
-
-        val textAndColor = Pair(currentBlankText, currentBlankColor)
-        _currentBlankTextAndColor.postValue(textAndColor)
+        postBlankColor()
     }
 
     fun sendConfiguration() {
@@ -126,5 +125,10 @@ class SongControlsModel @Inject constructor(
     private fun postSlide() {
         _currentSlideNumber.postValue("${currentSlide + 1}/${lyrics.size}")
         _currentSlideText.postValue(lyrics[currentSlide])
+    }
+
+    private fun postBlankColor() {
+        val textAndColor = Pair(currentBlankText, currentBlankColor)
+        _currentBlankTextAndColor.postValue(textAndColor)
     }
 }
