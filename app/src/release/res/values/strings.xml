@@ -1,0 +1,10 @@
+<!--
+  ~ Created by Tomasz Kiljanczyk on 19/12/2021, 19:38
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 19/12/2021, 19:33
+  -->
+
+<resources>
+    <!-- Chromecast -->
+    <string name="chromecast_app_id" translatable="false">F1C5CC30</string>
+</resources>
