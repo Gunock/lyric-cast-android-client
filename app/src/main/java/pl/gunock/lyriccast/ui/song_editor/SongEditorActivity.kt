@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 19/12/2021, 22:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 20:28
+ * Last modified 19/12/2021, 21:34
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -75,14 +75,15 @@ class SongEditorActivity : AppCompatActivity() {
 
         viewModel.categories.observe(this) { categories ->
             lifecycleScope.launch(Dispatchers.Default) {
+                val viewModelCategory = viewModel.category
                 categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
 
-                if (viewModel.isEditingSong) {
+                if (viewModelCategory != null) {
                     val categoryIndex = categorySpinnerAdapter.items
                         .map { category -> category.category.name }
-                        .indexOf(viewModel.category?.name)
+                        .indexOf(viewModelCategory.name)
 
-                    binding.spnSongEditorCategory.setSelection(categoryIndex)
+                    binding.spnSongEditorCategory.setSelection(categoryIndex, false)
                 }
             }
         }
@@ -114,7 +115,6 @@ class SongEditorActivity : AppCompatActivity() {
     private fun setupCategorySpinner() {
         categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
         binding.spnSongEditorCategory.adapter = categorySpinnerAdapter
-
         binding.spnSongEditorCategory.onItemSelectedListener = OnCategoryItemSelectedListener()
     }
 
@@ -274,7 +274,13 @@ class SongEditorActivity : AppCompatActivity() {
             id: Long
         ) {
             val categoryItem = binding.spnSongEditorCategory.selectedItem as CategoryItem?
-            viewModel.category = categoryItem?.category
+            val category = if (categoryItem == viewModel.categoryNone) {
+                null
+            } else {
+                categoryItem?.category
+            }
+
+            viewModel.category = category
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {}

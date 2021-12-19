@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 07/10/2021, 11:16
+ * Created by Tomasz Kiljanczyk on 19/12/2021, 22:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 07/10/2021, 11:05
+ * Last modified 19/12/2021, 20:46
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistEditorBinding
 import pl.gunock.lyriccast.shared.enums.NameValidationState
@@ -177,13 +178,15 @@ class SetlistEditorFragment : Fragment() {
         }
 
         if (viewModel.songs.isEmpty()) {
-            toast?.cancel()
-            toast = Toast.makeText(
-                requireContext(),
-                getString(R.string.setlist_editor_empty_warning),
-                Toast.LENGTH_SHORT
-            )
-            toast!!.show()
+            withContext(Dispatchers.Main) {
+                toast?.cancel()
+                toast = Toast.makeText(
+                    requireContext(),
+                    getString(R.string.setlist_editor_empty_warning),
+                    Toast.LENGTH_SHORT
+                )
+                toast!!.show()
+            }
             requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             return false
         }
