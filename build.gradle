@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 12:22
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 12:06
+ * Last modified 21/12/2021, 00:25
  */
 
 ext {
@@ -11,9 +11,9 @@ ext {
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        kotlin_version = '1.6.0'
+        kotlin_version = '1.6.10'
         nav_version = '2.3.5'
-        hilt_version = '2.39.1'
+        hilt_version = '2.40.5'
         mongo_realm_version = '10.7.1'
     }
 

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 10:03
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 09:54
+ * Last modified 21/12/2021, 00:05
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -50,7 +50,7 @@ internal class SetlistsRepositoryMongoImpl : SetlistsRepository {
             for (id in setlistIds) {
                 transactionRealm.where<SetlistDocument>().findAll()
                     .where()
-                    .equalTo("id", id)
+                    .equalTo("id", ObjectId(id))
                     .findFirst()
                     ?.deleteFromRealm()
             }

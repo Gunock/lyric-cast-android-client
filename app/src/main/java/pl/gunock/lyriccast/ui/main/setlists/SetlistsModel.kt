@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:23
+ * Last modified 21/12/2021, 00:16
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -46,10 +46,10 @@ class SetlistsModel @Inject constructor(
 
     private val _setlists: MutableLiveData<List<SetlistItem>> = MutableLiveData(listOf())
 
-    val pickedSetlist: LiveData<SetlistItem>
+    val pickedSetlist: LiveData<SetlistItem?>
         get() = _pickedSetlist
 
-    private val _pickedSetlist: MutableLiveData<SetlistItem> = MutableLiveData()
+    private val _pickedSetlist: MutableLiveData<SetlistItem?> = MutableLiveData()
 
 
     val numberOfSelectedSetlists: LiveData<Pair<Int, Int>>
@@ -87,8 +87,8 @@ class SetlistsModel @Inject constructor(
     suspend fun deleteSelectedSetlists() {
         val selectedSetlists = allSetlists.filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
-
         setlistsRepository.deleteSetlists(selectedSetlists)
+        _numberOfSelectedSetlists.postValue(Pair(selectedSetlists.size, 0))
     }
 
     // TODO: Move filter to separate class (functional interface?)

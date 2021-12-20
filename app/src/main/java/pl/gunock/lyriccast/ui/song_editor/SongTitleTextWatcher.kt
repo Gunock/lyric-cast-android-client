@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 19:41
+ * Last modified 21/12/2021, 00:27
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -42,8 +42,8 @@ class SongTitleTextWatcher(
             }
             NameValidationState.VALID -> {
                 binding.tinSongTitle.error = null
-                viewModel.songTitle = newText.trim()
             }
         }
+        viewModel.songTitle = newText.trim()
     }
 }

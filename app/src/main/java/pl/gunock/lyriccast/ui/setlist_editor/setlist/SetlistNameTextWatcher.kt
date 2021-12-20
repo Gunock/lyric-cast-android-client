@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 07/10/2021, 11:16
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 07/10/2021, 11:16
+ * Last modified 21/12/2021, 00:28
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -42,8 +42,8 @@ class SetlistNameTextWatcher(
             }
             NameValidationState.VALID -> {
                 binding.tinSetlistName.error = null
-                viewModel.setlistName = newText
             }
         }
+        viewModel.setlistName = newText.trim()
     }
 }

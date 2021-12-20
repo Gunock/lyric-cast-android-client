@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/11/2021, 18:07
+ * Last modified 21/12/2021, 00:22
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -37,8 +37,7 @@ class SongEditorModel @Inject constructor(
         const val TAG = "SongEditorModel"
     }
 
-    val isEditingSong: Boolean get() = _isEditingSong
-    private var _isEditingSong: Boolean = false
+    private var isEditingSong: Boolean = false
 
     private var songId: String? = null
     var songTitle: String = ""
@@ -110,7 +109,7 @@ class SongEditorModel @Inject constructor(
         Log.v(TAG, "Received song : $song")
 
         editedSong = song
-        _isEditingSong = true
+        isEditingSong = true
         this.songId = song.id
         songTitle = song.title
         category = song.category

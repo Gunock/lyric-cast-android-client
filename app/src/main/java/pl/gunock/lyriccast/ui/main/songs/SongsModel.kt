@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:23
+ * Last modified 21/12/2021, 00:14
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -48,8 +48,8 @@ class SongsModel @Inject constructor(
     private var allSongs: List<SongItem> = listOf()
 
 
-    val pickedSong: LiveData<SongItem> get() = _pickedSong
-    private val _pickedSong: MutableLiveData<SongItem> = MutableLiveData()
+    val pickedSong: LiveData<SongItem?> get() = _pickedSong
+    private val _pickedSong: MutableLiveData<SongItem?> = MutableLiveData()
 
     val numberOfSelectedSongs: LiveData<Pair<Int, Int>> get() = _numberOfSelectedSongs
     private val _numberOfSelectedSongs: MutableLiveData<Pair<Int, Int>> =
@@ -108,6 +108,7 @@ class SongsModel @Inject constructor(
             .map { item -> item.song.id }
 
         songsRepository.deleteSongs(selectedSongs)
+        _numberOfSelectedSongs.postValue(Pair(selectedSongs.size, 0))
     }
 
     // TODO: Move filter to separate class (functional interface?)

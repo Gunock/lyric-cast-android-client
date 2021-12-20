@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 21/12/2021, 00:14
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -64,6 +64,7 @@ class CategoryManagerModel @Inject constructor(
             .map { item -> item.category.id }
 
         categoriesRepository.deleteCategories(selectedCategories)
+        _numberOfSelectedCategories.postValue(Pair(selectedCategories.size, 0))
     }
 
     fun resetCategorySelection() {
