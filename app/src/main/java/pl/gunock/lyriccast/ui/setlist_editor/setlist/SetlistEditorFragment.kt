@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 21/12/2021, 16:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:08
+ * Last modified 21/12/2021, 16:27
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -138,6 +138,9 @@ class SetlistEditorFragment : Fragment() {
         }
 
         binding.btnSaveSetlist.setOnClickListener {
+            if (checkSetlistNameValidity()) {
+                return@setOnClickListener
+            }
             lifecycleScope.launch(Dispatchers.Default) {
                 if (saveSetlist()) {
                     requireActivity().finish()
@@ -170,13 +173,16 @@ class SetlistEditorFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
     }
 
-    private suspend fun saveSetlist(): Boolean {
+    private fun checkSetlistNameValidity(): Boolean {
         if (viewModel.validateSetlistName(viewModel.setlistName) != NameValidationState.VALID) {
-            withContext(Dispatchers.Main) { binding.edSetlistName.setText(viewModel.setlistName) }
+            binding.edSetlistName.setText(viewModel.setlistName)
             binding.tinSetlistName.requestFocus()
             return false
         }
+        return true
+    }
 
+    private suspend fun saveSetlist(): Boolean {
         if (viewModel.songs.isEmpty()) {
             withContext(Dispatchers.Main) {
                 toast?.cancel()
