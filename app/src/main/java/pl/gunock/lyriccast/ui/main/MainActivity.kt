@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:51
+ * Last modified 24/12/2021, 15:28
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -32,7 +32,6 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivityMainBinding
 import pl.gunock.lyriccast.databinding.ContentMainBinding
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
-import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.extensions.loadAd
@@ -46,7 +45,6 @@ import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -56,9 +54,6 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainModel by viewModels()
     private val importDialogModel: ImportDialogModel by viewModels()
-
-    @Inject
-    lateinit var dataTransferRepository: DataTransferRepository
 
     private lateinit var binding: ContentMainBinding
 
@@ -89,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         binding.advMain.loadAd()
-
         super.onResume()
     }
 

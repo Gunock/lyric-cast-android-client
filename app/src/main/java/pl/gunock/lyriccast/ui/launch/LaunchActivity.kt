@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 12:57
+ * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 12:56
+ * Last modified 24/12/2021, 15:07
  */
 
 package pl.gunock.lyriccast.ui.launch
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -35,8 +34,6 @@ class LaunchActivity : AppCompatActivity() {
     private val turnOnWifiManagerResultLauncher =
         registerForActivityResult(this::handleTurnOnWiFiResult)
 
-    // TODO: Resolve this problem
-    @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,7 +43,7 @@ class LaunchActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE)
+        requestPermissions()
     }
 
     override fun onRequestPermissionsResult(
@@ -64,11 +61,21 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
 
-        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        if (!wifiManager.isWifiEnabled) {
-            turnOnWifi()
+        checkWifiEnabled()
+    }
+
+    private fun requestPermissions() {
+        val permissions: MutableList<String> = mutableListOf()
+        for (permission in PERMISSIONS) {
+            if (applicationContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(permission)
+            }
+        }
+
+        if (permissions.isEmpty()) {
+            checkWifiEnabled()
         } else {
-            goToMain()
+            requestPermissions(permissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
         }
     }
 
@@ -78,6 +85,15 @@ class LaunchActivity : AppCompatActivity() {
         }
 
         goToMain()
+    }
+
+    private fun checkWifiEnabled() {
+        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (!wifiManager.isWifiEnabled) {
+            turnOnWifi()
+        } else {
+            goToMain()
+        }
     }
 
     private fun turnOnWifi() {

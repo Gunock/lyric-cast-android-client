@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 16:28
+ * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 16:27
+ * Last modified 24/12/2021, 14:58
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistEditorBinding
 import pl.gunock.lyriccast.shared.enums.NameValidationState
@@ -138,14 +137,7 @@ class SetlistEditorFragment : Fragment() {
         }
 
         binding.btnSaveSetlist.setOnClickListener {
-            if (checkSetlistNameValidity()) {
-                return@setOnClickListener
-            }
-            lifecycleScope.launch(Dispatchers.Default) {
-                if (saveSetlist()) {
-                    requireActivity().finish()
-                }
-            }
+            saveSetlist()
         }
     }
 
@@ -182,23 +174,23 @@ class SetlistEditorFragment : Fragment() {
         return true
     }
 
-    private suspend fun saveSetlist(): Boolean {
-        if (viewModel.songs.isEmpty()) {
-            withContext(Dispatchers.Main) {
-                toast?.cancel()
-                toast = Toast.makeText(
-                    requireContext(),
-                    getString(R.string.setlist_editor_empty_warning),
-                    Toast.LENGTH_SHORT
-                )
-                toast!!.show()
-            }
-            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-            return false
+    private fun saveSetlist() {
+        if (!checkSetlistNameValidity()) {
+            return
         }
 
-        viewModel.saveSetlist()
-        return true
+        if (viewModel.songs.isNotEmpty()) {
+            lifecycleScope.launch(Dispatchers.Default) { viewModel.saveSetlist() }
+            requireActivity().finish()
+        } else {
+            toast?.cancel()
+            toast = Toast.makeText(
+                requireContext(),
+                getString(R.string.setlist_editor_empty_warning),
+                Toast.LENGTH_SHORT
+            ).apply { show() }
+            requireView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
     }
 
     private fun onSelectSong(numberOfSelectedSongs: Pair<Int, Int>): Boolean {

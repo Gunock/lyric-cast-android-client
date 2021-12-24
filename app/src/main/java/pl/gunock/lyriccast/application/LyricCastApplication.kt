@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 12:57
+ * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 12:55
+ * Last modified 24/12/2021, 15:21
  */
 
 package pl.gunock.lyriccast.application
@@ -26,13 +26,11 @@ import pl.gunock.lyriccast.shared.extensions.getSettings
 @HiltAndroidApp
 class LyricCastApplication : Application() {
     override fun onCreate() {
+        initializeFromThread()
+
         // Initializes MongoDB Realm
         RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
-        // Initializes settings
-        CoroutineScope(Dispatchers.IO).launch {
-            applicationContext.settingsDataStore.data.first()
-        }
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext)
@@ -41,12 +39,19 @@ class LyricCastApplication : Application() {
                 CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart)
             })
 
-        MobileAds.initialize(applicationContext) {}
-        CastMessageHelper.initialize(resources)
-
 
         AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)
 
         super.onCreate()
+    }
+
+    private fun initializeFromThread() {
+        CoroutineScope(Dispatchers.Default).launch {
+            // Initializes settings
+            applicationContext.settingsDataStore.data.first()
+
+            MobileAds.initialize(applicationContext) {}
+            CastMessageHelper.initialize(resources)
+        }
     }
 }
