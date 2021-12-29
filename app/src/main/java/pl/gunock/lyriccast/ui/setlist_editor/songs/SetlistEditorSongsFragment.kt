@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 18:43
+ * Last modified 29/12/2021, 14:34
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -52,7 +52,6 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel // Initializes viewModel
 
         viewModel.setlistSongIds = args.presentation.toList()
         lifecycleScope.launch(Dispatchers.Default) {
@@ -119,9 +118,7 @@ class SetlistEditorSongsFragment : Fragment() {
         binding.spnCategory.adapter = categorySpinnerAdapter
 
         viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                categorySpinnerAdapter.submitCollection(categories)
-            }
+            categorySpinnerAdapter.submitCollection(categories)
         }
     }
 

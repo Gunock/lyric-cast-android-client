@@ -1,13 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/10/2021, 22:40
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 03/10/2021, 22:32
+ * Last modified 26/12/2021, 14:00
  */
 
 package pl.gunock.lyriccast.datamodel
 
 import android.content.Context
+import android.os.Handler
+import android.os.HandlerThread
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.android.asCoroutineDispatcher
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -27,19 +31,28 @@ object RepositoryFactory {
 
     fun createSongsRepository(provider: RepositoryProvider): SongsRepository {
         return when (provider) {
-            RepositoryProvider.MONGO -> SongsRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> {
+                val dispatcher = createDispatcher("SongsRepositoryMongoImpl")
+                SongsRepositoryMongoImpl(dispatcher)
+            }
         }
     }
 
     fun createSetlistsRepository(provider: RepositoryProvider): SetlistsRepository {
         return when (provider) {
-            RepositoryProvider.MONGO -> SetlistsRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> {
+                val dispatcher = createDispatcher("SetlistsRepositoryMongoImpl")
+                SetlistsRepositoryMongoImpl(dispatcher)
+            }
         }
     }
 
     fun createCategoriesRepository(provider: RepositoryProvider): CategoriesRepository {
         return when (provider) {
-            RepositoryProvider.MONGO -> CategoriesRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> {
+                val dispatcher = createDispatcher("CategoriesRepositoryMongoImpl")
+                CategoriesRepositoryMongoImpl(dispatcher)
+            }
         }
     }
 
@@ -47,10 +60,17 @@ object RepositoryFactory {
         provider: RepositoryProvider
     ): DataTransferRepository {
         return when (provider) {
-            RepositoryProvider.MONGO -> DataTransferRepositoryMongoImpl()
+            RepositoryProvider.MONGO -> {
+                val dispatcher = createDispatcher("DataTransferRepositoryMongoImpl")
+                DataTransferRepositoryMongoImpl(dispatcher)
+            }
         }
     }
 
+    private fun createDispatcher(name: String): CoroutineDispatcher {
+        val handlerThread = HandlerThread(name).also { it.start() }
+        return Handler(handlerThread.looper).asCoroutineDispatcher()
+    }
 
     enum class RepositoryProvider {
         MONGO

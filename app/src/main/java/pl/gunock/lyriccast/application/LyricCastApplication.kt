@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/12/2021, 15:21
+ * Last modified 26/12/2021, 13:39
  */
 
 package pl.gunock.lyriccast.application
@@ -30,7 +30,6 @@ class LyricCastApplication : Application() {
 
         // Initializes MongoDB Realm
         RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
-
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext)

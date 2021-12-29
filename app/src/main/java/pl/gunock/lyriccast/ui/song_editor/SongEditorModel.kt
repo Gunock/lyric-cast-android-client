@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:22
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -14,8 +14,6 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Song
@@ -131,9 +129,7 @@ class SongEditorModel @Inject constructor(
             category
         )
 
-        withContext(Dispatchers.Main) {
-            songsRepository.upsertSong(song)
-        }
+        songsRepository.upsertSong(song)
     }
 
     fun setUpSection(sectionName: String) {

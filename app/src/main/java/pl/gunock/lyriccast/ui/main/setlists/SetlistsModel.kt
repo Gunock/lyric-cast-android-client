@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:16
+ * Last modified 29/12/2021, 14:34
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -124,57 +124,53 @@ class SetlistsModel @Inject constructor(
         outputStream: OutputStream,
         messageResourceId: MutableLiveData<Int>
     ) {
-        val exportData: DatabaseTransferData = withContext(Dispatchers.Main) {
-            dataTransferRepository.getDatabaseTransferData()
-        }
+        val exportData: DatabaseTransferData = dataTransferRepository.getDatabaseTransferData()
 
-        withContext(Dispatchers.IO) {
-            val exportDir = File(cacheDir, ".export")
-            exportDir.deleteRecursively()
-            exportDir.mkdirs()
+        val exportDir = File(cacheDir, ".export")
+        exportDir.deleteRecursively()
+        exportDir.mkdirs()
 
-            val selectedSongs = allSetlists.filter { it.isSelected }
+        val selectedSongs = allSetlists.filter { it.isSelected }
 
-            val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
+        val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
 
 
-            val exportSetlists = exportData.setlistDtos!!
-                .filter { it.name in setlistNames }
+        val exportSetlists = exportData.setlistDtos!!
+            .filter { it.name in setlistNames }
 
-            val songTitles: Set<String> = exportSetlists.flatMap { it.songs }.toSet()
+        val songTitles: Set<String> = exportSetlists.flatMap { it.songs }.toSet()
 
-            val categoryNames: Set<String> = exportData.songDtos!!
-                .filter { it.title in songTitles }
-                .mapNotNull { it.category }
-                .toSet()
+        val categoryNames: Set<String> = exportData.songDtos!!
+            .filter { it.title in songTitles }
+            .mapNotNull { it.category }
+            .toSet()
 
-            val songJsons: List<JSONObject> = exportData.songDtos!!
-                .filter { it.title in songTitles }
-                .map { it.toJson() }
+        val songJsons: List<JSONObject> = exportData.songDtos!!
+            .filter { it.title in songTitles }
+            .map { it.toJson() }
 
-            val categoryJsons = exportData.categoryDtos!!
-                .filter { it.name in categoryNames }
-                .map { it.toJson() }
+        val categoryJsons = exportData.categoryDtos!!
+            .filter { it.name in categoryNames }
+            .map { it.toJson() }
 
-            val setlistJsons = exportSetlists.filter { it.name in setlistNames }
-                .map { it.toJson() }
+        val setlistJsons = exportSetlists.filter { it.name in setlistNames }
+            .map { it.toJson() }
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_json)
-            val songsString = JSONArray(songJsons).toString()
-            val categoriesString = JSONArray(categoryJsons).toString()
-            val setlistsString = JSONArray(setlistJsons).toString()
-            File(exportDir, "songs.json").writeText(songsString)
-            File(exportDir, "categories.json").writeText(categoriesString)
-            File(exportDir, "setlists.json").writeText(setlistsString)
+        messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        val songsString = JSONArray(songJsons).toString()
+        val categoriesString = JSONArray(categoryJsons).toString()
+        val setlistsString = JSONArray(setlistJsons).toString()
+        File(exportDir, "songs.json").writeText(songsString)
+        File(exportDir, "categories.json").writeText(categoriesString)
+        File(exportDir, "setlists.json").writeText(setlistsString)
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_zip)
-            @Suppress("BlockingMethodInNonBlockingContext")
-            FileHelper.zip(outputStream, exportDir.path)
+        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        @Suppress("BlockingMethodInNonBlockingContext")
+        FileHelper.zip(outputStream, exportDir.path)
 
-            messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
-            exportDir.deleteRecursively()
-            resetSetlistSelection()
-        }
+        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        exportDir.deleteRecursively()
+        resetSetlistSelection()
     }
 
     private fun onSetlistSelection(

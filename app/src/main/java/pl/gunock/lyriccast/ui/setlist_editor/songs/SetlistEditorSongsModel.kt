@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 07/10/2021, 19:59
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 07/10/2021, 19:59
+ * Last modified 29/12/2021, 14:16
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -57,7 +57,7 @@ class SetlistEditorSongsModel @Inject constructor(
 
     init {
         songsSubscription = songsRepository.getAllSongs().subscribe {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Default) {
                 val songItems = it.map { song ->
                     val isSelected = song.id in setlistSongIds
                     SongItem(song, hasCheckbox = true, isSelected = isSelected)

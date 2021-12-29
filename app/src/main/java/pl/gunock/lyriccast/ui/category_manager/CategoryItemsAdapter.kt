@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 20:11
+ * Last modified 29/12/2021, 14:44
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -11,8 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.databinding.ItemCategoryBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
@@ -26,22 +24,17 @@ class CategoryItemsAdapter(
         const val TAG = "CategoryItemsAdapter"
     }
 
-    private var _items: MutableList<CategoryItem> = mutableListOf()
+    private var _items: List<CategoryItem> = listOf()
 
     init {
         setHasStableIds(true)
     }
 
-    suspend fun submitCollection(categories: List<CategoryItem>) {
+    fun submitCollection(categories: List<CategoryItem>) {
         val previousSize = itemCount
-        withContext(Dispatchers.Default) {
-            _items.clear()
-            _items.addAll(categories)
-        }
-        withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, previousSize)
-            notifyItemRangeInserted(0, _items.size)
-        }
+        _items = categories
+        notifyItemRangeRemoved(0, previousSize)
+        notifyItemRangeInserted(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

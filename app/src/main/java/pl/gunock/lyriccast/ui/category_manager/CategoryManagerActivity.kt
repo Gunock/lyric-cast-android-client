@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 19:56
+ * Last modified 29/12/2021, 14:35
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
 import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
@@ -86,9 +87,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         binding.rcvCategories.adapter = categoryItemsAdapter
 
         viewModel.categories.observe(this) {
-            lifecycleScope.launch(Dispatchers.Default) {
-                categoryItemsAdapter.submitCollection(it)
-            }
+            categoryItemsAdapter.submitCollection(it)
         }
     }
 
@@ -168,7 +167,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Default) {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
                         viewModel.deleteSelectedCategories()
@@ -179,7 +178,7 @@ class CategoryManagerActivity : AppCompatActivity() {
                 }
 
                 if (result) {
-                    mode.finish()
+                    withContext(Dispatchers.Main) { mode.finish() }
                 }
             }
 

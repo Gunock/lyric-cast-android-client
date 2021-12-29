@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 20:13
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -11,8 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
@@ -26,22 +24,17 @@ class SetlistItemsAdapter(
         const val TAG = "SetlistItemsAdapter"
     }
 
-    private var _items: MutableList<SetlistItem> = mutableListOf()
+    private var _items: List<SetlistItem> = listOf()
 
     init {
         setHasStableIds(true)
     }
 
-    suspend fun submitCollection(setlists: List<SetlistItem>) {
+    fun submitCollection(setlists: List<SetlistItem>) {
         val previousSize = itemCount
-        withContext(Dispatchers.Default) {
-            _items.clear()
-            _items.addAll(setlists)
-        }
-        withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, previousSize)
-            notifyItemRangeRemoved(0, _items.size)
-        }
+        _items = setlists
+        notifyItemRangeRemoved(0, previousSize)
+        notifyItemRangeRemoved(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

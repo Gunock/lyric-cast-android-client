@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 17:56
+ * Last modified 26/12/2021, 12:25
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
@@ -27,5 +27,5 @@ interface DataTransferRepository {
         options: ImportOptions
     )
 
-    fun getDatabaseTransferData(): DatabaseTransferData
+    suspend fun getDatabaseTransferData(): DatabaseTransferData
 }

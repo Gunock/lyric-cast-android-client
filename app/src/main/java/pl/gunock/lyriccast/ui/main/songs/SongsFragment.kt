@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 17:40
+ * Last modified 29/12/2021, 14:35
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
@@ -67,7 +68,6 @@ class SongsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel // Initializes viewModel
 
         binding.swtSelectedSongs.visibility = View.GONE
 
@@ -115,9 +115,7 @@ class SongsFragment : Fragment() {
         binding.spnCategory.adapter = categorySpinnerAdapter
 
         viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                categorySpinnerAdapter.submitCollection(categories)
-            }
+            categorySpinnerAdapter.submitCollection(categories)
         }
     }
 
@@ -280,7 +278,7 @@ class SongsFragment : Fragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Default) {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
                         viewModel.deleteSelectedSongs()
@@ -293,7 +291,7 @@ class SongsFragment : Fragment() {
                 }
 
                 if (result) {
-                    mode.finish()
+                    withContext(Dispatchers.Main) { mode.finish() }
                 }
             }
 

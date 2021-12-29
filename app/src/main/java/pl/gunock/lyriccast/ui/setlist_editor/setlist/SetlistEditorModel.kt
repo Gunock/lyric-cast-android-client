@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/11/2021, 18:03
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -12,8 +12,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -102,10 +100,7 @@ class SetlistEditorModel @Inject constructor(
             .toTypedArray()
 
         val setlist = Setlist(setlistName, presentation.toList(), setlistId)
-
-        withContext(Dispatchers.Main) {
-            setlistsRepository.upsertSetlist(setlist)
-        }
+        setlistsRepository.upsertSetlist(setlist)
         Log.i(TAG, "Created setlist: $setlist")
     }
 

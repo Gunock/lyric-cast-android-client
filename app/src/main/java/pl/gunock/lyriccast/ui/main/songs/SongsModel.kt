@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:14
+ * Last modified 29/12/2021, 14:16
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -156,44 +156,40 @@ class SongsModel @Inject constructor(
         outputStream: OutputStream,
         messageResourceId: MutableLiveData<Int>
     ) {
-        val exportData: DatabaseTransferData = withContext(Dispatchers.Main) {
-            dataTransferRepository.getDatabaseTransferData()
-        }
+        val exportData: DatabaseTransferData = dataTransferRepository.getDatabaseTransferData()
 
-        withContext(Dispatchers.IO) {
-            val exportDir = File(cacheDir, ".export")
-            exportDir.deleteRecursively()
-            exportDir.mkdirs()
+        val exportDir = File(cacheDir, ".export")
+        exportDir.deleteRecursively()
+        exportDir.mkdirs()
 
-            val selectedSongs = allSongs.filter { it.isSelected }
+        val selectedSongs = allSongs.filter { it.isSelected }
 
-            val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
-            val categoryNames: Set<String> =
-                selectedSongs.mapNotNull { it.song.category?.name }.toSet()
+        val songTitles: Set<String> = selectedSongs.map { it.song.title }.toSet()
+        val categoryNames: Set<String> =
+            selectedSongs.mapNotNull { it.song.category?.name }.toSet()
 
 
-            val songJsons = exportData.songDtos!!
-                .filter { it.title in songTitles }
-                .map { it.toJson() }
+        val songJsons = exportData.songDtos!!
+            .filter { it.title in songTitles }
+            .map { it.toJson() }
 
-            val categoryJsons = exportData.categoryDtos!!
-                .filter { it.name in categoryNames }
-                .map { it.toJson() }
+        val categoryJsons = exportData.categoryDtos!!
+            .filter { it.name in categoryNames }
+            .map { it.toJson() }
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        messageResourceId.postValue(R.string.main_activity_export_saving_json)
 
-            val songsString = JSONArray(songJsons).toString()
-            val categoriesString = JSONArray(categoryJsons).toString()
-            File(exportDir, "songs.json").writeText(songsString)
-            File(exportDir, "categories.json").writeText(categoriesString)
+        val songsString = JSONArray(songJsons).toString()
+        val categoriesString = JSONArray(categoryJsons).toString()
+        File(exportDir, "songs.json").writeText(songsString)
+        File(exportDir, "categories.json").writeText(categoriesString)
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_zip)
-            FileHelper.zip(outputStream, exportDir.path)
+        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        FileHelper.zip(outputStream, exportDir.path)
 
-            messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
-            exportDir.deleteRecursively()
-            resetSongSelection()
-        }
+        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        exportDir.deleteRecursively()
+        resetSongSelection()
     }
 
     private fun onSongSelection(

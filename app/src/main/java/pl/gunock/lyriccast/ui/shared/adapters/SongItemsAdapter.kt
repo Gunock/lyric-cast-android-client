@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 20:13
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -13,8 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
@@ -39,18 +37,13 @@ class SongItemsAdapter(
     private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
-    private val _items: MutableList<SongItem> = mutableListOf()
+    private var _items: List<SongItem> = listOf()
 
-    suspend fun submitCollection(songs: List<SongItem>) {
+    fun submitCollection(songs: List<SongItem>) {
         val previousSize = itemCount
-        withContext(Dispatchers.Default) {
-            _items.clear()
-            _items.addAll(songs)
-        }
-        withContext(Dispatchers.Main) {
-            notifyItemRangeRemoved(0, previousSize)
-            notifyItemRangeRemoved(0, _items.size)
-        }
+        _items = songs
+        notifyItemRangeRemoved(0, previousSize)
+        notifyItemRangeRemoved(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

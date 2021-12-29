@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 19:46
+ * Last modified 29/12/2021, 14:49
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -11,8 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
 import pl.gunock.lyriccast.datamodel.models.Category
@@ -29,19 +27,14 @@ class CategorySpinnerAdapter(
 
     val items: List<CategoryItem> get() = _items
 
-    private var _items: MutableList<CategoryItem> = mutableListOf()
+    private var _items: List<CategoryItem> = listOf()
 
-    suspend fun submitCollection(
+    fun submitCollection(
         categories: List<CategoryItem>,
         firstCategory: CategoryItem = categoryAll
     ) {
-        withContext(Dispatchers.Default) {
-            _items.clear()
-            _items.addAll(listOf(firstCategory) + categories)
-        }
-        withContext(Dispatchers.Main) {
-            notifyDataSetChanged()
-        }
+        _items = listOf(firstCategory) + categories
+        notifyDataSetChanged()
     }
 
     override fun getItem(position: Int): Any {

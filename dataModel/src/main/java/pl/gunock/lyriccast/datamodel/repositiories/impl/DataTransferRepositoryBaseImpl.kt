@@ -1,13 +1,14 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 17:56
+ * Last modified 29/12/2021, 14:49
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.*
 import pl.gunock.lyriccast.datamodel.R
 import pl.gunock.lyriccast.datamodel.extentions.toRealmList
 import pl.gunock.lyriccast.datamodel.models.*
@@ -48,27 +49,24 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         importSongs(data, messageResourceId, options)
     }
 
-    final override fun getDatabaseTransferData(): DatabaseTransferData {
-        val songs: List<Song> = getAllSongs()
-        val categories: List<Category> = getAllCategories()
-        val setlists: List<Setlist> = getAllSetlists()
+    final override suspend fun getDatabaseTransferData(): DatabaseTransferData =
+        coroutineScope {
+            val songs: Deferred<List<Song>> = async { getAllSongs() }
+            val categories: Deferred<List<Category>> = async { getAllCategories() }
+            val setlists: Deferred<List<Setlist>> = async { getAllSetlists() }
 
-        val songDtos: List<SongDto> = songs.map { it.toDto() }
-        val categoryDtos: List<CategoryDto> = categories.map { it.toDto() }
-        val setlistDtos: List<SetlistDto> = setlists.map { it.toDto() }
+            return@coroutineScope DatabaseTransferData(
+                songDtos = songs.await().map { it.toDto() },
+                categoryDtos = categories.await().map { it.toDto() },
+                setlistDtos = setlists.await().map { it.toDto() }
+            )
+        }
 
-        return DatabaseTransferData(
-            songDtos = songDtos,
-            categoryDtos = categoryDtos,
-            setlistDtos = setlistDtos
-        )
-    }
+    protected abstract suspend fun getAllSongs(): List<Song>
 
-    protected abstract fun getAllSongs(): List<Song>
+    protected abstract suspend fun getAllSetlists(): List<Setlist>
 
-    protected abstract fun getAllSetlists(): List<Setlist>
-
-    protected abstract fun getAllCategories(): List<Category>
+    protected abstract suspend fun getAllCategories(): List<Category>
 
     protected abstract suspend fun upsertSongs(songs: Iterable<Song>)
 

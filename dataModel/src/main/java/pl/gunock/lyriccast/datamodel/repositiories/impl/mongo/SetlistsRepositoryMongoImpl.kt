@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:05
+ * Last modified 26/12/2021, 14:24
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -9,52 +9,59 @@ package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 import io.reactivex.Flowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.kotlin.executeTransactionAwait
 import io.realm.kotlin.where
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 
-internal class SetlistsRepositoryMongoImpl : SetlistsRepository {
+internal class SetlistsRepositoryMongoImpl(
+    private val dispatcher: CoroutineDispatcher
+) : SetlistsRepository {
 
-    private val realm: Realm = Realm.getInstance(RealmConfiguration.Builder().build())
-
-    override fun getAllSetlists(): Flowable<List<Setlist>> {
-        return realm.where<SetlistDocument>().findAllAsync()
-            .asFlowable()
-            .map { setlistDocuments ->
-                setlistDocuments.map { it.toGenericModel() }
-            }
+    private val realm: Realm = runBlocking(dispatcher) {
+        Realm.getInstance(RealmConfiguration.Builder().build())
     }
 
-    override fun getSetlist(id: String): Setlist? {
-        val setlistDocument = realm.where<SetlistDocument>()
-            .equalTo("id", ObjectId(id))
-            .findFirst()
-
-        return setlistDocument?.toGenericModel()
-    }
-
-    override suspend fun upsertSetlist(setlist: Setlist) {
-        val setlistDocument = SetlistDocument(setlist)
-
-        realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
-            transactionRealm.insertOrUpdate(setlistDocument)
+    override fun getAllSetlists(): Flowable<List<Setlist>> =
+        runBlocking(dispatcher) {
+            realm.where<SetlistDocument>().findAllAsync()
+                .asFlowable()
+                .map { setlistDocuments ->
+                    setlistDocuments.map { it.toGenericModel() }
+                }
         }
-    }
 
-    override suspend fun deleteSetlists(setlistIds: Collection<String>) {
-        realm.executeTransactionAwait(Dispatchers.IO) { transactionRealm ->
-            for (id in setlistIds) {
-                transactionRealm.where<SetlistDocument>().findAll()
-                    .where()
-                    .equalTo("id", ObjectId(id))
-                    .findFirst()
-                    ?.deleteFromRealm()
+    override fun getSetlist(id: String): Setlist? =
+        runBlocking(dispatcher) {
+            val setlistDocument = realm.where<SetlistDocument>()
+                .equalTo("id", ObjectId(id))
+                .findFirst()
+
+            setlistDocument?.toGenericModel()
+        }
+
+    override suspend fun upsertSetlist(setlist: Setlist) =
+        withContext(dispatcher) {
+            val setlistDocument = SetlistDocument(setlist)
+
+            realm.executeTransaction { it.insertOrUpdate(setlistDocument) }
+        }
+
+    override suspend fun deleteSetlists(setlistIds: Collection<String>) =
+        withContext(dispatcher) {
+            realm.executeTransaction { transactionRealm ->
+                for (id in setlistIds) {
+                    transactionRealm.where<SetlistDocument>().findAll()
+                        .where()
+                        .equalTo("id", ObjectId(id))
+                        .findFirst()
+                        ?.deleteFromRealm()
+                }
             }
         }
-    }
 
 }

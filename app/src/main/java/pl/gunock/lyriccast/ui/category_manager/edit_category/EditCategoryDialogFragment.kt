@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:48
+ * Last modified 29/12/2021, 14:16
  */
 
 package pl.gunock.lyriccast.ui.category_manager.edit_category
@@ -105,8 +105,12 @@ class EditCategoryDialogFragment(
         binding.edCategoryName.addTextChangedListener(categoryNameTextWatcher)
 
         binding.btnSaveCategory.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Main) {
-                saveCategory()
+            if (validateCategoryName()) {
+                viewModel.categoryColor = binding.spnCategoryColor.selectedItem as ColorItem
+                lifecycleScope.launch(Dispatchers.Default) {
+                    viewModel.saveCategory()
+                    dismiss()
+                }
             }
         }
 
@@ -115,18 +119,15 @@ class EditCategoryDialogFragment(
         }
     }
 
-    private suspend fun saveCategory() {
+    private fun validateCategoryName(): Boolean {
         val categoryName = binding.edCategoryName.text.toString().trim()
         if (validateCategoryName(categoryName) != NameValidationState.VALID) {
             binding.edCategoryName.setText(categoryName)
             binding.tinCategoryName.requestFocus()
-            return
+            return false
         }
 
-        viewModel.categoryColor = binding.spnCategoryColor.selectedItem as ColorItem
-
-        viewModel.saveCategory()
-        dismiss()
+        return true
     }
 
     private fun validateCategoryName(name: String): NameValidationState {

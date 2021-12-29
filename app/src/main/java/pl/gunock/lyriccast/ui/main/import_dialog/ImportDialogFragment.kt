@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:51
+ * Last modified 26/12/2021, 11:17
  */
 
 package pl.gunock.lyriccast.ui.main.import_dialog
@@ -45,7 +45,6 @@ class ImportDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel // Initializes viewModel
 
         binding.tvDialogTitle.text = getString(R.string.main_activity_import_dialog_title)
 

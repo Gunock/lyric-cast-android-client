@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/12/2021, 22:30
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/12/2021, 21:34
+ * Last modified 29/12/2021, 14:34
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -51,7 +51,6 @@ class SongEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel // Initializes view model
 
         val rootBinding = ActivitySongEditorBinding.inflate(layoutInflater)
         binding = rootBinding.contentSongEditor
@@ -74,17 +73,15 @@ class SongEditorActivity : AppCompatActivity() {
         setupListeners()
 
         viewModel.categories.observe(this) { categories ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                val viewModelCategory = viewModel.category
-                categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
+            val viewModelCategory = viewModel.category
+            categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
 
-                if (viewModelCategory != null) {
-                    val categoryIndex = categorySpinnerAdapter.items
-                        .map { category -> category.category.name }
-                        .indexOf(viewModelCategory.name)
+            if (viewModelCategory != null) {
+                val categoryIndex = categorySpinnerAdapter.items
+                    .map { category -> category.category.name }
+                    .indexOf(viewModelCategory.name)
 
-                    binding.spnSongEditorCategory.setSelection(categoryIndex, false)
-                }
+                binding.spnSongEditorCategory.setSelection(categoryIndex, false)
             }
         }
     }

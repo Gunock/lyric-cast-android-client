@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:23
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -11,6 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
@@ -37,46 +40,44 @@ class MainModel @Inject constructor(
         const val TAG = "MainViewModel"
     }
 
+    fun init() {}
+
     suspend fun exportAll(
         cacheDir: String,
         outputStream: OutputStream,
         messageResourceId: MutableLiveData<Int>
     ) {
-        val exportData = withContext(Dispatchers.Main) {
-            dataTransferRepository.getDatabaseTransferData()
-        }
+        val exportData = dataTransferRepository.getDatabaseTransferData()
 
-        withContext(Dispatchers.IO) {
-            val exportDir = File(cacheDir, ".export")
-            exportDir.deleteRecursively()
-            exportDir.mkdirs()
+        val exportDir = File(cacheDir, ".export")
+        exportDir.deleteRecursively()
+        exportDir.mkdirs()
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_json)
-            val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
-            val categoriesString =
-                JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
-            val setlistsString =
-                JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
+        messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
+        val categoriesString =
+            JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
+        val setlistsString =
+            JSONArray(exportData.setlistDtos!!.map { it.toJson() }).toString()
 
-            File(exportDir, "songs.json").writeText(songsString)
-            File(exportDir, "categories.json").writeText(categoriesString)
-            File(exportDir, "setlists.json").writeText(setlistsString)
+        File(exportDir, "songs.json").writeText(songsString)
+        File(exportDir, "categories.json").writeText(categoriesString)
+        File(exportDir, "setlists.json").writeText(setlistsString)
 
-            messageResourceId.postValue(R.string.main_activity_export_saving_zip)
-            FileHelper.zip(outputStream, exportDir.path)
+        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        FileHelper.zip(outputStream, exportDir.path)
 
-            messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
-            exportDir.deleteRecursively()
-        }
+        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        exportDir.deleteRecursively()
     }
 
-    suspend fun importLyricCast(
+    fun importLyricCast(
         cacheDir: String,
         inputStream: InputStream,
         messageResourceId: MutableLiveData<Int>,
         importError: MutableLiveData<Boolean>,
         importOptions: ImportOptions
-    ): Boolean {
+    ): Flow<Boolean?> = flow {
         val transferData: DatabaseTransferData? = withContext(Dispatchers.IO) {
             getImportData(cacheDir, inputStream)
         }
@@ -84,19 +85,16 @@ class MainModel @Inject constructor(
         if (transferData == null) {
             messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
             importError.postValue(true)
-            return false
-        }
-
-        withContext(Dispatchers.Main) {
+            emit(false)
+        } else {
             dataTransferRepository.importSongs(
                 transferData,
                 messageResourceId,
                 importOptions
             )
+            emit(true)
         }
-
-        return true
-    }
+    }.flowOn(Dispatchers.Default)
 
     suspend fun importOpenSong(
         cacheDir: String,
@@ -105,32 +103,24 @@ class MainModel @Inject constructor(
         importError: MutableLiveData<Boolean>,
         importOptions: ImportOptions
     ): Boolean {
-        val importedSongs: Set<SongDto>? = withContext(Dispatchers.IO) {
-            val importDir = File(cacheDir)
-            val importSongXmlParser =
-                ImportSongXmlParserFactory.create(importDir, SongXmlParserType.OPEN_SONG)
+        val importDir = File(cacheDir)
+        val importSongXmlParser =
+            ImportSongXmlParserFactory.create(importDir, SongXmlParserType.OPEN_SONG)
 
-            return@withContext try {
-                importSongXmlParser.parseZip(inputStream)
-            } catch (exception: Exception) {
-                Log.e(TAG, exception.stackTraceToString())
-                null
-            }
-        }
-
-        if (importedSongs == null) {
+        val importedSongs: Set<SongDto> = try {
+            importSongXmlParser.parseZip(inputStream)
+        } catch (exception: Exception) {
+            Log.e(TAG, exception.stackTraceToString())
             messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
             importError.postValue(true)
             return false
         }
 
-        withContext(Dispatchers.Main) {
-            dataTransferRepository.importSongs(
-                importedSongs,
-                messageResourceId,
-                importOptions
-            )
-        }
+        dataTransferRepository.importSongs(
+            importedSongs,
+            messageResourceId,
+            importOptions
+        )
 
         return true
     }

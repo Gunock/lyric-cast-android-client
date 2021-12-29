@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/12/2021, 14:58
+ * Last modified 29/12/2021, 14:52
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -68,7 +68,6 @@ class SetlistEditorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel // Initializes viewModel
 
         loadSetlist()
         setupListeners()

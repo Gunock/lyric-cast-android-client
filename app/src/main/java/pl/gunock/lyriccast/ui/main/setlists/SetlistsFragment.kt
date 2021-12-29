@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 12:51
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 12:23
+ * Last modified 29/12/2021, 14:35
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistsBinding
 import pl.gunock.lyriccast.domain.models.SetlistItem
@@ -64,7 +65,6 @@ class SetlistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel // Initializes viewModel
 
         viewModel.pickedSetlist.observe(viewLifecycleOwner, this::onPickSetlist)
         viewModel.numberOfSelectedSetlists.observe(viewLifecycleOwner, this::onSelectSetlist)
@@ -129,16 +129,14 @@ class SetlistsFragment : Fragment() {
         binding.rcvSetlists.adapter = setlistItemsAdapter
 
         viewModel.setlists.observe(viewLifecycleOwner) {
-            lifecycleScope.launch(Dispatchers.Default) {
-                setlistItemsAdapter.submitCollection(it)
-            }
+            setlistItemsAdapter.submitCollection(it)
         }
     }
 
 
     private fun setupListeners() {
         binding.edSetlistNameFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Default) {
                 viewModel.resetSetlistSelection()
                 viewModel.filterSetlists(newText)
             }
@@ -244,7 +242,7 @@ class SetlistsFragment : Fragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Default) {
                 val result = when (item.itemId) {
                     R.id.action_menu_delete -> {
                         viewModel.deleteSelectedSetlists()
@@ -256,7 +254,7 @@ class SetlistsFragment : Fragment() {
                 }
 
                 if (result) {
-                    mode.finish()
+                    withContext(Dispatchers.Main) { mode.finish() }
                 }
             }
 
