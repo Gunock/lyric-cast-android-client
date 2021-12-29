@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:35
+ * Last modified 29/12/2021, 15:28
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -84,6 +84,7 @@ class SongsFragment : Fragment() {
 
     override fun onStop() {
         actionMode?.finish()
+        viewModel.resetSongSelection()
         super.onStop()
     }
 
@@ -136,7 +137,7 @@ class SongsFragment : Fragment() {
         }
     }
 
-    private suspend fun filterSongs() {
+    private fun filterSongs() {
         Log.v(TAG, "filterSongs invoked")
         val title: String = binding.edSongTitleFilter.editableText.toString()
         val categoryId: String? = getSelectedCategoryId(binding.spnCategory)
@@ -188,7 +189,7 @@ class SongsFragment : Fragment() {
         intent.putExtra("songId", selectedItem.song.id)
         startActivity(intent)
 
-        resetSelection()
+        viewModel.resetSongSelection()
 
         return true
     }
@@ -238,7 +239,7 @@ class SongsFragment : Fragment() {
         intent.putExtra("setlistSongs", setlistSongs)
         startActivity(intent)
 
-        resetSelection()
+        viewModel.resetSongSelection()
         return true
     }
 
@@ -257,11 +258,6 @@ class SongsFragment : Fragment() {
     private fun getSelectedCategoryId(categorySpinner: Spinner): String? {
         categorySpinner.selectedItem ?: return null
         return (categorySpinner.selectedItem as CategoryItem).category.id
-    }
-
-    private fun resetSelection() {
-        viewModel.resetSongSelection()
-        songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
     }
 
     private inner class SongsActionModeCallback : ActionMode.Callback {
@@ -301,7 +297,7 @@ class SongsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            resetSelection()
+            viewModel.resetSongSelection()
         }
     }
 

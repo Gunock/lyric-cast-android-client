@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:34
+ * Last modified 29/12/2021, 15:31
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -113,6 +113,10 @@ class SetlistsModel @Inject constructor(
             it.hasCheckbox = false
         }
         selectionTracker.reset()
+
+        if (_numberOfSelectedSetlists.value!! != Pair(1, 0)) {
+            _numberOfSelectedSetlists.postValue(Pair(1, 0))
+        }
     }
 
     fun resetPickedSetlist() {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:16
+ * Last modified 29/12/2021, 15:31
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.normalize
@@ -112,31 +111,29 @@ class SongsModel @Inject constructor(
     }
 
     // TODO: Move filter to separate class (functional interface?)
-    suspend fun filterSongs(
+    fun filterSongs(
         songTitle: String,
         categoryId: String? = null
     ) {
-        withContext(Dispatchers.Default) {
-            val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
+        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
-            if (!categoryId.isNullOrBlank()) {
-                predicates.add { songItem -> songItem.song.category?.id == categoryId }
-            }
-
-            val normalizedTitle = songTitle.trim().normalize()
-            predicates.add { item ->
-                item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
-            }
-
-            val duration = measureTimeMillis {
-                val filteredItems = allSongs.filter { songItem ->
-                    predicates.all { predicate -> predicate(songItem) }
-                }.toSortedSet().toList()
-
-                _songs.postValue(filteredItems)
-            }
-            Log.v(TAG, "Filtering took : ${duration}ms")
+        if (!categoryId.isNullOrBlank()) {
+            predicates.add { songItem -> songItem.song.category?.id == categoryId }
         }
+
+        val normalizedTitle = songTitle.trim().normalize()
+        predicates.add { item ->
+            item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
+        }
+
+        val duration = measureTimeMillis {
+            val filteredItems = allSongs.filter { songItem ->
+                predicates.all { predicate -> predicate(songItem) }
+            }.toSortedSet().toList()
+
+            _songs.postValue(filteredItems)
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
     }
 
     fun resetSongSelection() {
@@ -145,6 +142,9 @@ class SongsModel @Inject constructor(
             it.hasCheckbox = false
         }
         selectionTracker.reset()
+        if (_numberOfSelectedSongs.value!! != Pair(1, 0)) {
+            _numberOfSelectedSongs.postValue(Pair(1, 0))
+        }
     }
 
     fun resetPickedSong() {

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:35
+ * Last modified 29/12/2021, 15:28
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -79,6 +79,7 @@ class SetlistsFragment : Fragment() {
 
     override fun onStop() {
         actionMode?.finish()
+        viewModel.resetSetlistSelection()
         super.onStop()
     }
 
@@ -206,7 +207,7 @@ class SetlistsFragment : Fragment() {
         intent.putExtra("setlistId", selectedItem.setlist.id)
         startActivity(intent)
 
-        resetSelection()
+        viewModel.resetSetlistSelection()
 
         return true
     }
@@ -220,11 +221,6 @@ class SetlistsFragment : Fragment() {
             findItem(R.id.action_menu_export_selected).isVisible = showGroupActions
             findItem(R.id.action_menu_edit).isVisible = showEdit
         }
-    }
-
-    private fun resetSelection() {
-        viewModel.resetSetlistSelection()
-        setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
     }
 
     private inner class SetlistsActionModeCallback : ActionMode.Callback {
@@ -264,7 +260,7 @@ class SetlistsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            resetSelection()
+            viewModel.resetSetlistSelection()
         }
     }
 

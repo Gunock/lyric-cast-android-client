@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:16
+ * Last modified 29/12/2021, 15:15
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -107,7 +107,7 @@ class SetlistEditorSongsModel @Inject constructor(
         return newPresentation + addedSongIds
     }
 
-    suspend fun filterSongs(
+    fun filterSongs(
         songTitle: String,
         categoryItem: CategoryItem? = null,
         isSelected: Boolean? = null
@@ -115,38 +115,36 @@ class SetlistEditorSongsModel @Inject constructor(
         filterSongs(songTitle, categoryItem?.category?.id, isSelected)
     }
 
-    suspend fun filterSongs(
+    fun filterSongs(
         songTitle: String,
         categoryId: String? = null,
         isSelected: Boolean? = null
     ) {
-        withContext(Dispatchers.Default) {
-            updateSelectedSongs()
+        updateSelectedSongs()
 
-            val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
+        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
-            if (isSelected != null) {
-                predicates.add { songItem -> songItem.isSelected }
-            }
-
-            if (!categoryId.isNullOrBlank()) {
-                predicates.add { songItem -> songItem.song.category?.id == categoryId }
-            }
-
-            val normalizedTitle = songTitle.trim().normalize()
-            predicates.add { item ->
-                item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
-            }
-
-            val duration = measureTimeMillis {
-                val filteredItems = allSongs.filter { songItem ->
-                    predicates.all { predicate -> predicate(songItem) }
-                }.toSortedSet().toList()
-
-                _songs.postValue(filteredItems)
-            }
-            Log.v(TAG, "Filtering took : ${duration}ms")
+        if (isSelected != null) {
+            predicates.add { songItem -> songItem.isSelected }
         }
+
+        if (!categoryId.isNullOrBlank()) {
+            predicates.add { songItem -> songItem.song.category?.id == categoryId }
+        }
+
+        val normalizedTitle = songTitle.trim().normalize()
+        predicates.add { item ->
+            item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
+        }
+
+        val duration = measureTimeMillis {
+            val filteredItems = allSongs.filter { songItem ->
+                predicates.all { predicate -> predicate(songItem) }
+            }.toSortedSet().toList()
+
+            _songs.postValue(filteredItems)
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
     }
 
     private fun onSongSelection(
