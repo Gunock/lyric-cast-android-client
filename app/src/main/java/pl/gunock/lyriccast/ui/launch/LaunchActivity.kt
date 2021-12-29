@@ -1,20 +1,19 @@
 /*
- * Created by Tomasz Kiljanczyk on 24/12/2021, 15:28
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 15:01
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 24/12/2021, 15:07
+ * Last modified 29/12/2021, 14:59
  */
 
 package pl.gunock.lyriccast.ui.launch
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import pl.gunock.lyriccast.R
@@ -31,8 +30,7 @@ class LaunchActivity : AppCompatActivity() {
         )
     }
 
-    private val turnOnWifiManagerResultLauncher =
-        registerForActivityResult(this::handleTurnOnWiFiResult)
+    private val turnOnWifiManagerResultLauncher = registerForActivityResult { goToMain() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,14 +77,6 @@ class LaunchActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleTurnOnWiFiResult(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        goToMain()
-    }
-
     private fun checkWifiEnabled() {
         val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
@@ -102,8 +92,7 @@ class LaunchActivity : AppCompatActivity() {
             .setMessage(getString(R.string.launch_activity_turn_on_wifi))
             .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
                 buttonClicked = true
-                val turnWifiOn = Intent(Settings.ACTION_WIRELESS_SETTINGS)
-                turnOnWifiManagerResultLauncher.launch(turnWifiOn)
+                openWifiSettings()
             }
             .setNegativeButton(getString(R.string.launch_activity_ignore)) { _, _ ->
                 buttonClicked = true
@@ -118,10 +107,20 @@ class LaunchActivity : AppCompatActivity() {
             .show()
     }
 
+
     private fun goToMain() {
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun openWifiSettings() {
+        val wifiIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
+        } else {
+            Intent(Settings.ACTION_WIRELESS_SETTINGS)
+        }
+        turnOnWifiManagerResultLauncher.launch(wifiIntent)
     }
 
 }
