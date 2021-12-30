@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 00:03
+ * Last modified 30/12/2021, 14:14
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -25,7 +25,6 @@ class ProgressDialogFragment : DialogFragment() {
     }
 
     val messageResourceId = MutableLiveData(0)
-    val isError = MutableLiveData(false)
 
     private lateinit var binding: DialogFragmentProgressBinding
 
@@ -56,10 +55,6 @@ class ProgressDialogFragment : DialogFragment() {
         binding.btnProgressOk.setOnClickListener { dismiss() }
 
         messageResourceId.observe(viewLifecycleOwner) { setMessage(it) }
-        isError.observe(viewLifecycleOwner) {
-            setErrorColor(it)
-            setShowOkButton(it)
-        }
     }
 
     fun setMessage(stringResourceId: Int) {
@@ -72,6 +67,11 @@ class ProgressDialogFragment : DialogFragment() {
 
     fun hasBinding(): Boolean {
         return this::binding.isInitialized
+    }
+
+    fun setErrorState(isError: Boolean) {
+        setErrorColor(isError)
+        setShowOkButton(isError)
     }
 
     private fun setErrorColor(errorColor: Boolean) {

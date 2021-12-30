@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 15:28
+ * Last modified 30/12/2021, 13:55
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -82,10 +82,10 @@ class SongsFragment : Fragment() {
         setupListeners()
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         actionMode?.finish()
         viewModel.resetSongSelection()
-        super.onStop()
+        super.onDestroy()
     }
 
     private fun setupListeners() {
@@ -297,7 +297,6 @@ class SongsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            viewModel.resetSongSelection()
         }
     }
 

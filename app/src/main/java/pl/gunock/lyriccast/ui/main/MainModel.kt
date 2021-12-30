@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Last modified 30/12/2021, 14:09
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.helpers.FileHelper
@@ -75,16 +74,12 @@ class MainModel @Inject constructor(
         cacheDir: String,
         inputStream: InputStream,
         messageResourceId: MutableLiveData<Int>,
-        importError: MutableLiveData<Boolean>,
         importOptions: ImportOptions
-    ): Flow<Boolean?> = flow {
-        val transferData: DatabaseTransferData? = withContext(Dispatchers.IO) {
-            getImportData(cacheDir, inputStream)
-        }
+    ): Flow<Boolean> = flow {
+        val transferData: DatabaseTransferData? = getImportData(cacheDir, inputStream)
 
         if (transferData == null) {
             messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
-            importError.postValue(true)
             emit(false)
         } else {
             dataTransferRepository.importSongs(
@@ -100,30 +95,32 @@ class MainModel @Inject constructor(
         cacheDir: String,
         inputStream: InputStream,
         messageResourceId: MutableLiveData<Int>,
-        importError: MutableLiveData<Boolean>,
         importOptions: ImportOptions
-    ): Boolean {
+    ): Flow<Boolean> = flow {
         val importDir = File(cacheDir)
         val importSongXmlParser =
             ImportSongXmlParserFactory.create(importDir, SongXmlParserType.OPEN_SONG)
 
-        val importedSongs: Set<SongDto> = try {
+        val importedSongs: Set<SongDto>? = try {
             importSongXmlParser.parseZip(inputStream)
         } catch (exception: Exception) {
             Log.e(TAG, exception.stackTraceToString())
-            messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
-            importError.postValue(true)
-            return false
+            null
         }
 
-        dataTransferRepository.importSongs(
-            importedSongs,
-            messageResourceId,
-            importOptions
-        )
+        if (importedSongs == null) {
+            messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
+            emit(false)
+        } else {
+            dataTransferRepository.importSongs(
+                importedSongs,
+                messageResourceId,
+                importOptions
+            )
 
-        return true
-    }
+            emit(true)
+        }
+    }.flowOn(Dispatchers.Default)
 
     private fun getImportData(
         cacheDir: String,

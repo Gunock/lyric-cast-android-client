@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:38
+ * Last modified 30/12/2021, 14:09
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -138,6 +138,7 @@ class MainActivity : AppCompatActivity() {
                 binding.fabAdd.requestFocus()
             }
         }
+
         binding.fabAdd.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 fabContainer.visibility = View.VISIBLE
@@ -231,37 +232,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun importLyricCast(uri: Uri) = lifecycleScope.launch(Dispatchers.Default) {
-        val dialogFragment =
-            DialogFragmentUtils.createProgressDialogFragment(
-                supportFragmentManager,
-                R.string.main_activity_loading_file
+    private fun importLyricCast(uri: Uri) =
+        lifecycleScope.launch(Dispatchers.Default) {
+            val dialogFragment =
+                DialogFragmentUtils.createProgressDialogFragment(
+                    supportFragmentManager,
+                    R.string.main_activity_loading_file
+                )
+
+            val importOptions = ImportOptions(
+                deleteAll = importDialogModel.deleteAll,
+                replaceOnConflict = importDialogModel.replaceOnConflict
             )
 
-        val importOptions = ImportOptions(
-            deleteAll = importDialogModel.deleteAll,
-            replaceOnConflict = importDialogModel.replaceOnConflict
-        )
-
-        @Suppress("BlockingMethodInNonBlockingContext")
-        val inputStream = contentResolver.openInputStream(uri)!!
-
-        val importSucceeded =
-            viewModel.importLyricCast(
-                cacheDir.path,
-                inputStream,
-                dialogFragment.messageResourceId,
-                dialogFragment.isError,
-                importOptions
-            )
-        importSucceeded.collect {
-            if (it == true) dialogFragment.dismiss()
             @Suppress("BlockingMethodInNonBlockingContext")
-            inputStream.close()
-        }
-    }
+            val inputStream = contentResolver.openInputStream(uri)!!
 
-    private fun importOpenSong(uri: Uri) {
+            val importSucceeded =
+                viewModel.importLyricCast(
+                    cacheDir.path,
+                    inputStream,
+                    dialogFragment.messageResourceId,
+                    importOptions
+                )
+
+            importSucceeded.collect {
+                @Suppress("BlockingMethodInNonBlockingContext")
+                inputStream.close()
+
+                if (it) {
+                    dialogFragment.dismiss()
+                } else {
+                    dialogFragment.setErrorState(true)
+                }
+            }
+        }
+
+    private fun importOpenSong(uri: Uri) =
         lifecycleScope.launch(Dispatchers.Default) {
             val dialogFragment =
                 DialogFragmentUtils.createProgressDialogFragment(
@@ -277,21 +284,27 @@ class MainActivity : AppCompatActivity() {
             )
 
             @Suppress("BlockingMethodInNonBlockingContext")
-            val importSucceeded = contentResolver.openInputStream(uri)!!.use { inputStream ->
+            val inputStream = contentResolver.openInputStream(uri)!!
+
+            val importSucceeded =
                 viewModel.importOpenSong(
                     cacheDir.path,
                     inputStream,
                     dialogFragment.messageResourceId,
-                    dialogFragment.isError,
                     importOptions
                 )
-            }
 
-            if (importSucceeded) {
-                dialogFragment.dismiss()
+            importSucceeded.collect {
+                @Suppress("BlockingMethodInNonBlockingContext")
+                inputStream.close()
+
+                if (it) {
+                    dialogFragment.dismiss()
+                } else {
+                    dialogFragment.setErrorState(true)
+                }
             }
         }
-    }
 
     private fun startImport(): Boolean {
         val intent = Intent(Intent.ACTION_GET_CONTENT)

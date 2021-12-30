@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 15:28
+ * Last modified 30/12/2021, 13:55
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -77,10 +77,10 @@ class SetlistsFragment : Fragment() {
         setupListeners()
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         actionMode?.finish()
         viewModel.resetSetlistSelection()
-        super.onStop()
+        super.onDestroy()
     }
 
     private fun startExport(): Boolean {
@@ -144,9 +144,7 @@ class SetlistsFragment : Fragment() {
         })
 
         binding.edSetlistNameFilter.setOnFocusChangeListener { view, hasFocus ->
-            if (!hasFocus) {
-                view.hideKeyboard()
-            }
+            if (!hasFocus) view.hideKeyboard()
         }
     }
 
@@ -260,7 +258,6 @@ class SetlistsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
-            viewModel.resetSetlistSelection()
         }
     }
 

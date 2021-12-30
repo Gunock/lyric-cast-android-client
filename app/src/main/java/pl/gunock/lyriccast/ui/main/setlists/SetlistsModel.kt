@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
+ * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 15:31
+ * Last modified 30/12/2021, 13:56
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -134,10 +134,9 @@ class SetlistsModel @Inject constructor(
         exportDir.deleteRecursively()
         exportDir.mkdirs()
 
-        val selectedSongs = allSetlists.filter { it.isSelected }
+        val selectedSetlists = allSetlists.filter { it.isSelected }
 
-        val setlistNames: Set<String> = selectedSongs.map { it.setlist.name }.toSet()
-
+        val setlistNames: Set<String> = selectedSetlists.map { it.setlist.name }.toSet()
 
         val exportSetlists = exportData.setlistDtos!!
             .filter { it.name in setlistNames }
@@ -161,6 +160,7 @@ class SetlistsModel @Inject constructor(
             .map { it.toJson() }
 
         messageResourceId.postValue(R.string.main_activity_export_saving_json)
+
         val songsString = JSONArray(songJsons).toString()
         val categoriesString = JSONArray(categoryJsons).toString()
         val setlistsString = JSONArray(setlistJsons).toString()
