@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Last modified 31/12/2021, 13:13
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -10,8 +10,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -56,17 +58,10 @@ class SetlistEditorModel @Inject constructor(
 
     private var availableId: Long = 0L
 
-    private var setlistsSubscription: Disposable? = null
-
     init {
-        setlistsSubscription = setlistsRepository.getAllSetlists().subscribe { setlists ->
-            setlistNames = setlists.map { setlist -> setlist.name }.toSet()
-        }
-    }
-
-    override fun onCleared() {
-        setlistsSubscription?.dispose()
-        super.onCleared()
+        setlistsRepository.getAllSetlists()
+            .onEach { setlists -> setlistNames = setlists.map { it.name }.toSet() }
+            .launchIn(viewModelScope)
     }
 
     fun loadSetlist(setlistId: String, setlistName: String, presentation: List<String>) {

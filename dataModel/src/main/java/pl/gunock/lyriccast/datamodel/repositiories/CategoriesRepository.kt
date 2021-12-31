@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 04/10/2021, 18:29
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 04/10/2021, 16:37
+ * Last modified 31/12/2021, 12:40
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
 
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 import pl.gunock.lyriccast.datamodel.models.Category
 
 interface CategoriesRepository {
 
-    fun getAllCategories(): Flowable<List<Category>>
+    fun getAllCategories(): Flow<List<Category>>
 
     suspend fun upsertCategory(category: Category)
 

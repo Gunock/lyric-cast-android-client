@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 15:31
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 15:31
+ * Last modified 31/12/2021, 13:13
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -12,9 +12,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.normalize
@@ -64,32 +63,19 @@ class SongsModel @Inject constructor(
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onSongSelection)
 
-    private var songsSubscription: Disposable? = null
-    private var categoriesSubscription: Disposable? = null
-
     init {
-        songsSubscription =
-            songsRepository.getAllSongs().subscribe {
-                viewModelScope.launch(Dispatchers.Default) {
-                    val songItems = it.map { song -> SongItem(song) }.sorted()
-                    allSongs = songItems
-                    _songs.postValue(allSongs)
-                }
-            }
+        songsRepository.getAllSongs()
+            .onEach {
+                val songItems = it.map { song -> SongItem(song) }.sorted()
+                allSongs = songItems
+                _songs.postValue(allSongs)
+            }.launchIn(viewModelScope)
 
-        categoriesSubscription =
-            categoriesRepository.getAllCategories().subscribe {
-                viewModelScope.launch(Dispatchers.Default) {
-                    val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                    _categories.postValue(categoryItems)
-                }
-            }
-    }
-
-    override fun onCleared() {
-        songsSubscription?.dispose()
-        categoriesSubscription?.dispose()
-        super.onCleared()
+        categoriesRepository.getAllCategories()
+            .onEach {
+                val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
+                _categories.postValue(categoryItems)
+            }.launchIn(viewModelScope)
     }
 
     fun getSelectedSong(): SongItem {

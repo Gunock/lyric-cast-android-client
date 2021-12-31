@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Last modified 31/12/2021, 13:13
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -11,9 +11,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Song
@@ -67,24 +69,16 @@ class SongEditorModel @Inject constructor(
 
     private var newSectionCount = 1
 
-    private var songsSubscription: Disposable? = null
-    private var categoriesSubscription: Disposable? = null
-
     init {
-        songsSubscription = songsRepository.getAllSongs()
-            .subscribe { songs ->
-                songTitles = songs.map { it.title }.toSet()
-            }
+        songsRepository.getAllSongs()
+            .onEach { songs -> songTitles = songs.map { it.title }.toSet() }
+            .launchIn(viewModelScope)
 
-        categoriesSubscription = categoriesRepository.getAllCategories().subscribe { categories1 ->
-            _categories.postValue(categories1.map { CategoryItem(it) })
-        }
-    }
-
-    override fun onCleared() {
-        songsSubscription?.dispose()
-        categoriesSubscription?.dispose()
-        super.onCleared()
+        categoriesRepository.getAllCategories()
+            .onEach {
+                val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
+                _categories.postValue(categoryItems)
+            }.launchIn(viewModelScope)
     }
 
     fun validateSongTitle(songTitle: String): NameValidationState {

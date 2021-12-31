@@ -1,16 +1,19 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/12/2021, 14:24
+ * Last modified 31/12/2021, 13:07
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import io.reactivex.Flowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.kotlin.toFlow
 import io.realm.kotlin.where
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
@@ -26,14 +29,14 @@ internal class SongsRepositoryMongoImpl(
         Realm.getInstance(RealmConfiguration.Builder().build())
     }
 
-    override fun getAllSongs(): Flowable<List<Song>> =
+    override fun getAllSongs(): Flow<List<Song>> =
         runBlocking(dispatcher) {
             realm.where<SongDocument>()
                 .findAllAsync()
-                .asFlowable()
-                .map { songDocuments ->
-                    songDocuments.map { it.toGenericModel() }
-                }
+                .toFlow()
+                .map { songs -> songs.map { it.toGenericModel() } }
+                .flowOn(dispatcher)
+
         }
 
     override fun getSong(id: String): Song? =

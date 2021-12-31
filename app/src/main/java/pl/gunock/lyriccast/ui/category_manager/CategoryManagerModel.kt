@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 21/12/2021, 00:28
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 21/12/2021, 00:14
+ * Last modified 31/12/2021, 13:13
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -11,9 +11,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
@@ -38,21 +37,12 @@ class CategoryManagerModel @Inject constructor(
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onCategorySelection)
 
-    private var categoriesSubscription: Disposable? = null
-
     init {
-        categoriesSubscription =
-            categoriesRepository.getAllCategories().subscribe {
-                viewModelScope.launch(Dispatchers.Default) {
-                    val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                    _categories.postValue(categoryItems)
-                }
-            }
-    }
-
-    override fun onCleared() {
-        categoriesSubscription?.dispose()
-        super.onCleared()
+        categoriesRepository.getAllCategories()
+            .onEach {
+                val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
+                _categories.postValue(categoryItems)
+            }.launchIn(viewModelScope)
     }
 
     fun getSelectedCategory(): CategoryItem {

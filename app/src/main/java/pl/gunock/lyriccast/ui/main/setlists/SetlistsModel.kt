@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 13:56
+ * Last modified 31/12/2021, 13:13
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -12,9 +12,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,7 +35,7 @@ import kotlin.system.measureTimeMillis
 @HiltViewModel
 class SetlistsModel @Inject constructor(
     private val setlistsRepository: SetlistsRepository,
-    val dataTransferRepository: DataTransferRepository
+    private val dataTransferRepository: DataTransferRepository
 ) : ViewModel() {
     private companion object {
         const val TAG = "SetlistsViewModel"
@@ -66,22 +66,13 @@ class SetlistsModel @Inject constructor(
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onSetlistSelection)
 
-    private var setlistsSubscription: Disposable? = null
-
     init {
-        setlistsSubscription = setlistsRepository.getAllSetlists()
-            .subscribe {
-                viewModelScope.launch(Dispatchers.Default) {
-                    val setlistItems = it.map { setlist -> SetlistItem(setlist) }.sorted()
-                    allSetlists = setlistItems
-                    _setlists.postValue(setlistItems)
-                }
-            }
-    }
-
-    override fun onCleared() {
-        setlistsSubscription?.dispose()
-        super.onCleared()
+        setlistsRepository.getAllSetlists()
+            .onEach {
+                val setlistItems = it.map { setlist -> SetlistItem(setlist) }.sorted()
+                allSetlists = setlistItems
+                _setlists.postValue(setlistItems)
+            }.launchIn(viewModelScope)
     }
 
     suspend fun deleteSelectedSetlists() {
@@ -92,7 +83,7 @@ class SetlistsModel @Inject constructor(
     }
 
     // TODO: Move filter to separate class (functional interface?)
-    suspend fun filterSetlists(setlistName: String) {
+    suspend fun filterSetlists(setlistName: String) =
         withContext(Dispatchers.Default) {
             val normalizedTitle = setlistName.trim().normalize()
             val duration = measureTimeMillis {
@@ -104,7 +95,6 @@ class SetlistsModel @Inject constructor(
             }
             Log.v(TAG, "Filtering took : ${duration}ms")
         }
-    }
 
 
     fun resetSetlistSelection() {
