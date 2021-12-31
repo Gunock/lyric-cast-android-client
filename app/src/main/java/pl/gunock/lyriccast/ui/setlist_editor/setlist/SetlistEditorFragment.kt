@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Last modified 31/12/2021, 16:55
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -22,6 +22,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistEditorBinding
@@ -73,13 +76,20 @@ class SetlistEditorFragment : Fragment() {
         setupListeners()
         setupRecyclerView()
 
-        viewModel.numberOfSelectedSongs.observe(viewLifecycleOwner, this::onSelectSong)
-        viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
-            songItemsAdapter.notifyItemChanged(it)
-        }
-        viewModel.removedSongPosition.observe(viewLifecycleOwner) {
-            songItemsAdapter.notifyItemRemoved(it)
-        }
+        viewModel.numberOfSelectedSongs
+            .onEach(this::onSelectSong)
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.selectedSongPosition
+            .onEach { songItemsAdapter.notifyItemChanged(it) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
+
+        viewModel.removedSongPosition
+            .onEach { songItemsAdapter.notifyItemRemoved(it) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
     }
 
     private fun loadSetlist() {

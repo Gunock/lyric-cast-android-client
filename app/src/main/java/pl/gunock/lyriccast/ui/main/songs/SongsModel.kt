@@ -1,19 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 13:13
+ * Last modified 31/12/2021, 17:26
  */
 
 package pl.gunock.lyriccast.ui.main.songs
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.normalize
@@ -41,23 +39,23 @@ class SongsModel @Inject constructor(
         const val TAG = "SongsViewModel"
     }
 
-    val songs: LiveData<List<SongItem>> get() = _songs
-    private val _songs: MutableLiveData<List<SongItem>> = MutableLiveData(listOf())
+    val songs: StateFlow<List<SongItem>> get() = _songs
+    private val _songs: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
     private var allSongs: List<SongItem> = listOf()
 
 
-    val pickedSong: LiveData<SongItem?> get() = _pickedSong
-    private val _pickedSong: MutableLiveData<SongItem?> = MutableLiveData()
+    val pickedSong: StateFlow<SongItem?> get() = _pickedSong
+    private val _pickedSong: MutableStateFlow<SongItem?> = MutableStateFlow(null)
 
-    val numberOfSelectedSongs: LiveData<Pair<Int, Int>> get() = _numberOfSelectedSongs
-    private val _numberOfSelectedSongs: MutableLiveData<Pair<Int, Int>> =
-        MutableLiveData(Pair(0, 0))
+    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> get() = _numberOfSelectedSongs
+    private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
+        MutableStateFlow(Pair(0, 0))
 
-    val selectedSongPosition: LiveData<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedSongPosition: StateFlow<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    val categories: LiveData<List<CategoryItem>> get() = _categories
-    private val _categories: MutableLiveData<List<CategoryItem>> = MutableLiveData(listOf())
+    val categories: StateFlow<List<CategoryItem>> get() = _categories
+    private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
 
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
@@ -67,23 +65,27 @@ class SongsModel @Inject constructor(
         songsRepository.getAllSongs()
             .onEach {
                 val songItems = it.map { song -> SongItem(song) }.sorted()
+                if (_songs.value == songItems) return@onEach
+
                 allSongs = songItems
-                _songs.postValue(allSongs)
-            }.launchIn(viewModelScope)
+                _songs.value = allSongs
+            }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
 
         categoriesRepository.getAllCategories()
             .onEach {
                 val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                _categories.postValue(categoryItems)
-            }.launchIn(viewModelScope)
+                _categories.value = categoryItems
+            }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 
     fun getSelectedSong(): SongItem {
-        return _songs.value!!.first { songItem -> songItem.isSelected }
+        return _songs.value.first { songItem -> songItem.isSelected }
     }
 
     fun getSelectedSongIds(): List<String> {
-        return songs.value!!
+        return songs.value
             .filter { it.isSelected }
             .map { item -> item.song.id }
     }
@@ -93,7 +95,7 @@ class SongsModel @Inject constructor(
             .map { item -> item.song.id }
 
         songsRepository.deleteSongs(selectedSongs)
-        _numberOfSelectedSongs.postValue(Pair(selectedSongs.size, 0))
+        _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
     }
 
     // TODO: Move filter to separate class (functional interface?)
@@ -117,31 +119,30 @@ class SongsModel @Inject constructor(
                 predicates.all { predicate -> predicate(songItem) }
             }.toSortedSet().toList()
 
-            _songs.postValue(filteredItems)
+            _songs.value = filteredItems
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
     }
 
     fun resetSongSelection() {
-        _songs.value!!.forEach {
+        _songs.value.forEach {
             it.isSelected = false
             it.hasCheckbox = false
         }
         selectionTracker.reset()
-        if (_numberOfSelectedSongs.value!! != Pair(1, 0)) {
-            _numberOfSelectedSongs.postValue(Pair(1, 0))
+        if (_numberOfSelectedSongs.value != Pair(1, 0)) {
+            _numberOfSelectedSongs.value = Pair(1, 0)
         }
     }
 
     fun resetPickedSong() {
-        _pickedSong.postValue(null)
+        _pickedSong.value = null
     }
 
     suspend fun exportSelectedSongs(
         cacheDir: String,
-        outputStream: OutputStream,
-        messageResourceId: MutableLiveData<Int>
-    ) {
+        outputStream: OutputStream
+    ): Flow<Int> = flow {
         val exportData: DatabaseTransferData = dataTransferRepository.getDatabaseTransferData()
 
         val exportDir = File(cacheDir, ".export")
@@ -163,20 +164,20 @@ class SongsModel @Inject constructor(
             .filter { it.name in categoryNames }
             .map { it.toJson() }
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        emit(R.string.main_activity_export_saving_json)
 
         val songsString = JSONArray(songJsons).toString()
         val categoriesString = JSONArray(categoryJsons).toString()
         File(exportDir, "songs.json").writeText(songsString)
         File(exportDir, "categories.json").writeText(categoriesString)
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        emit(R.string.main_activity_export_saving_zip)
         FileHelper.zip(outputStream, exportDir.path)
 
-        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()
         resetSongSelection()
-    }
+    }.flowOn(Dispatchers.Default)
 
     private fun onSongSelection(
         @Suppress("UNUSED_PARAMETER")
@@ -184,22 +185,22 @@ class SongsModel @Inject constructor(
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = _songs.value!![position]
+        val item = _songs.value[position]
 
         if (!isLongClick && selectionTracker.count == 0) {
-            _pickedSong.postValue(item)
+            _pickedSong.value = item
         } else {
             item.isSelected = !item.isSelected
 
             if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-                _songs.value!!.forEach { it.hasCheckbox = true }
+                _songs.value.forEach { it.hasCheckbox = true }
             } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-                _songs.value!!.forEach { it.hasCheckbox = false }
+                _songs.value.forEach { it.hasCheckbox = false }
             }
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedSongs.postValue(countPair)
-            _selectedSongPosition.postValue(position)
+            _numberOfSelectedSongs.value = countPair
+            _selectedSongPosition.value = position
         }
 
         return true

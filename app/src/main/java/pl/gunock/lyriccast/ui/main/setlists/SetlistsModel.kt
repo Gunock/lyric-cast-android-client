@@ -1,20 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 13:13
+ * Last modified 31/12/2021, 17:26
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -41,25 +38,25 @@ class SetlistsModel @Inject constructor(
         const val TAG = "SetlistsViewModel"
     }
 
-    val setlists: LiveData<List<SetlistItem>>
+    val setlists: StateFlow<List<SetlistItem>>
         get() = _setlists
 
-    private val _setlists: MutableLiveData<List<SetlistItem>> = MutableLiveData(listOf())
+    private val _setlists: MutableStateFlow<List<SetlistItem>> = MutableStateFlow(listOf())
 
-    val pickedSetlist: LiveData<SetlistItem?>
+    val pickedSetlist: StateFlow<SetlistItem?>
         get() = _pickedSetlist
 
-    private val _pickedSetlist: MutableLiveData<SetlistItem?> = MutableLiveData()
+    private val _pickedSetlist: MutableStateFlow<SetlistItem?> = MutableStateFlow(null)
 
 
-    val numberOfSelectedSetlists: LiveData<Pair<Int, Int>>
+    val numberOfSelectedSetlists: StateFlow<Pair<Int, Int>>
         get() = _numberOfSelectedSetlists
 
-    private val _numberOfSelectedSetlists: MutableLiveData<Pair<Int, Int>> =
-        MutableLiveData(Pair(0, 0))
+    private val _numberOfSelectedSetlists: MutableStateFlow<Pair<Int, Int>> =
+        MutableStateFlow(Pair(0, 0))
 
-    val selectedSetlistPosition: LiveData<Int> get() = _selectedSetlistPosition
-    private val _selectedSetlistPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedSetlistPosition: StateFlow<Int> get() = _selectedSetlistPosition
+    private val _selectedSetlistPosition: MutableStateFlow<Int> = MutableStateFlow(0)
 
     private var allSetlists: Iterable<SetlistItem> = listOf()
 
@@ -68,18 +65,21 @@ class SetlistsModel @Inject constructor(
 
     init {
         setlistsRepository.getAllSetlists()
-            .onEach {
-                val setlistItems = it.map { setlist -> SetlistItem(setlist) }.sorted()
+            .onEach { setlists ->
+                val setlistItems = setlists.map { SetlistItem(it) }.sorted()
+                if (_setlists.value == setlistItems) return@onEach
+
                 allSetlists = setlistItems
-                _setlists.postValue(setlistItems)
-            }.launchIn(viewModelScope)
+                _setlists.value = setlistItems
+            }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 
     suspend fun deleteSelectedSetlists() {
         val selectedSetlists = allSetlists.filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
         setlistsRepository.deleteSetlists(selectedSetlists)
-        _numberOfSelectedSetlists.postValue(Pair(selectedSetlists.size, 0))
+        _numberOfSelectedSetlists.value = Pair(selectedSetlists.size, 0)
     }
 
     // TODO: Move filter to separate class (functional interface?)
@@ -91,33 +91,32 @@ class SetlistsModel @Inject constructor(
                     setlistItem.normalizedName.contains(normalizedTitle, ignoreCase = true)
                 }
 
-                _setlists.postValue(filteredItems)
+                _setlists.value = filteredItems
             }
             Log.v(TAG, "Filtering took : ${duration}ms")
         }
 
 
     fun resetSetlistSelection() {
-        _setlists.value?.forEach {
+        _setlists.value.forEach {
             it.isSelected = false
             it.hasCheckbox = false
         }
         selectionTracker.reset()
 
-        if (_numberOfSelectedSetlists.value!! != Pair(1, 0)) {
-            _numberOfSelectedSetlists.postValue(Pair(1, 0))
+        if (_numberOfSelectedSetlists.value != Pair(1, 0)) {
+            _numberOfSelectedSetlists.value = Pair(1, 0)
         }
     }
 
     fun resetPickedSetlist() {
-        _pickedSetlist.postValue(null)
+        _pickedSetlist.value = null
     }
 
     suspend fun exportSelectedSetlists(
         cacheDir: String,
-        outputStream: OutputStream,
-        messageResourceId: MutableLiveData<Int>
-    ) {
+        outputStream: OutputStream
+    ): Flow<Int> = flow {
         val exportData: DatabaseTransferData = dataTransferRepository.getDatabaseTransferData()
 
         val exportDir = File(cacheDir, ".export")
@@ -149,7 +148,7 @@ class SetlistsModel @Inject constructor(
         val setlistJsons = exportSetlists.filter { it.name in setlistNames }
             .map { it.toJson() }
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        emit(R.string.main_activity_export_saving_json)
 
         val songsString = JSONArray(songJsons).toString()
         val categoriesString = JSONArray(categoryJsons).toString()
@@ -158,14 +157,14 @@ class SetlistsModel @Inject constructor(
         File(exportDir, "categories.json").writeText(categoriesString)
         File(exportDir, "setlists.json").writeText(setlistsString)
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        emit(R.string.main_activity_export_saving_zip)
         @Suppress("BlockingMethodInNonBlockingContext")
         FileHelper.zip(outputStream, exportDir.path)
 
-        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()
         resetSetlistSelection()
-    }
+    }.flowOn(Dispatchers.Default)
 
     private fun onSetlistSelection(
         @Suppress("UNUSED_PARAMETER")
@@ -173,22 +172,22 @@ class SetlistsModel @Inject constructor(
         position: Int,
         isLongClick: Boolean
     ): Boolean {
-        val item = _setlists.value!![position]
+        val item = _setlists.value[position]
 
         if (!isLongClick && selectionTracker.count == 0) {
-            _pickedSetlist.postValue(item)
+            _pickedSetlist.value = item
         } else {
             item.isSelected = !item.isSelected
 
             if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-                _setlists.value!!.forEach { it.hasCheckbox = true }
+                _setlists.value.forEach { it.hasCheckbox = true }
             } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-                _setlists.value!!.forEach { it.hasCheckbox = false }
+                _setlists.value.forEach { it.hasCheckbox = false }
             }
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedSetlists.postValue(countPair)
-            _selectedSetlistPosition.postValue(position)
+            _numberOfSelectedSetlists.value = countPair
+            _selectedSetlistPosition.value = position
         }
 
         return true

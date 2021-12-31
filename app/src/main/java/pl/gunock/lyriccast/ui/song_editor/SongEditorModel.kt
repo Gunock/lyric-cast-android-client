@@ -1,21 +1,19 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 13:13
+ * Last modified 31/12/2021, 17:15
  */
 
 package pl.gunock.lyriccast.ui.song_editor
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Song
@@ -46,8 +44,8 @@ class SongEditorModel @Inject constructor(
 
     private var editedSong: Song? = null
 
-    val categories: LiveData<List<CategoryItem>> get() = _categories
-    private val _categories: MutableLiveData<List<CategoryItem>> = MutableLiveData(listOf())
+    val categories: StateFlow<List<CategoryItem>> get() = _categories
+    private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
 
     private var songTitles: Set<String> = setOf()
 
@@ -72,13 +70,15 @@ class SongEditorModel @Inject constructor(
     init {
         songsRepository.getAllSongs()
             .onEach { songs -> songTitles = songs.map { it.title }.toSet() }
+            .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
         categoriesRepository.getAllCategories()
             .onEach {
                 val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                _categories.postValue(categoryItems)
-            }.launchIn(viewModelScope)
+                _categories.value = categoryItems
+            }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 
     fun validateSongTitle(songTitle: String): NameValidationState {

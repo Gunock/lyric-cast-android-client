@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 14:14
+ * Last modified 31/12/2021, 16:34
  */
 
 package pl.gunock.lyriccast.ui.shared.fragments
@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.MutableLiveData
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentProgressBinding
 
@@ -23,8 +22,6 @@ class ProgressDialogFragment : DialogFragment() {
     companion object {
         const val TAG = "ProgressDialogFragment"
     }
-
-    val messageResourceId = MutableLiveData(0)
 
     private lateinit var binding: DialogFragmentProgressBinding
 
@@ -53,8 +50,6 @@ class ProgressDialogFragment : DialogFragment() {
 
         binding.btnProgressOk.visibility = View.GONE
         binding.btnProgressOk.setOnClickListener { dismiss() }
-
-        messageResourceId.observe(viewLifecycleOwner) { setMessage(it) }
     }
 
     fun setMessage(stringResourceId: Int) {

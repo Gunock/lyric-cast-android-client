@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:34
+ * Last modified 31/12/2021, 16:51
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -18,6 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
@@ -72,18 +75,20 @@ class SongEditorActivity : AppCompatActivity() {
         setupCategorySpinner()
         setupListeners()
 
-        viewModel.categories.observe(this) { categories ->
-            val viewModelCategory = viewModel.category
-            categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
+        viewModel.categories
+            .onEach { categories ->
+                val viewModelCategory = viewModel.category
+                categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
 
-            if (viewModelCategory != null) {
-                val categoryIndex = categorySpinnerAdapter.items
-                    .map { category -> category.category.name }
-                    .indexOf(viewModelCategory.name)
+                if (viewModelCategory != null) {
+                    val categoryIndex = categorySpinnerAdapter.items
+                        .map { category -> category.category.name }
+                        .indexOf(viewModelCategory.name)
 
-                binding.spnSongEditorCategory.setSelection(categoryIndex, false)
-            }
-        }
+                    binding.spnSongEditorCategory.setSelection(categoryIndex, false)
+                }
+            }.flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

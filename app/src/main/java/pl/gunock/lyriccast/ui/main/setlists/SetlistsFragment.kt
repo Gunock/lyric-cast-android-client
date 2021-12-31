@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 13:55
+ * Last modified 31/12/2021, 16:57
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -22,6 +22,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
@@ -66,13 +70,6 @@ class SetlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.pickedSetlist.observe(viewLifecycleOwner, this::onPickSetlist)
-        viewModel.numberOfSelectedSetlists.observe(viewLifecycleOwner, this::onSelectSetlist)
-        viewModel.selectedSetlistPosition.observe(viewLifecycleOwner) {
-            setlistItemsAdapter.notifyItemChanged(it)
-            binding.tinSetlistNameFilter.clearFocus()
-        }
-
         setupRecyclerView()
         setupListeners()
     }
@@ -108,17 +105,19 @@ class SetlistsFragment : Fragment() {
                 )
 
             @Suppress("BlockingMethodInNonBlockingContext")
-            requireActivity().contentResolver.openOutputStream(uri)!!
-                .use { outputStream ->
-                    viewModel.exportSelectedSetlists(
-                        requireActivity().cacheDir.canonicalPath,
-                        outputStream,
-                        dialogFragment.messageResourceId
-                    )
-                }
+            val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
+            val exportMessageFlow = viewModel.exportSelectedSetlists(
+                requireActivity().cacheDir.canonicalPath,
+                outputStream
+            )
 
-            dialogFragment.dismiss()
-            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
+            exportMessageFlow.onEach { dialogFragment.setMessage(it) }
+                .onCompletion {
+                    outputStream.close()
+                    dialogFragment.dismiss()
+                    setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
+                }.flowOn(Dispatchers.Default)
+                .launchIn(dialogFragment.lifecycleScope)
         }
     }
 
@@ -129,9 +128,27 @@ class SetlistsFragment : Fragment() {
         binding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvSetlists.adapter = setlistItemsAdapter
 
-        viewModel.setlists.observe(viewLifecycleOwner) {
-            setlistItemsAdapter.submitCollection(it)
-        }
+        viewModel.setlists
+            .onEach { setlistItemsAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.pickedSetlist
+            .onEach(this::onPickSetlist)
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
+
+        viewModel.numberOfSelectedSetlists
+            .onEach(this::onSelectSetlist)
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.selectedSetlistPosition
+            .onEach {
+                setlistItemsAdapter.notifyItemChanged(it)
+                binding.tinSetlistNameFilter.clearFocus()
+            }.flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
     }
 
 
@@ -174,7 +191,7 @@ class SetlistsFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSetlists
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value!!.size)
+            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
         }
 
         when (countAfter) {
@@ -197,7 +214,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedItem = viewModel.setlists.value!!
+        val selectedItem = viewModel.setlists.value
             .first { setlistItem -> setlistItem.isSelected }
 
         Log.v(TAG, "Editing setlist : ${selectedItem.setlist}")

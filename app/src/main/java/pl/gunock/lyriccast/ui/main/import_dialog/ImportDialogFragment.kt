@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/12/2021, 11:17
+ * Last modified 31/12/2021, 16:43
  */
 
 package pl.gunock.lyriccast.ui.main.import_dialog
@@ -13,8 +13,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentImportBinding
 import pl.gunock.lyriccast.datatransfer.enums.ImportFormat
@@ -31,7 +31,7 @@ class ImportDialogFragment : DialogFragment() {
 
     private lateinit var binding: DialogFragmentImportBinding
 
-    val isAccepted: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isAccepted: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 
     override fun onCreateView(
@@ -78,7 +78,7 @@ class ImportDialogFragment : DialogFragment() {
             viewModel.replaceOnConflict = binding.chkReplaceOnConflict.isChecked
             viewModel.importFormat =
                 ImportFormat.getByName(binding.spnImportFormat.selectedItem as String)
-            isAccepted.postValue(true)
+            isAccepted.value = true
             dismiss()
         }
 

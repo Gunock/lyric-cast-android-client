@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/12/2021, 14:24
+ * Last modified 31/12/2021, 15:50
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
@@ -22,7 +22,7 @@ import pl.gunock.lyriccast.datamodel.repositiories.impl.DataTransferRepositoryBa
 
 internal class DataTransferRepositoryMongoImpl(
     private val dispatcher: CoroutineDispatcher
-) : DataTransferRepositoryBaseImpl() {
+) : DataTransferRepositoryBaseImpl(dispatcher) {
 
     private val realm: Realm = runBlocking(dispatcher) {
         Realm.getInstance(RealmConfiguration.Builder().build())

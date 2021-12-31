@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 14:09
+ * Last modified 31/12/2021, 16:51
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -27,7 +27,7 @@ import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
@@ -45,8 +45,10 @@ import pl.gunock.lyriccast.ui.main.import_dialog.ImportDialogModel
 import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
+import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
+import java.io.Closeable
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -204,16 +206,14 @@ class MainActivity : AppCompatActivity() {
                 )
 
             @Suppress("BlockingMethodInNonBlockingContext")
-            contentResolver.openOutputStream(uri)!!
-                .use { outputStream ->
-                    viewModel.exportAll(
-                        cacheDir.canonicalPath,
-                        outputStream,
-                        dialogFragment.messageResourceId
-                    )
-                }
+            val outputStream = contentResolver.openOutputStream(uri)!!
 
-            dialogFragment.dismiss()
+            val exportMessageFlow = viewModel.exportAll(
+                cacheDir.canonicalPath,
+                outputStream
+            )
+
+            handleDialogMessages(dialogFragment, exportMessageFlow, outputStream)
         }
     }
 
@@ -228,7 +228,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         withContext(Dispatchers.Main) {
-            importDialog.isAccepted.observe(importDialog.viewLifecycleOwner) { if (it) startImport() }
+            importDialog.isAccepted
+                .onEach { if (it) startImport() }
+                .flowOn(Dispatchers.Default)
+                .launchIn(importDialog.lifecycleScope)
         }
     }
 
@@ -248,24 +251,14 @@ class MainActivity : AppCompatActivity() {
             @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
-            val importSucceeded =
+            val importMessageFlow =
                 viewModel.importLyricCast(
                     cacheDir.path,
                     inputStream,
-                    dialogFragment.messageResourceId,
                     importOptions
                 )
 
-            importSucceeded.collect {
-                @Suppress("BlockingMethodInNonBlockingContext")
-                inputStream.close()
-
-                if (it) {
-                    dialogFragment.dismiss()
-                } else {
-                    dialogFragment.setErrorState(true)
-                }
-            }
+            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
         }
 
     private fun importOpenSong(uri: Uri) =
@@ -286,25 +279,36 @@ class MainActivity : AppCompatActivity() {
             @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
-            val importSucceeded =
+            val importMessageFlow =
                 viewModel.importOpenSong(
                     cacheDir.path,
                     inputStream,
-                    dialogFragment.messageResourceId,
                     importOptions
                 )
 
-            importSucceeded.collect {
-                @Suppress("BlockingMethodInNonBlockingContext")
-                inputStream.close()
-
-                if (it) {
-                    dialogFragment.dismiss()
-                } else {
-                    dialogFragment.setErrorState(true)
-                }
-            }
+            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
         }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private fun handleDialogMessages(
+        dialogFragment: ProgressDialogFragment,
+        messageFlow: Flow<Int>?,
+        stream: Closeable
+    ) {
+        if (messageFlow != null) {
+            messageFlow.onEach { dialogFragment.setMessage(it) }
+                .onCompletion {
+                    stream.close()
+                    dialogFragment.dismiss()
+                }.flowOn(Dispatchers.Default)
+                .launchIn(dialogFragment.lifecycleScope)
+        } else {
+            stream.close()
+            dialogFragment.setErrorState(true)
+            dialogFragment.setMessage(R.string.main_activity_import_incorrect_file_format)
+        }
+    }
+
 
     private fun startImport(): Boolean {
         val intent = Intent(Intent.ACTION_GET_CONTENT)

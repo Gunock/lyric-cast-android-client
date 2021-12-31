@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:34
+ * Last modified 31/12/2021, 16:57
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -19,6 +19,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
@@ -117,9 +120,10 @@ class SetlistEditorSongsFragment : Fragment() {
         val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
         binding.spnCategory.adapter = categorySpinnerAdapter
 
-        viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
-            categorySpinnerAdapter.submitCollection(categories)
-        }
+        viewModel.categories
+            .onEach { categorySpinnerAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
     }
 
     private fun setupRecyclerView() {
@@ -132,15 +136,15 @@ class SetlistEditorSongsFragment : Fragment() {
         binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvSongs.adapter = songItemsAdapter
 
-        viewModel.songs.observe(viewLifecycleOwner) {
-            lifecycleScope.launch(Dispatchers.Default) {
-                songItemsAdapter.submitCollection(it)
-            }
-        }
+        viewModel.songs
+            .onEach { songItemsAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
 
-        viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
-            songItemsAdapter.notifyItemChanged(it)
-        }
+        viewModel.selectedSongPosition
+            .onEach { songItemsAdapter.notifyItemChanged(it) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
     }
 
     private fun goToSetlistFragment() {

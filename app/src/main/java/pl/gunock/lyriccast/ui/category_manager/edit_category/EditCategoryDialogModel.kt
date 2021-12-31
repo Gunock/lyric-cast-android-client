@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 13:13
+ * Last modified 31/12/2021, 17:15
  */
 
 package pl.gunock.lyriccast.ui.category_manager.edit_category
@@ -9,6 +9,8 @@ package pl.gunock.lyriccast.ui.category_manager.edit_category
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.datamodel.models.Category
@@ -33,6 +35,7 @@ class EditCategoryDialogModel @Inject constructor(
     init {
         categoriesRepository.getAllCategories()
             .onEach { categories -> _categoryNames = categories.map { it.name }.toSet() }
+            .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
     }
 

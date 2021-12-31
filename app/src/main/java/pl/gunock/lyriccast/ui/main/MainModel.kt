@@ -1,13 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 14:09
+ * Last modified 31/12/2021, 16:34
  */
 
 package pl.gunock.lyriccast.ui.main
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -44,15 +43,14 @@ class MainModel @Inject constructor(
     suspend fun exportAll(
         cacheDir: String,
         outputStream: OutputStream,
-        messageResourceId: MutableLiveData<Int>
-    ) {
+    ): Flow<Int> = flow {
         val exportData = dataTransferRepository.getDatabaseTransferData()
 
         val exportDir = File(cacheDir, ".export")
         exportDir.deleteRecursively()
         exportDir.mkdirs()
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_json)
+        emit(R.string.main_activity_export_saving_json)
         val songsString = JSONArray(exportData.songDtos!!.map { it.toJson() }).toString()
         val categoriesString =
             JSONArray(exportData.categoryDtos!!.map { it.toJson() }).toString()
@@ -63,40 +61,35 @@ class MainModel @Inject constructor(
         File(exportDir, "categories.json").writeText(categoriesString)
         File(exportDir, "setlists.json").writeText(setlistsString)
 
-        messageResourceId.postValue(R.string.main_activity_export_saving_zip)
+        emit(R.string.main_activity_export_saving_zip)
         FileHelper.zip(outputStream, exportDir.path)
 
-        messageResourceId.postValue(R.string.main_activity_export_deleting_temp)
+        emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()
-    }
+    }.flowOn(Dispatchers.Default)
 
-    fun importLyricCast(
+    suspend fun importLyricCast(
         cacheDir: String,
         inputStream: InputStream,
-        messageResourceId: MutableLiveData<Int>,
         importOptions: ImportOptions
-    ): Flow<Boolean> = flow {
+    ): Flow<Int>? {
         val transferData: DatabaseTransferData? = getImportData(cacheDir, inputStream)
 
-        if (transferData == null) {
-            messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
-            emit(false)
-        } else {
+        return if (transferData != null) {
             dataTransferRepository.importSongs(
                 transferData,
-                messageResourceId,
                 importOptions
             )
-            emit(true)
+        } else {
+            null
         }
-    }.flowOn(Dispatchers.Default)
+    }
 
     suspend fun importOpenSong(
         cacheDir: String,
         inputStream: InputStream,
-        messageResourceId: MutableLiveData<Int>,
         importOptions: ImportOptions
-    ): Flow<Boolean> = flow {
+    ): Flow<Int>? {
         val importDir = File(cacheDir)
         val importSongXmlParser =
             ImportSongXmlParserFactory.create(importDir, SongXmlParserType.OPEN_SONG)
@@ -108,19 +101,15 @@ class MainModel @Inject constructor(
             null
         }
 
-        if (importedSongs == null) {
-            messageResourceId.postValue(R.string.main_activity_import_incorrect_file_format)
-            emit(false)
-        } else {
+        return if (importedSongs != null) {
             dataTransferRepository.importSongs(
                 importedSongs,
-                messageResourceId,
                 importOptions
             )
-
-            emit(true)
+        } else {
+            null
         }
-    }.flowOn(Dispatchers.Default)
+    }
 
     private fun getImportData(
         cacheDir: String,

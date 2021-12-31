@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 30/12/2021, 14:14
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 30/12/2021, 13:55
+ * Last modified 31/12/2021, 16:57
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -23,6 +23,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
@@ -71,12 +75,6 @@ class SongsFragment : Fragment() {
 
         binding.swtSelectedSongs.visibility = View.GONE
 
-        viewModel.pickedSong.observe(viewLifecycleOwner, this::onPickSong)
-        viewModel.numberOfSelectedSongs.observe(viewLifecycleOwner, this::onSelectSong)
-        viewModel.selectedSongPosition.observe(viewLifecycleOwner) {
-            songItemsAdapter.notifyItemChanged(it)
-        }
-
         setupCategorySpinner()
         setupRecyclerView()
         setupListeners()
@@ -115,9 +113,10 @@ class SongsFragment : Fragment() {
 
         binding.spnCategory.adapter = categorySpinnerAdapter
 
-        viewModel.categories.observe(viewLifecycleOwner) { categories: List<CategoryItem> ->
-            categorySpinnerAdapter.submitCollection(categories)
-        }
+        viewModel.categories
+            .onEach { categorySpinnerAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
     }
 
     private fun setupRecyclerView() {
@@ -130,11 +129,25 @@ class SongsFragment : Fragment() {
         binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvSongs.adapter = songItemsAdapter
 
-        viewModel.songs.observe(viewLifecycleOwner) {
-            lifecycleScope.launch(Dispatchers.Default) {
-                songItemsAdapter.submitCollection(it)
-            }
-        }
+        viewModel.songs
+            .onEach { songItemsAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.selectedSongPosition
+            .onEach { songItemsAdapter.notifyItemChanged(it) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
+
+        viewModel.pickedSong
+            .onEach(this::onPickSong)
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
+
+        viewModel.numberOfSelectedSongs
+            .onEach(this::onSelectSong)
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
     }
 
     private fun filterSongs() {
@@ -160,7 +173,7 @@ class SongsFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
+            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
         }
 
         when (countAfter) {
@@ -219,17 +232,19 @@ class SongsFragment : Fragment() {
                 )
 
             @Suppress("BlockingMethodInNonBlockingContext")
-            requireActivity().contentResolver.openOutputStream(uri)!!
-                .use { outputStream ->
-                    viewModel.exportSelectedSongs(
-                        requireActivity().cacheDir.canonicalPath,
-                        outputStream,
-                        dialogFragment.messageResourceId
-                    )
-                }
+            val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
+            val exportMessageFlow = viewModel.exportSelectedSongs(
+                requireActivity().cacheDir.canonicalPath,
+                outputStream
+            )
 
-            dialogFragment.dismiss()
-            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value!!.size)
+            exportMessageFlow.onEach { dialogFragment.setMessage(it) }
+                .onCompletion {
+                    outputStream.close()
+                    dialogFragment.dismiss()
+                    songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
+                }.flowOn(Dispatchers.Default)
+                .launchIn(dialogFragment.lifecycleScope)
         }
     }
 

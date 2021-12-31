@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:35
+ * Last modified 31/12/2021, 16:57
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -17,6 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
@@ -51,11 +54,6 @@ class CategoryManagerActivity : AppCompatActivity() {
         binding.rcvCategories.setHasFixedSize(true)
         binding.rcvCategories.layoutManager = LinearLayoutManager(baseContext)
 
-        viewModel.numberOfSelectedCategories.observe(this, this::onSelectCategory)
-        viewModel.selectedCategoryPosition.observe(this) {
-            categoryItemsAdapter.notifyItemChanged(it)
-        }
-
         setupRecyclerView()
     }
 
@@ -86,9 +84,20 @@ class CategoryManagerActivity : AppCompatActivity() {
         )
         binding.rcvCategories.adapter = categoryItemsAdapter
 
-        viewModel.categories.observe(this) {
-            categoryItemsAdapter.submitCollection(it)
-        }
+        viewModel.categories
+            .onEach { categoryItemsAdapter.submitCollection(it) }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.numberOfSelectedCategories
+            .onEach(this::onSelectCategory)
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        viewModel.selectedCategoryPosition
+            .onEach { categoryItemsAdapter.notifyItemChanged(it) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
     }
 
     private fun showAddCategoryDialog(): Boolean {
@@ -118,7 +127,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedCategories
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value!!.size)
+            categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size)
         }
 
         when (countAfter) {
@@ -150,7 +159,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun resetSelection() {
         viewModel.resetCategorySelection()
-        categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value!!.size)
+        categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size)
     }
 
     private inner class CategoryManagerActionModeCallback : ActionMode.Callback {

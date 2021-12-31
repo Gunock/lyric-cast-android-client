@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/12/2021, 23:38
+ * Last modified 31/12/2021, 17:29
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -15,9 +15,12 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
@@ -52,21 +55,26 @@ class SetlistControlsActivity : AppCompatActivity() {
         val setlistId: String = intent.getStringExtra("setlistId")!!
         viewModel.loadSetlist(setlistId)
 
-        viewModel.currentBlankTextAndColor.observe(this) {
-            val (blankText: Int, blankColor: Int) = it
-            binding.btnSetlistBlank.setBackgroundColor(getColor(blankColor))
-            binding.btnSetlistBlank.text = getString(blankText)
-        }
+        viewModel.currentBlankTextAndColor
+            .onEach {
+                val (blankText: Int, blankColor: Int) = it
+                binding.btnSetlistBlank.setBackgroundColor(getColor(blankColor))
+                binding.btnSetlistBlank.text = getString(blankText)
+            }.launchIn(lifecycleScope)
 
-        viewModel.currentSlideText.observe(this) { binding.tvSetlistSlidePreview.text = it }
-        viewModel.currentSongTitle.observe(this) { binding.tvCurrentSongTitle.text = it }
-        viewModel.currentSongPosition.observe(this) {
-            binding.rcvSongs.scrollToPosition(it)
-            binding.rcvSongs.postInvalidate()
-        }
-        viewModel.changedSongPosition.observe(this) {
-            songItemsAdapter.notifyItemChanged(it)
-        }
+        viewModel.currentSlideText
+            .onEach { binding.tvSetlistSlidePreview.text = it }
+            .launchIn(lifecycleScope)
+
+        viewModel.currentSongTitle
+            .onEach { binding.tvCurrentSongTitle.text = it }
+            .launchIn(lifecycleScope)
+
+        viewModel.currentSongPosition
+            .onEach {
+                binding.rcvSongs.scrollToPosition(it)
+                binding.rcvSongs.postInvalidate()
+            }.launchIn(lifecycleScope)
 
         setupRecyclerView()
         setupListeners()
@@ -78,13 +86,15 @@ class SetlistControlsActivity : AppCompatActivity() {
         val settings = applicationContext.getSettings()
         viewModel.settings = settings
 
-        val params = binding.setlistControlsButtonContainer.layoutParams
-        params.height = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            settings.controlButtonsHeight,
-            resources.displayMetrics
-        ).toInt()
-        binding.setlistControlsButtonContainer.layoutParams = params
+        if (settings.controlButtonsHeight > 0.0) {
+            val params = binding.setlistControlsButtonContainer.layoutParams
+            params.height = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                settings.controlButtonsHeight,
+                resources.displayMetrics
+            ).toInt()
+            binding.setlistControlsButtonContainer.layoutParams = params
+        }
 
         viewModel.sendConfiguration()
         viewModel.sendSlide()
@@ -132,6 +142,11 @@ class SetlistControlsActivity : AppCompatActivity() {
         )
 
         binding.rcvSongs.adapter = songItemsAdapter
+
+        viewModel.changedSongPositions
+            .onEach { itemPositions ->
+                itemPositions.forEach { songItemsAdapter.notifyItemChanged(it) }
+            }.launchIn(lifecycleScope)
     }
 
     private fun setupListeners() {

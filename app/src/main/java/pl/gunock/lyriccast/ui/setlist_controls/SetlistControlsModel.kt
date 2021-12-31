@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/12/2021, 20:01
+ * Last modified 31/12/2021, 15:42
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.getCastConfigurationJson
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SetlistControlsModel @Inject constructor(
-        private val setlistsRepository: SetlistsRepository
+    private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green
@@ -47,26 +47,27 @@ class SetlistControlsModel @Inject constructor(
             }
     }
 
+    // TODO: Try to remove this field
     var settings: Settings? = null
 
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
 
-    val currentSlideText: LiveData<String> get() = _currentSlideText
-    private val _currentSlideText: MutableLiveData<String> = MutableLiveData("")
+    val currentSlideText: StateFlow<String> get() = _currentSlideText
+    private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentSongTitle: LiveData<String> get() = _currentSongTitle
-    private val _currentSongTitle: MutableLiveData<String> = MutableLiveData("")
+    val currentSongTitle: StateFlow<String> get() = _currentSongTitle
+    private val _currentSongTitle: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentSongPosition: LiveData<Int> get() = _currentSongPosition
-    private val _currentSongPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val currentSongPosition: StateFlow<Int> get() = _currentSongPosition
+    private val _currentSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    val changedSongPosition: LiveData<Int> get() = _changedSongPosition
-    private val _changedSongPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val changedSongPositions: StateFlow<List<Int>> get() = _changedSongPositions
+    private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf(0))
 
-    val currentBlankTextAndColor: LiveData<Pair<Int, Int>> get() = _currentBlankTextAndColor
-    private val _currentBlankTextAndColor: MutableLiveData<Pair<Int, Int>> =
-            MutableLiveData(Pair(currentBlankText, currentBlankColor))
+    val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
+    private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
+        MutableStateFlow(Pair(currentBlankText, currentBlankColor))
 
 
     private lateinit var setlistLyrics: List<String>
@@ -94,7 +95,7 @@ class SetlistControlsModel @Inject constructor(
 
     override fun onCleared() {
         CastContext.getSharedInstance()!!.sessionManager
-                .removeSessionManagerListener(sessionStartedListener)
+            .removeSessionManagerListener(sessionStartedListener)
 
         super.onCleared()
     }
@@ -104,18 +105,18 @@ class SetlistControlsModel @Inject constructor(
 
         var setlistLyricsIndex = 0
         setlistLyrics = setlist.presentation
-                .flatMapIndexed { index: Int, song: Song ->
-                    val lyrics = song.lyricsList
+            .flatMapIndexed { index: Int, song: Song ->
+                val lyrics = song.lyricsList
 
-                    val indexedTitle = "[$index] ${song.title}"
-                    songTitles[setlistLyricsIndex] = indexedTitle
-                    songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
-                    songStartPoints[indexedTitle] = setlistLyricsIndex
+                val indexedTitle = "[$index] ${song.title}"
+                songTitles[setlistLyricsIndex] = indexedTitle
+                songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
+                songStartPoints[indexedTitle] = setlistLyricsIndex
 
-                    setlistLyricsIndex += lyrics.size
+                setlistLyricsIndex += lyrics.size
 
-                    return@flatMapIndexed lyrics
-                }
+                return@flatMapIndexed lyrics
+            }
 
         _songs.clear()
 
@@ -124,11 +125,11 @@ class SetlistControlsModel @Inject constructor(
 
         currentLyricsPosition = 0
         previousSongTitle = songTitles[currentLyricsPosition]!!
-        highlightSong(previousSongTitle, isHighlighted = true, isCurrent = true)
+        val itemPosition = highlightSong(previousSongTitle, isHighlighted = true, isCurrent = true)
+        _changedSongPositions.value = listOf(itemPosition)
 
         postSlide()
     }
-
 
     fun previousSlide() {
         if (currentLyricsPosition <= 0) {
@@ -171,41 +172,48 @@ class SetlistControlsModel @Inject constructor(
     }
 
     private fun postSlide() {
-        if (
-                songTitles.containsKey(currentLyricsPosition)
+        val isNewSongTitle = songTitles.containsKey(currentLyricsPosition)
                 && songTitles[currentLyricsPosition]!! != previousSongTitle
-        ) {
+
+        if (isNewSongTitle) {
             val songTitle = songTitles[currentLyricsPosition]!!
             val songTitleWithoutNumber = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
 
-            highlightSong(previousSongTitle, isHighlighted = false)
-            highlightSong(songTitle, isHighlighted = true, isCurrent = true)
+            val itemPosition1 = highlightSong(previousSongTitle, isHighlighted = false)
+            val itemPosition2 = highlightSong(songTitle, isHighlighted = true, isCurrent = true)
+
+            _changedSongPositions.value = listOf(itemPosition1, itemPosition2)
             previousSongTitle = songTitle
 
-            _currentSongTitle.postValue(songTitleWithoutNumber)
+            _currentSongTitle.value = songTitleWithoutNumber
         }
 
-        _currentSlideText.postValue(setlistLyrics[currentLyricsPosition])
+        _currentSlideText.value = setlistLyrics[currentLyricsPosition]
     }
 
-    private fun highlightSong(title: String, isHighlighted: Boolean, isCurrent: Boolean = false) {
+    private fun highlightSong(
+        title: String,
+        isHighlighted: Boolean,
+        isCurrent: Boolean = false
+    ): Int {
         if (title.isBlank()) {
-            return
+            throw IllegalArgumentException("Song title cannot be blank")
         }
 
         val songItemPosition: Int = songStartPoints.keys
-                .indexOfFirst { songTitle -> songTitle == title }
+            .indexOfFirst { songTitle -> songTitle == title }
 
         _songs[songItemPosition].isHighlighted = isHighlighted
-        _changedSongPosition.value = songItemPosition
         if (isCurrent) {
-            _currentSongPosition.postValue(songItemPosition)
+            _currentSongPosition.value = songItemPosition
         }
+
+        return songItemPosition
     }
 
     private fun postBlankColor() {
         val textAndColor = Pair(currentBlankText, currentBlankColor)
-        _currentBlankTextAndColor.postValue(textAndColor)
+        _currentBlankTextAndColor.value = textAndColor
     }
 
 }

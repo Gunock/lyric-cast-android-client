@@ -1,14 +1,16 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:49
+ * Last modified 31/12/2021, 15:51
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import pl.gunock.lyriccast.datamodel.R
 import pl.gunock.lyriccast.datamodel.extentions.toRealmList
 import pl.gunock.lyriccast.datamodel.models.*
@@ -17,7 +19,9 @@ import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository {
+internal abstract class DataTransferRepositoryBaseImpl(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+) : DataTransferRepository {
 
     private companion object {
         const val TAG = "DataTransferRepository"
@@ -25,17 +29,15 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
 
     final override suspend fun importSongs(
         data: DatabaseTransferData,
-        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
-    ) {
-        executeDataImport(data, messageResourceId, options)
+    ): Flow<Int> {
+        return executeDataImport(data, options)
     }
 
     final override suspend fun importSongs(
         songDtoSet: Set<SongDto>,
-        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
-    ) {
+    ): Flow<Int> {
         val categoryDtos: List<CategoryDto> = songDtoSet.map { songDto -> songDto.category }
             .distinct()
             .mapIndexedNotNull { index, categoryName ->
@@ -46,7 +48,7 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
             }
 
         val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
-        importSongs(data, messageResourceId, options)
+        return importSongs(data, options)
     }
 
     final override suspend fun getDatabaseTransferData(): DatabaseTransferData =
@@ -76,9 +78,8 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
 
     private suspend fun executeDataImport(
         data: DatabaseTransferData,
-        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
-    ) {
+    ): Flow<Int> = flow {
         if (options.deleteAll) {
             clearDatabase()
         }
@@ -86,23 +87,23 @@ internal abstract class DataTransferRepositoryBaseImpl : DataTransferRepository 
         val removeConflicts: Boolean = !options.deleteAll && !options.replaceOnConflict
 
         if (data.categoryDtos != null) {
-            messageResourceId.postValue(R.string.data_transfer_processor_importing_categories)
+            emit(R.string.data_transfer_processor_importing_categories)
             executeCategoryImport(data.categoryDtos, options, removeConflicts)
         }
 
         if (data.songDtos != null) {
-            messageResourceId.postValue(R.string.data_transfer_processor_importing_songs)
+            emit(R.string.data_transfer_processor_importing_songs)
             executeSongImport(data.songDtos, options, removeConflicts)
         }
 
         if (data.setlistDtos != null) {
-            messageResourceId.postValue(R.string.data_transfer_processor_importing_setlists)
+            emit(R.string.data_transfer_processor_importing_setlists)
             executeSetlistImport(data.setlistDtos, options, removeConflicts)
         }
 
-        messageResourceId.postValue(R.string.data_transfer_processor_finishing_import)
+        emit(R.string.data_transfer_processor_finishing_import)
         Log.d(TAG, "Finished import")
-    }
+    }.flowOn(dispatcher)
 
     private suspend fun executeCategoryImport(
         categoryDtos: List<CategoryDto>,

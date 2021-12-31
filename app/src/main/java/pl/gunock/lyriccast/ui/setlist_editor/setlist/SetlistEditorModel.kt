@@ -1,19 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 13:15
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 13:13
+ * Last modified 31/12/2021, 17:15
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -44,15 +42,15 @@ class SetlistEditorModel @Inject constructor(
 
     private var editedSetlist: Setlist? = null
 
-    val numberOfSelectedSongs: LiveData<Pair<Int, Int>> get() = _numberOfSelectedSongs
-    private val _numberOfSelectedSongs: MutableLiveData<Pair<Int, Int>> =
-        MutableLiveData(Pair(0, 0))
+    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> get() = _numberOfSelectedSongs
+    private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
+        MutableStateFlow(Pair(0, 0))
 
-    val selectedSongPosition: LiveData<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedSongPosition: StateFlow<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    val removedSongPosition: LiveData<Int> get() = _removedSongPosition
-    private val _removedSongPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val removedSongPosition: StateFlow<Int> get() = _removedSongPosition
+    private val _removedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
 
     val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
@@ -61,6 +59,7 @@ class SetlistEditorModel @Inject constructor(
     init {
         setlistsRepository.getAllSetlists()
             .onEach { setlists -> setlistNames = setlists.map { it.name }.toSet() }
+            .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
     }
 
@@ -172,8 +171,8 @@ class SetlistEditorModel @Inject constructor(
         }
 
         val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-        _numberOfSelectedSongs.postValue(countPair)
-        _selectedSongPosition.postValue(position)
+        _numberOfSelectedSongs.value = countPair
+        _selectedSongPosition.value = position
 
         return true
     }

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 11/12/2021, 23:38
+ * Last modified 31/12/2021, 16:51
  */
 
 package pl.gunock.lyriccast.ui.song_controls
@@ -14,8 +14,13 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
@@ -47,14 +52,23 @@ class SongControlsActivity : AppCompatActivity() {
         viewModel.loadSong(songId)
         binding.tvControlsSongTitle.text = viewModel.songTitle
 
-        viewModel.currentBlankTextAndColor.observe(this) {
-            val (blankText: Int, blankColor: Int) = it
-            binding.btnSongBlank.setBackgroundColor(getColor(blankColor))
-            binding.btnSongBlank.text = getString(blankText)
-        }
+        viewModel.currentBlankTextAndColor
+            .onEach {
+                val (blankText: Int, blankColor: Int) = it
+                binding.btnSongBlank.setBackgroundColor(getColor(blankColor))
+                binding.btnSongBlank.text = getString(blankText)
+            }.flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
 
-        viewModel.currentSlideText.observe(this) { binding.tvSlidePreview.text = it }
-        viewModel.currentSlideNumber.observe(this) { binding.tvSongSlideNumber.text = it }
+        viewModel.currentSlideText
+            .onEach { binding.tvSlidePreview.text = it }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
+
+        viewModel.currentSlideNumber
+            .onEach { binding.tvSongSlideNumber.text = it }
+            .flowOn(Dispatchers.Default)
+            .launchIn(lifecycleScope)
 
         setupListeners()
     }
@@ -65,13 +79,15 @@ class SongControlsActivity : AppCompatActivity() {
         val settings = applicationContext.getSettings()
         viewModel.settings = settings
 
-        val params = binding.songControlsButtonContainer.layoutParams
-        params.height = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            settings.controlButtonsHeight,
-            resources.displayMetrics
-        ).toInt()
-        binding.songControlsButtonContainer.layoutParams = params
+        if (settings.controlButtonsHeight > 0.0) {
+            val params = binding.songControlsButtonContainer.layoutParams
+            params.height = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                settings.controlButtonsHeight,
+                resources.displayMetrics
+            ).toInt()
+            binding.songControlsButtonContainer.layoutParams = params
+        }
 
         viewModel.sendConfiguration()
         viewModel.sendSlide()

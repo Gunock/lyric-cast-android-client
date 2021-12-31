@@ -1,12 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/12/2021, 12:25
+ * Last modified 31/12/2021, 17:29
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories
 
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.Flow
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
 import pl.gunock.lyriccast.datatransfer.models.SongDto
@@ -17,15 +17,13 @@ interface DataTransferRepository {
 
     suspend fun importSongs(
         data: DatabaseTransferData,
-        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
-    )
+    ): Flow<Int>
 
     suspend fun importSongs(
         songDtoSet: Set<SongDto>,
-        messageResourceId: MutableLiveData<Int>,
         options: ImportOptions
-    )
+    ): Flow<Int>
 
     suspend fun getDatabaseTransferData(): DatabaseTransferData
 }

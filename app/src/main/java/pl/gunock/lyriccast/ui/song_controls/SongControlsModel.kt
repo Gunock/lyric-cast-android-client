@@ -1,17 +1,17 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/12/2021, 20:01
+ * Last modified 31/12/2021, 17:29
  */
 
 package pl.gunock.lyriccast.ui.song_controls
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.getCastConfigurationJson
@@ -49,15 +49,15 @@ class SongControlsModel @Inject constructor(
 
     var settings: Settings? = null
 
-    val currentSlideText: LiveData<String> get() = _currentSlideText
-    private val _currentSlideText: MutableLiveData<String> = MutableLiveData("")
+    val currentSlideText: StateFlow<String> get() = _currentSlideText
+    private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentSlideNumber: LiveData<String> get() = _currentSlideNumber
-    private val _currentSlideNumber: MutableLiveData<String> = MutableLiveData("")
+    val currentSlideNumber: StateFlow<String> get() = _currentSlideNumber
+    private val _currentSlideNumber: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentBlankTextAndColor: LiveData<Pair<Int, Int>> get() = _currentBlankTextAndColor
-    private val _currentBlankTextAndColor: MutableLiveData<Pair<Int, Int>> =
-            MutableLiveData(Pair(currentBlankText, currentBlankColor))
+    val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
+    private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
+        MutableStateFlow(Pair(currentBlankText, currentBlankColor))
 
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
@@ -123,12 +123,12 @@ class SongControlsModel @Inject constructor(
     }
 
     private fun postSlide() {
-        _currentSlideNumber.postValue("${currentSlide + 1}/${lyrics.size}")
-        _currentSlideText.postValue(lyrics[currentSlide])
+        _currentSlideNumber.value = "${currentSlide + 1}/${lyrics.size}"
+        _currentSlideText.value = lyrics[currentSlide]
     }
 
     private fun postBlankColor() {
         val textAndColor = Pair(currentBlankText, currentBlankColor)
-        _currentBlankTextAndColor.postValue(textAndColor)
+        _currentBlankTextAndColor.value = textAndColor
     }
 }
