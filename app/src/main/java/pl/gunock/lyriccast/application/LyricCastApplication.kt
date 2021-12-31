@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 26/12/2021, 13:39
+ * Last modified 31/12/2021, 18:15
  */
 
 package pl.gunock.lyriccast.application
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
-import pl.gunock.lyriccast.shared.cast.SessionStartedListener
+import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import pl.gunock.lyriccast.shared.extensions.getSettings
 
 // TODO: Resolve this problem
@@ -34,9 +34,14 @@ class LyricCastApplication : Application() {
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext)
             .sessionManager
-            .addSessionManagerListener(SessionStartedListener {
-                CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart)
-            })
+            .addSessionManagerListener(
+                CastSessionListener(
+                    onStarted = {
+                        CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart)
+                    },
+                    onEnded = { CastMessageHelper.onSessionEnded() }
+                )
+            )
 
 
         AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)

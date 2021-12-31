@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/11/2021, 17:59
+ * Last modified 31/12/2021, 18:15
  */
 
 package pl.gunock.lyriccast.shared.cast
@@ -9,15 +9,16 @@ package pl.gunock.lyriccast.shared.cast
 import com.google.android.gms.cast.framework.Session
 import com.google.android.gms.cast.framework.SessionManagerListener
 
-class SessionStartedListener(
-    private val listener: (session: Session) -> Unit
+class CastSessionListener(
+    private val onStarted: (session: Session) -> Unit,
+    private val onEnded: ((session: Session) -> Unit)? = null
 ) : SessionManagerListener<Session> {
 
     override fun onSessionStarting(session: Session) {
     }
 
     override fun onSessionStarted(session: Session, sessionId: String) {
-        listener(session)
+        onStarted(session)
     }
 
     override fun onSessionStartFailed(session: Session, error: Int) {
@@ -27,6 +28,7 @@ class SessionStartedListener(
     }
 
     override fun onSessionEnded(session: Session, error: Int) {
+        onEnded?.invoke(session)
     }
 
     override fun onSessionResuming(session: Session, sessionId: String) {

@@ -1,48 +1,37 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:29
+ * Last modified 31/12/2021, 18:15
  */
 
 package pl.gunock.lyriccast.ui.song_controls
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.getCastConfigurationJson
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
-import pl.gunock.lyriccast.shared.cast.SessionStartedListener
+import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import javax.inject.Inject
 
 @HiltViewModel
 class SongControlsModel @Inject constructor(
-        val songsRepository: SongsRepository
+    val songsRepository: SongsRepository
 ) : ViewModel() {
     private companion object {
         private const val blankOnColor: Int = R.color.green
         private const val blankOffColor: Int = R.color.red
-        private val currentBlankColor: Int
-            get() = if (CastMessageHelper.isBlanked) {
-                blankOffColor
-            } else {
-                blankOnColor
-            }
 
         private const val blankOffText: Int = R.string.controls_off
         private const val blankOnText: Int = R.string.controls_on
-        private val currentBlankText: Int
-            get() = if (CastMessageHelper.isBlanked) {
-                blankOffText
-            } else {
-                blankOnText
-            }
     }
 
     var songTitle: String = ""
@@ -57,27 +46,42 @@ class SongControlsModel @Inject constructor(
 
     val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
     private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(currentBlankText, currentBlankColor))
+        MutableStateFlow(Pair(blankOffText, blankOffColor))
 
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
 
-    private val sessionStartedListener: SessionStartedListener = SessionStartedListener {
-        postBlankColor()
-        if (settings != null) {
-            sendConfiguration()
-        }
+    private val castSessionListener: CastSessionListener = CastSessionListener(onStarted = {
+        if (settings != null) sendConfiguration()
         sendSlide()
-    }
+    })
 
     init {
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(sessionStartedListener)
+        sessionsManager.addSessionManagerListener(castSessionListener)
+
+        CastMessageHelper.isBlanked
+            .onEach {
+                val currentBlankText: Int = if (it) {
+                    blankOffText
+                } else {
+                    blankOnText
+                }
+
+                val currentBlankColor: Int = if (it) {
+                    blankOffColor
+                } else {
+                    blankOnColor
+                }
+
+                _currentBlankTextAndColor.value = Pair(currentBlankText, currentBlankColor)
+            }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 
     override fun onCleared() {
         CastContext.getSharedInstance()!!.sessionManager
-                .removeSessionManagerListener(sessionStartedListener)
+            .removeSessionManagerListener(castSessionListener)
 
         super.onCleared()
     }
@@ -109,8 +113,7 @@ class SongControlsModel @Inject constructor(
     }
 
     fun sendBlank() {
-        CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked)
-        postBlankColor()
+        CastMessageHelper.sendBlank(!CastMessageHelper.isBlanked.value)
     }
 
     fun sendConfiguration() {
@@ -125,10 +128,5 @@ class SongControlsModel @Inject constructor(
     private fun postSlide() {
         _currentSlideNumber.value = "${currentSlide + 1}/${lyrics.size}"
         _currentSlideText.value = lyrics[currentSlide]
-    }
-
-    private fun postBlankColor() {
-        val textAndColor = Pair(currentBlankText, currentBlankColor)
-        _currentBlankTextAndColor.value = textAndColor
     }
 }
