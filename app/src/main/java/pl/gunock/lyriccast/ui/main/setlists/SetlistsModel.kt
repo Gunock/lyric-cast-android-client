@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:26
+ * Last modified 31/12/2021, 19:15
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -55,8 +55,8 @@ class SetlistsModel @Inject constructor(
     private val _numberOfSelectedSetlists: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
 
-    val selectedSetlistPosition: StateFlow<Int> get() = _selectedSetlistPosition
-    private val _selectedSetlistPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedSetlistPosition: SharedFlow<Int> get() = _selectedSetlistPosition
+    private val _selectedSetlistPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
     private var allSetlists: Iterable<SetlistItem> = listOf()
 
@@ -80,6 +80,7 @@ class SetlistsModel @Inject constructor(
             .map { item -> item.setlist.id }
         setlistsRepository.deleteSetlists(selectedSetlists)
         _numberOfSelectedSetlists.value = Pair(selectedSetlists.size, 0)
+        selectionTracker.reset()
     }
 
     // TODO: Move filter to separate class (functional interface?)
@@ -187,7 +188,7 @@ class SetlistsModel @Inject constructor(
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
             _numberOfSelectedSetlists.value = countPair
-            _selectedSetlistPosition.value = position
+            _selectedSetlistPosition.tryEmit(position)
         }
 
         return true

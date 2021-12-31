@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:55
+ * Last modified 31/12/2021, 18:28
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -86,8 +86,8 @@ class SetlistEditorFragment : Fragment() {
             .flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
 
-        viewModel.removedSongPosition
-            .onEach { songItemsAdapter.notifyItemRemoved(it) }
+        viewModel.removedSongPositions
+            .onEach { positions -> positions.forEach { songItemsAdapter.notifyItemRemoved(it) } }
             .flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
     }

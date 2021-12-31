@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:15
+ * Last modified 31/12/2021, 19:07
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -46,11 +46,11 @@ class SetlistEditorModel @Inject constructor(
     private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
 
-    val selectedSongPosition: StateFlow<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
-    val removedSongPosition: StateFlow<Int> get() = _removedSongPosition
-    private val _removedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val removedSongPositions: SharedFlow<List<Int>> get() = _removedSongPositions
+    private val _removedSongPositions: MutableSharedFlow<List<Int>> = MutableSharedFlow(replay = 1)
 
     val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
@@ -112,19 +112,23 @@ class SetlistEditorModel @Inject constructor(
     }
 
     fun removeSelectedSongs() {
-        @Suppress("ControlFlowWithEmptyBody")
-        while (deleteSelectedItem()) {
+        val removedItemPositions: MutableList<Int> = mutableListOf()
+        var itemPosition = -2
+        while (itemPosition != -1) {
+            itemPosition = deleteSelectedItem()
+            if (itemPosition >= 0) removedItemPositions.add(itemPosition)
         }
+
+        _removedSongPositions.tryEmit(removedItemPositions)
     }
 
-    private fun deleteSelectedItem(): Boolean {
+    private fun deleteSelectedItem(): Int {
         val selectedItemIndex = _songs.indexOfFirst { item -> item.isSelected }
-        if (selectedItemIndex == -1) {
-            return false
+        if (selectedItemIndex >= 0) {
+            _songs.removeAt(selectedItemIndex)
         }
-        _songs.removeAt(selectedItemIndex)
-        _removedSongPosition.value = selectedItemIndex
-        return true
+
+        return selectedItemIndex
     }
 
     fun duplicateSelectedSong(): Int {
@@ -172,7 +176,7 @@ class SetlistEditorModel @Inject constructor(
 
         val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
         _numberOfSelectedSongs.value = countPair
-        _selectedSongPosition.value = position
+        _selectedSongPosition.tryEmit(position)
 
         return true
     }

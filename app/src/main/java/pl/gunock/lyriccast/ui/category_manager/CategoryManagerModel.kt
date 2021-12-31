@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:28
+ * Last modified 31/12/2021, 19:07
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -29,8 +29,8 @@ class CategoryManagerModel @Inject constructor(
     private val _numberOfSelectedCategories: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
 
-    val selectedCategoryPosition: StateFlow<Int> get() = _selectedCategoryPosition
-    private val _selectedCategoryPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedCategoryPosition: SharedFlow<Int> get() = _selectedCategoryPosition
+    private val _selectedCategoryPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onCategorySelection)
@@ -85,7 +85,7 @@ class CategoryManagerModel @Inject constructor(
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
             _numberOfSelectedCategories.value = countPair
-            _selectedCategoryPosition.value = position
+            _selectedCategoryPosition.tryEmit(position)
         }
 
         return true

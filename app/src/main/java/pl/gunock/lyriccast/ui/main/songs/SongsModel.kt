@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:26
+ * Last modified 31/12/2021, 19:15
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -51,12 +51,11 @@ class SongsModel @Inject constructor(
     private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
 
-    val selectedSongPosition: StateFlow<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
     val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
-
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onSongSelection)
@@ -96,6 +95,7 @@ class SongsModel @Inject constructor(
 
         songsRepository.deleteSongs(selectedSongs)
         _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
+        selectionTracker.reset()
     }
 
     // TODO: Move filter to separate class (functional interface?)
@@ -200,7 +200,7 @@ class SongsModel @Inject constructor(
 
             val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
             _numberOfSelectedSongs.value = countPair
-            _selectedSongPosition.value = position
+            _selectedSongPosition.tryEmit(position)
         }
 
         return true

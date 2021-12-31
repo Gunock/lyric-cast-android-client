@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
+ * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 17:29
+ * Last modified 31/12/2021, 19:02
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -39,8 +39,8 @@ class SetlistEditorSongsModel @Inject constructor(
 
     private var selectedSongs: MutableSet<SongItem> = mutableSetOf()
 
-    val selectedSongPosition: StateFlow<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
+    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
     var setlistSongIds: List<String> = listOf()
 
@@ -58,7 +58,7 @@ class SetlistEditorSongsModel @Inject constructor(
                 if (_songs.value == songItems) return@onEach
 
                 allSongs = songItems
-                _songs.value = allSongs
+                _songs.value = songItems
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
@@ -143,7 +143,7 @@ class SetlistEditorSongsModel @Inject constructor(
     ): Boolean {
         val item: SongItem = _songs.value[position]
         item.isSelected = !item.isSelected
-        _selectedSongPosition.value = position
+        _selectedSongPosition.tryEmit(position)
         return true
     }
 
