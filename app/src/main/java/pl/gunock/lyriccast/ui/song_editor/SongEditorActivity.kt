@@ -263,7 +263,11 @@ class SongEditorActivity : AppCompatActivity() {
         if (viewModel.removeSection(tabText)) {
             binding.tblSongSection.removeTab(tab)
         } else {
-            tab.text = viewModel.newSectionName
+            val newSectionName = getString(R.string.song_editor_input_new_section)
+            tab.text = newSectionName
+            viewModel.increaseSectionCount(newSectionName)
+            viewModel.setSectionText(newSectionName, "")
+            binding.edSectionLyrics.setText("")
         }
     }
 

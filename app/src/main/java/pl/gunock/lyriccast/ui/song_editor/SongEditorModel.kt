@@ -26,9 +26,9 @@ import kotlin.collections.set
 
 @HiltViewModel
 class SongEditorModel @Inject constructor(
-    @ApplicationContext context: Context,
-    categoriesRepository: CategoriesRepository,
-    private val songsRepository: SongsRepository
+        @ApplicationContext context: Context,
+        categoriesRepository: CategoriesRepository,
+        private val songsRepository: SongsRepository
 ) : ViewModel() {
 
     private companion object {
@@ -50,7 +50,7 @@ class SongEditorModel @Inject constructor(
     private var songTitles: Set<String> = setOf()
 
     val categoryNone: CategoryItem = CategoryItem(
-        Category(name = context.getString(R.string.category_none))
+            Category(name = context.getString(R.string.category_none))
     )
 
     val newSectionName: String
@@ -60,7 +60,7 @@ class SongEditorModel @Inject constructor(
             return result
         }
     private val _newSectionName: String =
-        context.getString(R.string.song_editor_input_new_section_template)
+            context.getString(R.string.song_editor_input_new_section_template)
 
     private val sectionLyrics: MutableMap<String, String> = mutableMapOf()
     private val sectionCountMap: MutableMap<String, Int> = mutableMapOf()
@@ -69,16 +69,16 @@ class SongEditorModel @Inject constructor(
 
     init {
         songsRepository.getAllSongs()
-            .onEach { songs -> songTitles = songs.map { it.title }.toSet() }
-            .flowOn(Dispatchers.Default)
-            .launchIn(viewModelScope)
+                .onEach { songs -> songTitles = songs.map { it.title }.toSet() }
+                .flowOn(Dispatchers.Default)
+                .launchIn(viewModelScope)
 
         categoriesRepository.getAllCategories()
-            .onEach {
-                val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                _categories.value = categoryItems
-            }.flowOn(Dispatchers.Default)
-            .launchIn(viewModelScope)
+                .onEach {
+                    val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
+                    _categories.value = categoryItems
+                }.flowOn(Dispatchers.Default)
+                .launchIn(viewModelScope)
     }
 
     fun validateSongTitle(songTitle: String): NameValidationState {
@@ -116,11 +116,11 @@ class SongEditorModel @Inject constructor(
         val lyricsSections = sectionLyrics.map { Song.LyricsSection(it.key, it.value) }
 
         val song = Song(
-            songId ?: "",
-            songTitle,
-            lyricsSections,
-            presentation,
-            category
+                songId ?: "",
+                songTitle,
+                lyricsSections,
+                presentation,
+                category
         )
 
         songsRepository.upsertSong(song)
@@ -149,7 +149,6 @@ class SongEditorModel @Inject constructor(
 
     fun removeSection(sectionName: String): Boolean {
         val tabCount = sectionCountMap[sectionName]!! - 1
-
         if (tabCount <= 0) {
             sectionCountMap.remove(sectionName)
             sectionLyrics.remove(sectionName)
@@ -158,24 +157,22 @@ class SongEditorModel @Inject constructor(
         }
 
         val totalSectionCount = sectionCountMap.values
-            .toList()
-            .sum()
+                .toList()
+                .sum()
 
-        return if (totalSectionCount > 2) {
-            true
-        } else {
+        if (totalSectionCount <= 1) {
             newSectionCount = 1
-            false
         }
+
+        return totalSectionCount > 0
     }
 
     fun calculateNewSectionCount(newSectionName: String) {
         while (
-            sectionCountMap.keys.any { sectionName ->
-                sectionName.contains(newSectionName)
-                        && sectionName.split(" ")
-                    .last() == newSectionCount.toString()
-            }
+                sectionCountMap.keys.any { sectionName ->
+                    sectionName.contains(newSectionName)
+                            && sectionName.split(" ").last() == newSectionCount.toString()
+                }
         ) {
             newSectionCount++
         }
@@ -193,11 +190,11 @@ class SongEditorModel @Inject constructor(
 
     fun increaseSectionCount(sectionName: String): Boolean {
         sectionCountMap[sectionName] =
-            if (sectionCountMap.containsKey(sectionName)) {
-                sectionCountMap[sectionName]!! + 1
-            } else {
-                1
-            }
+                if (sectionCountMap.containsKey(sectionName)) {
+                    sectionCountMap[sectionName]!! + 1
+                } else {
+                    1
+                }
 
         return sectionLyrics.containsKey(sectionName)
     }
