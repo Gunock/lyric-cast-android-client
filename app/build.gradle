@@ -30,7 +30,7 @@ android {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 14
+        versionCode 15
         versionName "0.1.0-a10"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -39,8 +39,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
