@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 15:46
+ * Created by Tomasz Kiljanczyk on 03/01/2022, 23:12
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 03/01/2022, 23:12
  */
 
 plugins {
@@ -26,9 +26,29 @@ android {
     }
 
     buildTypes {
+        debugMini {
+            initWith buildTypes.debug
+
+            minifyEnabled true
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
