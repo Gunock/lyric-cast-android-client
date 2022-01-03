@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 03/01/2022, 23:12
+ * Created by Tomasz Kiljanczyk on 03/01/2022, 23:17
  * Copyright (c) 2022 . All rights reserved.
- * Last modified 03/01/2022, 23:12
+ * Last modified 03/01/2022, 23:13
  */
 
 plugins {
@@ -92,7 +92,7 @@ dependencies {
     implementation project(':dataTransfer')
     implementation project(':dataModel')
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0-native-mt'
 
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.android.gms:play-services-cast-framework:21.0.0'
