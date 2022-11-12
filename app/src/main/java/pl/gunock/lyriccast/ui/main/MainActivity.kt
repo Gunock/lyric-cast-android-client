@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 20:29
  * Copyright (c) 2022 . All rights reserved.
- * Last modified 12/11/2022, 19:48
+ * Last modified 12/11/2022, 20:13
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -122,10 +122,10 @@ class MainActivity : AppCompatActivity() {
 
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
-                    Log.d(TAG, "Switching to song list")
+                    Log.v(TAG, "Switching to song list")
                     navController.navigate(R.id.action_Setlists_to_Songs)
                 } else if (tab.text == getString(R.string.title_setlists)) {
-                    Log.d(TAG, "Switching to setlists")
+                    Log.v(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_Songs_to_Setlists)
                 }
             })
