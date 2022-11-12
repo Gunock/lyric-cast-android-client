@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:51
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:48
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -205,7 +205,6 @@ class MainActivity : AppCompatActivity() {
                     R.string.main_activity_export_preparing_data
                 )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val outputStream = contentResolver.openOutputStream(uri)!!
 
             val exportMessageFlow = viewModel.exportAll(
@@ -213,7 +212,9 @@ class MainActivity : AppCompatActivity() {
                 outputStream
             )
 
-            handleDialogMessages(dialogFragment, exportMessageFlow, outputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, exportMessageFlow, outputStream)
+            }
         }
     }
 
@@ -248,7 +249,6 @@ class MainActivity : AppCompatActivity() {
                 replaceOnConflict = importDialogModel.replaceOnConflict
             )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
             val importMessageFlow =
@@ -258,7 +258,9 @@ class MainActivity : AppCompatActivity() {
                     importOptions
                 )
 
-            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            }
         }
 
     private fun importOpenSong(uri: Uri) =
@@ -276,7 +278,6 @@ class MainActivity : AppCompatActivity() {
                 colors = colors
             )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
             val importMessageFlow =
@@ -286,10 +287,11 @@ class MainActivity : AppCompatActivity() {
                     importOptions
                 )
 
-            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            }
         }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private fun handleDialogMessages(
         dialogFragment: ProgressDialogFragment,
         messageFlow: Flow<Int>?,
@@ -298,9 +300,11 @@ class MainActivity : AppCompatActivity() {
         if (messageFlow != null) {
             messageFlow.onEach { dialogFragment.setMessage(it) }
                 .onCompletion {
-                    stream.close()
+                    withContext(Dispatchers.IO) {
+                        stream.close()
+                    }
                     dialogFragment.dismiss()
-                }.flowOn(Dispatchers.Default)
+                }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         } else {
             stream.close()

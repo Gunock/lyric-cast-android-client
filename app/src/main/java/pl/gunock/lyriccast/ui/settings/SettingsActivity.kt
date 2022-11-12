@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 19/12/2021, 20:07
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 19/12/2021, 19:49
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 22/09/2022, 20:45
  */
 
 package pl.gunock.lyriccast.ui.settings
@@ -117,7 +117,7 @@ class SettingsActivity : AppCompatActivity() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-        ): View? {
+        ): View {
             val contextThemeWrapper: Context =
                 ContextThemeWrapper(activity, R.style.Theme_LyricCast_Dialog)
 

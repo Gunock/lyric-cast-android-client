@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 09/03/2022, 08:59
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -17,7 +17,6 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
-import java.util.*
 
 class SongItemsAdapter(
     context: Context,

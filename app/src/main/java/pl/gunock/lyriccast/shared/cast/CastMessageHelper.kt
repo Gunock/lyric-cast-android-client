@@ -1,34 +1,25 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 18:15
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:31
  */
 
 package pl.gunock.lyriccast.shared.cast
 
-import android.content.res.Resources
 import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
-import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.shared.enums.ControlAction
 
 object CastMessageHelper {
     private const val TAG = "MessageHelper"
+    private const val CONTENT_NAMESPACE: String = "urn:x-cast:lyric.cast.content"
+    private const val CONTROL_NAMESPACE: String = "urn:x-cast:lyric.cast.control"
 
     val isBlanked: StateFlow<Boolean> get() = _isBlanked
     private val _isBlanked: MutableStateFlow<Boolean> = MutableStateFlow(true)
-
-    private var CONTENT_NAMESPACE: String = ""
-    private var CONTROL_NAMESPACE: String = ""
-
-
-    fun initialize(resources: Resources) {
-        CONTENT_NAMESPACE = resources.getString(R.string.chromecast_content_namespace)
-        CONTROL_NAMESPACE = resources.getString(R.string.chromecast_control_namespace)
-    }
 
     fun sendContentMessage(message: String) {
         val context: CastContext = CastContext.getSharedInstance()!!
@@ -53,10 +44,12 @@ object CastMessageHelper {
     }
 
     fun sendBlank(blanked: Boolean) {
-        if (isInSession()) {
-            _isBlanked.value = blanked
-            sendControlMessage(ControlAction.BLANK, blanked)
+        if (isNotInSession()) {
+            return
         }
+
+        _isBlanked.value = blanked
+        sendControlMessage(ControlAction.BLANK, blanked)
     }
 
     fun sendConfiguration(configurationJson: JSONObject) {
@@ -70,10 +63,10 @@ object CastMessageHelper {
         _isBlanked.value = true
     }
 
-    private fun isInSession(): Boolean {
+    private fun isNotInSession(): Boolean {
         val context: CastContext = CastContext.getSharedInstance()!!
         val castSession = context.sessionManager.currentCastSession
-        return castSession != null
+        return castSession == null
     }
 
     private fun sendControlMessage(action: ControlAction, value: Any) {
@@ -85,7 +78,7 @@ object CastMessageHelper {
         Log.d(TAG, "Sending control message")
         Log.d(TAG, "Namespace: $CONTROL_NAMESPACE")
         Log.d(TAG, "Content: $messageJson")
-        if (!isInSession()) {
+        if (isNotInSession()) {
             Log.d(TAG, "Message not sent (no session)")
             return
         }

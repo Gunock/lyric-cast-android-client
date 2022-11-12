@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 18:00
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:57
  */
 
 package pl.gunock.lyriccast.common.tests
@@ -42,7 +42,11 @@ class FileHelperTest {
 
     @After
     fun cleanUp() {
-        testDir.deleteRecursively()
+        try {
+            testDir.deleteRecursively()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @Test

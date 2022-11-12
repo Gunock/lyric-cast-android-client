@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 18:15
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:31
  */
 
 package pl.gunock.lyriccast.application
@@ -55,7 +55,6 @@ class LyricCastApplication : Application() {
             applicationContext.settingsDataStore.data.first()
 
             MobileAds.initialize(applicationContext) {}
-            CastMessageHelper.initialize(resources)
         }
     }
 }

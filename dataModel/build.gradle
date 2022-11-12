@@ -12,11 +12,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 31
+        targetSdkVersion 33
 
         consumerProguardFiles "consumer-rules.pro"
 
@@ -60,10 +60,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    namespace 'pl.gunock.lyriccast.datamodel'
 }
 
 dependencies {
     implementation project(':dataTransfer')
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 }

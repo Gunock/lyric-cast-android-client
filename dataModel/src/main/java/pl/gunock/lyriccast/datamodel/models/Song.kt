@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/10/2021, 20:28
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/10/2021, 17:45
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:25
  */
 
 package pl.gunock.lyriccast.datamodel.models
@@ -23,7 +23,7 @@ data class Song(
 
     val idLong: Long = id.hashCode().toLong()
 
-    val lyricsMap: Map<String, String> = lyrics.map { it.name to it.text }.toMap()
+    val lyricsMap: Map<String, String> = lyrics.associate { it.name to it.text }
 
     val lyricsList: List<String> = presentation.map { lyricsMap[it]!! }
 

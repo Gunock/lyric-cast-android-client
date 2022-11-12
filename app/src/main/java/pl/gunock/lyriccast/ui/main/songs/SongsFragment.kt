@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:57
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:48
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -231,7 +231,6 @@ class SongsFragment : Fragment() {
                     R.string.main_activity_export_preparing_data
                 )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
             val exportMessageFlow = viewModel.exportSelectedSongs(
                 requireActivity().cacheDir.canonicalPath,
@@ -240,10 +239,12 @@ class SongsFragment : Fragment() {
 
             exportMessageFlow.onEach { dialogFragment.setMessage(it) }
                 .onCompletion {
-                    outputStream.close()
+                    withContext(Dispatchers.IO) {
+                        outputStream.close()
+                    }
                     dialogFragment.dismiss()
                     songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
-                }.flowOn(Dispatchers.Default)
+                }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
     }

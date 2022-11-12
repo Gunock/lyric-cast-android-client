@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:02
  */
 
 package pl.gunock.lyriccast.application
@@ -20,7 +20,6 @@ object SettingsSerializer : Serializer<Settings> {
 
     override suspend fun readFrom(input: InputStream): Settings {
         try {
-            @Suppress("BlockingMethodInNonBlockingContext")
             val settingsBuilder = Settings.parseFrom(input).toBuilder()
             setDefaultValues(settingsBuilder)
 
@@ -34,7 +33,6 @@ object SettingsSerializer : Serializer<Settings> {
         t: Settings,
         output: OutputStream
     ) {
-        @Suppress("BlockingMethodInNonBlockingContext")
         t.writeTo(output)
     }
 
