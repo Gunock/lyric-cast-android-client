@@ -7,6 +7,7 @@
 package pl.gunock.lyriccast.application
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
@@ -38,7 +39,7 @@ object SettingsSerializer : Serializer<Settings> {
 
     private fun setDefaultValues(settingsBuilder: Settings.Builder) {
         if (settingsBuilder.appTheme == 0) {
-            settingsBuilder.appTheme = -1
+            settingsBuilder.appTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
         if (settingsBuilder.controlButtonsHeight == 0.0f) {
             settingsBuilder.controlButtonsHeight = 88.0f

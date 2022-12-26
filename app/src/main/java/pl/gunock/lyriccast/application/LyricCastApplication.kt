@@ -20,11 +20,11 @@ import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import pl.gunock.lyriccast.shared.extensions.getSettings
+import java.util.concurrent.Executors
 
-// TODO: Resolve this problem
-@SuppressLint("WrongConstant")
 @HiltAndroidApp
 class LyricCastApplication : Application() {
+    @SuppressLint("WrongConstant")
     override fun onCreate() {
         initializeFromThread()
 
@@ -32,21 +32,23 @@ class LyricCastApplication : Application() {
         RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
         // Initializes CastContext
-        // TODO: Fix deprecation
-        CastContext.getSharedInstance(applicationContext)
-            .sessionManager
-            .addSessionManagerListener(
-                CastSessionListener(
-                    onStarted = {
-                        CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart)
-                    },
-                    onEnded = { CastMessageHelper.onSessionEnded() }
-                )
-            )
+        CastContext.getSharedInstance(applicationContext, Executors.newSingleThreadExecutor())
+            .addOnCompleteListener { task ->
+                task.result
+                    .sessionManager
+                    .addSessionManagerListener(
+                        CastSessionListener(
+                            onStarted = { CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart) },
+                            onEnded = { CastMessageHelper.onSessionEnded() }
+                        )
+                    )
+            }
 
 
-        val appTheme = applicationContext.getSettings().appTheme
-        AppCompatDelegate.setDefaultNightMode(if (appTheme == 0) -1 else appTheme)
+        var appTheme = applicationContext.getSettings().appTheme
+        appTheme = if (appTheme == 0) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else appTheme
+
+        AppCompatDelegate.setDefaultNightMode(appTheme)
 
         super.onCreate()
     }
