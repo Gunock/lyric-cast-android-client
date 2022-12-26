@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+  ~ Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
   ~ Copyright (c) 2022 . All rights reserved.
-  ~ Last modified 12/11/2022, 19:57
+  ~ Last modified 26/12/2022, 17:02
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,9 +10,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!--  File permissions  -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".application.LyricCastApplication"

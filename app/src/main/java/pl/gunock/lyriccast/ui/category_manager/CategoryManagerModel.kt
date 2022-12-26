@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 19:07
+ * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 26/12/2022, 17:02
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -88,7 +88,7 @@ class CategoryManagerModel @Inject constructor(
             _selectedCategoryPosition.tryEmit(position)
         }
 
-        return true
+        return isLongClick || selectionTracker.count != 0
     }
 
 }

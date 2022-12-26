@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:57
+ * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 26/12/2022, 17:02
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -9,6 +9,8 @@ package pl.gunock.lyriccast.ui.category_manager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -41,6 +43,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     private var actionMode: ActionMode? = null
     private val actionModeCallback: ActionMode.Callback = CategoryManagerActionModeCallback()
 
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,14 +70,6 @@ class CategoryManagerActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_add_category -> showAddCategoryDialog()
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.selectionTracker.count != 0) {
-            resetSelection()
-        } else {
-            super.onBackPressed()
         }
     }
 
@@ -167,6 +162,14 @@ class CategoryManagerActivity : AppCompatActivity() {
             mode.menuInflater.inflate(R.menu.action_menu_category_manager, menu)
             mode.title = ""
             actionMenu = menu
+
+            onBackPressedCallback =
+                onBackPressedDispatcher.addCallback(this@CategoryManagerActivity) {
+                    resetSelection()
+                    onBackPressedCallback?.remove()
+                    onBackPressedCallback = null
+                }
+
             return true
         }
 
@@ -198,6 +201,9 @@ class CategoryManagerActivity : AppCompatActivity() {
             actionMode = null
             actionMenu = null
             resetSelection()
+
+            onBackPressedCallback?.remove()
+            onBackPressedCallback = null
         }
     }
 

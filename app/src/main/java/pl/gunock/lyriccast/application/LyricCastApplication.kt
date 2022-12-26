@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
  * Copyright (c) 2022 . All rights reserved.
- * Last modified 12/11/2022, 19:31
+ * Last modified 26/12/2022, 17:04
  */
 
 package pl.gunock.lyriccast.application
@@ -32,6 +32,7 @@ class LyricCastApplication : Application() {
         RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
         // Initializes CastContext
+        // TODO: Fix deprecation
         CastContext.getSharedInstance(applicationContext)
             .sessionManager
             .addSessionManagerListener(
@@ -44,7 +45,8 @@ class LyricCastApplication : Application() {
             )
 
 
-        AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)
+        val appTheme = applicationContext.getSettings().appTheme
+        AppCompatDelegate.setDefaultNightMode(if (appTheme == 0) -1 else appTheme)
 
         super.onCreate()
     }
