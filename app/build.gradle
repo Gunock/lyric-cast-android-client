@@ -31,7 +31,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 16
-        versionName "0.1.0-a10"
+        versionName "0.1.0-a11"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs 'en', 'pl'
