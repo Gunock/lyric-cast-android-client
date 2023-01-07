@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
- * Copyright (c) 2022 . All rights reserved.
- * Last modified 26/12/2022, 17:02
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 20:15
  */
 
 package pl.gunock.lyriccast.ui.category_manager
@@ -75,6 +75,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         categoryItemsAdapter = CategoryItemsAdapter(
+            binding.rcvCategories.context,
             viewModel.selectionTracker
         )
         binding.rcvCategories.adapter = categoryItemsAdapter

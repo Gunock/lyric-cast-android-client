@@ -30,7 +30,7 @@ android {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 16
+        versionCode 17
         versionName "0.1.0-a11"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 05/10/2021, 19:46
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 05/10/2021, 19:25
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.setlist_controls
@@ -29,9 +29,10 @@ class ControlsSongItemsAdapter(
     private val defaultTextColor = context.getColor(R.color.text)
     private val highlightTextColor = context.getColor(R.color.button_text_2)
 
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
-            ItemControlsSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemControlsSongBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

@@ -1,11 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,12 +18,15 @@ import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 
 class SetlistItemsAdapter(
+    context: Context,
     val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
 
     companion object {
         const val TAG = "SetlistItemsAdapter"
     }
+
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     private var _items: List<SetlistItem> = listOf()
 
@@ -38,7 +42,7 @@ class SetlistItemsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemSetlistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemSetlistBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

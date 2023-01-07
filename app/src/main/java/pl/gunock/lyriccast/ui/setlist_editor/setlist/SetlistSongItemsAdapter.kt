@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 07/10/2021, 11:16
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 07/10/2021, 11:09
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import pl.gunock.lyriccast.ui.shared.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 
 class SetlistSongItemsAdapter(
+    context: Context,
     private val items: List<SetlistSongItem>,
     private val selectionTracker: SelectionTracker<BaseViewHolder>?,
     private val onHandleTouchListener: TouchAdapterItemListener<BaseViewHolder>? = null
@@ -27,14 +29,14 @@ class SetlistSongItemsAdapter(
         const val TAG = "SetlistSongItemsAdapter"
     }
 
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+
     init {
         setHasStableIds(true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
-            ItemSetlistSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
+        val binding = ItemSetlistSongBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

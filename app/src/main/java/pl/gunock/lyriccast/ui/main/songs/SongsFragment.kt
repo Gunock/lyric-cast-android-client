@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
- * Copyright (c) 2022 . All rights reserved.
- * Last modified 12/11/2022, 19:48
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:51
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -109,7 +109,7 @@ class SongsFragment : Fragment() {
 
     @SuppressLint("CutPasteId")
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
+        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnCategory.context)
 
         binding.spnCategory.adapter = categorySpinnerAdapter
 
@@ -121,7 +121,7 @@ class SongsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         songItemsAdapter = SongItemsAdapter(
-            requireContext(),
+            binding.rcvSongs.context,
             selectionTracker = viewModel.selectionTracker
         )
 

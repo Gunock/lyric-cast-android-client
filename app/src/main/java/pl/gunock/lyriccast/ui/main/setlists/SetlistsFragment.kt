@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
- * Copyright (c) 2022 . All rights reserved.
- * Last modified 12/11/2022, 19:48
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -123,7 +123,8 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        setlistItemsAdapter = SetlistItemsAdapter(viewModel.selectionTracker)
+        setlistItemsAdapter =
+            SetlistItemsAdapter(binding.rcvSetlists.context, viewModel.selectionTracker)
 
         binding.rcvSetlists.setHasFixedSize(true)
         binding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())

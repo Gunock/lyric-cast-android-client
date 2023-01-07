@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:51
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:16
  */
 
 package pl.gunock.lyriccast.ui.song_editor
@@ -115,7 +115,7 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        categorySpinnerAdapter = CategorySpinnerAdapter(baseContext)
+        categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnSongEditorCategory.context)
         binding.spnSongEditorCategory.adapter = categorySpinnerAdapter
         binding.spnSongEditorCategory.onItemSelectedListener = OnCategoryItemSelectedListener()
     }
