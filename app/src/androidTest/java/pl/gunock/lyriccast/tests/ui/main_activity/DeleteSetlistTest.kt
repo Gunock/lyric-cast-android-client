@@ -4,7 +4,7 @@
  * Last modified 18/07/2021, 12:38
  */
 
-package pl.gunock.lyriccast.tests.e2e.main_activity
+package pl.gunock.lyriccast.tests.ui.main_activity
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
@@ -12,49 +12,42 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import io.realm.RealmList
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.AllOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.RepositoryFactory
+import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.ui.main.MainActivity
 import java.lang.Thread.sleep
 
 
-@RunWith(AndroidJUnit4::class)
 class DeleteSetlistTest {
 
     private companion object {
-        val setlist1 = SetlistDocument("DeleteSetlistTest 1", RealmList())
-        val setlist2 = SetlistDocument("DeleteSetlistTest 2", RealmList())
-        val setlist3 = SetlistDocument("DeleteSetlistTest 3", RealmList())
+        val setlist1 = Setlist("1", "DeleteSetlistTest 1", listOf())
+        val setlist2 = Setlist("2", "DeleteSetlistTest 2", listOf())
+        val setlist3 = Setlist("3", "DeleteSetlistTest 3", listOf())
     }
 
     @Before
     fun setUp() {
-        getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                getInstrumentation().context.resources
-            ).create()
+        val setlistsRepository = RepositoryFactory.createSetlistsRepository(
+            RepositoryFactory.RepositoryProvider.MONGO
+        )
 
-            databaseViewModel.clearDatabase()
-
-            databaseViewModel.upsertSetlist(setlist1)
-            databaseViewModel.upsertSetlist(setlist2)
-            databaseViewModel.upsertSetlist(setlist3)
+        runBlocking {
+            setlistsRepository.upsertSetlist(setlist1)
+            setlistsRepository.upsertSetlist(setlist2)
+            setlistsRepository.upsertSetlist(setlist3)
         }
 
         ActivityScenario.launch(MainActivity::class.java)
         onView(AllOf.allOf(isDescendantOfA(withId(R.id.tbl_main_fragments)), withText("Setlists")))
             .perform(click())
-
     }
 
     @Test

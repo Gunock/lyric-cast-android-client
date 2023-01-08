@@ -6,40 +6,37 @@
 
 package pl.gunock.lyriccast.tests.integration.category_manager
 
+import android.graphics.Color
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
+import pl.gunock.lyriccast.datamodel.RepositoryFactory
+import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
-import java.util.*
 
-@RunWith(AndroidJUnit4::class)
 class CategoryNameValidationTest {
 
     private companion object {
         const val newCategoryName = "NameValidationTest 2"
         const val newCategoryLongName = "NAME_VALIDATION_TEST 2 VERY LONG NAME VERY SO LONG"
-        val category1 = CategoryDocument("NAME_VALIDATION_TEST 1", -65536)
+        val category1 = Category("NAME_VALIDATION_TEST 1", Color.RED)
     }
 
     @Before
     fun setUp() {
-        getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                getInstrumentation().context.resources
-            ).create()
+        val categoriesRepository = RepositoryFactory.createCategoriesRepository(
+            RepositoryFactory.RepositoryProvider.MONGO
+        )
 
-            databaseViewModel.clearDatabase()
-            databaseViewModel.upsertCategory(category1)
+        runBlocking {
+            categoriesRepository.upsertCategory(category1)
         }
 
         ActivityScenario.launch(CategoryManagerActivity::class.java)
@@ -78,7 +75,7 @@ class CategoryNameValidationTest {
         Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
             .perform(ViewActions.replaceText(newCategoryName))
 
-        val newCategoryNameUppercase = newCategoryName.uppercase(Locale.getDefault())
+        val newCategoryNameUppercase = newCategoryName.uppercase()
         Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
             .check(ViewAssertions.matches(ViewMatchers.withText(newCategoryNameUppercase)))
     }

@@ -9,14 +9,14 @@ package pl.gunock.lyriccast.datamodel.models
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 
 data class Setlist(
+    var id: String,
     var name: String,
-    var presentation: List<Song>,
-    var id: String
+    var presentation: List<Song>
 ) {
 
     val idLong: Long = id.hashCode().toLong()
 
-    internal constructor(dto: SetlistDto) : this(dto.name, listOf(), "")
+    internal constructor(dto: SetlistDto) : this("", dto.name, listOf())
 
     internal fun toDto(): SetlistDto {
         val songs: List<String> = presentation.map { it.title }

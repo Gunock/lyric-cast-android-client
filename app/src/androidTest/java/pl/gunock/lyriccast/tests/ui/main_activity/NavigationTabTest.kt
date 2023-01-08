@@ -4,22 +4,19 @@
  * Last modified 04/10/2021, 18:53
  */
 
-package pl.gunock.lyriccast.tests.e2e.main_activity
+package pl.gunock.lyriccast.tests.ui.main_activity
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.ui.main.MainActivity
 
-@RunWith(AndroidJUnit4::class)
 class NavigationTabTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)

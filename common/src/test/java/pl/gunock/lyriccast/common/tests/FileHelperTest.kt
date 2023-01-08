@@ -6,17 +6,14 @@
 
 package pl.gunock.lyriccast.common.tests
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import java.io.File
 
-@RunWith(AndroidJUnit4::class)
 class FileHelperTest {
 
     private companion object {

@@ -33,7 +33,7 @@ android {
         versionCode 17
         versionName "0.1.0-a11"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "pl.gunock.lyriccast.tests.shared.HiltTestRunner"
         resConfigs 'en', 'pl'
     }
 
@@ -80,6 +80,8 @@ android {
     }
 
     testOptions {
+        animationsDisabled = true
+
         unitTests {
             returnDefaultValues = true
             includeAndroidResources = true
@@ -112,6 +114,7 @@ dependencies {
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
@@ -119,11 +122,13 @@ dependencies {
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'androidx.test:runner:1.5.1'
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0'
-    debugImplementation 'androidx.fragment:fragment-testing:1.5.5'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    debugImplementation 'androidx.fragment:fragment-testing:1.6.0-alpha04'
     testImplementation 'com.google.truth:truth:1.1.3'
 }
 

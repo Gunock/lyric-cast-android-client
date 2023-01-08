@@ -71,8 +71,8 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.11.2'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'androidx.test:runner:1.5.1'
-    testImplementation 'androidx.test.ext:junit-ktx:1.1.4'
+    testImplementation 'androidx.test:runner:1.5.2'
+    testImplementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'org.robolectric:robolectric:4.9.1'
     testImplementation 'com.google.truth:truth:1.1.3'
 }

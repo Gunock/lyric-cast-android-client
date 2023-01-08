@@ -12,35 +12,30 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import io.realm.RealmList
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.RepositoryFactory
+import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment
 
-@RunWith(AndroidJUnit4::class)
 class SetlistNameValidationTest {
 
     private companion object {
         const val longSetlistName = "SetlistNameValidationTest 2 very long name omg"
-        val setlist = SetlistDocument("SetlistNameValidationTest 1", RealmList())
+        val setlist = Setlist("1", "SetlistNameValidationTest 1", listOf())
     }
 
     @Before
     fun setUp() {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                InstrumentationRegistry.getInstrumentation().context.resources
-            ).create()
+        val setlistsRepository = RepositoryFactory.createSetlistsRepository(
+            RepositoryFactory.RepositoryProvider.MONGO
+        )
 
-            databaseViewModel.clearDatabase()
-
-            databaseViewModel.upsertSetlist(setlist)
+        runBlocking {
+            setlistsRepository.upsertSetlist(setlist)
         }
 
         launchFragmentInContainer<SetlistEditorFragment>(

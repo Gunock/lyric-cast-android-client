@@ -4,48 +4,45 @@
  * Last modified 18/07/2021, 12:38
  */
 
-package pl.gunock.lyriccast.tests.e2e.category_manager
+package pl.gunock.lyriccast.tests.ui.category_manager
 
+import android.graphics.Color
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
+import pl.gunock.lyriccast.datamodel.RepositoryFactory
+import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 import java.lang.Thread.sleep
 
 
-@RunWith(AndroidJUnit4::class)
 class DeleteCategoryTest {
 
     private companion object {
-        val category1 = CategoryDocument("DELETE_CATEGORY_TEST 1", -65536)
-        val category2 = CategoryDocument("DELETE_CATEGORY_TEST 2", -65536)
-        val category3 = CategoryDocument("DELETE_CATEGORY_TEST 3", -65536)
+        val category1 = Category("DELETE_CATEGORY_TEST 1", Color.RED)
+        val category2 = Category("DELETE_CATEGORY_TEST 2", Color.RED)
+        val category3 = Category("DELETE_CATEGORY_TEST 3", Color.RED)
     }
 
     @Before
     fun setUp() {
-        getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                getInstrumentation().context.resources
-            ).create()
+        val categoriesRepository = RepositoryFactory.createCategoriesRepository(
+            RepositoryFactory.RepositoryProvider.MONGO
+        )
 
-            databaseViewModel.clearDatabase()
-            databaseViewModel.upsertCategory(category1)
-            databaseViewModel.upsertCategory(category2)
-            databaseViewModel.upsertCategory(category3)
+        runBlocking {
+            categoriesRepository.upsertCategory(category1)
+            categoriesRepository.upsertCategory(category2)
+            categoriesRepository.upsertCategory(category3)
         }
 
         ActivityScenario.launch(CategoryManagerActivity::class.java)
