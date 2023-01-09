@@ -6,7 +6,6 @@
 
 package pl.gunock.lyriccast.tests.ui.category_manager
 
-import android.graphics.Color
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -18,15 +17,12 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
-import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.tests.shared.CustomEspresso.waitForView
+import pl.gunock.lyriccast.tests.shared.fakes.modules.FakeAppModule
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 
 
@@ -43,27 +39,6 @@ class AddCategoryTest {
 
     private companion object {
         const val newCategoryName = "AddCategoryTest 2"
-        val category1 = Category("ADD_CATEGORY_TEST 1", Color.RED)
-    }
-
-    @Before
-    fun setUp() {
-        hiltRule.inject()
-
-        val categoriesRepository = RepositoryFactory.createCategoriesRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
-
-        val dataTransferRepository = RepositoryFactory.createDataTransferRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
-
-        runBlocking {
-            // TODO: Use repository fakes instead
-            dataTransferRepository.clearDatabase()
-
-            categoriesRepository.upsertCategory(category1)
-        }
     }
 
     @Test
@@ -74,7 +49,7 @@ class AddCategoryTest {
 
 
         onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(category1.name))))
+            .check(matches(hasDescendant(withText(FakeAppModule.category1.name))))
 
         onView(withId(R.id.menu_add_category))
             .perform(click())
@@ -98,9 +73,8 @@ class AddCategoryTest {
         onView(withId(R.id.btn_save_category)).perform(click())
 
         onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(category1.name))))
+            .check(matches(hasDescendant(withText(FakeAppModule.category1.name))))
             .check(matches(hasDescendant(withText(newCategoryName.uppercase()))))
 
     }
-
 }
