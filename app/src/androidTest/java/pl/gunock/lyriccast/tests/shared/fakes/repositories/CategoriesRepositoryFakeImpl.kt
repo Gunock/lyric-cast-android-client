@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import java.util.*
 import javax.inject.Inject
 
 class CategoriesRepositoryFakeImpl @Inject constructor() : CategoriesRepository {
@@ -22,6 +23,13 @@ class CategoriesRepositoryFakeImpl @Inject constructor() : CategoriesRepository 
     }
 
     override suspend fun upsertCategory(category: Category) {
+        val existingCategory = categories.find { it.id == category.id }
+        if (existingCategory != null) {
+            categories.remove(existingCategory)
+        } else {
+            category.id = UUID.randomUUID().toString()
+        }
+
         categories += category
         categoryFlow.emit(categories.toList())
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
+import java.util.*
 import javax.inject.Inject
 
 class SetlistsRepositoryFakeImpl @Inject constructor() : SetlistsRepository {
@@ -26,6 +27,13 @@ class SetlistsRepositoryFakeImpl @Inject constructor() : SetlistsRepository {
     }
 
     override suspend fun upsertSetlist(setlist: Setlist) {
+        val existingSetlist = setlists.find { it.id == setlist.id }
+        if (existingSetlist != null) {
+            setlists.remove(existingSetlist)
+        } else {
+            setlist.id = UUID.randomUUID().toString()
+        }
+
         setlists += setlist
         setlistFlow.emit(setlists.toList())
     }

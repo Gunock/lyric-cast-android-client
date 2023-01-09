@@ -19,7 +19,7 @@ import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal abstract class DataTransferRepositoryBaseImpl(
+abstract class DataTransferRepositoryBaseImpl(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : DataTransferRepository {
 

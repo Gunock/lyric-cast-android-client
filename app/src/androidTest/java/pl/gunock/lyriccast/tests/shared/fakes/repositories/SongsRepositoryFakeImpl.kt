@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import java.util.*
 import javax.inject.Inject
 
 class SongsRepositoryFakeImpl @Inject constructor() : SongsRepository {
@@ -26,6 +27,13 @@ class SongsRepositoryFakeImpl @Inject constructor() : SongsRepository {
     }
 
     override suspend fun upsertSong(song: Song) {
+        val existingSong = songs.find { it.id == song.id }
+        if (existingSong != null) {
+            songs.remove(existingSong)
+        } else {
+            song.id = UUID.randomUUID().toString()
+        }
+
         songs += song
         songFlow.emit(songs.toList())
     }

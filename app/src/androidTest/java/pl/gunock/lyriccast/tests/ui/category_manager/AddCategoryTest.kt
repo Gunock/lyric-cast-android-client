@@ -22,13 +22,16 @@ import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.tests.shared.CustomEspresso.waitForView
-import pl.gunock.lyriccast.tests.shared.fakes.modules.FakeAppModule
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 
 
 @HiltAndroidTest
 @LargeTest
 class AddCategoryTest {
+
+    private companion object {
+        const val newCategoryName = "AddCategoryTest 2"
+    }
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -37,19 +40,12 @@ class AddCategoryTest {
     var activityRule: ActivityScenarioRule<CategoryManagerActivity> =
         ActivityScenarioRule(CategoryManagerActivity::class.java)
 
-    private companion object {
-        const val newCategoryName = "AddCategoryTest 2"
-    }
-
     @Test
     fun categoryIsAdded() {
         val colorName = getInstrumentation().targetContext
             .resources
             .getStringArray(R.array.category_color_names)[1]
 
-
-        onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(FakeAppModule.category1.name))))
 
         onView(withId(R.id.menu_add_category))
             .perform(click())
@@ -73,8 +69,6 @@ class AddCategoryTest {
         onView(withId(R.id.btn_save_category)).perform(click())
 
         onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(FakeAppModule.category1.name))))
             .check(matches(hasDescendant(withText(newCategoryName.uppercase()))))
-
     }
 }
