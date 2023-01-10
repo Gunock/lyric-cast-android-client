@@ -4,7 +4,7 @@
  * Last modified 08/01/2023, 23:37
  */
 
-package pl.gunock.lyriccast.tests.shared
+package pl.gunock.lyriccast
 
 import android.view.View
 import androidx.test.espresso.Espresso.onView

@@ -21,7 +21,7 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.tests.shared.CustomEspresso.waitForView
+import pl.gunock.lyriccast.CustomEspresso.waitForView
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 
 

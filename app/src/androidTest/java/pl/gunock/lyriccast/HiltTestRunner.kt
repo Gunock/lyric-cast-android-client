@@ -4,7 +4,7 @@
  * Last modified 08/01/2023, 23:04
  */
 
-package pl.gunock.lyriccast.tests.shared
+package pl.gunock.lyriccast
 
 import android.app.Application
 import android.content.Context

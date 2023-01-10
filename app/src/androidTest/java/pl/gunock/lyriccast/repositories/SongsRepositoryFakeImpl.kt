@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 08/01/2023, 23:51
+ * Created by Tomasz Kiljanczyk on 10/01/2023, 21:34
  * Copyright (c) 2023 . All rights reserved.
- * Last modified 08/01/2023, 23:51
+ * Last modified 10/01/2023, 21:31
  */
 
-package pl.gunock.lyriccast.tests.shared.fakes.repositories
+package pl.gunock.lyriccast.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

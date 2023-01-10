@@ -1,12 +1,12 @@
 /*
- * Created by Tomasz Kiljanczyk on 09/01/2023, 01:38
+ * Created by Tomasz Kiljanczyk on 10/01/2023, 21:34
  * Copyright (c) 2023 . All rights reserved.
- * Last modified 09/01/2023, 01:38
+ * Last modified 10/01/2023, 21:31
  */
 
 @file:Suppress("unused")
 
-package pl.gunock.lyriccast.tests.shared.fakes.modules
+package pl.gunock.lyriccast.modules
 
 import dagger.Module
 import dagger.Provides
@@ -17,10 +17,10 @@ import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.di.AppModule
-import pl.gunock.lyriccast.tests.shared.fakes.repositories.CategoriesRepositoryFakeImpl
-import pl.gunock.lyriccast.tests.shared.fakes.repositories.DataTransferRepositoryFakeImpl
-import pl.gunock.lyriccast.tests.shared.fakes.repositories.SetlistsRepositoryFakeImpl
-import pl.gunock.lyriccast.tests.shared.fakes.repositories.SongsRepositoryFakeImpl
+import pl.gunock.lyriccast.repositories.CategoriesRepositoryFakeImpl
+import pl.gunock.lyriccast.repositories.DataTransferRepositoryFakeImpl
+import pl.gunock.lyriccast.repositories.SetlistsRepositoryFakeImpl
+import pl.gunock.lyriccast.repositories.SongsRepositoryFakeImpl
 import javax.inject.Singleton
 
 @Module
