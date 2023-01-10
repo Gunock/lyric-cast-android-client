@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 17/07/2021, 12:26
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 22/09/2022, 20:43
  */
 
 package pl.gunock.lyriccast.shared.cast
@@ -13,7 +13,7 @@ import androidx.mediarouter.app.MediaRouteControllerDialogFragment
 
 class CustomMediaRouteControllerDialogFragment : MediaRouteControllerDialogFragment() {
     override fun onCreateControllerDialog(
-        context: Context?,
+        context: Context,
         savedInstanceState: Bundle?
     ): MediaRouteControllerDialog {
         val dialog = super.onCreateControllerDialog(context, savedInstanceState)

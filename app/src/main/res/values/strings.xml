@@ -1,7 +1,7 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 06/05/2021, 14:38
-  ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 06/05/2021, 14:32
+  ~ Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+  ~ Copyright (c) 2022 . All rights reserved.
+  ~ Last modified 12/11/2022, 19:31
   -->
 
 <resources>
@@ -9,8 +9,6 @@
 
     <!-- Chromecast -->
     <string name="chromecast_app_id" translatable="false">67E9729E</string>
-    <string name="chromecast_content_namespace" translatable="false">urn:x-cast:lyric.cast.content</string>
-    <string name="chromecast_control_namespace" translatable="false">urn:x-cast:lyric.cast.control</string>
 
     <!-- Placeholders -->
     <string name="placeholder_text" translatable="false">Text</string>

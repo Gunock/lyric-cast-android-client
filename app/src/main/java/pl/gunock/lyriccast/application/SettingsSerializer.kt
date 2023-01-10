@@ -1,12 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/12/2021, 00:06
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/12/2021, 00:06
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:02
  */
 
 package pl.gunock.lyriccast.application
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
@@ -20,7 +21,6 @@ object SettingsSerializer : Serializer<Settings> {
 
     override suspend fun readFrom(input: InputStream): Settings {
         try {
-            @Suppress("BlockingMethodInNonBlockingContext")
             val settingsBuilder = Settings.parseFrom(input).toBuilder()
             setDefaultValues(settingsBuilder)
 
@@ -34,13 +34,12 @@ object SettingsSerializer : Serializer<Settings> {
         t: Settings,
         output: OutputStream
     ) {
-        @Suppress("BlockingMethodInNonBlockingContext")
         t.writeTo(output)
     }
 
     private fun setDefaultValues(settingsBuilder: Settings.Builder) {
         if (settingsBuilder.appTheme == 0) {
-            settingsBuilder.appTheme = -1
+            settingsBuilder.appTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
         if (settingsBuilder.controlButtonsHeight == 0.0f) {
             settingsBuilder.controlButtonsHeight = 88.0f

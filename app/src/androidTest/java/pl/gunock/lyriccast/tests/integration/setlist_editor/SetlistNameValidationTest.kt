@@ -7,43 +7,51 @@
 package pl.gunock.lyriccast.tests.integration.setlist_editor
 
 import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
-import io.realm.RealmList
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.Setlist
+import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
+import pl.gunock.lyriccast.launchFragmentInHiltContainer
 import pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment
+import java.lang.Thread.sleep
+import javax.inject.Inject
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+@SmallTest
 class SetlistNameValidationTest {
 
     private companion object {
         const val longSetlistName = "SetlistNameValidationTest 2 very long name omg"
-        val setlist = SetlistDocument("SetlistNameValidationTest 1", RealmList())
+        val setlist = Setlist("1", "SetlistNameValidationTest 1", listOf())
     }
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var setlistsRepository: SetlistsRepository
 
     @Before
     fun setUp() {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                InstrumentationRegistry.getInstrumentation().context.resources
-            ).create()
+        hiltRule.inject()
 
-            databaseViewModel.clearDatabase()
-
-            databaseViewModel.upsertSetlist(setlist)
+        runBlocking {
+            setlistsRepository.upsertSetlist(setlist)
         }
+        sleep(100)
 
-        launchFragmentInContainer<SetlistEditorFragment>(
+        launchFragmentInHiltContainer<SetlistEditorFragment>(
             bundleOf(),
             R.style.Theme_LyricCast_DarkActionBar
         )

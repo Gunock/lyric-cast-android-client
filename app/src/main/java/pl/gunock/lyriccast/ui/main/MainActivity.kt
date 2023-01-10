@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:51
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 20:29
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 20:13
  */
 
 package pl.gunock.lyriccast.ui.main
@@ -49,6 +49,7 @@ import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.Closeable
+import java.util.concurrent.Executors
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val exportChooserResultLauncher = registerForActivityResult(this::exportAll)
     private val importChooserResultLauncher = registerForActivityResult(this::import)
 
+    private val castExecutor = Executors.newSingleThreadExecutor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +99,9 @@ class MainActivity : AppCompatActivity() {
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
 
-        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector!!
+        // TODO: Apply this approach to every .getSharedInstance() usage
+        castActionProvider.routeSelector =
+            CastContext.getSharedInstance(this, castExecutor).result.mergedSelector!!
 
         return true
     }
@@ -122,10 +126,10 @@ class MainActivity : AppCompatActivity() {
 
                 val navController = findNavController(R.id.navh_main)
                 if (tab.text == getString(R.string.title_songs)) {
-                    Log.d(TAG, "Switching to song list")
+                    Log.v(TAG, "Switching to song list")
                     navController.navigate(R.id.action_Setlists_to_Songs)
                 } else if (tab.text == getString(R.string.title_setlists)) {
-                    Log.d(TAG, "Switching to setlists")
+                    Log.v(TAG, "Switching to setlists")
                     navController.navigate(R.id.action_Songs_to_Setlists)
                 }
             })
@@ -205,7 +209,6 @@ class MainActivity : AppCompatActivity() {
                     R.string.main_activity_export_preparing_data
                 )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val outputStream = contentResolver.openOutputStream(uri)!!
 
             val exportMessageFlow = viewModel.exportAll(
@@ -213,7 +216,9 @@ class MainActivity : AppCompatActivity() {
                 outputStream
             )
 
-            handleDialogMessages(dialogFragment, exportMessageFlow, outputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, exportMessageFlow, outputStream)
+            }
         }
     }
 
@@ -248,7 +253,6 @@ class MainActivity : AppCompatActivity() {
                 replaceOnConflict = importDialogModel.replaceOnConflict
             )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
             val importMessageFlow =
@@ -258,7 +262,9 @@ class MainActivity : AppCompatActivity() {
                     importOptions
                 )
 
-            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            }
         }
 
     private fun importOpenSong(uri: Uri) =
@@ -276,7 +282,6 @@ class MainActivity : AppCompatActivity() {
                 colors = colors
             )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val inputStream = contentResolver.openInputStream(uri)!!
 
             val importMessageFlow =
@@ -286,10 +291,11 @@ class MainActivity : AppCompatActivity() {
                     importOptions
                 )
 
-            handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            withContext(Dispatchers.Main) {
+                handleDialogMessages(dialogFragment, importMessageFlow, inputStream)
+            }
         }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private fun handleDialogMessages(
         dialogFragment: ProgressDialogFragment,
         messageFlow: Flow<Int>?,
@@ -298,9 +304,11 @@ class MainActivity : AppCompatActivity() {
         if (messageFlow != null) {
             messageFlow.onEach { dialogFragment.setMessage(it) }
                 .onCompletion {
-                    stream.close()
+                    withContext(Dispatchers.IO) {
+                        stream.close()
+                    }
                     dialogFragment.dismiss()
-                }.flowOn(Dispatchers.Default)
+                }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         } else {
             stream.close()

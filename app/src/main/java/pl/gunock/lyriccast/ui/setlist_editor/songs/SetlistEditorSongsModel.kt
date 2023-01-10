@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 19:02
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:34
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -102,7 +102,7 @@ class SetlistEditorSongsModel @Inject constructor(
         filterSongs(songTitle, categoryItem?.category?.id, isSelected)
     }
 
-    fun filterSongs(
+    private fun filterSongs(
         songTitle: String,
         categoryId: String? = null,
         isSelected: Boolean? = null

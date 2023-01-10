@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 15:51
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:25
  */
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl
@@ -19,7 +19,7 @@ import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-internal abstract class DataTransferRepositoryBaseImpl(
+abstract class DataTransferRepositoryBaseImpl(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : DataTransferRepository {
 
@@ -118,7 +118,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
         if (removeConflicts) {
             categories.removeAll { it.name in categoryNames }
         } else if (options.replaceOnConflict) {
-            val categoryNameMap = allCategories.map { it.name to it.id }.toMap()
+            val categoryNameMap = allCategories.associate { it.name to it.id }
             val categoriesToAdd: MutableList<Category> = mutableListOf()
 
             categories.removeAll {
@@ -139,7 +139,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
         options: ImportOptions,
         removeConflicts: Boolean
     ) {
-        val categoryMap: Map<String, Category> = getAllCategories().map { it.name to it }.toMap()
+        val categoryMap: Map<String, Category> = getAllCategories().associateBy { it.name }
 
         val songs: MutableList<Song> = songDtos
             .map { dto ->
@@ -160,7 +160,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
         if (removeConflicts) {
             songs.removeAll { it.title in songTitles }
         } else if (options.replaceOnConflict) {
-            val songTitleMap = allSongs.map { it.title to it.id }.toMap()
+            val songTitleMap = allSongs.associate { it.title to it.id }
             val songsToAdd: MutableList<Song> = mutableListOf()
             songs.removeAll {
                 if (it.title in songTitles) {
@@ -190,7 +190,7 @@ internal abstract class DataTransferRepositoryBaseImpl(
         if (removeConflicts) {
             setlists.removeAll { it.name in setlistNames }
         } else if (options.replaceOnConflict) {
-            val setlistNameMap = allSetlists.map { it.name to it.id }.toMap()
+            val setlistNameMap = allSetlists.associate { it.name to it.id }
 
             val setlistsToAdd: MutableList<Setlist> = mutableListOf()
             setlists.removeAll {
@@ -203,8 +203,8 @@ internal abstract class DataTransferRepositoryBaseImpl(
             setlists.addAll(setlistsToAdd)
         }
 
-        val songTitleMap: Map<String, Song> = getAllSongs().map { it.title to it }.toMap()
-        val setlistDtoNameMap = setlistDtos.map { it.name to it.songs }.toMap()
+        val songTitleMap: Map<String, Song> = getAllSongs().associateBy { it.title }
+        val setlistDtoNameMap = setlistDtos.associate { it.name to it.songs }
         setlists.forEach { setlist ->
             val presentation: List<Song> = setlistDtoNameMap[setlist.name]!!
                 .map { songTitleMap[it]!! }

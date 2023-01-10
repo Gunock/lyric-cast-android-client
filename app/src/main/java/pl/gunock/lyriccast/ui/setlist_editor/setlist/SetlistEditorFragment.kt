@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 18:28
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.setlist
@@ -162,6 +162,7 @@ class SetlistEditorFragment : Fragment() {
             }
 
         songItemsAdapter = SetlistSongItemsAdapter(
+            binding.rcvSongs.context,
             items = viewModel.songs,
             selectionTracker = viewModel.selectionTracker,
             onHandleTouchListener = onHandleTouchListener

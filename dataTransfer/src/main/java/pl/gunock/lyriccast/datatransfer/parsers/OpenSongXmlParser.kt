@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 12/11/2021, 18:07
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 12/11/2021, 17:59
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 22/09/2022, 20:49
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
@@ -65,9 +65,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
 
         val song = readSong(parser)
 
-        val presentationList: List<String> = if (song.presentationList.isNotEmpty()) {
-            song.presentationList
-        } else {
+        val presentationList: List<String> = song.presentationList.ifEmpty {
             song.lyricsMap.keys.toList()
         }
 

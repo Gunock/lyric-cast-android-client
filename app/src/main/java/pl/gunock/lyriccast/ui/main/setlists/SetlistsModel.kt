@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 19:17
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 19:15
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:10
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -159,8 +159,9 @@ class SetlistsModel @Inject constructor(
         File(exportDir, "setlists.json").writeText(setlistsString)
 
         emit(R.string.main_activity_export_saving_zip)
-        @Suppress("BlockingMethodInNonBlockingContext")
-        FileHelper.zip(outputStream, exportDir.path)
+        withContext(Dispatchers.IO) {
+            FileHelper.zip(outputStream, exportDir.path)
+        }
 
         emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()

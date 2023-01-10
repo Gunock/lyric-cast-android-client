@@ -93,7 +93,7 @@ class SetlistEditorModel @Inject constructor(
             .map { it.song }
             .toTypedArray()
 
-        val setlist = Setlist(setlistName, presentation.toList(), setlistId)
+        val setlist = Setlist(setlistId, setlistName, presentation.toList())
         setlistsRepository.upsertSetlist(setlist)
         Log.i(TAG, "Created setlist: $setlist")
     }

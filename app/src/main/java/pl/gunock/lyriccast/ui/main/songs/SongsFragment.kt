@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:57
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:51
  */
 
 package pl.gunock.lyriccast.ui.main.songs
@@ -109,7 +109,7 @@ class SongsFragment : Fragment() {
 
     @SuppressLint("CutPasteId")
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
+        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnCategory.context)
 
         binding.spnCategory.adapter = categorySpinnerAdapter
 
@@ -121,7 +121,7 @@ class SongsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         songItemsAdapter = SongItemsAdapter(
-            requireContext(),
+            binding.rcvSongs.context,
             selectionTracker = viewModel.selectionTracker
         )
 
@@ -231,7 +231,6 @@ class SongsFragment : Fragment() {
                     R.string.main_activity_export_preparing_data
                 )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
             val exportMessageFlow = viewModel.exportSelectedSongs(
                 requireActivity().cacheDir.canonicalPath,
@@ -240,10 +239,12 @@ class SongsFragment : Fragment() {
 
             exportMessageFlow.onEach { dialogFragment.setMessage(it) }
                 .onCompletion {
-                    outputStream.close()
+                    withContext(Dispatchers.IO) {
+                        outputStream.close()
+                    }
                     dialogFragment.dismiss()
                     songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
-                }.flowOn(Dispatchers.Default)
+                }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
     }

@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 12/12/2021, 12:29
-  ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 12/12/2021, 12:28
+  ~ Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
+  ~ Copyright (c) 2022 . All rights reserved.
+  ~ Last modified 26/12/2022, 17:02
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="pl.gunock.lyriccast"
     tools:ignore="LockedOrientationActivity">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!--  File permissions  -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".application.LyricCastApplication"
@@ -35,10 +32,9 @@
 
         <activity
             android:name=".ui.launch.LaunchActivity"
-            android:exported="true"
-            android:label="@string/app_name"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +45,6 @@
 
         <activity
             android:name=".ui.main.MainActivity"
-            android:label="@string/app_name"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan" />

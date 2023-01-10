@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:57
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:16
  */
 
 package pl.gunock.lyriccast.ui.setlist_editor.songs
@@ -117,7 +117,7 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(requireContext())
+        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnCategory.context)
         binding.spnCategory.adapter = categorySpinnerAdapter
 
         viewModel.categories
@@ -128,7 +128,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         songItemsAdapter = SongItemsAdapter(
-            requireContext(),
+            binding.rcvSongs.context,
             selectionTracker = viewModel.selectionTracker
         )
 

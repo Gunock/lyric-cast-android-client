@@ -7,49 +7,55 @@
 package pl.gunock.lyriccast.tests.integration.main_activity
 
 import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import io.realm.RealmList
+import androidx.test.filters.SmallTest
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.Setlist
+import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
+import pl.gunock.lyriccast.launchFragmentInHiltContainer
 import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
 import java.lang.Thread.sleep
+import javax.inject.Inject
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+@SmallTest
 class FilterSetlistsTest {
 
     private companion object {
         const val setlistName = "FilterSetlistsTest 1"
-        val setlist1 = SetlistDocument("$setlistName 1", RealmList())
-        val setlist2 = SetlistDocument("$setlistName 2", RealmList())
-        val setlist3 = SetlistDocument("FilterSetlistsTest 2", RealmList())
+        val setlist1 = Setlist("1", "$setlistName 1", listOf())
+        val setlist2 = Setlist("2", "$setlistName 2", listOf())
+        val setlist3 = Setlist("3", "FilterSetlistsTest 2", listOf())
     }
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var setlistsRepository: SetlistsRepository
 
     @Before
     fun setUp() {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                InstrumentationRegistry.getInstrumentation().context.resources
-            ).create()
+        hiltRule.inject()
 
-            databaseViewModel.clearDatabase()
-
-            databaseViewModel.upsertSetlist(setlist1)
-            databaseViewModel.upsertSetlist(setlist2)
-            databaseViewModel.upsertSetlist(setlist3)
+        runBlocking {
+            setlistsRepository.upsertSetlist(setlist1)
+            setlistsRepository.upsertSetlist(setlist2)
+            setlistsRepository.upsertSetlist(setlist3)
         }
+        sleep(100)
 
-        launchFragmentInContainer<SetlistsFragment>(
+        launchFragmentInHiltContainer<SetlistsFragment>(
             bundleOf(),
             R.style.Theme_LyricCast_DarkActionBar
         )
@@ -64,7 +70,7 @@ class FilterSetlistsTest {
 
         onView(withId(R.id.ed_setlist_name_filter)).perform(replaceText(setlistName))
 
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlist1.name))))

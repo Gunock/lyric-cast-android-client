@@ -6,65 +6,74 @@
 
 package pl.gunock.lyriccast.tests.integration.setlist_editor
 
-import androidx.fragment.app.testing.launchFragmentInContainer
+import android.graphics.Color
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import io.realm.RealmList
-import org.bson.types.ObjectId
+import androidx.test.filters.LargeTest
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.DatabaseViewModel
-import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
-import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
-import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorSongsFragmentArgs
+import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import pl.gunock.lyriccast.launchFragmentInHiltContainer
 import pl.gunock.lyriccast.ui.setlist_editor.songs.SetlistEditorSongsFragment
+import pl.gunock.lyriccast.ui.setlist_editor.songs.SetlistEditorSongsFragmentArgs
 import java.lang.Thread.sleep
+import javax.inject.Inject
 
-
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+@LargeTest
 class FilterSetlistEditorSongsTest {
 
     private companion object {
-        val category = CategoryDocument("TEST CATEGORY", -65536)
+        val category = Category("TEST CATEGORY", Color.RED)
 
         const val songTitle = "FilterSongsTest 1"
-        val song1 =
-            SongDocument("$songTitle 1", RealmList(), RealmList(), category = category)
-        val song2 = SongDocument("$songTitle 2", RealmList(), RealmList())
-        val song3 = SongDocument("FilterSongsTest 2", RealmList(), RealmList())
+        val song1 = Song("1", "$songTitle 1", listOf(), listOf(), category = category)
+        val song2 = Song("2", "$songTitle 2", listOf(), listOf())
+        val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var songsRepository: SongsRepository
+
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
 
     @Before
     fun setUp() {
-        getInstrumentation().runOnMainSync {
-            val databaseViewModel = DatabaseViewModel.Factory(
-                getInstrumentation().context.resources
-            ).create()
+        hiltRule.inject()
 
-            databaseViewModel.clearDatabase()
+        runBlocking {
+            categoriesRepository.upsertCategory(category)
 
-            databaseViewModel.upsertCategory(category)
-            databaseViewModel.upsertSong(song1)
-            databaseViewModel.upsertSong(song2)
-            databaseViewModel.upsertSong(song3)
+            songsRepository.upsertSong(song1)
+            songsRepository.upsertSong(song2)
+            songsRepository.upsertSong(song3)
         }
+        sleep(100)
 
         val bundle = SetlistEditorSongsFragmentArgs(
-            setlistId = ObjectId(),
+            setlistId = "1",
             setlistName = "",
-            presentation = arrayOf(song2.id.toString())
+            presentation = arrayOf(song2.id)
         ).toBundle()
 
-        launchFragmentInContainer<SetlistEditorSongsFragment>(
+        launchFragmentInHiltContainer<SetlistEditorSongsFragment>(
             bundle,
             R.style.Theme_LyricCast_DarkActionBar
         )
@@ -78,7 +87,7 @@ class FilterSetlistEditorSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.ed_song_title_filter)).perform(replaceText(songTitle))
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
@@ -94,11 +103,11 @@ class FilterSetlistEditorSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.spn_category)).perform(click())
-        sleep(200)
+        sleep(100)
         onView(
             allOf(withId(R.id.tv_spinner_color_name), withText(category.name))
         ).perform(click())
-        sleep(200)
+        sleep(100)
 
         val allOfMatcher = allOf(
             hasDescendant(withText(song1.title)),
@@ -119,7 +128,7 @@ class FilterSetlistEditorSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.swt_selected_songs)).perform(click())
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(not(hasDescendant(withText(song1.title)))))

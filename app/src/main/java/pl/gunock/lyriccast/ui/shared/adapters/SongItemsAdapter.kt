@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:52
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.shared.adapters
@@ -17,7 +17,6 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
-import java.util.*
 
 class SongItemsAdapter(
     context: Context,
@@ -28,16 +27,18 @@ class SongItemsAdapter(
         const val TAG = "SongItemsAdapter"
     }
 
-    init {
-        setHasStableIds(true)
-    }
-
     private val defaultItemCardColor = context.getColor(R.color.window_background_2)
     private val withCategoryTextColor = context.getColor(R.color.text_item_with_category)
     private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
     private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
 
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+
     private var _items: List<SongItem> = listOf()
+
+    init {
+        setHasStableIds(true)
+    }
 
     fun submitCollection(songs: List<SongItem>) {
         val previousSize = itemCount
@@ -47,7 +48,7 @@ class SongItemsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemSongBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

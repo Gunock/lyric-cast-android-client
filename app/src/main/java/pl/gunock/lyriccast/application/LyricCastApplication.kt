@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 18:15
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 18:15
+ * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 26/12/2022, 17:04
  */
 
 package pl.gunock.lyriccast.application
@@ -14,17 +14,16 @@ import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import pl.gunock.lyriccast.shared.extensions.getSettings
+import java.util.concurrent.Executors
 
-// TODO: Resolve this problem
-@SuppressLint("WrongConstant")
 @HiltAndroidApp
 class LyricCastApplication : Application() {
+    @SuppressLint("WrongConstant")
     override fun onCreate() {
         initializeFromThread()
 
@@ -32,30 +31,30 @@ class LyricCastApplication : Application() {
         RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
         // Initializes CastContext
-        CastContext.getSharedInstance(applicationContext)
-            .sessionManager
-            .addSessionManagerListener(
-                CastSessionListener(
-                    onStarted = {
-                        CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart)
-                    },
-                    onEnded = { CastMessageHelper.onSessionEnded() }
-                )
-            )
+        CastContext.getSharedInstance(applicationContext, Executors.newSingleThreadExecutor())
+            .addOnCompleteListener { task ->
+                task.result
+                    .sessionManager
+                    .addSessionManagerListener(
+                        CastSessionListener(
+                            onStarted = { CastMessageHelper.sendBlank(applicationContext.getSettings().blankOnStart) },
+                            onEnded = { CastMessageHelper.onSessionEnded() }
+                        )
+                    )
+            }
 
 
-        AppCompatDelegate.setDefaultNightMode(applicationContext.getSettings().appTheme)
+        var appTheme = applicationContext.getSettings().appTheme
+        appTheme = if (appTheme == 0) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else appTheme
+
+        AppCompatDelegate.setDefaultNightMode(appTheme)
 
         super.onCreate()
     }
 
     private fun initializeFromThread() {
         CoroutineScope(Dispatchers.Default).launch {
-            // Initializes settings
-            applicationContext.settingsDataStore.data.first()
-
             MobileAds.initialize(applicationContext) {}
-            CastMessageHelper.initialize(resources)
         }
     }
 }

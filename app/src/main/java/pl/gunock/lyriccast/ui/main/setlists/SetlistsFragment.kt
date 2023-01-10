@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 31/12/2021, 17:30
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 31/12/2021, 16:57
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.main.setlists
@@ -104,7 +104,6 @@ class SetlistsFragment : Fragment() {
                     R.string.main_activity_export_preparing_data
                 )
 
-            @Suppress("BlockingMethodInNonBlockingContext")
             val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
             val exportMessageFlow = viewModel.exportSelectedSetlists(
                 requireActivity().cacheDir.canonicalPath,
@@ -113,16 +112,19 @@ class SetlistsFragment : Fragment() {
 
             exportMessageFlow.onEach { dialogFragment.setMessage(it) }
                 .onCompletion {
-                    outputStream.close()
+                    withContext(Dispatchers.IO) {
+                        outputStream.close()
+                    }
                     dialogFragment.dismiss()
                     setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
-                }.flowOn(Dispatchers.Default)
+                }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
     }
 
     private fun setupRecyclerView() {
-        setlistItemsAdapter = SetlistItemsAdapter(viewModel.selectionTracker)
+        setlistItemsAdapter =
+            SetlistItemsAdapter(binding.rcvSetlists.context, viewModel.selectionTracker)
 
         binding.rcvSetlists.setHasFixedSize(true)
         binding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())

@@ -1,15 +1,13 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 15:01
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:59
+ * Created by Tomasz Kiljanczyk on 26/12/2022, 17:04
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 26/12/2022, 17:02
  */
 
 package pl.gunock.lyriccast.ui.launch
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -22,14 +20,6 @@ import pl.gunock.lyriccast.ui.main.MainActivity
 
 class LaunchActivity : AppCompatActivity() {
 
-    companion object {
-        const val PERMISSIONS_REQUEST_CODE = 1
-        val PERMISSIONS = arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.INTERNET
-        )
-    }
-
     private val turnOnWifiManagerResultLauncher = registerForActivityResult { goToMain() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,40 +31,7 @@ class LaunchActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        requestPermissions()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode != PERMISSIONS_REQUEST_CODE) {
-            return
-        }
-
-        if (grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
-            return
-        }
-
         checkWifiEnabled()
-    }
-
-    private fun requestPermissions() {
-        val permissions: MutableList<String> = mutableListOf()
-        for (permission in PERMISSIONS) {
-            if (applicationContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(permission)
-            }
-        }
-
-        if (permissions.isEmpty()) {
-            checkWifiEnabled()
-        } else {
-            requestPermissions(permissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
-        }
     }
 
     private fun checkWifiEnabled() {
@@ -106,7 +63,6 @@ class LaunchActivity : AppCompatActivity() {
             .create()
             .show()
     }
-
 
     private fun goToMain() {
         val intent = Intent(baseContext, MainActivity::class.java)

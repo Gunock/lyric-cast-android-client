@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 29/12/2021, 14:16
+ * Created by Tomasz Kiljanczyk on 07/01/2023, 21:51
+ * Copyright (c) 2023 . All rights reserved.
+ * Last modified 07/01/2023, 21:22
  */
 
 package pl.gunock.lyriccast.ui.category_manager.edit_category
@@ -85,7 +85,7 @@ class EditCategoryDialogFragment(
         }
 
         val colorSpinnerAdapter = ColorSpinnerAdapter(
-            requireContext(),
+            binding.spnCategoryColor.context,
             colors
         )
         binding.spnCategoryColor.adapter = colorSpinnerAdapter

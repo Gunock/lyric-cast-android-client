@@ -8,11 +8,9 @@ package pl.gunock.lyriccast.common.tests
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import pl.gunock.lyriccast.common.extensions.normalize
 
-@RunWith(Parameterized::class)
 class StringsExtensionsTest(
     private val text: String,
     private val normalizedText: String

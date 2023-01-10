@@ -1,22 +1,19 @@
 /*
- * Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 15/05/2021, 18:00
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 12/11/2022, 19:57
  */
 
 package pl.gunock.lyriccast.common.tests
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import java.io.File
 
-@RunWith(AndroidJUnit4::class)
 class FileHelperTest {
 
     private companion object {
@@ -42,7 +39,11 @@ class FileHelperTest {
 
     @After
     fun cleanUp() {
-        testDir.deleteRecursively()
+        try {
+            testDir.deleteRecursively()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @Test
