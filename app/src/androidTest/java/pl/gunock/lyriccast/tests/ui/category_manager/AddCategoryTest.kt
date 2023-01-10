@@ -37,8 +37,7 @@ class AddCategoryTest {
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    var activityRule: ActivityScenarioRule<CategoryManagerActivity> =
-        ActivityScenarioRule(CategoryManagerActivity::class.java)
+    var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
 
     @Test
     fun categoryIsAdded() {
@@ -62,7 +61,7 @@ class AddCategoryTest {
         onView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)))
             .perform()
 
-        waitForView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)), 1000)
+        waitForView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)), 100)
             .inRoot(isPlatformPopup())
             .perform(click())
 

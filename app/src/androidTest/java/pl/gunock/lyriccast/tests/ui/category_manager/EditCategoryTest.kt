@@ -43,8 +43,7 @@ class EditCategoryTest {
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    var activityRule: ActivityScenarioRule<CategoryManagerActivity> =
-        ActivityScenarioRule(CategoryManagerActivity::class.java)
+    var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
 
     @Inject
     lateinit var categoriesRepository: CategoriesRepository
@@ -59,7 +58,7 @@ class EditCategoryTest {
             categoriesRepository.upsertCategory(category3)
         }
 
-        sleep(400)
+        sleep(100)
     }
 
     @Test
@@ -81,7 +80,7 @@ class EditCategoryTest {
         onView(withId(R.id.ed_category_name)).perform(replaceText(editedCategoryName))
         onView(withId(R.id.btn_save_category)).perform(click())
 
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_categories))
             .check(matches(hasDescendant(withText(category1.name))))

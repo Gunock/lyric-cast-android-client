@@ -44,8 +44,7 @@ class DeleteCategoryTest {
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    var activityRule: ActivityScenarioRule<CategoryManagerActivity> =
-        ActivityScenarioRule(CategoryManagerActivity::class.java)
+    var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
 
     @Inject
     lateinit var categoriesRepository: CategoriesRepository
@@ -59,7 +58,7 @@ class DeleteCategoryTest {
             categoriesRepository.upsertCategory(category2)
             categoriesRepository.upsertCategory(category3)
         }
-        sleep(400)
+        sleep(100)
     }
 
     @Test
@@ -74,7 +73,7 @@ class DeleteCategoryTest {
         ).perform(longClick())
         onView(withId(R.id.action_menu_delete)).perform(click())
 
-        sleep(400)
+        sleep(100)
 
         onView(withId(R.id.rcv_categories))
             .check(matches(hasDescendant(withText(category1.name))))
@@ -97,7 +96,7 @@ class DeleteCategoryTest {
         ).perform(click())
         onView(withId(R.id.action_menu_delete)).perform(click())
 
-        sleep(400)
+        sleep(100)
 
         onView(withId(R.id.rcv_categories))
             .check(matches(not(hasDescendant(withText(category1.name)))))

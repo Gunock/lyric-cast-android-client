@@ -49,6 +49,7 @@ import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.Closeable
+import java.util.concurrent.Executors
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val exportChooserResultLauncher = registerForActivityResult(this::exportAll)
     private val importChooserResultLauncher = registerForActivityResult(this::import)
 
+    private val castExecutor = Executors.newSingleThreadExecutor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +99,9 @@ class MainActivity : AppCompatActivity() {
         val castActionProvider =
             MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_cast)) as CustomMediaRouteActionProvider
 
-        castActionProvider.routeSelector = CastContext.getSharedInstance()!!.mergedSelector!!
+        // TODO: Apply this approach to every .getSharedInstance() usage
+        castActionProvider.routeSelector =
+            CastContext.getSharedInstance(this, castExecutor).result.mergedSelector!!
 
         return true
     }

@@ -14,7 +14,6 @@ import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
@@ -55,9 +54,6 @@ class LyricCastApplication : Application() {
 
     private fun initializeFromThread() {
         CoroutineScope(Dispatchers.Default).launch {
-            // Initializes settings
-            applicationContext.settingsDataStore.data.first()
-
             MobileAds.initialize(applicationContext) {}
         }
     }

@@ -6,24 +6,30 @@
 
 package pl.gunock.lyriccast.tests.ui.main_activity
 
-import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.filters.LargeTest
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.ui.main.MainActivity
 import java.lang.Thread.sleep
+import javax.inject.Inject
 
-
+@HiltAndroidTest
+@LargeTest
 class DeleteSongTest {
 
     private companion object {
@@ -33,19 +39,25 @@ class DeleteSongTest {
         val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
 
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    var activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Inject
+    lateinit var songsRepository: SongsRepository
+
     @Before
     fun setUp() {
-        val songsRepository = RepositoryFactory.createSongsRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
+        hiltRule.inject()
 
         runBlocking {
             songsRepository.upsertSong(song1)
             songsRepository.upsertSong(song2)
             songsRepository.upsertSong(song3)
         }
-
-        ActivityScenario.launch(MainActivity::class.java)
+        sleep(100)
     }
 
     @Test
@@ -59,7 +71,7 @@ class DeleteSongTest {
             allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
         ).perform(longClick())
         onView(withId(R.id.action_menu_delete)).perform(click())
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
@@ -81,7 +93,7 @@ class DeleteSongTest {
             allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
         ).perform(click())
         onView(withId(R.id.action_menu_delete)).perform(click())
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(not(hasDescendant(withText(song1.title)))))
