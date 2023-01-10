@@ -8,25 +8,32 @@ package pl.gunock.lyriccast.tests.integration.main_activity
 
 import android.graphics.Color
 import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.filters.SmallTest
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Song
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import pl.gunock.lyriccast.launchFragmentInHiltContainer
 import pl.gunock.lyriccast.ui.main.songs.SongsFragment
 import java.lang.Thread.sleep
+import javax.inject.Inject
 
-
+@HiltAndroidTest
+@SmallTest
 class FilterSongsTest {
 
     private companion object {
@@ -38,15 +45,18 @@ class FilterSongsTest {
         val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
 
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var songsRepository: SongsRepository
+
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
+
     @Before
     fun setUp() {
-        val categoriesRepository = RepositoryFactory.createCategoriesRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
-
-        val songsRepository = RepositoryFactory.createSongsRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
+        hiltRule.inject()
 
         runBlocking {
             categoriesRepository.upsertCategory(category)
@@ -57,7 +67,10 @@ class FilterSongsTest {
         }
         sleep(100)
 
-        launchFragmentInContainer<SongsFragment>(bundleOf(), R.style.Theme_LyricCast_DarkActionBar)
+        launchFragmentInHiltContainer<SongsFragment>(
+            bundleOf(),
+            R.style.Theme_LyricCast_DarkActionBar
+        )
     }
 
     @Test

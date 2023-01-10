@@ -7,21 +7,28 @@
 package pl.gunock.lyriccast.tests.integration.setlist_editor
 
 import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.models.Setlist
+import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
+import pl.gunock.lyriccast.launchFragmentInHiltContainer
 import pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment
 import java.lang.Thread.sleep
+import javax.inject.Inject
 
+@HiltAndroidTest
+@SmallTest
 class SetlistNameValidationTest {
 
     private companion object {
@@ -29,18 +36,22 @@ class SetlistNameValidationTest {
         val setlist = Setlist("1", "SetlistNameValidationTest 1", listOf())
     }
 
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var setlistsRepository: SetlistsRepository
+
     @Before
     fun setUp() {
-        val setlistsRepository = RepositoryFactory.createSetlistsRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
+        hiltRule.inject()
 
         runBlocking {
             setlistsRepository.upsertSetlist(setlist)
         }
         sleep(100)
 
-        launchFragmentInContainer<SetlistEditorFragment>(
+        launchFragmentInHiltContainer<SetlistEditorFragment>(
             bundleOf(),
             R.style.Theme_LyricCast_DarkActionBar
         )
