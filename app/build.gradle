@@ -33,7 +33,7 @@ android {
         versionCode 17
         versionName "0.1.0-a11"
 
-        testInstrumentationRunner "pl.gunock.lyriccast.tests.shared.HiltTestRunner"
+        testInstrumentationRunner "pl.gunock.lyriccast.HiltTestRunner"
         resConfigs 'en', 'pl'
     }
 

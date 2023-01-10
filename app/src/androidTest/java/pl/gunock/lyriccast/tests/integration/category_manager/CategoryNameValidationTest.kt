@@ -7,20 +7,30 @@
 package pl.gunock.lyriccast.tests.integration.category_manager
 
 import android.graphics.Color
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.models.Category
+import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
+import java.lang.Thread.sleep
+import javax.inject.Inject
 
+@HiltAndroidTest
+@SmallTest
 class CategoryNameValidationTest {
 
     private companion object {
@@ -29,55 +39,55 @@ class CategoryNameValidationTest {
         val category1 = Category("NAME_VALIDATION_TEST 1", Color.RED)
     }
 
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
+
+    @Inject
+    lateinit var categoriesRepository: CategoriesRepository
+
     @Before
     fun setUp() {
-        val categoriesRepository = RepositoryFactory.createCategoriesRepository(
-            RepositoryFactory.RepositoryProvider.MONGO
-        )
+        hiltRule.inject()
 
         runBlocking {
             categoriesRepository.upsertCategory(category1)
         }
-
-        ActivityScenario.launch(CategoryManagerActivity::class.java)
+        sleep(100)
     }
 
     @Test
     fun categoryNameAlreadyInUse() {
-        Espresso.onView(ViewMatchers.withId(R.id.rcv_categories))
-            .check(
-                ViewAssertions.matches(
-                    ViewMatchers.hasDescendant(
-                        ViewMatchers.withText(category1.name)
-                    )
-                )
-            )
+        onView(withId(R.id.rcv_categories))
+            .check(matches(hasDescendant(ViewMatchers.withText(category1.name))))
 
-        Espresso.onView(ViewMatchers.withId(R.id.menu_add_category)).perform(ViewActions.click())
+        onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tv_dialog_title))
-            .check(ViewAssertions.matches(ViewMatchers.withText("Add category")))
+        onView(withId(R.id.tv_dialog_title))
+            .check(matches(ViewMatchers.withText("Add category")))
 
-        Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
+        onView(withId(R.id.ed_category_name))
             .perform(ViewActions.replaceText(category1.name))
 
-        Espresso.onView(ViewMatchers.withId(R.id.tin_category_name))
-            .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText("Category name already in use"))))
+        onView(withId(R.id.tin_category_name))
+            .check(matches(hasDescendant(ViewMatchers.withText("Category name already in use"))))
     }
 
     @Test
     fun categoryNameIsUpperCase() {
-        Espresso.onView(ViewMatchers.withId(R.id.menu_add_category)).perform(ViewActions.click())
+        onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tv_dialog_title))
-            .check(ViewAssertions.matches(ViewMatchers.withText("Add category")))
+        onView(withId(R.id.tv_dialog_title))
+            .check(matches(ViewMatchers.withText("Add category")))
 
-        Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
+        onView(withId(R.id.ed_category_name))
             .perform(ViewActions.replaceText(newCategoryName))
 
         val newCategoryNameUppercase = newCategoryName.uppercase()
-        Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
-            .check(ViewAssertions.matches(ViewMatchers.withText(newCategoryNameUppercase)))
+        onView(withId(R.id.ed_category_name))
+            .check(matches(ViewMatchers.withText(newCategoryNameUppercase)))
     }
 
     @Test
@@ -86,17 +96,17 @@ class CategoryNameValidationTest {
             .resources
             .getInteger(R.integer.ed_max_length_category_name)
 
-        Espresso.onView(ViewMatchers.withId(R.id.menu_add_category)).perform(ViewActions.click())
+        onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        Espresso.onView(ViewMatchers.withId(R.id.tv_dialog_title))
-            .check(ViewAssertions.matches(ViewMatchers.withText("Add category")))
+        onView(withId(R.id.tv_dialog_title))
+            .check(matches(ViewMatchers.withText("Add category")))
 
-        Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
+        onView(withId(R.id.ed_category_name))
             .perform(ViewActions.replaceText(newCategoryLongName))
 
         val limitedCategoryName = newCategoryLongName.substring(0, maxNameLength)
-        Espresso.onView(ViewMatchers.withId(R.id.ed_category_name))
-            .check(ViewAssertions.matches(ViewMatchers.withText(limitedCategoryName)))
+        onView(withId(R.id.ed_category_name))
+            .check(matches(ViewMatchers.withText(limitedCategoryName)))
     }
 
 }

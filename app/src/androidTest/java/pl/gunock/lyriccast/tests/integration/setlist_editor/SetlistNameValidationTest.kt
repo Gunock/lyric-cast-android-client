@@ -20,6 +20,7 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment
+import java.lang.Thread.sleep
 
 class SetlistNameValidationTest {
 
@@ -37,6 +38,7 @@ class SetlistNameValidationTest {
         runBlocking {
             setlistsRepository.upsertSetlist(setlist)
         }
+        sleep(100)
 
         launchFragmentInContainer<SetlistEditorFragment>(
             bundleOf(),

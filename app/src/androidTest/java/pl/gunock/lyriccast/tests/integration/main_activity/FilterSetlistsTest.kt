@@ -42,6 +42,7 @@ class FilterSetlistsTest {
             setlistsRepository.upsertSetlist(setlist2)
             setlistsRepository.upsertSetlist(setlist3)
         }
+        sleep(100)
 
         launchFragmentInContainer<SetlistsFragment>(
             bundleOf(),
@@ -58,7 +59,7 @@ class FilterSetlistsTest {
 
         onView(withId(R.id.ed_setlist_name_filter)).perform(replaceText(setlistName))
 
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlist1.name))))

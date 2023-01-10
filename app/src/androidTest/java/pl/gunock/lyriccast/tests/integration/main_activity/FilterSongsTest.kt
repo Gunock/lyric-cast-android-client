@@ -55,6 +55,7 @@ class FilterSongsTest {
             songsRepository.upsertSong(song2)
             songsRepository.upsertSong(song3)
         }
+        sleep(100)
 
         launchFragmentInContainer<SongsFragment>(bundleOf(), R.style.Theme_LyricCast_DarkActionBar)
     }
@@ -67,7 +68,7 @@ class FilterSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.ed_song_title_filter)).perform(replaceText(songTitle))
-        sleep(200)
+        sleep(100)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
@@ -83,14 +84,14 @@ class FilterSongsTest {
             .check(matches(hasDescendant(withText(song3.title))))
 
         onView(withId(R.id.spn_category)).perform(click())
-        sleep(200)
+        sleep(100)
         onView(
             allOf(
                 withId(R.id.tv_spinner_color_name),
                 withText(category.name)
             )
         ).perform(click())
-        sleep(200)
+        sleep(100)
 
         val allOfMatcher = allOf(
             hasDescendant(withText(song1.title)),
