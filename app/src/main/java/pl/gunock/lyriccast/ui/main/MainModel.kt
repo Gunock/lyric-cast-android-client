@@ -76,7 +76,7 @@ class MainModel @Inject constructor(
         val transferData: DatabaseTransferData? = getImportData(cacheDir, inputStream)
 
         return if (transferData != null) {
-            dataTransferRepository.importSongs(
+            dataTransferRepository.importData(
                 transferData,
                 importOptions
             )

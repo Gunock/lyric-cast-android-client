@@ -6,20 +6,17 @@
 
 package pl.gunock.lyriccast.datamodel.models.mongo.embedded
 
-import io.realm.RealmObject
-import io.realm.annotations.RealmClass
-import io.realm.annotations.Required
+import io.realm.kotlin.types.EmbeddedRealmObject
 import pl.gunock.lyriccast.datamodel.models.Song
 
-@RealmClass(embedded = true)
-internal open class LyricsSectionDocument(
-    @field:Required
-    var name: String,
-    @field:Required
-    var text: String
-) : RealmObject() {
+internal open class LyricsSectionDocument() : EmbeddedRealmObject {
+    var name: String = ""
+    var text: String = ""
 
-    constructor() : this("", "")
+    constructor(name: String, text: String) : this() {
+        this.name = name
+        this.text = text
+    }
 
     constructor(lyricsSection: Song.LyricsSection) : this(lyricsSection.name, lyricsSection.text)
 

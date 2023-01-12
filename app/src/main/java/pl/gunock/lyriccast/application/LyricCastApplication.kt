@@ -15,7 +15,6 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pl.gunock.lyriccast.datamodel.RepositoryFactory
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import pl.gunock.lyriccast.shared.extensions.getSettings
@@ -26,9 +25,6 @@ class LyricCastApplication : Application() {
     @SuppressLint("WrongConstant")
     override fun onCreate() {
         initializeFromThread()
-
-        // Initializes MongoDB Realm
-        RepositoryFactory.initialize(applicationContext, RepositoryFactory.RepositoryProvider.MONGO)
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext, Executors.newSingleThreadExecutor())

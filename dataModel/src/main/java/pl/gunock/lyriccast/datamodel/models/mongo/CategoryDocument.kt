@@ -6,29 +6,26 @@
 
 package pl.gunock.lyriccast.datamodel.models.mongo
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
-import org.bson.types.ObjectId
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Category
 
-internal open class CategoryDocument(
-    @field:Required
-    var name: String = "",
-    var color: Int? = null,
-    @field:PrimaryKey
-    var id: ObjectId = ObjectId()
-) : RealmObject(), Comparable<CategoryDocument> {
+internal open class CategoryDocument() : RealmObject, Comparable<CategoryDocument> {
+    @PrimaryKey
+    var _id: ObjectId = ObjectId()
+    var name: String = ""
+    var color: Int? = null
 
-    constructor(category: Category) : this(
-        id = if (category.id.isNotBlank()) ObjectId(category.id) else ObjectId(),
-        name = category.name,
+    constructor(category: Category) : this() {
+        _id = if (category.id.isNotBlank()) ObjectId(category.id) else ObjectId()
+        name = category.name
         color = category.color
-    )
+    }
 
     fun toGenericModel(): Category {
         return Category(
-            id = id.toString(),
+            id = _id.toHexString(),
             name = name,
             color = color
         )

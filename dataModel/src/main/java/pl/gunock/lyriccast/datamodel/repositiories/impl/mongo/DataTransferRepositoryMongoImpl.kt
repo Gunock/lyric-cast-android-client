@@ -6,11 +6,10 @@
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.kotlin.where
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Setlist
@@ -20,53 +19,45 @@ import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
 import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
 import pl.gunock.lyriccast.datamodel.repositiories.impl.DataTransferRepositoryBaseImpl
 
-internal class DataTransferRepositoryMongoImpl(
-    private val dispatcher: CoroutineDispatcher
-) : DataTransferRepositoryBaseImpl(dispatcher) {
+internal class DataTransferRepositoryMongoImpl(private val realm: Realm) :
+    DataTransferRepositoryBaseImpl() {
 
-    private val realm: Realm = runBlocking(dispatcher) {
-        Realm.getInstance(RealmConfiguration.Builder().build())
-    }
-
-    override suspend fun clearDatabase() =
-        withContext(dispatcher) {
-            realm.executeTransaction { it.deleteAll() }
-        }
+    override suspend fun clearDatabase() = realm.write { deleteAll() }
 
     override suspend fun getAllSongs(): List<Song> =
-        withContext(dispatcher) {
-            realm.where<SongDocument>().findAllAsync()
+        withContext(Dispatchers.IO) {
+            realm.query<SongDocument>().find()
                 .map { it.toGenericModel() }
         }
 
     override suspend fun getAllSetlists(): List<Setlist> =
-        withContext(dispatcher) {
-            realm.where<SetlistDocument>().findAllAsync()
+        withContext(Dispatchers.IO) {
+            realm.query<SetlistDocument>().find()
                 .map { it.toGenericModel() }
         }
 
     override suspend fun getAllCategories(): List<Category> =
-        withContext(dispatcher) {
-            realm.where<CategoryDocument>().findAllAsync()
+        withContext(Dispatchers.IO) {
+            realm.query<CategoryDocument>().find()
                 .map { it.toGenericModel() }
         }
 
     override suspend fun upsertSongs(songs: Iterable<Song>) =
-        withContext(dispatcher) {
-            val songDocuments = songs.map { SongDocument(it) }
-            realm.executeTransaction { it.insertOrUpdate(songDocuments) }
+        realm.write {
+            songs.map { SongDocument(it) }
+                .forEach { copyToRealm(it, UpdatePolicy.ALL) }
         }
 
     override suspend fun upsertSetlists(setlists: Iterable<Setlist>) =
-        withContext(dispatcher) {
-            val setlistDocuments = setlists.map { SetlistDocument(it) }
-            realm.executeTransaction { it.insertOrUpdate(setlistDocuments) }
+        realm.write {
+            setlists.map { SetlistDocument(it) }
+                .forEach { copyToRealm(it, UpdatePolicy.ALL) }
         }
 
     override suspend fun upsertCategories(categories: Iterable<Category>) =
-        withContext(dispatcher) {
-            val categoryDocuments = categories.map { CategoryDocument(it) }
-            realm.executeTransaction { it.insertOrUpdate(categoryDocuments) }
+        realm.write {
+            categories.map { CategoryDocument(it) }
+                .forEach { copyToRealm(it, UpdatePolicy.ALL) }
         }
 
 }

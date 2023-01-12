@@ -15,7 +15,7 @@ interface DataTransferRepository {
 
     suspend fun clearDatabase()
 
-    suspend fun importSongs(
+    suspend fun importData(
         data: DatabaseTransferData,
         options: ImportOptions
     ): Flow<Int>

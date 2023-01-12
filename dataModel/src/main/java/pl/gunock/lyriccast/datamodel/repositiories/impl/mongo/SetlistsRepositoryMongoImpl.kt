@@ -6,65 +6,44 @@
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.kotlin.toFlow
-import io.realm.kotlin.where
-import kotlinx.coroutines.CoroutineDispatcher
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 
-internal class SetlistsRepositoryMongoImpl(
-    private val dispatcher: CoroutineDispatcher
-) : SetlistsRepository {
+internal class SetlistsRepositoryMongoImpl(private val realm: Realm) : SetlistsRepository {
 
-    private val realm: Realm = runBlocking(dispatcher) {
-        Realm.getInstance(RealmConfiguration.Builder().build())
+    override fun getAllSetlists(): Flow<List<Setlist>> {
+        return realm.query<SetlistDocument>().find()
+            .asFlow()
+            .map { resultsChange -> resultsChange.list.map { it.toGenericModel() } }
+            .flowOn(Dispatchers.IO)
     }
 
-    override fun getAllSetlists(): Flow<List<Setlist>> =
-        runBlocking(dispatcher) {
-            realm.where<SetlistDocument>()
-                .findAllAsync()
-                .toFlow()
-                .map { setlists -> setlists.map { it.toGenericModel() } }
-                .flowOn(dispatcher)
-        }
+    override fun getSetlist(id: String): Setlist? {
+        val objectId = ObjectId(id)
+        val setlistDocument = realm.query<SetlistDocument>("_id == $0", objectId).first().find()
+        return setlistDocument?.toGenericModel()
+    }
 
-    override fun getSetlist(id: String): Setlist? =
-        runBlocking(dispatcher) {
-            val setlistDocument = realm.where<SetlistDocument>()
-                .equalTo("id", ObjectId(id))
-                .findFirst()
-
-            setlistDocument?.toGenericModel()
-        }
-
-    override suspend fun upsertSetlist(setlist: Setlist) =
-        withContext(dispatcher) {
+    override suspend fun upsertSetlist(setlist: Setlist): Unit =
+        realm.write {
             val setlistDocument = SetlistDocument(setlist)
-
-            realm.executeTransaction { it.insertOrUpdate(setlistDocument) }
+            copyToRealm(setlistDocument, UpdatePolicy.ALL)
         }
 
     override suspend fun deleteSetlists(setlistIds: Collection<String>) =
-        withContext(dispatcher) {
-            realm.executeTransaction { transactionRealm ->
-                for (id in setlistIds) {
-                    transactionRealm.where<SetlistDocument>().findAll()
-                        .where()
-                        .equalTo("id", ObjectId(id))
-                        .findFirst()
-                        ?.deleteFromRealm()
-                }
-            }
+        realm.write {
+            setlistIds.map { ObjectId(it) }
+                .mapNotNull { query<SetlistDocument>("_id == $0", it).first().find() }
+                .forEach { delete(it) }
         }
 
 }
