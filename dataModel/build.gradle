@@ -11,11 +11,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 33
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -59,8 +59,10 @@ android {
 }
 
 dependencies {
+    // Submodules
     implementation project(':dataTransfer')
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation "io.realm.kotlin:library-base:$mongo_realm_kotlin_version"
+    // Library dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+    implementation "io.realm.kotlin:library-base:$realmVersion"
 }
