@@ -133,6 +133,10 @@ dependencies {
     testImplementation 'com.google.truth:truth:1.1.3'
 }
 
+kapt {
+    correctErrorTypes true
+}
+
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:3.21.12"
