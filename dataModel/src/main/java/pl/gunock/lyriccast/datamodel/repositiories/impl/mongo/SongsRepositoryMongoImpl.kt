@@ -6,65 +6,44 @@
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.kotlin.toFlow
-import io.realm.kotlin.where
-import kotlinx.coroutines.CoroutineDispatcher
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 
-internal class SongsRepositoryMongoImpl(
-    private val dispatcher: CoroutineDispatcher
-) : SongsRepository {
+internal class SongsRepositoryMongoImpl(private val realm: Realm) : SongsRepository {
 
-    private val realm: Realm = runBlocking(dispatcher) {
-        Realm.getInstance(RealmConfiguration.Builder().build())
+    override fun getAllSongs(): Flow<List<Song>> {
+        return realm.query<SongDocument>().find()
+            .asFlow()
+            .map { resultsChange -> resultsChange.list.map { it.toGenericModel() } }
+            .flowOn(Dispatchers.IO)
     }
 
-    override fun getAllSongs(): Flow<List<Song>> =
-        runBlocking(dispatcher) {
-            realm.where<SongDocument>()
-                .findAllAsync()
-                .toFlow()
-                .map { songs -> songs.map { it.toGenericModel() } }
-                .flowOn(dispatcher)
+    override fun getSong(id: String): Song? {
+        val objectId = ObjectId(id)
+        val songDocument = realm.query<SongDocument>("_id == $0", objectId).first().find()
+        return songDocument?.toGenericModel()
+    }
 
-        }
-
-    override fun getSong(id: String): Song? =
-        runBlocking(dispatcher) {
-            val songDocument = realm.where<SongDocument>()
-                .equalTo("id", ObjectId(id))
-                .findFirst()
-
-            songDocument?.toGenericModel()
-        }
-
-    override suspend fun upsertSong(song: Song) =
-        withContext(dispatcher) {
+    override suspend fun upsertSong(song: Song): Unit =
+        realm.write {
             val songDocument = SongDocument(song)
-            realm.executeTransaction { it.insertOrUpdate(songDocument) }
+            copyToRealm(songDocument, UpdatePolicy.ALL)
         }
 
     override suspend fun deleteSongs(songIds: Collection<String>) =
-        withContext(dispatcher) {
-            realm.executeTransaction { transactionRealm ->
-                for (id in songIds) {
-                    transactionRealm.where<SongDocument>().findAll()
-                        .where()
-                        .equalTo("id", ObjectId(id))
-                        .findFirst()
-                        ?.deleteFromRealm()
-                }
-            }
+        realm.write {
+            songIds.map { ObjectId(it) }
+                .mapNotNull { query<SongDocument>("_id == $0", it).first().find() }
+                .forEach { delete(it) }
         }
 
 }

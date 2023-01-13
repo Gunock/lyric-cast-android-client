@@ -7,8 +7,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'realm-android'
+    id 'io.realm.kotlin'
 }
 
 android {
@@ -19,10 +18,6 @@ android {
         targetSdkVersion 33
 
         consumerProguardFiles "consumer-rules.pro"
-
-        realm {
-            syncEnabled = false
-        }
     }
 
     buildTypes {
@@ -67,4 +62,5 @@ dependencies {
     implementation project(':dataTransfer')
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation "io.realm.kotlin:library-base:$mongo_realm_kotlin_version"
 }

@@ -6,12 +6,12 @@
 
 package pl.gunock.lyriccast.datamodel
 
-import android.content.Context
-import android.os.Handler
-import android.os.HandlerThread
-import io.realm.Realm
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.android.asCoroutineDispatcher
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
+import pl.gunock.lyriccast.datamodel.models.mongo.embedded.LyricsSectionDocument
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -23,17 +23,11 @@ import pl.gunock.lyriccast.datamodel.repositiories.impl.mongo.SongsRepositoryMon
 
 object RepositoryFactory {
 
-    fun initialize(context: Context, provider: RepositoryProvider) {
-        return when (provider) {
-            RepositoryProvider.MONGO -> Realm.init(context)
-        }
-    }
-
     fun createSongsRepository(provider: RepositoryProvider): SongsRepository {
         return when (provider) {
             RepositoryProvider.MONGO -> {
-                val dispatcher = createDispatcher("SongsRepositoryMongoImpl")
-                SongsRepositoryMongoImpl(dispatcher)
+                val realm = openRealm()
+                SongsRepositoryMongoImpl(realm)
             }
         }
     }
@@ -41,8 +35,8 @@ object RepositoryFactory {
     fun createSetlistsRepository(provider: RepositoryProvider): SetlistsRepository {
         return when (provider) {
             RepositoryProvider.MONGO -> {
-                val dispatcher = createDispatcher("SetlistsRepositoryMongoImpl")
-                SetlistsRepositoryMongoImpl(dispatcher)
+                val realm = openRealm()
+                SetlistsRepositoryMongoImpl(realm)
             }
         }
     }
@@ -50,8 +44,8 @@ object RepositoryFactory {
     fun createCategoriesRepository(provider: RepositoryProvider): CategoriesRepository {
         return when (provider) {
             RepositoryProvider.MONGO -> {
-                val dispatcher = createDispatcher("CategoriesRepositoryMongoImpl")
-                CategoriesRepositoryMongoImpl(dispatcher)
+                val realm = openRealm()
+                CategoriesRepositoryMongoImpl(realm)
             }
         }
     }
@@ -61,15 +55,21 @@ object RepositoryFactory {
     ): DataTransferRepository {
         return when (provider) {
             RepositoryProvider.MONGO -> {
-                val dispatcher = createDispatcher("DataTransferRepositoryMongoImpl")
-                DataTransferRepositoryMongoImpl(dispatcher)
+                val realm = openRealm()
+                DataTransferRepositoryMongoImpl(realm)
             }
         }
     }
 
-    private fun createDispatcher(name: String): CoroutineDispatcher {
-        val handlerThread = HandlerThread(name).also { it.start() }
-        return Handler(handlerThread.looper).asCoroutineDispatcher()
+    private fun openRealm(): Realm {
+        val schema = setOf(
+            LyricsSectionDocument::class,
+            CategoryDocument::class,
+            SongDocument::class,
+            SetlistDocument::class,
+        )
+
+        return Realm.open(RealmConfiguration.Builder(schema).build())
     }
 
     enum class RepositoryProvider {

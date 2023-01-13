@@ -6,37 +6,35 @@
 
 package pl.gunock.lyriccast.datamodel.models.mongo
 
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
-import org.bson.types.ObjectId
-import pl.gunock.lyriccast.datamodel.extentions.mapRealmList
-import pl.gunock.lyriccast.datamodel.extentions.toRealmList
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.models.mongo.embedded.LyricsSectionDocument
 
-internal open class SongDocument(
-    @field:Required
-    var title: String = "",
-    var lyrics: RealmList<LyricsSectionDocument> = RealmList(),
-    var presentation: RealmList<String> = RealmList(),
-    var category: CategoryDocument? = null,
+internal open class SongDocument() : RealmObject {
     @field:PrimaryKey
-    var id: ObjectId = ObjectId()
-) : RealmObject() {
+    var _id: ObjectId = ObjectId()
 
-    constructor(song: Song) : this(
-        id = if (song.id.isNotBlank()) ObjectId(song.id) else ObjectId(),
-        title = song.title,
-        lyrics = song.lyrics.mapRealmList { LyricsSectionDocument(it) },
-        presentation = song.presentation.toRealmList(),
+    var title: String = ""
+    var lyrics: RealmList<LyricsSectionDocument> = realmListOf()
+    var presentation: RealmList<String> = realmListOf()
+    var category: CategoryDocument? = null
+
+    constructor(song: Song) : this() {
+        _id = if (song.id.isNotBlank()) ObjectId(song.id) else ObjectId()
+        title = song.title
+        lyrics = song.lyrics.map { LyricsSectionDocument(it) }.toRealmList()
+        presentation = song.presentation.toRealmList()
         category = song.category?.let { CategoryDocument(it) }
-    )
+    }
 
     fun toGenericModel(): Song {
         return Song(
-            id = id.toString(),
+            id = _id.toHexString(),
             title = title,
             lyrics = lyrics.map { it.toGenericModel() },
             presentation = presentation.toList(),

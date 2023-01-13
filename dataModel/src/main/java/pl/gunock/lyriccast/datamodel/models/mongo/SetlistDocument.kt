@@ -6,31 +6,30 @@
 
 package pl.gunock.lyriccast.datamodel.models.mongo
 
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
-import org.bson.types.ObjectId
-import pl.gunock.lyriccast.datamodel.extentions.mapRealmList
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Setlist
 
-internal open class SetlistDocument(
-    @field:Required
-    var name: String = "",
-    var presentation: RealmList<SongDocument> = RealmList(),
-    @field:PrimaryKey
-    var id: ObjectId = ObjectId()
-) : RealmObject() {
+internal open class SetlistDocument() : RealmObject {
 
-    constructor(setlist: Setlist) : this(
-        id = if (setlist.id.isNotBlank()) ObjectId(setlist.id) else ObjectId(),
-        name = setlist.name,
-        presentation = setlist.presentation.mapRealmList { SongDocument(it) }
-    )
+    @PrimaryKey
+    var _id: ObjectId = ObjectId()
+    var name: String = ""
+    var presentation: RealmList<SongDocument> = realmListOf()
+
+    constructor(setlist: Setlist) : this() {
+        _id = if (setlist.id.isNotBlank()) ObjectId(setlist.id) else ObjectId()
+        name = setlist.name
+        presentation = setlist.presentation.map { SongDocument(it) }.toRealmList()
+    }
 
     fun toGenericModel(): Setlist {
         return Setlist(
-            id = id.toString(),
+            id = _id.toHexString(),
             name = name,
             presentation = presentation.map { it.toGenericModel() }.toList()
         )

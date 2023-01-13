@@ -6,54 +6,38 @@
 
 package pl.gunock.lyriccast.datamodel.repositiories.impl.mongo
 
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.kotlin.toFlow
-import io.realm.kotlin.where
-import kotlinx.coroutines.CoroutineDispatcher
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.bson.types.ObjectId
+import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 
-internal class CategoriesRepositoryMongoImpl(
-    private val dispatcher: CoroutineDispatcher
-) : CategoriesRepository {
+internal class CategoriesRepositoryMongoImpl(private val realm: Realm) : CategoriesRepository {
 
-    private val realm: Realm = runBlocking(dispatcher) {
-        Realm.getInstance(RealmConfiguration.Builder().build())
+    override fun getAllCategories(): Flow<List<Category>> {
+        return realm.query<CategoryDocument>().find()
+            .asFlow()
+            .map { resultsChange -> resultsChange.list.map { it.toGenericModel() } }
+            .flowOn(Dispatchers.IO)
     }
 
-    override fun getAllCategories(): Flow<List<Category>> =
-        runBlocking(dispatcher) {
-            realm.where<CategoryDocument>().findAllAsync()
-                .toFlow()
-                .map { categories -> categories.map { it.toGenericModel() } }
-                .flowOn(dispatcher)
-        }
-
-    override suspend fun upsertCategory(category: Category) =
-        withContext(dispatcher) {
+    override suspend fun upsertCategory(category: Category): Unit =
+        realm.write {
             val categoryDocument = CategoryDocument(category)
-            realm.executeTransaction { it.insertOrUpdate(categoryDocument) }
+            copyToRealm(categoryDocument, UpdatePolicy.ALL)
         }
 
     override suspend fun deleteCategories(categoryIds: Collection<String>) =
-        withContext(dispatcher) {
-            realm.executeTransaction { transactionRealm ->
-                for (id in categoryIds) {
-                    transactionRealm.where<CategoryDocument>().findAll()
-                        .where()
-                        .equalTo("id", ObjectId(id))
-                        .findFirst()
-                        ?.deleteFromRealm()
-                }
-            }
+        realm.write {
+            categoryIds.map { ObjectId(it) }
+                .mapNotNull { query<CategoryDocument>("_id == $0", it).first().find() }
+                .forEach { delete(it) }
         }
 
 }

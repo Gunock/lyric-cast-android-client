@@ -7,27 +7,25 @@
 package pl.gunock.lyriccast.datamodel.repositiories.impl
 
 import android.util.Log
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import pl.gunock.lyriccast.datamodel.R
-import pl.gunock.lyriccast.datamodel.extentions.toRealmList
 import pl.gunock.lyriccast.datamodel.models.*
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datatransfer.models.CategoryDto
 import pl.gunock.lyriccast.datatransfer.models.SetlistDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 
-abstract class DataTransferRepositoryBaseImpl(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) : DataTransferRepository {
+abstract class DataTransferRepositoryBaseImpl : DataTransferRepository {
 
     private companion object {
         const val TAG = "DataTransferRepository"
     }
 
-    final override suspend fun importSongs(
+    final override suspend fun importData(
         data: DatabaseTransferData,
         options: ImportOptions
     ): Flow<Int> {
@@ -48,7 +46,7 @@ abstract class DataTransferRepositoryBaseImpl(
             }
 
         val data = DatabaseTransferData(songDtoSet.toList(), categoryDtos, null)
-        return importSongs(data, options)
+        return importData(data, options)
     }
 
     final override suspend fun getDatabaseTransferData(): DatabaseTransferData =
@@ -103,7 +101,7 @@ abstract class DataTransferRepositoryBaseImpl(
 
         emit(R.string.data_transfer_processor_finishing_import)
         Log.d(TAG, "Finished import")
-    }.flowOn(dispatcher)
+    }.flowOn(Dispatchers.Default)
 
     private suspend fun executeCategoryImport(
         categoryDtos: List<CategoryDto>,
