@@ -16,6 +16,7 @@ import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.models.mongo.embedded.LyricsSectionDocument
 
 internal open class SongDocument() : RealmObject {
+    @Suppress("PropertyName")
     @field:PrimaryKey
     var _id: ObjectId = ObjectId()
 

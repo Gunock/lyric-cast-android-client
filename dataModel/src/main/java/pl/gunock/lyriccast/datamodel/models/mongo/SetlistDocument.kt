@@ -15,9 +15,10 @@ import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Setlist
 
 internal open class SetlistDocument() : RealmObject {
-
+    @Suppress("PropertyName")
     @PrimaryKey
     var _id: ObjectId = ObjectId()
+
     var name: String = ""
     var presentation: RealmList<SongDocument> = realmListOf()
 

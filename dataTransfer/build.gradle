@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 33
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -57,7 +57,6 @@ android {
 }
 
 dependencies {
+    // Submodules
     implementation project(':common')
-
-    testImplementation 'junit:junit:4.13.2'
 }

@@ -12,8 +12,10 @@ import org.mongodb.kbson.ObjectId
 import pl.gunock.lyriccast.datamodel.models.Category
 
 internal open class CategoryDocument() : RealmObject, Comparable<CategoryDocument> {
+    @Suppress("PropertyName")
     @PrimaryKey
     var _id: ObjectId = ObjectId()
+
     var name: String = ""
     var color: Int? = null
 

@@ -11,10 +11,8 @@ import org.junit.Test
 import org.junit.runners.Parameterized
 import pl.gunock.lyriccast.common.extensions.normalize
 
-class StringsExtensionsTest(
-    private val text: String,
-    private val normalizedText: String
-) {
+// TODO: Fix the tests
+class StringsExtensionsTest {
 
     companion object {
         @Suppress("SpellCheckingInspection")
@@ -30,7 +28,7 @@ class StringsExtensionsTest(
     }
 
     @Test
-    fun stringIsNormalized() {
+    fun stringIsNormalized(text: String, normalizedText: String) {
         assertThat(text.normalize()).isEqualTo(normalizedText)
     }
 

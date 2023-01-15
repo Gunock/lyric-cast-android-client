@@ -14,6 +14,8 @@ import org.junit.Test
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import java.io.File
 
+
+// TODO: Fix the tests
 class FileHelperTest {
 
     private companion object {

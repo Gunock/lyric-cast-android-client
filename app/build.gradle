@@ -10,12 +10,17 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id "androidx.navigation.safeargs.kotlin"
-    id "dagger.hilt.android.plugin"
-    id "com.google.protobuf" version "0.9.1"
+    id "com.google.dagger.hilt.android"
+    id "com.google.protobuf"
 }
 
 
 android {
+    def major = 0
+    def minor = 1
+    def patch = 0
+
+
     signingConfigs {
         release {
             storeFile file(var)
@@ -25,14 +30,14 @@ android {
         }
     }
 
-    compileSdkVersion 33
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "pl.gunock.lyriccast"
-        minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 17
-        versionName "0.1.0-a11"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode major * 100000000 + minor * 10000 + patch
+        versionName "$major.$minor.$patch"
 
         testInstrumentationRunner "pl.gunock.lyriccast.HiltTestRunner"
         resConfigs 'en', 'pl'
@@ -92,45 +97,55 @@ android {
 }
 
 dependencies {
+    // Submodules
     implementation project(':common')
     implementation project(':dataTransfer')
     implementation project(':dataModel')
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    // App dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
-    implementation 'com.google.android.material:material:1.7.0'
-    implementation 'com.google.android.gms:play-services-cast-framework:21.2.0'
-    implementation 'com.google.android.gms:play-services-ads:21.4.0'
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.mediarouter:mediarouter:1.3.1'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    // Architecture Components
+    implementation "androidx.datastore:datastore:$datastoreVersion"
+    implementation "com.google.protobuf:protobuf-javalite:$protobufJavaLiteVersion"
 
-    implementation 'androidx.datastore:datastore:1.0.0'
-    implementation 'com.google.protobuf:protobuf-javalite:3.21.12'
+    // AndroidX
+    implementation "com.google.android.material:material:$materialVersion"
+    implementation "androidx.core:core-ktx:$androidXCoreVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation "androidx.cardview:cardview:$cardViewVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+    // AdMob
+    implementation "com.google.android.gms:play-services-ads:$googleAdsVersion"
 
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    // Chromecast
+    implementation "com.google.android.gms:play-services-cast-framework:$castFrameworkVersion"
+    implementation "androidx.mediarouter:mediarouter:$mediaRouterVersion"
 
-//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    // Hilt
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
-    debugImplementation 'androidx.fragment:fragment-testing:1.6.0-alpha04'
-    testImplementation 'com.google.truth:truth:1.1.3'
+
+    // AndroidX Test - Instrumented testing
+    androidTestImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
+    androidTestImplementation "androidx.test.ext:$androidXTestExtKotlinRunnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+
+
+    // AndroidX Test - Hilt testing
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    kaptAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
+
+    // LeakCanary
+//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 }
 
 kapt {
@@ -139,7 +154,7 @@ kapt {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.12"
+        artifact = "com.google.protobuf:protoc:$protobufJavaLiteVersion"
     }
 
     // Generates the java Protobuf-lite code for the Protobufs in this project. See
