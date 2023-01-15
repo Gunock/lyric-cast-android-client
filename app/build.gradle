@@ -16,6 +16,11 @@ plugins {
 
 
 android {
+    def major = 0
+    def minor = 1
+    def patch = 0
+
+
     signingConfigs {
         release {
             storeFile file(var)
@@ -31,8 +36,8 @@ android {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 17
-        versionName "0.1.0-a11"
+        versionCode major * 100000000 + minor * 10000 + patch
+        versionName "$major.$minor.$patch"
 
         testInstrumentationRunner "pl.gunock.lyriccast.HiltTestRunner"
         resConfigs 'en', 'pl'
