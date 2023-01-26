@@ -43,7 +43,7 @@ class SetlistNameValidationTest {
     lateinit var setlistsRepository: SetlistsRepository
 
     @Before
-    fun setUp() {
+    fun setup() {
         hiltRule.inject()
 
         runBlocking {

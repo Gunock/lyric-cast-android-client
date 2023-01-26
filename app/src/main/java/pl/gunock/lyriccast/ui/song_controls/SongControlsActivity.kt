@@ -46,7 +46,7 @@ class SongControlsActivity : AppCompatActivity() {
         binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
         binding.advSongControls.loadAd()
 
-        viewModel.settings = applicationContext.getSettings()
+        viewModel.settings = getSettings()
 
         val songId: String = intent.getStringExtra("songId")!!
         viewModel.loadSong(songId)
@@ -76,7 +76,7 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val settings = applicationContext.getSettings()
+        val settings = getSettings()
         viewModel.settings = settings
 
         if (settings.controlButtonsHeight > 0.0) {

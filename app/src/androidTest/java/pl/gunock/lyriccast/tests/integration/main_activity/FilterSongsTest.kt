@@ -55,7 +55,7 @@ class FilterSongsTest {
     lateinit var categoriesRepository: CategoriesRepository
 
     @Before
-    fun setUp() {
+    fun setup() {
         hiltRule.inject()
 
         runBlocking {

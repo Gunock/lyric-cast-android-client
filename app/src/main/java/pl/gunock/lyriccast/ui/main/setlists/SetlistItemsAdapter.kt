@@ -63,7 +63,7 @@ class SetlistItemsAdapter(
         private val binding: ItemSetlistBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
 
-        override fun setUpViewHolder(position: Int) {
+        override fun setupViewHolder(position: Int) {
             val item = try {
                 _items[position]
             } catch (e: IndexOutOfBoundsException) {

@@ -53,7 +53,7 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             runBlocking {
-                applicationContext.settingsDataStore.updateData { settings ->
+                settingsDataStore.updateData { settings ->
                     val settingsBuilder = settings.toBuilder()
                     when (key) {
                         "appTheme" -> {
@@ -94,10 +94,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.contentSettings.advSettings2.loadAd()
 
         if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fml_settings, SettingsFragment())
-                .commit()
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fml_settings, SettingsFragment())
+            transaction.commit()
         }
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)

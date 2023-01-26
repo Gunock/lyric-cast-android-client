@@ -73,7 +73,7 @@ class SongItemsAdapter(
             binding.tvSongCategory.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
         }
 
-        override fun setUpViewHolder(position: Int) {
+        override fun setupViewHolder(position: Int) {
             val item = try {
                 _items[position]
             } catch (e: IndexOutOfBoundsException) {

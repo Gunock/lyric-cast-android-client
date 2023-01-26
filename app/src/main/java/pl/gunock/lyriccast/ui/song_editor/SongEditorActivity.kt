@@ -151,13 +151,13 @@ class SongEditorActivity : AppCompatActivity() {
         val intentSongId: String? = intent.getStringExtra("songId")
         if (intentSongId != null) {
             viewModel.loadSong(intentSongId)
-            setUpSongSections()
+            setupSongSections()
             selectedTab = binding.tblSongSection.getTabAt(0)!!
         } else {
             binding.edSongTitle.setText("")
             selectedTab = binding.tblSongSection.getTabAt(0)!!
             val sectionName = selectedTab.text.toString().trim()
-            viewModel.setUpSection(sectionName)
+            viewModel.setupSection(sectionName)
         }
     }
 
@@ -219,7 +219,7 @@ class SongEditorActivity : AppCompatActivity() {
         viewModel.saveSong(presentation)
     }
 
-    private fun setUpSongSections() {
+    private fun setupSongSections() {
         binding.edSongTitle.setText(viewModel.songTitle)
 
         binding.tblSongSection.removeAllTabs()

@@ -7,10 +7,9 @@
 package pl.gunock.lyriccast.ui.setlist_editor.songs
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +41,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+        setupMenu()
     }
 
     override fun onCreateView(
@@ -73,14 +72,9 @@ class SetlistEditorSongsFragment : Fragment() {
         requireView().hideKeyboard()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                goToSetlistFragment()
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+    private fun setupMenu() {
+        val menuHost = requireActivity() as MenuHost
+        menuHost.addMenuProvider(SetlistSongsMenuProvider(), this)
     }
 
     private fun setupListeners() {
@@ -158,6 +152,22 @@ class SetlistEditorSongsFragment : Fragment() {
             )
 
         findNavController().navigate(action)
+    }
+
+
+    private inner class SetlistSongsMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return when (menuItem.itemId) {
+                android.R.id.home -> {
+                    goToSetlistFragment()
+                    return true
+                }
+                else -> false
+            }
+        }
     }
 
 }

@@ -49,7 +49,7 @@ class DeleteSongTest {
     lateinit var songsRepository: SongsRepository
 
     @Before
-    fun setUp() {
+    fun setup() {
         hiltRule.inject()
 
         runBlocking {

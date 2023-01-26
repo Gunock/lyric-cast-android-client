@@ -13,5 +13,5 @@ import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.settingsDataStore
 
 fun Context.getSettings(): Settings {
-    return runBlocking { applicationContext.settingsDataStore.data.first() }
+    return runBlocking { settingsDataStore.data.first() }
 }

@@ -17,9 +17,9 @@ abstract class BaseViewHolder(
 
     fun bind(position: Int) {
         selectionTracker?.attach(this)
-        setUpViewHolder(position)
+        setupViewHolder(position)
     }
 
-    protected abstract fun setUpViewHolder(position: Int)
+    protected abstract fun setupViewHolder(position: Int)
 
 }

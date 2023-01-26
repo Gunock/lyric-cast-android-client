@@ -126,7 +126,7 @@ class SongEditorModel @Inject constructor(
         songsRepository.upsertSong(song)
     }
 
-    fun setUpSection(sectionName: String) {
+    fun setupSection(sectionName: String) {
         sectionLyrics[sectionName] = ""
         sectionCountMap[sectionName] = 1
     }

@@ -50,7 +50,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         binding.advSetlistControls.loadAd()
 
-        viewModel.settings = applicationContext.getSettings()
+        viewModel.settings = getSettings()
 
         val setlistId: String = intent.getStringExtra("setlistId")!!
         viewModel.loadSetlist(setlistId)
@@ -83,7 +83,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val settings = applicationContext.getSettings()
+        val settings = getSettings()
         viewModel.settings = settings
 
         if (settings.controlButtonsHeight > 0.0) {

@@ -27,7 +27,7 @@ class FileHelperTest {
     private lateinit var testZipFile: File
 
     @Before
-    fun setUp() {
+    fun setup() {
         testDir = File("FileHelperTest")
         testDir.deleteRecursively()
         testDir.mkdirs()

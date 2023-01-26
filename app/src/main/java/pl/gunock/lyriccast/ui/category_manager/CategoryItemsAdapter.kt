@@ -63,7 +63,7 @@ class CategoryItemsAdapter(
     inner class ViewHolder(
         private val binding: ItemCategoryBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
-        override fun setUpViewHolder(position: Int) {
+        override fun setupViewHolder(position: Int) {
             val item: CategoryItem = try {
                 _items[position]
             } catch (e: IndexOutOfBoundsException) {

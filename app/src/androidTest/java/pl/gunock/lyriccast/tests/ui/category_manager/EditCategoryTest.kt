@@ -49,7 +49,7 @@ class EditCategoryTest {
     lateinit var categoriesRepository: CategoriesRepository
 
     @Before
-    fun setUp() {
+    fun setup() {
         hiltRule.inject()
 
         runBlocking {
