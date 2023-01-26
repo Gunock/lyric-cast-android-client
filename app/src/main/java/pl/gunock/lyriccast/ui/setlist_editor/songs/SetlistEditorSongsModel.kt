@@ -13,13 +13,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import pl.gunock.lyriccast.ui.shared.misc.SongItemFilter
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
@@ -49,6 +49,10 @@ class SetlistEditorSongsModel @Inject constructor(
 
     val selectionTracker = SelectionTracker(this::onSongSelection)
 
+    val searchValues get() = itemFilter.values
+
+    private val itemFilter = SongItemFilter()
+
     init {
         songsRepository.getAllSongs()
             .onEach {
@@ -58,7 +62,7 @@ class SetlistEditorSongsModel @Inject constructor(
                 if (_songs.value == songItems) return@onEach
 
                 allSongs = songItems
-                _songs.value = songItems
+                emitSongs()
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
@@ -67,6 +71,19 @@ class SetlistEditorSongsModel @Inject constructor(
                 val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
                 _categories.value = categoryItems
             }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
+
+        searchValues.songTitle
+            .debounce(500)
+            .onEach { emitSongs() }
+            .launchIn(viewModelScope)
+
+        searchValues.categoryId
+            .onEach { emitSongs() }
+            .launchIn(viewModelScope)
+
+        searchValues.isSelected
+            .onEach { emitSongs() }
             .launchIn(viewModelScope)
     }
 
@@ -94,46 +111,6 @@ class SetlistEditorSongsModel @Inject constructor(
         return newPresentation + addedSongIds
     }
 
-    fun filterSongs(
-        songTitle: String,
-        categoryItem: CategoryItem? = null,
-        isSelected: Boolean? = null
-    ) {
-        filterSongs(songTitle, categoryItem?.category?.id, isSelected)
-    }
-
-    private fun filterSongs(
-        songTitle: String,
-        categoryId: String? = null,
-        isSelected: Boolean? = null
-    ) {
-        updateSelectedSongs()
-
-        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
-
-        if (isSelected != null) {
-            predicates.add { songItem -> songItem.isSelected }
-        }
-
-        if (!categoryId.isNullOrBlank()) {
-            predicates.add { songItem -> songItem.song.category?.id == categoryId }
-        }
-
-        val normalizedTitle = songTitle.trim().normalize()
-        predicates.add { item ->
-            item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
-        }
-
-        val duration = measureTimeMillis {
-            val filteredItems = allSongs.filter { songItem ->
-                predicates.all { predicate -> predicate(songItem) }
-            }.toSortedSet().toList()
-
-            _songs.value = filteredItems
-        }
-        Log.v(TAG, "Filtering took : ${duration}ms")
-    }
-
     private fun onSongSelection(
         @Suppress("UNUSED_PARAMETER")
         holder: BaseViewHolder,
@@ -157,4 +134,11 @@ class SetlistEditorSongsModel @Inject constructor(
         }
     }
 
+    private suspend fun emitSongs() = withContext(Dispatchers.Default) {
+        Log.v(TAG, "Song filtering invoked")
+        val duration = measureTimeMillis {
+            _songs.value = itemFilter.apply(allSongs).toList()
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
+    }
 }

@@ -68,9 +68,11 @@ class FilterSetlistsTest {
             .check(matches(hasDescendant(withText(setlist2.name))))
             .check(matches(hasDescendant(withText(setlist3.name))))
 
-        onView(withId(R.id.ed_setlist_name_filter)).perform(replaceText(setlistName))
+        onView(withId(R.id.ed_setlist_name_filter))
+            .perform(replaceText(setlistName))
 
-        sleep(100)
+        // Test needs to accommodate for debounce
+        sleep(700)
 
         onView(withId(R.id.rcv_setlists))
             .check(matches(hasDescendant(withText(setlist1.name))))

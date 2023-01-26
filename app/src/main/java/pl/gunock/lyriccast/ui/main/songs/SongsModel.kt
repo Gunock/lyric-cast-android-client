@@ -24,6 +24,7 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import pl.gunock.lyriccast.ui.shared.misc.SongItemFilter
 import java.io.File
 import java.io.OutputStream
 import javax.inject.Inject

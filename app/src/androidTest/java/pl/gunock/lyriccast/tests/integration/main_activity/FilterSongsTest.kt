@@ -80,8 +80,11 @@ class FilterSongsTest {
             .check(matches(hasDescendant(withText(song2.title))))
             .check(matches(hasDescendant(withText(song3.title))))
 
-        onView(withId(R.id.ed_song_title_filter)).perform(replaceText(songTitle))
-        sleep(100)
+        onView(withId(R.id.ed_song_title_filter))
+            .perform(replaceText(songTitle))
+
+        // Test needs to accommodate for debounce
+        sleep(700)
 
         onView(withId(R.id.rcv_songs))
             .check(matches(hasDescendant(withText(song1.title))))
