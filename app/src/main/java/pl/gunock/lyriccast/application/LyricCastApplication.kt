@@ -26,10 +26,6 @@ import java.util.concurrent.Executors
 class LyricCastApplication : Application() {
     @SuppressLint("WrongConstant")
     override fun onCreate() {
-        if (BuildConfig.DEBUG) {
-            setupStrictMode()
-        }
-
         initializeFromThread()
 
         // Initializes CastContext
@@ -50,6 +46,10 @@ class LyricCastApplication : Application() {
         AppCompatDelegate.setDefaultNightMode(appTheme)
 
         super.onCreate()
+
+        if (BuildConfig.DEBUG) {
+            setupStrictMode()
+        }
     }
 
     private fun initializeFromThread() {

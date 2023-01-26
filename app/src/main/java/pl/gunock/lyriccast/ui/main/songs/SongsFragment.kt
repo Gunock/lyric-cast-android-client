@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Spinner
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -88,9 +87,7 @@ class SongsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener {
-            lifecycleScope.launch(Dispatchers.Default) {
-                filterSongs()
-            }
+            viewModel.searchValues.songTitle.value = it
         })
 
         binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -101,9 +98,9 @@ class SongsFragment : Fragment() {
 
         binding.spnCategory.onItemSelectedListener =
             ItemSelectedSpinnerListener { _, _ ->
-                lifecycleScope.launch(Dispatchers.Default) {
-                    filterSongs()
-                }
+                val selectedItem = binding.spnCategory.selectedItem as CategoryItem?
+                val categoryId: String? = selectedItem?.category?.id
+                viewModel.searchValues.categoryId.value = categoryId
             }
     }
 
@@ -150,15 +147,6 @@ class SongsFragment : Fragment() {
             .launchIn(lifecycleScope)
     }
 
-    private fun filterSongs() {
-        Log.v(TAG, "filterSongs invoked")
-        val title: String = binding.edSongTitleFilter.editableText.toString()
-        val categoryId: String? = getSelectedCategoryId(binding.spnCategory)
-
-        viewModel.resetSongSelection()
-        viewModel.filterSongs(title, categoryId = categoryId)
-    }
-
     private fun onPickSong(item: SongItem?) {
         item ?: return
         viewModel.resetPickedSong()
@@ -173,7 +161,7 @@ class SongsFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
+            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount)
         }
 
         when (countAfter) {
@@ -243,7 +231,7 @@ class SongsFragment : Fragment() {
                         outputStream.close()
                     }
                     dialogFragment.dismiss()
-                    songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.value.size)
+                    songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount)
                 }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
@@ -269,11 +257,6 @@ class SongsFragment : Fragment() {
             findItem(R.id.action_menu_add_setlist).isVisible = showGroupActions
             findItem(R.id.action_menu_edit).isVisible = showEdit
         }
-    }
-
-    private fun getSelectedCategoryId(categorySpinner: Spinner): String? {
-        categorySpinner.selectedItem ?: return null
-        return (categorySpinner.selectedItem as CategoryItem).category.id
     }
 
     private inner class SongsActionModeCallback : ActionMode.Callback {

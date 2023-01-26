@@ -12,9 +12,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
@@ -39,26 +39,29 @@ class SongsModel @Inject constructor(
         const val TAG = "SongsViewModel"
     }
 
-    val songs: StateFlow<List<SongItem>> get() = _songs
     private val _songs: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
+    val songs: Flow<List<SongItem>> = _songs
+
     private var allSongs: List<SongItem> = listOf()
 
-
-    val pickedSong: StateFlow<SongItem?> get() = _pickedSong
     private val _pickedSong: MutableStateFlow<SongItem?> = MutableStateFlow(null)
+    val pickedSong: StateFlow<SongItem?> = _pickedSong
 
     val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> get() = _numberOfSelectedSongs
     private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
 
-    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
     private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
+    val selectedSongPosition: SharedFlow<Int> = _selectedSongPosition
 
-    val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
+    val categories: StateFlow<List<CategoryItem>> = _categories
 
-    val selectionTracker: SelectionTracker<BaseViewHolder> =
-        SelectionTracker(this::onSongSelection)
+    val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
+
+    val searchValues get() = songItemFilter.values
+
+    private val songItemFilter = SongItemFilter()
 
     init {
         songsRepository.getAllSongs()
@@ -67,7 +70,7 @@ class SongsModel @Inject constructor(
                 if (_songs.value == songItems) return@onEach
 
                 allSongs = songItems
-                _songs.value = allSongs
+                emitSongs()
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
@@ -77,6 +80,15 @@ class SongsModel @Inject constructor(
                 _categories.value = categoryItems
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
+
+        searchValues.songTitle
+            .debounce(500)
+            .onEach { emitSongs() }
+            .launchIn(viewModelScope)
+
+        searchValues.categoryId
+            .onEach { emitSongs() }
+            .launchIn(viewModelScope)
     }
 
     fun getSelectedSong(): SongItem {
@@ -84,7 +96,7 @@ class SongsModel @Inject constructor(
     }
 
     fun getSelectedSongIds(): List<String> {
-        return songs.value
+        return _songs.value
             .filter { it.isSelected }
             .map { item -> item.song.id }
     }
@@ -96,32 +108,8 @@ class SongsModel @Inject constructor(
         songsRepository.deleteSongs(selectedSongs)
         _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
         selectionTracker.reset()
-    }
 
-    // TODO: Move filter to separate class (functional interface?)
-    fun filterSongs(
-        songTitle: String,
-        categoryId: String? = null
-    ) {
-        val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
-
-        if (!categoryId.isNullOrBlank()) {
-            predicates.add { songItem -> songItem.song.category?.id == categoryId }
-        }
-
-        val normalizedTitle = songTitle.trim().normalize()
-        predicates.add { item ->
-            item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
-        }
-
-        val duration = measureTimeMillis {
-            val filteredItems = allSongs.filter { songItem ->
-                predicates.all { predicate -> predicate(songItem) }
-            }.toSortedSet().toList()
-
-            _songs.value = filteredItems
-        }
-        Log.v(TAG, "Filtering took : ${duration}ms")
+        emitSongs()
     }
 
     fun resetSongSelection() {
@@ -206,4 +194,11 @@ class SongsModel @Inject constructor(
         return true
     }
 
+    private suspend fun emitSongs() = withContext(Dispatchers.Default) {
+        Log.v(TAG, "Song filtering invoked")
+        val duration = measureTimeMillis {
+            _songs.value = songItemFilter.apply(allSongs).toList()
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
+    }
 }
