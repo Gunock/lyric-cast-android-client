@@ -79,10 +79,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
-                viewModel.filterSongs(newText, categoryItem)
-            }
+            viewModel.searchValues.songTitle.value = newText
         })
 
         binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -92,21 +89,12 @@ class SetlistEditorSongsFragment : Fragment() {
         }
 
         binding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                val songTitle = binding.edSongTitleFilter.editableText.toString()
-                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
-                viewModel.filterSongs(songTitle, categoryItem)
-            }
+            val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
+            viewModel.searchValues.categoryId.value = categoryItem?.category?.id
         }
 
         binding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                val songTitle = binding.edSongTitleFilter.editableText.toString()
-                val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
-                val isSelected = if (isChecked) true else null
-
-                viewModel.filterSongs(songTitle, categoryItem, isSelected)
-            }
+            viewModel.searchValues.isSelected.value = if (isChecked) true else null
         }
     }
 

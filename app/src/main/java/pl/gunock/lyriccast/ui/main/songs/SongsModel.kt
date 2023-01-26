@@ -24,6 +24,7 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import pl.gunock.lyriccast.ui.shared.misc.SongItemFilter
 import java.io.File
 import java.io.OutputStream
 import javax.inject.Inject
@@ -59,9 +60,9 @@ class SongsModel @Inject constructor(
 
     val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
-    val searchValues get() = songItemFilter.values
+    val searchValues get() = itemFilter.values
 
-    private val songItemFilter = SongItemFilter()
+    private val itemFilter = SongItemFilter()
 
     init {
         songsRepository.getAllSongs()
@@ -108,8 +109,6 @@ class SongsModel @Inject constructor(
         songsRepository.deleteSongs(selectedSongs)
         _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
         selectionTracker.reset()
-
-        emitSongs()
     }
 
     fun resetSongSelection() {
@@ -197,7 +196,7 @@ class SongsModel @Inject constructor(
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {
         Log.v(TAG, "Song filtering invoked")
         val duration = measureTimeMillis {
-            _songs.value = songItemFilter.apply(allSongs).toList()
+            _songs.value = itemFilter.apply(allSongs).toList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
     }

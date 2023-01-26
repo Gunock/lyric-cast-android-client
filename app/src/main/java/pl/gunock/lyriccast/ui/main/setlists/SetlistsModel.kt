@@ -16,7 +16,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.common.helpers.FileHelper
 import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
@@ -58,10 +57,14 @@ class SetlistsModel @Inject constructor(
     val selectedSetlistPosition: SharedFlow<Int> get() = _selectedSetlistPosition
     private val _selectedSetlistPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
 
-    private var allSetlists: Iterable<SetlistItem> = listOf()
+    private var allSetlists: List<SetlistItem> = listOf()
 
     val selectionTracker: SelectionTracker<BaseViewHolder> =
         SelectionTracker(this::onSetlistSelection)
+
+    val searchValues get() = itemFilter.values
+
+    private val itemFilter = SetlistItemFilter()
 
     init {
         setlistsRepository.getAllSetlists()
@@ -70,8 +73,13 @@ class SetlistsModel @Inject constructor(
                 if (_setlists.value == setlistItems) return@onEach
 
                 allSetlists = setlistItems
-                _setlists.value = setlistItems
+                emitSetlists()
             }.flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
+
+        searchValues.setlistName
+            .debounce(500)
+            .onEach { emitSetlists() }
             .launchIn(viewModelScope)
     }
 
@@ -82,21 +90,6 @@ class SetlistsModel @Inject constructor(
         _numberOfSelectedSetlists.value = Pair(selectedSetlists.size, 0)
         selectionTracker.reset()
     }
-
-    // TODO: Move filter to separate class (functional interface?)
-    suspend fun filterSetlists(setlistName: String) =
-        withContext(Dispatchers.Default) {
-            val normalizedTitle = setlistName.trim().normalize()
-            val duration = measureTimeMillis {
-                val filteredItems = allSetlists.filter { setlistItem ->
-                    setlistItem.normalizedName.contains(normalizedTitle, ignoreCase = true)
-                }
-
-                _setlists.value = filteredItems
-            }
-            Log.v(TAG, "Filtering took : ${duration}ms")
-        }
-
 
     fun resetSetlistSelection() {
         _setlists.value.forEach {
@@ -193,6 +186,14 @@ class SetlistsModel @Inject constructor(
         }
 
         return true
+    }
+
+    private suspend fun emitSetlists() = withContext(Dispatchers.Default) {
+        Log.v(TAG, "Setlist filtering invoked")
+        val duration = measureTimeMillis {
+            _setlists.value = itemFilter.apply(allSetlists).toList()
+        }
+        Log.v(TAG, "Filtering took : ${duration}ms")
     }
 
 }
