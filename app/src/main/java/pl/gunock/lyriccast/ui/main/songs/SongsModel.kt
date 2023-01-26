@@ -59,9 +59,9 @@ class SongsModel @Inject constructor(
 
     val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
-    val searchValues get() = songItemFilter.values
+    val searchValues get() = itemFilter.values
 
-    private val songItemFilter = SongItemFilter()
+    private val itemFilter = SongItemFilter()
 
     init {
         songsRepository.getAllSongs()
@@ -108,8 +108,6 @@ class SongsModel @Inject constructor(
         songsRepository.deleteSongs(selectedSongs)
         _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
         selectionTracker.reset()
-
-        emitSongs()
     }
 
     fun resetSongSelection() {
@@ -197,7 +195,7 @@ class SongsModel @Inject constructor(
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {
         Log.v(TAG, "Song filtering invoked")
         val duration = measureTimeMillis {
-            _songs.value = songItemFilter.apply(allSongs).toList()
+            _songs.value = itemFilter.apply(allSongs).toList()
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
     }

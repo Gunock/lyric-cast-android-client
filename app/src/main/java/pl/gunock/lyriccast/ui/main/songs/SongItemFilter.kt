@@ -22,7 +22,7 @@ class SongItemFilter : ItemFilter<SongItem, SongItemFilter.Values>() {
     private val categoryId get() = values.categoryId.value
     private val songTitle get() = values.songTitle.value
 
-    override fun apply(collection: Collection<SongItem>): Collection<SongItem> {
+    override fun apply(items: Collection<SongItem>): Collection<SongItem> {
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
         if (!categoryId.isNullOrBlank()) {
@@ -36,7 +36,11 @@ class SongItemFilter : ItemFilter<SongItem, SongItemFilter.Values>() {
             }
         }
 
-        return collection.filter { songItem ->
+        if (predicates.isEmpty()) {
+            return items
+        }
+
+        return items.filter { songItem ->
             predicates.all { predicate -> predicate(songItem) }
         }.toSortedSet()
     }
