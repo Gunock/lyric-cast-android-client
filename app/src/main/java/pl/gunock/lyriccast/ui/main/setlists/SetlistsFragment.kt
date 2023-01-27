@@ -116,7 +116,6 @@ class SetlistsFragment : Fragment() {
                         outputStream.close()
                     }
                     dialogFragment.dismiss()
-                    setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
                 }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
@@ -131,7 +130,7 @@ class SetlistsFragment : Fragment() {
         binding.rcvSetlists.adapter = setlistItemsAdapter
 
         viewModel.setlists
-            .onEach { setlistItemsAdapter.submitCollection(it) }
+            .onEach { setlistItemsAdapter.submitList(it) }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 

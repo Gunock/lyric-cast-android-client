@@ -81,7 +81,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         binding.rcvCategories.adapter = categoryItemsAdapter
 
         viewModel.categories
-            .onEach { categoryItemsAdapter.submitCollection(it) }
+            .onEach { categoryItemsAdapter.submitList(it) }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 

@@ -12,7 +12,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
@@ -21,10 +22,18 @@ import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 class SongItemsAdapter(
     context: Context,
     private val selectionTracker: SelectionTracker<BaseViewHolder>?
-) : RecyclerView.Adapter<SongItemsAdapter.ViewHolder>() {
+) : ListAdapter<SongItem, SongItemsAdapter.ViewHolder>(DiffCallback()) {
 
     private companion object {
         const val TAG = "SongItemsAdapter"
+    }
+
+    private class DiffCallback : DiffUtil.ItemCallback<SongItem>() {
+        override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
+            oldItem.song.id == newItem.song.id
+
+        override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
+            oldItem == newItem
     }
 
     private val defaultItemCardColor = context.getColor(R.color.window_background_2)
@@ -34,17 +43,8 @@ class SongItemsAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    private var _items: List<SongItem> = listOf()
-
     init {
         setHasStableIds(true)
-    }
-
-    fun submitCollection(songs: List<SongItem>) {
-        val previousSize = itemCount
-        _items = songs
-        notifyItemRangeRemoved(0, previousSize)
-        notifyItemRangeRemoved(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,14 +57,12 @@ class SongItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        if (_items.isEmpty()) {
+        if (currentList.isEmpty()) {
             return -1L
         }
 
-        return _items[position].song.idLong
+        return currentList[position].song.idLong
     }
-
-    override fun getItemCount() = _items.size
 
     inner class ViewHolder(
         private val binding: ItemSongBinding
@@ -75,7 +73,7 @@ class SongItemsAdapter(
 
         override fun setupViewHolder(position: Int) {
             val item = try {
-                _items[position]
+                currentList[position]
             } catch (e: IndexOutOfBoundsException) {
                 Log.w(TAG, e)
                 return

@@ -127,7 +127,7 @@ class SongsFragment : Fragment() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.songs
-            .onEach { songItemsAdapter.submitCollection(it) }
+            .onEach { songItemsAdapter.submitList(it) }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
@@ -231,7 +231,6 @@ class SongsFragment : Fragment() {
                         outputStream.close()
                     }
                     dialogFragment.dismiss()
-                    songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount)
                 }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }

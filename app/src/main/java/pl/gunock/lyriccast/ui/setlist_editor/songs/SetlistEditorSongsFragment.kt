@@ -119,7 +119,7 @@ class SetlistEditorSongsFragment : Fragment() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.songs
-            .onEach { songItemsAdapter.submitCollection(it) }
+            .onEach { songItemsAdapter.submitList(it) }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 

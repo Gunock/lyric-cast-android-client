@@ -11,7 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
 import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
@@ -20,25 +21,25 @@ import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 class SetlistItemsAdapter(
     context: Context,
     val selectionTracker: SelectionTracker<BaseViewHolder>?
-) : RecyclerView.Adapter<SetlistItemsAdapter.ViewHolder>() {
+) : ListAdapter<SetlistItem, SetlistItemsAdapter.ViewHolder>(DiffCallback()) {
 
     companion object {
         const val TAG = "SetlistItemsAdapter"
     }
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
+    private class DiffCallback : DiffUtil.ItemCallback<SetlistItem>() {
+        override fun areItemsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
+            oldItem.setlist.id == newItem.setlist.id
 
-    private var _items: List<SetlistItem> = listOf()
+        override fun areContentsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
+            oldItem == newItem
+
+    }
+
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     init {
         setHasStableIds(true)
-    }
-
-    fun submitCollection(setlists: List<SetlistItem>) {
-        val previousSize = itemCount
-        _items = setlists
-        notifyItemRangeRemoved(0, previousSize)
-        notifyItemRangeRemoved(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,13 +52,11 @@ class SetlistItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        if (_items.isEmpty()) {
+        if (currentList.isEmpty()) {
             return -1L
         }
-        return _items[position].setlist.idLong
+        return currentList[position].setlist.idLong
     }
-
-    override fun getItemCount() = _items.size
 
     inner class ViewHolder(
         private val binding: ItemSetlistBinding
@@ -65,7 +64,7 @@ class SetlistItemsAdapter(
 
         override fun setupViewHolder(position: Int) {
             val item = try {
-                _items[position]
+                currentList[position]
             } catch (e: IndexOutOfBoundsException) {
                 Log.w(TAG, e)
                 return
