@@ -71,6 +71,8 @@ class SongItemsAdapter(
             binding.tvSongCategory.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
         }
 
+        private var oldItem: SongItem? = null
+
         override fun setupViewHolder(position: Int) {
             val item = try {
                 currentList[position]
@@ -84,26 +86,31 @@ class SongItemsAdapter(
                 binding.chkItemSong.isChecked = item.isSelected
             } else {
                 binding.chkItemSong.visibility = View.GONE
+                binding.chkItemSong.isChecked = false
             }
 
-            binding.tvItemSongTitle.text = item.song.title
+            if (item.song != oldItem?.song) {
+                binding.tvItemSongTitle.text = item.song.title
 
-            if (item.song.category != null) {
-                binding.tvSongCategory.text = item.song.category?.name
+                if (item.song.category != null) {
+                    binding.tvSongCategory.text = item.song.category?.name
 
-                binding.chkItemSong.buttonTintList =
-                    ColorStateList.valueOf(this@SongItemsAdapter.withCategoryTextColor)
+                    binding.chkItemSong.buttonTintList =
+                        ColorStateList.valueOf(this@SongItemsAdapter.withCategoryTextColor)
 
-                binding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
-                binding.root.setCardBackgroundColor(item.song.category?.color!!)
-            } else {
-                binding.tvSongCategory.text = ""
+                    binding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
+                    binding.root.setCardBackgroundColor(item.song.category?.color!!)
+                } else {
+                    binding.tvSongCategory.text = ""
 
-                binding.chkItemSong.buttonTintList = checkBoxColors
+                    binding.chkItemSong.buttonTintList = checkBoxColors
 
-                binding.tvItemSongTitle.setTextColor(noCategoryTextColor)
-                binding.root.setCardBackgroundColor(this@SongItemsAdapter.defaultItemCardColor)
+                    binding.tvItemSongTitle.setTextColor(noCategoryTextColor)
+                    binding.root.setCardBackgroundColor(this@SongItemsAdapter.defaultItemCardColor)
+                }
             }
+
+            oldItem = item
         }
     }
 }

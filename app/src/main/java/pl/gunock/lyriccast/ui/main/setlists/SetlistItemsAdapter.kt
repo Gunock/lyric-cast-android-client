@@ -62,6 +62,8 @@ class SetlistItemsAdapter(
         private val binding: ItemSetlistBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
 
+        private var oldItem: SetlistItem? = null
+
         override fun setupViewHolder(position: Int) {
             val item = try {
                 currentList[position]
@@ -75,9 +77,14 @@ class SetlistItemsAdapter(
                 binding.chkItemSetlist.isChecked = item.isSelected
             } else {
                 binding.chkItemSetlist.visibility = View.GONE
+                binding.chkItemSetlist.isChecked = false
             }
 
-            binding.tvItemSetlistName.text = item.setlist.name
+            if (item.setlist != oldItem?.setlist) {
+                binding.tvItemSetlistName.text = item.setlist.name
+            }
+
+            oldItem = item
         }
     }
 

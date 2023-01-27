@@ -61,6 +61,9 @@ class CategoryItemsAdapter(
     inner class ViewHolder(
         private val binding: ItemCategoryBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
+
+        private var oldItem: CategoryItem? = null
+
         override fun setupViewHolder(position: Int) {
             val item: CategoryItem = try {
                 currentList[position]
@@ -74,13 +77,18 @@ class CategoryItemsAdapter(
                 binding.chkItemCategory.isChecked = item.isSelected
             } else {
                 binding.chkItemCategory.visibility = View.GONE
+                binding.chkItemCategory.isChecked = false
             }
 
-            binding.tvCategoryName.text = currentList[absoluteAdapterPosition].category.name
+            if (item.category != oldItem?.category) {
+                binding.tvCategoryName.text = currentList[absoluteAdapterPosition].category.name
 
-            if (item.category.color != null) {
-                binding.cdvCategoryColor.setCardBackgroundColor(item.category.color!!)
+                if (item.category.color != null) {
+                    binding.cdvCategoryColor.setCardBackgroundColor(item.category.color!!)
+                }
             }
+
+            oldItem = item
         }
     }
 }

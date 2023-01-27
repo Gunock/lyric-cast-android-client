@@ -120,12 +120,10 @@ class SetlistEditorSongsFragment : Fragment() {
 
         viewModel.songs
             .onEach { songItemsAdapter.submitList(it) }
-            .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
         viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it) }
-            .flowOn(Dispatchers.Default)
+            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 

@@ -60,6 +60,7 @@
             android:maxLines="1"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
+            android:singleLine="true"
             android:text="@string/placeholder_category"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
             app:layout_constraintBottom_toBottomOf="parent"

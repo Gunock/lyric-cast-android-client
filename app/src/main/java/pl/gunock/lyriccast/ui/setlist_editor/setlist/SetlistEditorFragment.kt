@@ -10,6 +10,8 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
@@ -55,6 +57,8 @@ class SetlistEditorFragment : Fragment() {
 
     private val itemTouchHelper by lazy { ItemTouchHelper(SetlistItemTouchCallback()) }
 
+    private var onBackPressedCallback: OnBackPressedCallback? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,6 +70,7 @@ class SetlistEditorFragment : Fragment() {
 
     override fun onDestroy() {
         itemTouchHelper.attachToRecyclerView(null)
+        actionMode?.finish()
         super.onDestroy()
     }
 
@@ -82,13 +87,7 @@ class SetlistEditorFragment : Fragment() {
             .launchIn(lifecycleScope)
 
         viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it) }
-            .flowOn(Dispatchers.Default)
-            .launchIn(lifecycleScope)
-
-        viewModel.removedSongPositions
-            .onEach { positions -> positions.forEach { songItemsAdapter.notifyItemRemoved(it) } }
-            .flowOn(Dispatchers.Default)
+            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -132,7 +131,7 @@ class SetlistEditorFragment : Fragment() {
         binding.btnPickSetlistSongs.setOnClickListener {
             actionMode?.finish()
 
-            val presentation: Array<String> = viewModel.songs
+            val presentation: Array<String> = viewModel.songs.value
                 .map { it.song.id }
                 .toTypedArray()
 
@@ -163,7 +162,6 @@ class SetlistEditorFragment : Fragment() {
 
         songItemsAdapter = SetlistSongItemsAdapter(
             binding.rcvSongs.context,
-            items = viewModel.songs,
             selectionTracker = viewModel.selectionTracker,
             onHandleTouchListener = onHandleTouchListener
         )
@@ -173,6 +171,10 @@ class SetlistEditorFragment : Fragment() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
+
+        viewModel.songs
+            .onEach { songItemsAdapter.submitList(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun checkSetlistNameValidity(): Boolean {
@@ -189,7 +191,7 @@ class SetlistEditorFragment : Fragment() {
             return
         }
 
-        if (viewModel.songs.isNotEmpty()) {
+        if (viewModel.songs.value.isNotEmpty()) {
             lifecycleScope.launch(Dispatchers.Default) { viewModel.saveSetlist() }
             requireActivity().finish()
         } else {
@@ -207,7 +209,7 @@ class SetlistEditorFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.size)
+            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
         }
 
         when (countAfter) {
@@ -217,9 +219,8 @@ class SetlistEditorFragment : Fragment() {
             }
             1 -> {
                 if (actionMode == null) {
-                    actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                        actionModeCallback
-                    )
+                    actionMode = (requireActivity() as AppCompatActivity)
+                        .startSupportActionMode(actionModeCallback)
                 }
 
                 showMenuActions()
@@ -237,23 +238,19 @@ class SetlistEditorFragment : Fragment() {
 
     private fun removeSelectedSongs(): Boolean {
         viewModel.removeSelectedSongs()
-        resetSelection()
 
         return true
     }
 
     private fun duplicateSong(): Boolean {
-        val insertedPosition = viewModel.duplicateSelectedSong()
-        songItemsAdapter.notifyItemInserted(insertedPosition)
-        resetSelection()
+        viewModel.duplicateSelectedSong()
 
         return true
     }
 
     private fun resetSelection() {
         viewModel.resetSongSelection()
-        songItemsAdapter.notifyItemRangeChanged(0, viewModel.songs.size)
-        showMenuActions(showDelete = false, showDuplicate = false)
+        songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
     }
 
     private inner class SetlistEditorActionModeCallback : ActionMode.Callback {
@@ -261,6 +258,14 @@ class SetlistEditorFragment : Fragment() {
             mode.menuInflater.inflate(R.menu.action_menu_setlist_editor, menu)
             mode.title = ""
             actionMenu = menu
+
+            onBackPressedCallback =
+                requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
+                    resetSelection()
+                    onBackPressedCallback?.remove()
+                    onBackPressedCallback = null
+                }
+
             return true
         }
 
@@ -287,6 +292,9 @@ class SetlistEditorFragment : Fragment() {
             actionMode = null
             actionMenu = null
             resetSelection()
+
+            onBackPressedCallback?.remove()
+            onBackPressedCallback = null
         }
 
     }

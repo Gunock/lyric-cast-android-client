@@ -58,8 +58,8 @@ class CategoryManagerModel @Inject constructor(
 
     fun resetCategorySelection() {
         _categories.value.forEach {
-            it.isSelected = false
             it.hasCheckbox = false
+            it.isSelected = false
         }
         selectionTracker.reset()
     }
@@ -74,19 +74,22 @@ class CategoryManagerModel @Inject constructor(
 
         if (!isLongClick && selectionTracker.count == 0) {
             return false
-        } else {
-            item.isSelected = !item.isSelected
-
-            if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-                _categories.value.forEach { it.hasCheckbox = true }
-            } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-                _categories.value.forEach { it.hasCheckbox = false }
-            }
-
-            val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedCategories.value = countPair
-            _selectedCategoryPosition.tryEmit(position)
         }
+
+        item.isSelected = !item.isSelected
+
+        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
+            _categories.value.forEach { it.hasCheckbox = true }
+        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
+            _categories.value.forEach {
+                it.hasCheckbox = false
+                it.isSelected = false
+            }
+        }
+
+        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
+        _numberOfSelectedCategories.value = countPair
+        _selectedCategoryPosition.tryEmit(position)
 
         return isLongClick || selectionTracker.count != 0
     }
