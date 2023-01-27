@@ -11,7 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import pl.gunock.lyriccast.databinding.ItemCategoryBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
@@ -20,25 +21,24 @@ import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 class CategoryItemsAdapter(
     context: Context,
     private val selectionTracker: SelectionTracker<BaseViewHolder>?
-) : RecyclerView.Adapter<CategoryItemsAdapter.ViewHolder>() {
+) : ListAdapter<CategoryItem, CategoryItemsAdapter.ViewHolder>(DiffCallback()) {
 
     private companion object {
         const val TAG = "CategoryItemsAdapter"
     }
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
+    private class DiffCallback : DiffUtil.ItemCallback<CategoryItem>() {
+        override fun areItemsTheSame(oldItem: CategoryItem, newItem: CategoryItem): Boolean =
+            oldItem.category.id == newItem.category.id
 
-    private var _items: List<CategoryItem> = listOf()
+        override fun areContentsTheSame(oldItem: CategoryItem, newItem: CategoryItem): Boolean =
+            oldItem == newItem
+    }
+
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     init {
         setHasStableIds(true)
-    }
-
-    fun submitCollection(categories: List<CategoryItem>) {
-        val previousSize = itemCount
-        _items = categories
-        notifyItemRangeRemoved(0, previousSize)
-        notifyItemRangeInserted(0, _items.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,21 +51,22 @@ class CategoryItemsAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        if (_items.isEmpty()) {
+        if (currentList.isEmpty()) {
             return -1L
         }
 
-        return _items[position].category.idLong
+        return currentList[position].category.idLong
     }
-
-    override fun getItemCount() = _items.size
 
     inner class ViewHolder(
         private val binding: ItemCategoryBinding
     ) : BaseViewHolder(binding.root, selectionTracker) {
+
+        private var oldItem: CategoryItem? = null
+
         override fun setupViewHolder(position: Int) {
             val item: CategoryItem = try {
-                _items[position]
+                currentList[position]
             } catch (e: IndexOutOfBoundsException) {
                 Log.w(TAG, e)
                 return
@@ -76,13 +77,18 @@ class CategoryItemsAdapter(
                 binding.chkItemCategory.isChecked = item.isSelected
             } else {
                 binding.chkItemCategory.visibility = View.GONE
+                binding.chkItemCategory.isChecked = false
             }
 
-            binding.tvCategoryName.text = _items[absoluteAdapterPosition].category.name
+            if (item.category != oldItem?.category) {
+                binding.tvCategoryName.text = currentList[absoluteAdapterPosition].category.name
 
-            if (item.category.color != null) {
-                binding.cdvCategoryColor.setCardBackgroundColor(item.category.color!!)
+                if (item.category.color != null) {
+                    binding.cdvCategoryColor.setCardBackgroundColor(item.category.color!!)
+                }
             }
+
+            oldItem = item
         }
     }
 }

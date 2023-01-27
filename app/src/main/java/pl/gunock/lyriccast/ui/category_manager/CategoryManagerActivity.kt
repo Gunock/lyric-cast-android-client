@@ -81,8 +81,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         binding.rcvCategories.adapter = categoryItemsAdapter
 
         viewModel.categories
-            .onEach { categoryItemsAdapter.submitCollection(it) }
-            .flowOn(Dispatchers.Main)
+            .onEach { categoryItemsAdapter.submitList(it) }
             .launchIn(lifecycleScope)
 
         viewModel.numberOfSelectedCategories
@@ -91,8 +90,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             .launchIn(lifecycleScope)
 
         viewModel.selectedCategoryPosition
-            .onEach { categoryItemsAdapter.notifyItemChanged(it) }
-            .flowOn(Dispatchers.Default)
+            .onEach { categoryItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -123,7 +121,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedCategories
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size)
+            categoryItemsAdapter.notifyItemRangeChanged(0, categoryItemsAdapter.itemCount, true)
         }
 
         when (countAfter) {
@@ -155,7 +153,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     private fun resetSelection() {
         viewModel.resetCategorySelection()
-        categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size)
+        categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size, true)
     }
 
     private inner class CategoryManagerActionModeCallback : ActionMode.Callback {

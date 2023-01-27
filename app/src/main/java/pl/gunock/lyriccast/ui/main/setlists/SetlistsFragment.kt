@@ -13,6 +13,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -59,6 +61,8 @@ class SetlistsFragment : Fragment() {
     private val exportChooserResultLauncher =
         registerForActivityResult(this::exportSelectedSetlists)
 
+    private var onBackPressedCallback: OnBackPressedCallback? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,8 +80,16 @@ class SetlistsFragment : Fragment() {
 
     override fun onDestroy() {
         actionMode?.finish()
-        viewModel.resetSetlistSelection()
+
         super.onDestroy()
+    }
+
+    override fun onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment: Boolean) {
+        if (!isPrimaryNavigationFragment) {
+            actionMode?.finish()
+        }
+
+        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment)
     }
 
     private fun startExport(): Boolean {
@@ -116,7 +128,6 @@ class SetlistsFragment : Fragment() {
                         outputStream.close()
                     }
                     dialogFragment.dismiss()
-                    setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
                 }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
@@ -131,8 +142,7 @@ class SetlistsFragment : Fragment() {
         binding.rcvSetlists.adapter = setlistItemsAdapter
 
         viewModel.setlists
-            .onEach { setlistItemsAdapter.submitCollection(it) }
-            .flowOn(Dispatchers.Main)
+            .onEach { setlistItemsAdapter.submitList(it) }
             .launchIn(lifecycleScope)
 
         viewModel.pickedSetlist
@@ -146,10 +156,7 @@ class SetlistsFragment : Fragment() {
             .launchIn(lifecycleScope)
 
         viewModel.selectedSetlistPosition
-            .onEach {
-                setlistItemsAdapter.notifyItemChanged(it)
-                binding.tinSetlistNameFilter.clearFocus()
-            }.flowOn(Dispatchers.Default)
+            .onEach { setlistItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -157,8 +164,7 @@ class SetlistsFragment : Fragment() {
     private fun setupListeners() {
         binding.edSetlistNameFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Default) {
-                viewModel.resetSetlistSelection()
-                viewModel.searchValues.setlistName.value = newText
+                viewModel.searchValues.setlistName = newText
             }
         })
 
@@ -193,7 +199,7 @@ class SetlistsFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSetlists
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size)
+            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size, true)
         }
 
         when (countAfter) {
@@ -240,12 +246,25 @@ class SetlistsFragment : Fragment() {
         }
     }
 
+    private fun resetSelection() {
+        viewModel.resetSetlistSelection()
+        setlistItemsAdapter.notifyItemRangeChanged(0, setlistItemsAdapter.itemCount, true)
+    }
+
     private inner class SetlistsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
             menu.findItem(R.id.action_menu_add_setlist).isVisible = false
             mode.title = ""
             actionMenu = menu
+
+            onBackPressedCallback =
+                requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
+                    resetSelection()
+                    onBackPressedCallback?.remove()
+                    onBackPressedCallback = null
+                }
+
             return true
         }
 
@@ -277,6 +296,10 @@ class SetlistsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
+            resetSelection()
+
+            onBackPressedCallback?.remove()
+            onBackPressedCallback = null
         }
     }
 

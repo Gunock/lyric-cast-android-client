@@ -77,7 +77,7 @@ class SetlistsModel @Inject constructor(
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
-        searchValues.setlistName
+        searchValues.setlistNameFlow
             .debounce(500)
             .onEach { emitSetlists() }
             .launchIn(viewModelScope)
@@ -93,8 +93,8 @@ class SetlistsModel @Inject constructor(
 
     fun resetSetlistSelection() {
         _setlists.value.forEach {
-            it.isSelected = false
             it.hasCheckbox = false
+            it.isSelected = false
         }
         selectionTracker.reset()
 
@@ -171,21 +171,25 @@ class SetlistsModel @Inject constructor(
 
         if (!isLongClick && selectionTracker.count == 0) {
             _pickedSetlist.value = item
-        } else {
-            item.isSelected = !item.isSelected
-
-            if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-                _setlists.value.forEach { it.hasCheckbox = true }
-            } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-                _setlists.value.forEach { it.hasCheckbox = false }
-            }
-
-            val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedSetlists.value = countPair
-            _selectedSetlistPosition.tryEmit(position)
+            return false
         }
 
-        return true
+        item.isSelected = !item.isSelected
+
+        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
+            _setlists.value.forEach { it.hasCheckbox = true }
+        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
+            _setlists.value.forEach {
+                it.hasCheckbox = false
+                it.isSelected = false
+            }
+        }
+
+        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
+        _numberOfSelectedSetlists.value = countPair
+        _selectedSetlistPosition.tryEmit(position)
+
+        return isLongClick || selectionTracker.count != 0
     }
 
     private suspend fun emitSetlists() = withContext(Dispatchers.Default) {

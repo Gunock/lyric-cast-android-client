@@ -31,8 +31,9 @@ class SetlistEditorModel @Inject constructor(
         const val TAG = "SetlistEditorModel"
     }
 
-    val songs: List<SetlistSongItem> get() = _songs
-    private var _songs: MutableList<SetlistSongItem> = mutableListOf()
+    private var _songs: MutableStateFlow<MutableList<SetlistSongItem>> =
+        MutableStateFlow(mutableListOf())
+    val songs: StateFlow<List<SetlistSongItem>> = _songs
 
     private var setlistNames: Set<String> = setOf()
 
@@ -42,15 +43,12 @@ class SetlistEditorModel @Inject constructor(
 
     private var editedSetlist: Setlist? = null
 
-    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> get() = _numberOfSelectedSongs
     private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(0, 0))
+    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> = _numberOfSelectedSongs
 
-    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
     private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-
-    val removedSongPositions: SharedFlow<List<Int>> get() = _removedSongPositions
-    private val _removedSongPositions: MutableSharedFlow<List<Int>> = MutableSharedFlow(replay = 1)
+    val selectedSongPosition: SharedFlow<Int> = _selectedSongPosition
 
     val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
@@ -71,11 +69,11 @@ class SetlistEditorModel @Inject constructor(
             SetlistSongItem(songsRepository.getSong(songId)!!, availableId++)
         }
 
-        _songs = setlistSongs.toMutableList()
+        _songs.value = setlistSongs.toMutableList()
     }
 
     fun loadAdhocSetlist(presentation: List<String>) {
-        _songs = presentation.map { songId ->
+        _songs.value = presentation.map { songId ->
             SetlistSongItem(songsRepository.getSong(songId)!!, availableId++)
         }.toMutableList()
     }
@@ -83,13 +81,14 @@ class SetlistEditorModel @Inject constructor(
     fun loadEditedSetlist(setlistId: String) {
         this.setlistId = setlistId
         editedSetlist = setlistsRepository.getSetlist(setlistId)!!.also { setlist ->
-            _songs = setlist.presentation.map { SetlistSongItem(it, availableId++) }.toMutableList()
+            _songs.value =
+                setlist.presentation.map { SetlistSongItem(it, availableId++) }.toMutableList()
             setlistName = setlist.name
         }
     }
 
     suspend fun saveSetlist() {
-        val presentation: Array<Song> = songs
+        val presentation: Array<Song> = _songs.value
             .map { it.song }
             .toTypedArray()
 
@@ -99,46 +98,37 @@ class SetlistEditorModel @Inject constructor(
     }
 
     fun resetSongSelection() {
-        _songs.forEach {
+        _songs.value.forEach {
             it.isSelected = false
             it.hasCheckbox = false
         }
         selectionTracker.reset()
+        if (_numberOfSelectedSongs.value != Pair(1, 0)) {
+            _numberOfSelectedSongs.value = Pair(1, 0)
+        }
     }
 
     fun moveSong(from: Int, to: Int) {
-        val item = _songs.removeAt(from)
-        _songs.add(to, item)
+        val item = _songs.value.removeAt(from)
+        _songs.value.add(to, item)
     }
 
     fun removeSelectedSongs() {
-        val removedItemPositions: MutableList<Int> = mutableListOf()
-        var itemPosition = -2
-        while (itemPosition != -1) {
-            itemPosition = deleteSelectedItem()
-            if (itemPosition >= 0) removedItemPositions.add(itemPosition)
-        }
-
-        _removedSongPositions.tryEmit(removedItemPositions)
+        _songs.value = _songs.value.filter { !it.isSelected }.toMutableList()
+        selectionTracker.reset()
     }
 
-    private fun deleteSelectedItem(): Int {
-        val selectedItemIndex = _songs.indexOfFirst { item -> item.isSelected }
-        if (selectedItemIndex >= 0) {
-            _songs.removeAt(selectedItemIndex)
-        }
+    fun duplicateSelectedSong() {
+        val songsAfterDuplicate = _songs.value.toMutableList()
 
-        return selectedItemIndex
-    }
-
-    fun duplicateSelectedSong(): Int {
-        val selectedItemIndex = _songs.indexOfFirst { item -> item.isSelected }
-        val selectedItem = _songs[selectedItemIndex].copy(id = availableId++)
+        val selectedItemIndex = songsAfterDuplicate.indexOfFirst { item -> item.isSelected }
+        val selectedItem = songsAfterDuplicate[selectedItemIndex].copy(id = availableId++)
 
         selectedItem.isSelected = false
 
-        _songs.add(selectedItemIndex + 1, selectedItem)
-        return selectedItemIndex + 1
+        songsAfterDuplicate.add(selectedItemIndex + 1, selectedItem)
+        _songs.value = songsAfterDuplicate
+        selectionTracker.reset()
     }
 
     fun validateSetlistName(name: String): NameValidationState {
@@ -165,20 +155,23 @@ class SetlistEditorModel @Inject constructor(
             return false
         }
 
-        val item: SetlistSongItem = _songs[position]
+        val item: SetlistSongItem = _songs.value[position]
         item.isSelected = !item.isSelected
 
         if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-            _songs.forEach { it.hasCheckbox = true }
+            _songs.value.forEach { it.hasCheckbox = true }
         } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-            _songs.forEach { it.hasCheckbox = false }
+            _songs.value.forEach {
+                it.hasCheckbox = false
+                it.isSelected = false
+            }
         }
 
         val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
         _numberOfSelectedSongs.value = countPair
         _selectedSongPosition.tryEmit(position)
 
-        return true
+        return isLongClick || selectionTracker.count != 0
     }
 
 }

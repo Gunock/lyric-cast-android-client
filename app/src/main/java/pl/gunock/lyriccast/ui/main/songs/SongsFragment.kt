@@ -13,6 +13,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -61,6 +63,8 @@ class SongsFragment : Fragment() {
 
     private val exportChooserResultLauncher = registerForActivityResult(this::exportSelectedSongs)
 
+    private var onBackPressedCallback: OnBackPressedCallback? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,13 +85,21 @@ class SongsFragment : Fragment() {
 
     override fun onDestroy() {
         actionMode?.finish()
-        viewModel.resetSongSelection()
+
         super.onDestroy()
+    }
+
+    override fun onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment: Boolean) {
+        if (!isPrimaryNavigationFragment) {
+            actionMode?.finish()
+        }
+
+        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment)
     }
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener {
-            viewModel.searchValues.songTitle.value = it
+            viewModel.searchValues.songTitle = it
         })
 
         binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -100,7 +112,7 @@ class SongsFragment : Fragment() {
             ItemSelectedSpinnerListener { _, _ ->
                 val selectedItem = binding.spnCategory.selectedItem as CategoryItem?
                 val categoryId: String? = selectedItem?.category?.id
-                viewModel.searchValues.categoryId.value = categoryId
+                viewModel.searchValues.categoryId = categoryId
             }
     }
 
@@ -127,13 +139,11 @@ class SongsFragment : Fragment() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.songs
-            .onEach { songItemsAdapter.submitCollection(it) }
-            .flowOn(Dispatchers.Main)
+            .onEach { songItemsAdapter.submitList(it) }
             .launchIn(lifecycleScope)
 
         viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it) }
-            .flowOn(Dispatchers.Default)
+            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
 
         viewModel.pickedSong
@@ -150,7 +160,7 @@ class SongsFragment : Fragment() {
     private fun onPickSong(item: SongItem?) {
         item ?: return
         viewModel.resetPickedSong()
-        viewModel.resetSongSelection()
+        resetSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
         intent.putExtra("songId", item.song.id)
@@ -161,7 +171,7 @@ class SongsFragment : Fragment() {
         val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
 
         if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount)
+            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
         }
 
         when (countAfter) {
@@ -189,8 +199,6 @@ class SongsFragment : Fragment() {
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("songId", selectedItem.song.id)
         startActivity(intent)
-
-        viewModel.resetSongSelection()
 
         return true
     }
@@ -231,7 +239,6 @@ class SongsFragment : Fragment() {
                         outputStream.close()
                     }
                     dialogFragment.dismiss()
-                    songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount)
                 }.flowOn(Dispatchers.Main)
                 .launchIn(dialogFragment.lifecycleScope)
         }
@@ -243,7 +250,6 @@ class SongsFragment : Fragment() {
         intent.putExtra("setlistSongs", setlistSongs)
         startActivity(intent)
 
-        viewModel.resetSongSelection()
         return true
     }
 
@@ -259,11 +265,24 @@ class SongsFragment : Fragment() {
         }
     }
 
+    private fun resetSelection() {
+        viewModel.resetSongSelection()
+        songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
+    }
+
     private inner class SongsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
             mode.title = ""
             actionMenu = menu
+
+            onBackPressedCallback =
+                requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
+                    resetSelection()
+                    onBackPressedCallback?.remove()
+                    onBackPressedCallback = null
+                }
+
             return true
         }
 
@@ -296,6 +315,10 @@ class SongsFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             actionMode = null
             actionMenu = null
+            resetSelection()
+
+            onBackPressedCallback?.remove()
+            onBackPressedCallback = null
         }
     }
 

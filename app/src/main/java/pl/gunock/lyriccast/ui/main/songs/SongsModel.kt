@@ -82,12 +82,12 @@ class SongsModel @Inject constructor(
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
-        searchValues.songTitle
+        searchValues.songTitleFlow
             .debounce(500)
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
 
-        searchValues.categoryId
+        searchValues.categoryIdFlow
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
     }
@@ -176,21 +176,25 @@ class SongsModel @Inject constructor(
 
         if (!isLongClick && selectionTracker.count == 0) {
             _pickedSong.value = item
-        } else {
-            item.isSelected = !item.isSelected
-
-            if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-                _songs.value.forEach { it.hasCheckbox = true }
-            } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-                _songs.value.forEach { it.hasCheckbox = false }
-            }
-
-            val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-            _numberOfSelectedSongs.value = countPair
-            _selectedSongPosition.tryEmit(position)
+            return false
         }
 
-        return true
+        item.isSelected = !item.isSelected
+
+        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
+            _songs.value.forEach { it.hasCheckbox = true }
+        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
+            _songs.value.forEach {
+                it.hasCheckbox = false
+                it.isSelected = false
+            }
+        }
+
+        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
+        _numberOfSelectedSongs.value = countPair
+        _selectedSongPosition.tryEmit(position)
+
+        return isLongClick || selectionTracker.count != 0
     }
 
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {
