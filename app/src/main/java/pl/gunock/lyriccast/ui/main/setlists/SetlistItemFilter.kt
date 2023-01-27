@@ -13,19 +13,23 @@ import pl.gunock.lyriccast.ui.shared.misc.ItemFilter
 
 class SetlistItemFilter : ItemFilter<SetlistItem, SetlistItemFilter.Values>() {
     class Values(
-        val setlistName: MutableStateFlow<String> = MutableStateFlow(""),
-    )
+        val setlistNameFlow: MutableStateFlow<String> = MutableStateFlow("")
+    ) {
+        var setlistName
+            get() = setlistNameFlow.value
+            set(value) {
+                setlistNameFlow.value = value
+            }
+    }
 
     override val values: Values = Values()
 
-    private val setlistName get() = values.setlistName.value
-
     override fun apply(items: Collection<SetlistItem>): Collection<SetlistItem> {
-        if (setlistName.isBlank()) {
+        if (values.setlistName.isBlank()) {
             return items
         }
 
-        val normalizedTitle = setlistName.trim().normalize()
+        val normalizedTitle = values.setlistName.trim().normalize()
         val filteredItems = items.filter { setlistItem ->
             setlistItem.normalizedName.contains(normalizedTitle, ignoreCase = true)
         }

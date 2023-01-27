@@ -157,7 +157,7 @@ class SetlistsFragment : Fragment() {
         binding.edSetlistNameFilter.addTextChangedListener(InputTextChangedListener { newText ->
             lifecycleScope.launch(Dispatchers.Default) {
                 viewModel.resetSetlistSelection()
-                viewModel.searchValues.setlistName.value = newText
+                viewModel.searchValues.setlistName = newText
             }
         })
 

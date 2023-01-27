@@ -79,7 +79,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener { newText ->
-            viewModel.searchValues.songTitle.value = newText
+            viewModel.searchValues.songTitle = newText
         })
 
         binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -90,11 +90,11 @@ class SetlistEditorSongsFragment : Fragment() {
 
         binding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
             val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
-            viewModel.searchValues.categoryId.value = categoryItem?.category?.id
+            viewModel.searchValues.categoryId = categoryItem?.category?.id
         }
 
         binding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.searchValues.isSelected.value = if (isChecked) true else null
+            viewModel.searchValues.isSelected = if (isChecked) true else null
         }
     }
 

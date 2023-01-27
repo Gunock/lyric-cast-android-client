@@ -12,30 +12,42 @@ import pl.gunock.lyriccast.domain.models.SongItem
 
 class SongItemFilter : ItemFilter<SongItem, SongItemFilter.Values>() {
     class Values(
-        val songTitle: MutableStateFlow<String> = MutableStateFlow(""),
-        val categoryId: MutableStateFlow<String?> = MutableStateFlow(null),
-        val isSelected: MutableStateFlow<Boolean?> = MutableStateFlow(null)
-    )
+        val songTitleFlow: MutableStateFlow<String> = MutableStateFlow(""),
+        val categoryIdFlow: MutableStateFlow<String?> = MutableStateFlow(null),
+        val isSelectedFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    ) {
+        var songTitle
+            get() = songTitleFlow.value
+            set(value) {
+                songTitleFlow.value = value
+            }
+        var categoryId
+            get() = categoryIdFlow.value
+            set(value) {
+                categoryIdFlow.value = value
+            }
+        var isSelected
+            get() = isSelectedFlow.value
+            set(value) {
+                isSelectedFlow.value = value
+            }
+    }
 
     override val values: Values = Values()
-
-    private val categoryId get() = values.categoryId.value
-    private val songTitle get() = values.songTitle.value
-    private val isSelected get() = values.isSelected.value
 
     override fun apply(items: Collection<SongItem>): Collection<SongItem> {
         val predicates: MutableList<(SongItem) -> Boolean> = mutableListOf()
 
-        if (isSelected != null) {
+        if (values.isSelected != null) {
             predicates.add { songItem -> songItem.isSelected }
         }
 
-        if (!categoryId.isNullOrBlank()) {
-            predicates.add { songItem -> songItem.song.category?.id == categoryId }
+        if (!values.categoryId.isNullOrBlank()) {
+            predicates.add { songItem -> songItem.song.category?.id == values.categoryId }
         }
 
-        if (songTitle.isNotBlank()) {
-            val normalizedTitle = songTitle.trim().normalize()
+        if (values.songTitle.isNotBlank()) {
+            val normalizedTitle = values.songTitle.trim().normalize()
             predicates.add { item ->
                 item.normalizedTitle.contains(normalizedTitle, ignoreCase = true)
             }

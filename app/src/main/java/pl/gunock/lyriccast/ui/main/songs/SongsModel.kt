@@ -82,12 +82,12 @@ class SongsModel @Inject constructor(
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
-        searchValues.songTitle
+        searchValues.songTitleFlow
             .debounce(500)
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
 
-        searchValues.categoryId
+        searchValues.categoryIdFlow
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
     }

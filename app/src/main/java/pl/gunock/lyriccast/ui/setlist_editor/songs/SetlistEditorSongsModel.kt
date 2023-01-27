@@ -73,16 +73,16 @@ class SetlistEditorSongsModel @Inject constructor(
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
-        searchValues.songTitle
+        searchValues.songTitleFlow
             .debounce(500)
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
 
-        searchValues.categoryId
+        searchValues.categoryIdFlow
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
 
-        searchValues.isSelected
+        searchValues.isSelectedFlow
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
     }

@@ -77,7 +77,7 @@ class SetlistsModel @Inject constructor(
             }.flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
 
-        searchValues.setlistName
+        searchValues.setlistNameFlow
             .debounce(500)
             .onEach { emitSetlists() }
             .launchIn(viewModelScope)

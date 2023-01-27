@@ -87,7 +87,7 @@ class SongsFragment : Fragment() {
 
     private fun setupListeners() {
         binding.edSongTitleFilter.addTextChangedListener(InputTextChangedListener {
-            viewModel.searchValues.songTitle.value = it
+            viewModel.searchValues.songTitle = it
         })
 
         binding.edSongTitleFilter.setOnFocusChangeListener { view, hasFocus ->
@@ -100,7 +100,7 @@ class SongsFragment : Fragment() {
             ItemSelectedSpinnerListener { _, _ ->
                 val selectedItem = binding.spnCategory.selectedItem as CategoryItem?
                 val categoryId: String? = selectedItem?.category?.id
-                viewModel.searchValues.categoryId.value = categoryId
+                viewModel.searchValues.categoryId = categoryId
             }
     }
 
