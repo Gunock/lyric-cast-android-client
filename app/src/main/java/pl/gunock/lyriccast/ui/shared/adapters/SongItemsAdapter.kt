@@ -17,24 +17,17 @@ import androidx.recyclerview.widget.ListAdapter
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import pl.gunock.lyriccast.ui.shared.selection.SelectionViewHolder
 
 class SongItemsAdapter(
     context: Context,
-    private val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : ListAdapter<SongItem, SongItemsAdapter.ViewHolder>(DiffCallback()) {
 
     private companion object {
         const val TAG = "SongItemsAdapter"
     }
 
-    private class DiffCallback : DiffUtil.ItemCallback<SongItem>() {
-        override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
-            oldItem.song.id == newItem.song.id
-
-        override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
-            oldItem == newItem
-    }
+    var onItemClickListener: ((SongItem?) -> Unit)? = null
 
     private val defaultItemCardColor = context.getColor(R.color.window_background_2)
     private val withCategoryTextColor = context.getColor(R.color.text_item_with_category)
@@ -53,7 +46,18 @@ class SongItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(position)
+        val item = try {
+            currentList[position]
+        } catch (e: IndexOutOfBoundsException) {
+            Log.w(TAG, e)
+            return
+        }
+
+        onItemClickListener?.let {
+            holder.itemView.setOnClickListener { onItemClickListener?.invoke(holder.item) }
+        }
+
+        holder.bind(item)
     }
 
     override fun getItemId(position: Int): Long {
@@ -66,21 +70,12 @@ class SongItemsAdapter(
 
     inner class ViewHolder(
         private val binding: ItemSongBinding
-    ) : BaseViewHolder(binding.root, selectionTracker) {
+    ) : SelectionViewHolder<SongItem>(binding.root) {
         init {
-            binding.tvSongCategory.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
+            binding.tvSongCategory.setTextColor(withCategoryTextColor)
         }
 
-        private var oldItem: SongItem? = null
-
-        override fun setupViewHolder(position: Int) {
-            val item = try {
-                currentList[position]
-            } catch (e: IndexOutOfBoundsException) {
-                Log.w(TAG, e)
-                return
-            }
-
+        override fun bindAction(item: SongItem) {
             if (item.hasCheckbox) {
                 binding.chkItemSong.visibility = View.VISIBLE
                 binding.chkItemSong.isChecked = item.isSelected
@@ -89,7 +84,7 @@ class SongItemsAdapter(
                 binding.chkItemSong.isChecked = false
             }
 
-            if (item.song != oldItem?.song) {
+            if (item.song != this.item?.song) {
                 binding.tvItemSongTitle.text = item.song.title
 
                 if (item.song.category != null) {
@@ -109,8 +104,14 @@ class SongItemsAdapter(
                     binding.root.setCardBackgroundColor(this@SongItemsAdapter.defaultItemCardColor)
                 }
             }
-
-            oldItem = item
         }
+    }
+
+    private class DiffCallback : DiffUtil.ItemCallback<SongItem>() {
+        override fun areItemsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
+            oldItem.song.id == newItem.song.id
+
+        override fun areContentsTheSame(oldItem: SongItem, newItem: SongItem): Boolean =
+            oldItem == newItem
     }
 }

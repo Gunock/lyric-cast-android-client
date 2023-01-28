@@ -15,26 +15,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import pl.gunock.lyriccast.databinding.ItemSetlistBinding
 import pl.gunock.lyriccast.domain.models.SetlistItem
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
+import pl.gunock.lyriccast.ui.shared.selection.SelectionViewHolder
 
 class SetlistItemsAdapter(
     context: Context,
-    val selectionTracker: SelectionTracker<BaseViewHolder>?
 ) : ListAdapter<SetlistItem, SetlistItemsAdapter.ViewHolder>(DiffCallback()) {
 
     companion object {
         const val TAG = "SetlistItemsAdapter"
     }
 
-    private class DiffCallback : DiffUtil.ItemCallback<SetlistItem>() {
-        override fun areItemsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
-            oldItem.setlist.id == newItem.setlist.id
-
-        override fun areContentsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
-            oldItem == newItem
-
-    }
+    var onItemClickListener: ((SetlistItem?) -> Unit)? = null
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -48,7 +39,18 @@ class SetlistItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(position)
+        val item = try {
+            currentList[position]
+        } catch (e: IndexOutOfBoundsException) {
+            Log.w(TAG, e)
+            return
+        }
+
+        onItemClickListener?.let {
+            holder.itemView.setOnClickListener { onItemClickListener?.invoke(holder.item) }
+        }
+
+        holder.bind(item)
     }
 
     override fun getItemId(position: Int): Long {
@@ -60,18 +62,8 @@ class SetlistItemsAdapter(
 
     inner class ViewHolder(
         private val binding: ItemSetlistBinding
-    ) : BaseViewHolder(binding.root, selectionTracker) {
-
-        private var oldItem: SetlistItem? = null
-
-        override fun setupViewHolder(position: Int) {
-            val item = try {
-                currentList[position]
-            } catch (e: IndexOutOfBoundsException) {
-                Log.w(TAG, e)
-                return
-            }
-
+    ) : SelectionViewHolder<SetlistItem>(binding.root) {
+        override fun bindAction(item: SetlistItem) {
             if (item.hasCheckbox) {
                 binding.chkItemSetlist.visibility = View.VISIBLE
                 binding.chkItemSetlist.isChecked = item.isSelected
@@ -80,12 +72,19 @@ class SetlistItemsAdapter(
                 binding.chkItemSetlist.isChecked = false
             }
 
-            if (item.setlist != oldItem?.setlist) {
+            if (item.setlist != this.item?.setlist) {
                 binding.tvItemSetlistName.text = item.setlist.name
             }
-
-            oldItem = item
         }
+    }
+
+    private class DiffCallback : DiffUtil.ItemCallback<SetlistItem>() {
+        override fun areItemsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
+            oldItem.setlist.id == newItem.setlist.id
+
+        override fun areContentsTheSame(oldItem: SetlistItem, newItem: SetlistItem): Boolean =
+            oldItem == newItem
+
     }
 
 }

@@ -118,6 +118,7 @@ dependencies {
     implementation "androidx.cardview:cardview:$cardViewVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.recyclerview:recyclerview-selection:$recyclerViewSelectionVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 

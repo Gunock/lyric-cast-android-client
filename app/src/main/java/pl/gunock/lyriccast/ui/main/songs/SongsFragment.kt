@@ -21,6 +21,9 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +45,8 @@ import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
+import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
+import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
 import pl.gunock.lyriccast.ui.song_controls.SongControlsActivity
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 
@@ -64,6 +69,8 @@ class SongsFragment : Fragment() {
     private val exportChooserResultLauncher = registerForActivityResult(this::exportSelectedSongs)
 
     private var onBackPressedCallback: OnBackPressedCallback? = null
+
+    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,67 +136,67 @@ class SongsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        songItemsAdapter = SongItemsAdapter(
-            binding.rcvSongs.context,
-            selectionTracker = viewModel.selectionTracker
-        )
+        songItemsAdapter = SongItemsAdapter(binding.rcvSongs.context)
+        songItemsAdapter.onItemClickListener = this::onPickSong
 
         binding.rcvSongs.setHasFixedSize(true)
         binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvSongs.adapter = songItemsAdapter
 
+        tracker = SelectionTracker.Builder(
+            "selection",
+            binding.rcvSongs,
+            MappedItemKeyProvider(binding.rcvSongs),
+            SimpleItemDetailsLookup(binding.rcvSongs),
+            StorageStrategy.createLongStorage()
+        ).withSelectionPredicate(
+            SelectionPredicates.createSelectAnything()
+        ).build()
+
+        tracker.addObserver(
+            object : SelectionTracker.SelectionObserver<Long>() {
+                override fun onItemStateChanged(key: Long, selected: Boolean) {
+                    super.onItemStateChanged(key, selected)
+                    viewModel.selectSong(key, selected)
+                    onSelectSong()
+                }
+            }
+        )
+
         viewModel.songs
             .onEach { songItemsAdapter.submitList(it) }
-            .launchIn(lifecycleScope)
-
-        viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
-            .launchIn(lifecycleScope)
-
-        viewModel.pickedSong
-            .onEach(this::onPickSong)
-            .flowOn(Dispatchers.Default)
-            .launchIn(lifecycleScope)
-
-        viewModel.numberOfSelectedSongs
-            .onEach(this::onSelectSong)
-            .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
     }
 
     private fun onPickSong(item: SongItem?) {
+        if (!tracker.selection.isEmpty) {
+            return
+        }
+
         item ?: return
-        viewModel.resetPickedSong()
-        resetSelection()
 
         val intent = Intent(requireContext(), SongControlsActivity::class.java)
         intent.putExtra("songId", item.song.id)
         startActivity(intent)
     }
 
-    private fun onSelectSong(numberOfSelectedSongs: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
-
-        if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
-        }
-
-        when (countAfter) {
+    private fun onSelectSong() {
+        when (tracker.selection.size()) {
             0 -> {
                 actionMode?.finish()
-                return false
             }
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
                         .startSupportActionMode(actionModeCallback)
+                    viewModel.showSelectionCheckboxes()
+                    notifyAllItemsChanged()
                 }
 
                 showMenuActions()
             }
             2 -> showMenuActions(showEdit = false)
         }
-        return true
     }
 
     private fun editSelectedSong(): Boolean {
@@ -228,7 +235,7 @@ class SongsFragment : Fragment() {
                 )
 
             val outputStream = requireActivity().contentResolver.openOutputStream(uri)!!
-            val exportMessageFlow = viewModel.exportSelectedSongs(
+            val exportMessageFlow = viewModel.exportSongs(
                 requireActivity().cacheDir.canonicalPath,
                 outputStream
             )
@@ -244,7 +251,7 @@ class SongsFragment : Fragment() {
         }
     }
 
-    private fun addSetlist(): Boolean {
+    private fun createAdhocSetlist(): Boolean {
         val setlistSongs = viewModel.getSelectedSongIds().toTypedArray()
         val intent = Intent(context, SetlistEditorActivity::class.java)
         intent.putExtra("setlistSongs", setlistSongs)
@@ -266,7 +273,12 @@ class SongsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        viewModel.resetSongSelection()
+        tracker.clearSelection()
+        viewModel.hideSelectionCheckboxes()
+        notifyAllItemsChanged()
+    }
+
+    private fun notifyAllItemsChanged() {
         songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
     }
 
@@ -300,7 +312,7 @@ class SongsFragment : Fragment() {
                     }
                     R.id.action_menu_export_selected -> startExport()
                     R.id.action_menu_edit -> editSelectedSong()
-                    R.id.action_menu_add_setlist -> addSetlist()
+                    R.id.action_menu_add_setlist -> createAdhocSetlist()
                     else -> false
                 }
 

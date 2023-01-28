@@ -19,12 +19,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -32,8 +34,10 @@ import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSetlistEditorBinding
 import pl.gunock.lyriccast.shared.enums.NameValidationState
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
 import pl.gunock.lyriccast.ui.shared.listeners.TouchAdapterItemListener
+import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
+import pl.gunock.lyriccast.ui.shared.selection.SelectionViewHolder
+import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
 
 @AndroidEntryPoint
 class SetlistEditorFragment : Fragment() {
@@ -46,7 +50,7 @@ class SetlistEditorFragment : Fragment() {
         SetlistNameTextWatcher(resources, binding, viewModel)
     }
 
-    private lateinit var songItemsAdapter: SetlistSongItemsAdapter
+    private lateinit var setlistSongItemsAdapter: SetlistSongItemsAdapter
 
 
     private var toast: Toast? = null
@@ -58,6 +62,8 @@ class SetlistEditorFragment : Fragment() {
     private val itemTouchHelper by lazy { ItemTouchHelper(SetlistItemTouchCallback()) }
 
     private var onBackPressedCallback: OnBackPressedCallback? = null
+
+    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,13 +87,8 @@ class SetlistEditorFragment : Fragment() {
         setupListeners()
         setupRecyclerView()
 
-        viewModel.numberOfSelectedSongs
-            .onEach(this::onSelectSong)
-            .flowOn(Dispatchers.Main)
-            .launchIn(lifecycleScope)
-
         viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
+            .onEach { setlistSongItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -151,7 +152,7 @@ class SetlistEditorFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val onHandleTouchListener =
-            TouchAdapterItemListener { holder: BaseViewHolder, view, event ->
+            TouchAdapterItemListener { holder: SelectionViewHolder<SetlistSongItem>, view, event ->
                 view.requestFocus()
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                     itemTouchHelper.startDrag(holder)
@@ -160,20 +161,40 @@ class SetlistEditorFragment : Fragment() {
                 return@TouchAdapterItemListener true
             }
 
-        songItemsAdapter = SetlistSongItemsAdapter(
+        setlistSongItemsAdapter = SetlistSongItemsAdapter(
             binding.rcvSongs.context,
-            selectionTracker = viewModel.selectionTracker,
             onHandleTouchListener = onHandleTouchListener
         )
 
         binding.rcvSongs.setHasFixedSize(true)
         binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
-        binding.rcvSongs.adapter = songItemsAdapter
+        binding.rcvSongs.adapter = setlistSongItemsAdapter
+
+        tracker = SelectionTracker.Builder(
+            "selection",
+            binding.rcvSongs,
+            MappedItemKeyProvider(binding.rcvSongs),
+            SimpleItemDetailsLookup(binding.rcvSongs),
+            StorageStrategy.createLongStorage()
+        ).withSelectionPredicate(
+            SelectionPredicates.createSelectAnything()
+        ).build()
+
+        tracker.addObserver(
+            object : SelectionTracker.SelectionObserver<Long>() {
+                override fun onItemStateChanged(key: Long, selected: Boolean) {
+                    super.onItemStateChanged(key, selected)
+                    if (viewModel.selectSong(key, selected)) {
+                        onSelectSong()
+                    }
+                }
+            }
+        )
 
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
 
         viewModel.songs
-            .onEach { songItemsAdapter.submitList(it) }
+            .onEach { setlistSongItemsAdapter.submitList(it) }
             .launchIn(lifecycleScope)
     }
 
@@ -205,29 +226,23 @@ class SetlistEditorFragment : Fragment() {
         }
     }
 
-    private fun onSelectSong(numberOfSelectedSongs: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedSongs
-
-        if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
-        }
-
-        when (countAfter) {
+    private fun onSelectSong() {
+        when (tracker.selection.size()) {
             0 -> {
                 actionMode?.finish()
-                return false
             }
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
                         .startSupportActionMode(actionModeCallback)
+                    viewModel.showSelectionCheckboxes()
+                    notifyAllItemsChanged()
                 }
 
                 showMenuActions()
             }
             2 -> showMenuActions(showDuplicate = false)
         }
-        return true
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {
@@ -249,8 +264,13 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        viewModel.resetSongSelection()
-        songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
+        tracker.clearSelection()
+        viewModel.hideSelectionCheckboxes()
+        notifyAllItemsChanged()
+    }
+
+    private fun notifyAllItemsChanged() {
+        setlistSongItemsAdapter.notifyItemRangeChanged(0, setlistSongItemsAdapter.itemCount, true)
     }
 
     private inner class SetlistEditorActionModeCallback : ActionMode.Callback {
@@ -315,7 +335,7 @@ class SetlistEditorFragment : Fragment() {
             val to = target.absoluteAdapterPosition
 
             viewModel.moveSong(from, to)
-            songItemsAdapter.notifyItemMoved(from, to)
+            setlistSongItemsAdapter.notifyItemMoved(from, to)
 
             return true
         }

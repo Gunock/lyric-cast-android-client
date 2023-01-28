@@ -22,8 +22,6 @@ import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.SongItemFilter
 import java.io.File
 import java.io.OutputStream
@@ -45,20 +43,8 @@ class SongsModel @Inject constructor(
 
     private var allSongs: List<SongItem> = listOf()
 
-    private val _pickedSong: MutableStateFlow<SongItem?> = MutableStateFlow(null)
-    val pickedSong: StateFlow<SongItem?> = _pickedSong
-
-    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> get() = _numberOfSelectedSongs
-    private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(0, 0))
-
-    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-    val selectedSongPosition: SharedFlow<Int> = _selectedSongPosition
-
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
     val categories: StateFlow<List<CategoryItem>> = _categories
-
-    val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
     val searchValues get() = itemFilter.values
 
@@ -99,34 +85,28 @@ class SongsModel @Inject constructor(
     fun getSelectedSongIds(): List<String> {
         return _songs.value
             .filter { it.isSelected }
-            .map { item -> item.song.id }
+            .map { it.song.id }
     }
 
     suspend fun deleteSelectedSongs() {
-        val selectedSongs = allSongs.filter { item -> item.isSelected }
+        val selectedSongs = allSongs.filter { it.isSelected }
             .map { item -> item.song.id }
 
         songsRepository.deleteSongs(selectedSongs)
-        _numberOfSelectedSongs.value = Pair(selectedSongs.size, 0)
-        selectionTracker.reset()
     }
 
-    fun resetSongSelection() {
+    fun hideSelectionCheckboxes() {
         _songs.value.forEach {
-            it.isSelected = false
             it.hasCheckbox = false
-        }
-        selectionTracker.reset()
-        if (_numberOfSelectedSongs.value != Pair(1, 0)) {
-            _numberOfSelectedSongs.value = Pair(1, 0)
+            it.isSelected = false
         }
     }
 
-    fun resetPickedSong() {
-        _pickedSong.value = null
+    fun showSelectionCheckboxes() {
+        _songs.value.forEach { it.hasCheckbox = true }
     }
 
-    suspend fun exportSelectedSongs(
+    suspend fun exportSongs(
         cacheDir: String,
         outputStream: OutputStream
     ): Flow<Int> = flow {
@@ -163,38 +143,11 @@ class SongsModel @Inject constructor(
 
         emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()
-        resetSongSelection()
     }.flowOn(Dispatchers.Default)
 
-    private fun onSongSelection(
-        @Suppress("UNUSED_PARAMETER")
-        holder: BaseViewHolder,
-        position: Int,
-        isLongClick: Boolean
-    ): Boolean {
-        val item = _songs.value[position]
-
-        if (!isLongClick && selectionTracker.count == 0) {
-            _pickedSong.value = item
-            return false
-        }
-
-        item.isSelected = !item.isSelected
-
-        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-            _songs.value.forEach { it.hasCheckbox = true }
-        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-            _songs.value.forEach {
-                it.hasCheckbox = false
-                it.isSelected = false
-            }
-        }
-
-        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-        _numberOfSelectedSongs.value = countPair
-        _selectedSongPosition.tryEmit(position)
-
-        return isLongClick || selectionTracker.count != 0
+    fun selectSong(songId: Long, selected: Boolean) {
+        _songs.value
+            .first { it.song.idLong == songId }.isSelected = selected
     }
 
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {

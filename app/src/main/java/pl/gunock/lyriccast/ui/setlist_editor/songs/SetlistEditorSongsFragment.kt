@@ -109,10 +109,13 @@ class SetlistEditorSongsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        songItemsAdapter = SongItemsAdapter(
-            binding.rcvSongs.context,
-            selectionTracker = viewModel.selectionTracker
-        )
+        songItemsAdapter = SongItemsAdapter(binding.rcvSongs.context)
+        songItemsAdapter.onItemClickListener = {
+            if (it != null) {
+                val position = viewModel.selectSong(it)
+                songItemsAdapter.notifyItemChanged(position, true)
+            }
+        }
 
         binding.rcvSongs.setHasFixedSize(true)
         binding.rcvSongs.layoutManager = LinearLayoutManager(requireContext())
@@ -120,10 +123,6 @@ class SetlistEditorSongsFragment : Fragment() {
 
         viewModel.songs
             .onEach { songItemsAdapter.submitList(it) }
-            .launchIn(lifecycleScope)
-
-        viewModel.selectedSongPosition
-            .onEach { songItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
