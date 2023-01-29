@@ -331,8 +331,9 @@ class SongsFragment : Fragment() {
     private inner class SongSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
         override fun onItemStateChanged(key: Long, selected: Boolean) {
             super.onItemStateChanged(key, selected)
-            viewModel.selectSong(key, selected)
-            onSelectSong()
+            if (viewModel.selectSong(key, selected)) {
+                onSelectSong()
+            }
         }
     }
 }

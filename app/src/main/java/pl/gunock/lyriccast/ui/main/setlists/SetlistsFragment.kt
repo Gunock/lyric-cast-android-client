@@ -311,8 +311,9 @@ class SetlistsFragment : Fragment() {
     private inner class SetlistSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
         override fun onItemStateChanged(key: Long, selected: Boolean) {
             super.onItemStateChanged(key, selected)
-            viewModel.selectSetlist(key, selected)
-            onSelectSetlist()
+            if (viewModel.selectSetlist(key, selected)) {
+                onSelectSetlist()
+            }
         }
     }
 }

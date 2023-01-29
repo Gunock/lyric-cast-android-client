@@ -134,9 +134,12 @@ class SetlistsModel @Inject constructor(
         hideSelectionCheckboxes()
     }.flowOn(Dispatchers.Default)
 
-    fun selectSetlist(setlistId: Long, selected: Boolean) {
-        _setlists.value
-            .first { it.setlist.idLong == setlistId }.isSelected = selected
+    fun selectSetlist(setlistId: Long, selected: Boolean): Boolean {
+        val setlist = _setlists.value
+            .firstOrNull { it.setlist.idLong == setlistId } ?: return false
+
+        setlist.isSelected = selected
+        return true
     }
 
     private suspend fun emitSetlists() = withContext(Dispatchers.Default) {

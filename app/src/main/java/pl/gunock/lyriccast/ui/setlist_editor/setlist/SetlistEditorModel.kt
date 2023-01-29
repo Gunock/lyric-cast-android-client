@@ -133,14 +133,10 @@ class SetlistEditorModel @Inject constructor(
     }
 
     fun selectSong(songId: Long, selected: Boolean): Boolean {
-        val item = _songs.value.firstOrNull { it.id == songId }
-
-        if (item == null || item.isSelected == selected) {
-            return false
-        }
+        val item = _songs.value
+            .firstOrNull { it.id == songId } ?: return false
 
         item.isSelected = selected
-
         return true
     }
 

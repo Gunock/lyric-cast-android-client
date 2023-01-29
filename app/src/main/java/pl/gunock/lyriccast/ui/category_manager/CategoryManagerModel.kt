@@ -50,9 +50,12 @@ class CategoryManagerModel @Inject constructor(
         _categories.value.forEach { it.hasCheckbox = true }
     }
 
-    fun selectCategory(categoryId: Long, selected: Boolean) {
-        _categories.value
-            .first { it.category.idLong == categoryId }.isSelected = selected
+    fun selectCategory(categoryId: Long, selected: Boolean): Boolean {
+        val category = _categories.value
+            .firstOrNull { it.category.idLong == categoryId } ?: return false
+
+        category.isSelected = selected
+        return true
     }
 
 }

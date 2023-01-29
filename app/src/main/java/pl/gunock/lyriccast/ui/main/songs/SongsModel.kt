@@ -145,9 +145,12 @@ class SongsModel @Inject constructor(
         exportDir.deleteRecursively()
     }.flowOn(Dispatchers.Default)
 
-    fun selectSong(songId: Long, selected: Boolean) {
-        _songs.value
-            .first { it.song.idLong == songId }.isSelected = selected
+    fun selectSong(songId: Long, selected: Boolean): Boolean {
+        val song = _songs.value
+            .firstOrNull { it.song.idLong == songId } ?: return false
+
+        song.isSelected = selected
+        return true
     }
 
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {
