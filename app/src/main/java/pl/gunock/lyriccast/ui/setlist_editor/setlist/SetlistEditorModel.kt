@@ -41,9 +41,6 @@ class SetlistEditorModel @Inject constructor(
 
     private var editedSetlist: Setlist? = null
 
-    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-    val selectedSongPosition: SharedFlow<Int> = _selectedSongPosition
-
     private var availableId: Long = 0L
 
     init {

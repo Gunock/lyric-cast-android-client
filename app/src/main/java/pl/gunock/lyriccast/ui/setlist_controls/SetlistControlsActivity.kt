@@ -31,6 +31,7 @@ import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.listeners.LongClickAdapterItemListener
 
+// TODO: Check if AndroidX SelectionTracker can be used
 @AndroidEntryPoint
 class SetlistControlsActivity : AppCompatActivity() {
 

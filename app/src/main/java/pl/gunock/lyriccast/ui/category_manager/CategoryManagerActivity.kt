@@ -93,15 +93,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             SelectionPredicates.createSelectAnything()
         ).build()
 
-        tracker.addObserver(
-            object : SelectionTracker.SelectionObserver<Long>() {
-                override fun onItemStateChanged(key: Long, selected: Boolean) {
-                    super.onItemStateChanged(key, selected)
-                    viewModel.selectCategory(key, selected)
-                    onSelectCategory()
-                }
-            }
-        )
+        tracker.addObserver(CategorySelectionObserver())
 
         viewModel.categories
             .onEach { categoryItemsAdapter.submitList(it) }
@@ -218,4 +210,12 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
     }
 
+
+    private inner class CategorySelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            viewModel.selectCategory(key, selected)
+            onSelectCategory()
+        }
+    }
 }

@@ -19,8 +19,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.SelectionTracker.SelectionPredicate
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,6 +65,8 @@ class SetlistEditorFragment : Fragment() {
 
     private lateinit var tracker: SelectionTracker<Long>
 
+    private var selectionDisabled: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -86,10 +88,6 @@ class SetlistEditorFragment : Fragment() {
         loadSetlist()
         setupListeners()
         setupRecyclerView()
-
-        viewModel.selectedSongPosition
-            .onEach { setlistSongItemsAdapter.notifyItemChanged(it, true) }
-            .launchIn(lifecycleScope)
     }
 
     private fun loadSetlist() {
@@ -156,6 +154,7 @@ class SetlistEditorFragment : Fragment() {
                 view.requestFocus()
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                     itemTouchHelper.startDrag(holder)
+                    selectionDisabled = true
                 }
 
                 return@TouchAdapterItemListener true
@@ -177,19 +176,10 @@ class SetlistEditorFragment : Fragment() {
             SimpleItemDetailsLookup(binding.rcvSongs),
             StorageStrategy.createLongStorage()
         ).withSelectionPredicate(
-            SelectionPredicates.createSelectAnything()
+            SetlistSongSelectionPredicate()
         ).build()
 
-        tracker.addObserver(
-            object : SelectionTracker.SelectionObserver<Long>() {
-                override fun onItemStateChanged(key: Long, selected: Boolean) {
-                    super.onItemStateChanged(key, selected)
-                    if (viewModel.selectSong(key, selected)) {
-                        onSelectSong()
-                    }
-                }
-            }
-        )
+        tracker.addObserver(SetlistSelectionObserver())
 
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
 
@@ -273,6 +263,7 @@ class SetlistEditorFragment : Fragment() {
         setlistSongItemsAdapter.notifyItemRangeChanged(0, setlistSongItemsAdapter.itemCount, true)
     }
 
+
     private inner class SetlistEditorActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_setlist_editor, menu)
@@ -319,6 +310,7 @@ class SetlistEditorFragment : Fragment() {
 
     }
 
+
     private inner class SetlistItemTouchCallback :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
 
@@ -341,5 +333,35 @@ class SetlistEditorFragment : Fragment() {
         }
 
         override fun onSwiped(holder: RecyclerView.ViewHolder, direction: Int) {}
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            selectionDisabled = false
+        }
+    }
+
+
+    private inner class SetlistSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            if (viewModel.selectSong(key, selected)) {
+                onSelectSong()
+            }
+        }
+    }
+
+
+    private inner class SetlistSongSelectionPredicate : SelectionPredicate<Long>() {
+        override fun canSetStateForKey(key: Long, nextState: Boolean): Boolean {
+            return !selectionDisabled
+        }
+
+        override fun canSetStateAtPosition(position: Int, nextState: Boolean): Boolean {
+            return !selectionDisabled
+        }
+
+        override fun canSelectMultiple(): Boolean {
+            return true
+        }
     }
 }

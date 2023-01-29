@@ -158,15 +158,7 @@ class SetlistsFragment : Fragment() {
             SelectionPredicates.createSelectAnything()
         ).build()
 
-        tracker.addObserver(
-            object : SelectionTracker.SelectionObserver<Long>() {
-                override fun onItemStateChanged(key: Long, selected: Boolean) {
-                    super.onItemStateChanged(key, selected)
-                    viewModel.selectSetlist(key, selected)
-                    onSelectSetlist()
-                }
-            }
-        )
+        tracker.addObserver(SetlistSelectionObserver())
 
         viewModel.setlists
             .onEach { setlistItemsAdapter.submitList(it) }
@@ -262,6 +254,7 @@ class SetlistsFragment : Fragment() {
         setlistItemsAdapter.notifyItemRangeChanged(0, setlistItemsAdapter.itemCount, true)
     }
 
+
     private inner class SetlistsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
@@ -314,4 +307,12 @@ class SetlistsFragment : Fragment() {
         }
     }
 
+
+    private inner class SetlistSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            viewModel.selectSetlist(key, selected)
+            onSelectSetlist()
+        }
+    }
 }

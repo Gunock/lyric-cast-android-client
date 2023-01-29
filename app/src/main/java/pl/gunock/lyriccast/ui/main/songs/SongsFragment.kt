@@ -153,15 +153,7 @@ class SongsFragment : Fragment() {
             SelectionPredicates.createSelectAnything()
         ).build()
 
-        tracker.addObserver(
-            object : SelectionTracker.SelectionObserver<Long>() {
-                override fun onItemStateChanged(key: Long, selected: Boolean) {
-                    super.onItemStateChanged(key, selected)
-                    viewModel.selectSong(key, selected)
-                    onSelectSong()
-                }
-            }
-        )
+        tracker.addObserver(SongSelectionObserver())
 
         viewModel.songs
             .onEach { songItemsAdapter.submitList(it) }
@@ -282,6 +274,7 @@ class SongsFragment : Fragment() {
         songItemsAdapter.notifyItemRangeChanged(0, songItemsAdapter.itemCount, true)
     }
 
+
     private inner class SongsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.action_menu_main, menu)
@@ -334,4 +327,12 @@ class SongsFragment : Fragment() {
         }
     }
 
+
+    private inner class SongSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            viewModel.selectSong(key, selected)
+            onSelectSong()
+        }
+    }
 }
