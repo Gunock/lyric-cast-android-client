@@ -17,8 +17,6 @@ import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import pl.gunock.lyriccast.ui.shared.misc.SongItemFilter
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
@@ -39,15 +37,10 @@ class SetlistEditorSongsModel @Inject constructor(
 
     private var selectedSongs: MutableSet<SongItem> = mutableSetOf()
 
-    val selectedSongPosition: SharedFlow<Int> get() = _selectedSongPosition
-    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-
     var setlistSongIds: List<String> = listOf()
 
     val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
-
-    val selectionTracker = SelectionTracker(this::onSongSelection)
 
     val searchValues get() = itemFilter.values
 
@@ -111,17 +104,9 @@ class SetlistEditorSongsModel @Inject constructor(
         return newPresentation + addedSongIds
     }
 
-    private fun onSongSelection(
-        @Suppress("UNUSED_PARAMETER")
-        holder: BaseViewHolder,
-        position: Int,
-        @Suppress("UNUSED_PARAMETER")
-        isLongClick: Boolean
-    ): Boolean {
-        val item: SongItem = _songs.value[position]
-        item.isSelected = !item.isSelected
-        _selectedSongPosition.tryEmit(position)
-        return true
+    fun selectSong(songItem: SongItem): Int {
+        songItem.isSelected = !songItem.isSelected
+        return _songs.value.indexOf(songItem)
     }
 
     private fun updateSelectedSongs() {

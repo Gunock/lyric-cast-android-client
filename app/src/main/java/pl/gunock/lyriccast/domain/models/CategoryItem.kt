@@ -9,11 +9,11 @@ package pl.gunock.lyriccast.domain.models
 import pl.gunock.lyriccast.datamodel.models.Category
 
 data class CategoryItem(
-    val category: Category
+    val category: Category,
+    var hasCheckbox: Boolean = false,
+    var isSelected: Boolean = false
 ) : Comparable<CategoryItem> {
 
-    var isSelected: Boolean = false
-    var hasCheckbox: Boolean = false
 
     override fun compareTo(other: CategoryItem): Int {
         return category.name.compareTo(other.category.name)

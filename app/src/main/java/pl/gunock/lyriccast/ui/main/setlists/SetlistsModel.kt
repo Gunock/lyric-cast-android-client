@@ -21,8 +21,6 @@ import pl.gunock.lyriccast.datamodel.models.DatabaseTransferData
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.domain.models.SetlistItem
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import java.io.File
 import java.io.OutputStream
 import javax.inject.Inject
@@ -42,25 +40,7 @@ class SetlistsModel @Inject constructor(
 
     private val _setlists: MutableStateFlow<List<SetlistItem>> = MutableStateFlow(listOf())
 
-    val pickedSetlist: StateFlow<SetlistItem?>
-        get() = _pickedSetlist
-
-    private val _pickedSetlist: MutableStateFlow<SetlistItem?> = MutableStateFlow(null)
-
-
-    val numberOfSelectedSetlists: StateFlow<Pair<Int, Int>>
-        get() = _numberOfSelectedSetlists
-
-    private val _numberOfSelectedSetlists: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(0, 0))
-
-    val selectedSetlistPosition: SharedFlow<Int> get() = _selectedSetlistPosition
-    private val _selectedSetlistPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-
     private var allSetlists: List<SetlistItem> = listOf()
-
-    val selectionTracker: SelectionTracker<BaseViewHolder> =
-        SelectionTracker(this::onSetlistSelection)
 
     val searchValues get() = itemFilter.values
 
@@ -87,24 +67,17 @@ class SetlistsModel @Inject constructor(
         val selectedSetlists = allSetlists.filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
         setlistsRepository.deleteSetlists(selectedSetlists)
-        _numberOfSelectedSetlists.value = Pair(selectedSetlists.size, 0)
-        selectionTracker.reset()
     }
 
-    fun resetSetlistSelection() {
+    fun hideSelectionCheckboxes() {
         _setlists.value.forEach {
             it.hasCheckbox = false
             it.isSelected = false
         }
-        selectionTracker.reset()
-
-        if (_numberOfSelectedSetlists.value != Pair(1, 0)) {
-            _numberOfSelectedSetlists.value = Pair(1, 0)
-        }
     }
 
-    fun resetPickedSetlist() {
-        _pickedSetlist.value = null
+    fun showSelectionCheckboxes() {
+        _setlists.value.forEach { it.hasCheckbox = true }
     }
 
     suspend fun exportSelectedSetlists(
@@ -158,38 +131,12 @@ class SetlistsModel @Inject constructor(
 
         emit(R.string.main_activity_export_deleting_temp)
         exportDir.deleteRecursively()
-        resetSetlistSelection()
+        hideSelectionCheckboxes()
     }.flowOn(Dispatchers.Default)
 
-    private fun onSetlistSelection(
-        @Suppress("UNUSED_PARAMETER")
-        holder: BaseViewHolder,
-        position: Int,
-        isLongClick: Boolean
-    ): Boolean {
-        val item = _setlists.value[position]
-
-        if (!isLongClick && selectionTracker.count == 0) {
-            _pickedSetlist.value = item
-            return false
-        }
-
-        item.isSelected = !item.isSelected
-
-        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-            _setlists.value.forEach { it.hasCheckbox = true }
-        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-            _setlists.value.forEach {
-                it.hasCheckbox = false
-                it.isSelected = false
-            }
-        }
-
-        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-        _numberOfSelectedSetlists.value = countPair
-        _selectedSetlistPosition.tryEmit(position)
-
-        return isLongClick || selectionTracker.count != 0
+    fun selectSetlist(setlistId: Long, selected: Boolean) {
+        _setlists.value
+            .first { it.setlist.idLong == setlistId }.isSelected = selected
     }
 
     private suspend fun emitSetlists() = withContext(Dispatchers.Default) {

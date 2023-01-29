@@ -17,8 +17,6 @@ import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
 import pl.gunock.lyriccast.shared.enums.NameValidationState
-import pl.gunock.lyriccast.ui.shared.adapters.BaseViewHolder
-import pl.gunock.lyriccast.ui.shared.misc.SelectionTracker
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,15 +40,6 @@ class SetlistEditorModel @Inject constructor(
     var setlistId: String = ""
 
     private var editedSetlist: Setlist? = null
-
-    private val _numberOfSelectedSongs: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(0, 0))
-    val numberOfSelectedSongs: StateFlow<Pair<Int, Int>> = _numberOfSelectedSongs
-
-    private val _selectedSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(replay = 1)
-    val selectedSongPosition: SharedFlow<Int> = _selectedSongPosition
-
-    val selectionTracker: SelectionTracker<BaseViewHolder> = SelectionTracker(this::onSongSelection)
 
     private var availableId: Long = 0L
 
@@ -97,15 +86,15 @@ class SetlistEditorModel @Inject constructor(
         Log.i(TAG, "Created setlist: $setlist")
     }
 
-    fun resetSongSelection() {
+    fun hideSelectionCheckboxes() {
         _songs.value.forEach {
-            it.isSelected = false
             it.hasCheckbox = false
+            it.isSelected = false
         }
-        selectionTracker.reset()
-        if (_numberOfSelectedSongs.value != Pair(1, 0)) {
-            _numberOfSelectedSongs.value = Pair(1, 0)
-        }
+    }
+
+    fun showSelectionCheckboxes() {
+        _songs.value.forEach { it.hasCheckbox = true }
     }
 
     fun moveSong(from: Int, to: Int) {
@@ -115,7 +104,6 @@ class SetlistEditorModel @Inject constructor(
 
     fun removeSelectedSongs() {
         _songs.value = _songs.value.filter { !it.isSelected }.toMutableList()
-        selectionTracker.reset()
     }
 
     fun duplicateSelectedSong() {
@@ -128,7 +116,6 @@ class SetlistEditorModel @Inject constructor(
 
         songsAfterDuplicate.add(selectedItemIndex + 1, selectedItem)
         _songs.value = songsAfterDuplicate
-        selectionTracker.reset()
     }
 
     fun validateSetlistName(name: String): NameValidationState {
@@ -145,33 +132,16 @@ class SetlistEditorModel @Inject constructor(
         }
     }
 
-    private fun onSongSelection(
-        @Suppress("UNUSED_PARAMETER")
-        holder: BaseViewHolder,
-        position: Int,
-        isLongClick: Boolean
-    ): Boolean {
-        if (!isLongClick && selectionTracker.count == 0) {
+    fun selectSong(songId: Long, selected: Boolean): Boolean {
+        val item = _songs.value.firstOrNull { it.id == songId }
+
+        if (item == null || item.isSelected == selected) {
             return false
         }
 
-        val item: SetlistSongItem = _songs.value[position]
-        item.isSelected = !item.isSelected
+        item.isSelected = selected
 
-        if (selectionTracker.count == 0 && selectionTracker.countAfter == 1) {
-            _songs.value.forEach { it.hasCheckbox = true }
-        } else if (selectionTracker.count == 1 && selectionTracker.countAfter == 0) {
-            _songs.value.forEach {
-                it.hasCheckbox = false
-                it.isSelected = false
-            }
-        }
-
-        val countPair = Pair(selectionTracker.count, selectionTracker.countAfter)
-        _numberOfSelectedSongs.value = countPair
-        _selectedSongPosition.tryEmit(position)
-
-        return isLongClick || selectionTracker.count != 0
+        return true
     }
 
 }

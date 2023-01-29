@@ -16,10 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -29,6 +31,8 @@ import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
 import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.category_manager.edit_category.EditCategoryDialogFragment
+import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
+import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
 
 @AndroidEntryPoint
 class CategoryManagerActivity : AppCompatActivity() {
@@ -44,6 +48,8 @@ class CategoryManagerActivity : AppCompatActivity() {
     private val actionModeCallback: ActionMode.Callback = CategoryManagerActionModeCallback()
 
     private var onBackPressedCallback: OnBackPressedCallback? = null
+
+    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,23 +80,23 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        categoryItemsAdapter = CategoryItemsAdapter(
-            binding.rcvCategories.context,
-            viewModel.selectionTracker
-        )
+        categoryItemsAdapter = CategoryItemsAdapter(binding.rcvCategories.context)
         binding.rcvCategories.adapter = categoryItemsAdapter
+
+        tracker = SelectionTracker.Builder(
+            "selection",
+            binding.rcvCategories,
+            MappedItemKeyProvider(binding.rcvCategories),
+            SimpleItemDetailsLookup(binding.rcvCategories),
+            StorageStrategy.createLongStorage()
+        ).withSelectionPredicate(
+            SelectionPredicates.createSelectAnything()
+        ).build()
+
+        tracker.addObserver(CategorySelectionObserver())
 
         viewModel.categories
             .onEach { categoryItemsAdapter.submitList(it) }
-            .launchIn(lifecycleScope)
-
-        viewModel.numberOfSelectedCategories
-            .onEach(this::onSelectCategory)
-            .flowOn(Dispatchers.Main)
-            .launchIn(lifecycleScope)
-
-        viewModel.selectedCategoryPosition
-            .onEach { categoryItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -106,39 +112,32 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun editSelectedCategory(): Boolean {
-        val categoryItem = viewModel.getSelectedCategory()
+        val categoryItem = categoryItemsAdapter.currentList
+            .first { tracker.isSelected(it.category.idLong) }
 
         val dialogFragment = EditCategoryDialogFragment(categoryItem)
         dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog_NoTitle)
         dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
 
-        resetSelection()
-
         return true
     }
 
-    private fun onSelectCategory(numberOfSelectedCategories: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedCategories
-
-        if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            categoryItemsAdapter.notifyItemRangeChanged(0, categoryItemsAdapter.itemCount, true)
-        }
-
-        when (countAfter) {
+    private fun onSelectCategory() {
+        when (tracker.selection.size()) {
             0 -> {
                 actionMode?.finish()
-                return false
             }
             1 -> {
                 if (actionMode == null) {
                     actionMode = startSupportActionMode(actionModeCallback)
+                    viewModel.showSelectionCheckboxes()
+                    notifyAllItemsChanged()
                 }
 
                 showMenuActions()
             }
             2 -> showMenuActions(showEdit = false)
         }
-        return true
     }
 
     private fun showMenuActions(
@@ -152,7 +151,12 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun resetSelection() {
-        viewModel.resetCategorySelection()
+        tracker.clearSelection()
+        viewModel.hideSelectionCheckboxes()
+        notifyAllItemsChanged()
+    }
+
+    private fun notifyAllItemsChanged() {
         categoryItemsAdapter.notifyItemRangeChanged(0, viewModel.categories.value.size, true)
     }
 
@@ -206,4 +210,12 @@ class CategoryManagerActivity : AppCompatActivity() {
         }
     }
 
+
+    private inner class CategorySelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            viewModel.selectCategory(key, selected)
+            onSelectCategory()
+        }
+    }
 }

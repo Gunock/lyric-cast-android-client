@@ -21,6 +21,9 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +42,8 @@ import pl.gunock.lyriccast.shared.utils.DialogFragmentUtils
 import pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity
 import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
+import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
+import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
 
 @AndroidEntryPoint
 class SetlistsFragment : Fragment() {
@@ -62,6 +67,8 @@ class SetlistsFragment : Fragment() {
         registerForActivityResult(this::exportSelectedSetlists)
 
     private var onBackPressedCallback: OnBackPressedCallback? = null
+
+    private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -134,29 +141,27 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        setlistItemsAdapter =
-            SetlistItemsAdapter(binding.rcvSetlists.context, viewModel.selectionTracker)
+        setlistItemsAdapter = SetlistItemsAdapter(binding.rcvSetlists.context)
+        setlistItemsAdapter.onItemClickListener = this::onPickSetlist
 
         binding.rcvSetlists.setHasFixedSize(true)
         binding.rcvSetlists.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvSetlists.adapter = setlistItemsAdapter
 
+        tracker = SelectionTracker.Builder(
+            "selection",
+            binding.rcvSetlists,
+            MappedItemKeyProvider(binding.rcvSetlists),
+            SimpleItemDetailsLookup(binding.rcvSetlists),
+            StorageStrategy.createLongStorage()
+        ).withSelectionPredicate(
+            SelectionPredicates.createSelectAnything()
+        ).build()
+
+        tracker.addObserver(SetlistSelectionObserver())
+
         viewModel.setlists
             .onEach { setlistItemsAdapter.submitList(it) }
-            .launchIn(lifecycleScope)
-
-        viewModel.pickedSetlist
-            .onEach(this::onPickSetlist)
-            .flowOn(Dispatchers.Default)
-            .launchIn(lifecycleScope)
-
-        viewModel.numberOfSelectedSetlists
-            .onEach(this::onSelectSetlist)
-            .flowOn(Dispatchers.Main)
-            .launchIn(lifecycleScope)
-
-        viewModel.selectedSetlistPosition
-            .onEach { setlistItemsAdapter.notifyItemChanged(it, true) }
             .launchIn(lifecycleScope)
     }
 
@@ -174,9 +179,11 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun onPickSetlist(item: SetlistItem?) {
+        if (!tracker.selection.isEmpty) {
+            return
+        }
+
         item ?: return
-        viewModel.resetPickedSetlist()
-        viewModel.resetSetlistSelection()
 
         if (item.setlist.presentation.isEmpty()) {
             toast?.cancel()
@@ -195,30 +202,23 @@ class SetlistsFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun onSelectSetlist(numberOfSelectedSetlists: Pair<Int, Int>): Boolean {
-        val (countBefore: Int, countAfter: Int) = numberOfSelectedSetlists
-
-        if ((countBefore == 0 && countAfter == 1) || (countBefore == 1 && countAfter == 0)) {
-            setlistItemsAdapter.notifyItemRangeChanged(0, viewModel.setlists.value.size, true)
-        }
-
-        when (countAfter) {
+    private fun onSelectSetlist() {
+        when (tracker.selection.size()) {
             0 -> {
                 actionMode?.finish()
-                return false
             }
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
                         .startSupportActionMode(actionModeCallback)
+                    viewModel.showSelectionCheckboxes()
+                    notifyAllItemsChanged()
                 }
 
                 showMenuActions()
             }
             2 -> showMenuActions(showEdit = false)
         }
-
-        return true
     }
 
     private fun editSelectedSetlist(): Boolean {
@@ -229,8 +229,6 @@ class SetlistsFragment : Fragment() {
         val intent = Intent(context, SetlistEditorActivity::class.java)
         intent.putExtra("setlistId", selectedItem.setlist.id)
         startActivity(intent)
-
-        viewModel.resetSetlistSelection()
 
         return true
     }
@@ -247,9 +245,15 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun resetSelection() {
-        viewModel.resetSetlistSelection()
+        tracker.clearSelection()
+        viewModel.hideSelectionCheckboxes()
         setlistItemsAdapter.notifyItemRangeChanged(0, setlistItemsAdapter.itemCount, true)
     }
+
+    private fun notifyAllItemsChanged() {
+        setlistItemsAdapter.notifyItemRangeChanged(0, setlistItemsAdapter.itemCount, true)
+    }
+
 
     private inner class SetlistsActionModeCallback : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -303,4 +307,12 @@ class SetlistsFragment : Fragment() {
         }
     }
 
+
+    private inner class SetlistSelectionObserver : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+            super.onItemStateChanged(key, selected)
+            viewModel.selectSetlist(key, selected)
+            onSelectSetlist()
+        }
+    }
 }
