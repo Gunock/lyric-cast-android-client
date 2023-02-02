@@ -54,7 +54,6 @@ class SongsModel @Inject constructor(
         songsRepository.getAllSongs()
             .onEach {
                 val songItems = it.map { song -> SongItem(song) }.sorted()
-                if (_songs.value == songItems) return@onEach
 
                 allSongs = songItems
                 emitSongs()
@@ -79,11 +78,11 @@ class SongsModel @Inject constructor(
     }
 
     fun getSelectedSong(): SongItem {
-        return _songs.value.first { songItem -> songItem.isSelected }
+        return allSongs.first { songItem -> songItem.isSelected }
     }
 
     fun getSelectedSongIds(): List<String> {
-        return _songs.value
+        return allSongs
             .filter { it.isSelected }
             .map { it.song.id }
     }
@@ -96,14 +95,14 @@ class SongsModel @Inject constructor(
     }
 
     fun hideSelectionCheckboxes() {
-        _songs.value.forEach {
+        allSongs.forEach {
             it.hasCheckbox = false
             it.isSelected = false
         }
     }
 
     fun showSelectionCheckboxes() {
-        _songs.value.forEach { it.hasCheckbox = true }
+        allSongs.forEach { it.hasCheckbox = true }
     }
 
     suspend fun exportSongs(

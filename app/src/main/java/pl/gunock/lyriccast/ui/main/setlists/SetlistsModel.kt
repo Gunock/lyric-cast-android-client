@@ -50,7 +50,6 @@ class SetlistsModel @Inject constructor(
         setlistsRepository.getAllSetlists()
             .onEach { setlists ->
                 val setlistItems = setlists.map { SetlistItem(it) }.sorted()
-                if (_setlists.value == setlistItems) return@onEach
 
                 allSetlists = setlistItems
                 emitSetlists()
@@ -64,20 +63,21 @@ class SetlistsModel @Inject constructor(
     }
 
     suspend fun deleteSelectedSetlists() {
-        val selectedSetlists = allSetlists.filter { item -> item.isSelected }
+        val selectedSetlists = allSetlists
+            .filter { item -> item.isSelected }
             .map { item -> item.setlist.id }
         setlistsRepository.deleteSetlists(selectedSetlists)
     }
 
     fun hideSelectionCheckboxes() {
-        _setlists.value.forEach {
+        allSetlists.forEach {
             it.hasCheckbox = false
             it.isSelected = false
         }
     }
 
     fun showSelectionCheckboxes() {
-        _setlists.value.forEach { it.hasCheckbox = true }
+        allSetlists.forEach { it.hasCheckbox = true }
     }
 
     suspend fun exportSelectedSetlists(
@@ -135,7 +135,7 @@ class SetlistsModel @Inject constructor(
     }.flowOn(Dispatchers.Default)
 
     fun selectSetlist(setlistId: Long, selected: Boolean): Boolean {
-        val setlist = _setlists.value
+        val setlist = allSetlists
             .firstOrNull { it.setlist.idLong == setlistId } ?: return false
 
         setlist.isSelected = selected
