@@ -236,9 +236,10 @@ class SetlistEditorFragment : Fragment() {
     }
 
     private fun showMenuActions(showDelete: Boolean = true, showDuplicate: Boolean = true) {
-        actionMenu ?: return
-        actionMenu!!.findItem(R.id.action_menu_delete).isVisible = showDelete
-        actionMenu!!.findItem(R.id.menu_duplicate).isVisible = showDuplicate
+        actionMenu?.apply {
+            findItem(R.id.action_menu_delete).isVisible = showDelete
+            findItem(R.id.menu_duplicate).isVisible = showDuplicate
+        }
     }
 
     private fun removeSelectedSongs(): Boolean {

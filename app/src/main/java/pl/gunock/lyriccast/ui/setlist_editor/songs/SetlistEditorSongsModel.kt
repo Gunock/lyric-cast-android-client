@@ -35,9 +35,7 @@ class SetlistEditorSongsModel @Inject constructor(
     private val _songs: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
     private var allSongs: List<SongItem> = listOf()
 
-    private var selectedSongs: MutableSet<SongItem> = mutableSetOf()
-
-    var setlistSongIds: List<String> = listOf()
+    private var setlistSongIds: List<String> = listOf()
 
     val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
@@ -52,7 +50,6 @@ class SetlistEditorSongsModel @Inject constructor(
                 val songItems = it.map { song ->
                     SongItem(song, hasCheckbox = true, isSelected = song.id in setlistSongIds)
                 }.sorted()
-                if (_songs.value == songItems) return@onEach
 
                 allSongs = songItems
                 emitSongs()
@@ -80,18 +77,26 @@ class SetlistEditorSongsModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    suspend fun updateSongs() =
+
+    fun init() {
+    }
+
+    suspend fun updateSetlistSongIds(newSetlistSongIds: List<String>) {
+        setlistSongIds = newSetlistSongIds
+
         withContext(Dispatchers.Default) {
             allSongs.forEach { it.isSelected = it.song.id in setlistSongIds }
-            _songs.value = allSongs
 
-            selectedSongs = allSongs.filter { it.isSelected }.toMutableSet()
+            emitSongs()
         }
+    }
 
     fun updatePresentation(presentation: Array<String>): List<String> {
-        updateSelectedSongs()
+        val selectedSongIds = allSongs
+            .filter { it.isSelected }
+            .map { it.song.id }
+            .toSet()
 
-        val selectedSongIds = selectedSongs.map { it.song.id }
         val setlistSongIdsSet = setlistSongIds.toSet()
 
         val removedSongIds = setlistSongIdsSet.filter { it !in selectedSongIds }
@@ -107,16 +112,6 @@ class SetlistEditorSongsModel @Inject constructor(
     fun selectSong(songItem: SongItem): Int {
         songItem.isSelected = !songItem.isSelected
         return _songs.value.indexOf(songItem)
-    }
-
-    private fun updateSelectedSongs() {
-        for (item in _songs.value) {
-            if (item.isSelected) {
-                selectedSongs.add(item)
-            } else {
-                selectedSongs.remove(item)
-            }
-        }
     }
 
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {

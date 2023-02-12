@@ -41,6 +41,8 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.init()
+
         setupMenu()
     }
 
@@ -55,9 +57,9 @@ class SetlistEditorSongsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.setlistSongIds = args.presentation.toList()
+        val setlistSongIds = args.presentation.toList()
         lifecycleScope.launch(Dispatchers.Default) {
-            viewModel.updateSongs()
+            viewModel.updateSetlistSongIds(setlistSongIds)
         }
 
         setupRecyclerView()

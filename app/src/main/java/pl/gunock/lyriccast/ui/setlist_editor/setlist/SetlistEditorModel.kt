@@ -38,6 +38,7 @@ class SetlistEditorModel @Inject constructor(
     var setlistName: String = ""
 
     var setlistId: String = ""
+        private set
 
     private var editedSetlist: Setlist? = null
 
@@ -70,8 +71,9 @@ class SetlistEditorModel @Inject constructor(
     fun loadEditedSetlist(setlistId: String) {
         this.setlistId = setlistId
         editedSetlist = setlistsRepository.getSetlist(setlistId)!!.also { setlist ->
-            _songs.value =
-                setlist.presentation.map { SetlistSongItem(it, availableId++) }.toMutableList()
+            _songs.value = setlist.presentation
+                .map { SetlistSongItem(it, availableId++) }
+                .toMutableList()
             setlistName = setlist.name
         }
     }

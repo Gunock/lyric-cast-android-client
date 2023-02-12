@@ -11,28 +11,6 @@ import pl.gunock.lyriccast.common.extensions.normalize
 import pl.gunock.lyriccast.domain.models.SongItem
 
 class SongItemFilter : ItemFilter<SongItem, SongItemFilter.Values>() {
-    class Values(
-        val songTitleFlow: MutableStateFlow<String> = MutableStateFlow(""),
-        val categoryIdFlow: MutableStateFlow<String?> = MutableStateFlow(null),
-        val isSelectedFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
-    ) {
-        var songTitle
-            get() = songTitleFlow.value
-            set(value) {
-                songTitleFlow.value = value
-            }
-        var categoryId
-            get() = categoryIdFlow.value
-            set(value) {
-                categoryIdFlow.value = value
-            }
-        var isSelected
-            get() = isSelectedFlow.value
-            set(value) {
-                isSelectedFlow.value = value
-            }
-    }
-
     override val values: Values = Values()
 
     override fun apply(items: Collection<SongItem>): Collection<SongItem> {
@@ -60,5 +38,28 @@ class SongItemFilter : ItemFilter<SongItem, SongItemFilter.Values>() {
         return items.filter { songItem ->
             predicates.all { predicate -> predicate(songItem) }
         }.toSortedSet()
+    }
+
+
+    class Values(
+        val songTitleFlow: MutableStateFlow<String> = MutableStateFlow(""),
+        val categoryIdFlow: MutableStateFlow<String?> = MutableStateFlow(null),
+        val isSelectedFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    ) {
+        var songTitle
+            get() = songTitleFlow.value
+            set(value) {
+                songTitleFlow.value = value
+            }
+        var categoryId
+            get() = categoryIdFlow.value
+            set(value) {
+                categoryIdFlow.value = value
+            }
+        var isSelected
+            get() = isSelectedFlow.value
+            set(value) {
+                isSelectedFlow.value = value
+            }
     }
 }

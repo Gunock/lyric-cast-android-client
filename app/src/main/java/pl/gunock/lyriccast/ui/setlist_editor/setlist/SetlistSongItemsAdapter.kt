@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.databinding.ItemSetlistSongBinding
 import pl.gunock.lyriccast.ui.shared.listeners.TouchAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.selection.SelectionViewHolder
@@ -51,7 +52,7 @@ class SetlistSongItemsAdapter(
 
     override fun getItemId(position: Int): Long {
         if (currentList.isEmpty()) {
-            return -1L
+            return RecyclerView.NO_ID
         }
 
         return currentList[position].id

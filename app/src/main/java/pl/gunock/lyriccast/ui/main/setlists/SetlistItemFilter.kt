@@ -12,16 +12,6 @@ import pl.gunock.lyriccast.domain.models.SetlistItem
 import pl.gunock.lyriccast.ui.shared.misc.ItemFilter
 
 class SetlistItemFilter : ItemFilter<SetlistItem, SetlistItemFilter.Values>() {
-    class Values(
-        val setlistNameFlow: MutableStateFlow<String> = MutableStateFlow("")
-    ) {
-        var setlistName
-            get() = setlistNameFlow.value
-            set(value) {
-                setlistNameFlow.value = value
-            }
-    }
-
     override val values: Values = Values()
 
     override fun apply(items: Collection<SetlistItem>): Collection<SetlistItem> {
@@ -35,5 +25,16 @@ class SetlistItemFilter : ItemFilter<SetlistItem, SetlistItemFilter.Values>() {
         }
 
         return filteredItems
+    }
+
+
+    class Values(
+        val setlistNameFlow: MutableStateFlow<String> = MutableStateFlow("")
+    ) {
+        var setlistName
+            get() = setlistNameFlow.value
+            set(value) {
+                setlistNameFlow.value = value
+            }
     }
 }

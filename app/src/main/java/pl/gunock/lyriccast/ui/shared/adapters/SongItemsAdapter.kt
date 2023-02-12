@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemSongBinding
 import pl.gunock.lyriccast.domain.models.SongItem
@@ -62,7 +63,7 @@ class SongItemsAdapter(
 
     override fun getItemId(position: Int): Long {
         if (currentList.isEmpty()) {
-            return -1L
+            return RecyclerView.NO_ID
         }
 
         return currentList[position].song.idLong
