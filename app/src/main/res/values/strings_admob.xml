@@ -5,13 +5,13 @@
   -->
 
 <resources>
-    <string name="ads_application_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
-    <string name="ads_uid_main" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_song_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_setlist_controls" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_song_editor" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_setlist_editor" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_category_manager" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_settings1" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ads_uid_settings2" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ads_application_id" translatable="false">ca-app-pub-9090763948437577~3122719686</string>
+    <string name="ads_uid_main" translatable="false">ca-app-pub-9090763948437577/5557311337</string>
+    <string name="ads_uid_song_controls" translatable="false">ca-app-pub-9090763948437577/5736456499</string>
+    <string name="ads_uid_setlist_controls" translatable="false">ca-app-pub-9090763948437577/9867273193</string>
+    <string name="ads_uid_song_editor" translatable="false">ca-app-pub-9090763948437577/9484129813</string>
+    <string name="ads_uid_setlist_editor" translatable="false">ca-app-pub-9090763948437577/2931147997</string>
+    <string name="ads_uid_category_manager" translatable="false">ca-app-pub-9090763948437577/6311171569</string>
+    <string name="ads_uid_settings1" translatable="false">ca-app-pub-9090763948437577/3301864840</string>
+    <string name="ads_uid_settings2" translatable="false">ca-app-pub-9090763948437577/9675701505</string>
 </resources>
