@@ -8,7 +8,13 @@ package pl.gunock.lyriccast.ui.setlist_editor.setlist
 
 import android.os.Bundle
 import android.text.InputFilter
-import android.view.*
+import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
