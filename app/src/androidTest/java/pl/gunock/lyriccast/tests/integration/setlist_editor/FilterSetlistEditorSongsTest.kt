@@ -108,7 +108,7 @@ class FilterSetlistEditorSongsTest {
         onView(withId(R.id.spn_category)).perform(click())
         sleep(100)
         onView(
-            allOf(withId(R.id.tv_spinner_color_name), withText(category.name))
+            allOf(withId(R.id.text_color_name), withText(category.name))
         ).perform(click())
         sleep(100)
 

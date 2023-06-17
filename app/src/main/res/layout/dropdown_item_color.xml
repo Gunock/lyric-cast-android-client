@@ -13,23 +13,21 @@
     android:clipToPadding="false"
     android:padding="8dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cdv_spinner_category_color"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_category_color"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:background="@color/color_primary_dark"
-        android:elevation="@dimen/card_elevation_small"
         android:outlineProvider="background"
         app:cardBackgroundColor="@color/placeholder_card_color_1"
-        app:cardCornerRadius="@dimen/card_radius_small"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_spinner_color_name"
+        app:layout_constraintBottom_toBottomOf="@+id/text_color_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_spinner_color_name">
+        app:layout_constraintTop_toTopOf="@+id/text_color_name">
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/tv_spinner_color_name"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_color_name"
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginStart="8dp"
@@ -45,7 +43,7 @@
         android:textColorLink="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cdv_spinner_category_color"
+        app:layout_constraintStart_toEndOf="@+id/card_category_color"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

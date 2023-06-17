@@ -18,8 +18,8 @@ object CastMessageHelper {
     private const val CONTENT_NAMESPACE: String = "urn:x-cast:lyric.cast.content"
     private const val CONTROL_NAMESPACE: String = "urn:x-cast:lyric.cast.control"
 
-    val isBlanked: StateFlow<Boolean> get() = _isBlanked
     private val _isBlanked: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val isBlanked: StateFlow<Boolean> get() = _isBlanked
 
     fun sendContentMessage(message: String) {
         val context: CastContext = CastContext.getSharedInstance()!!

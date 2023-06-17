@@ -13,6 +13,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -25,7 +26,7 @@ import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.ColorItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
-import java.util.*
+import java.util.Locale
 
 @AndroidEntryPoint
 class EditCategoryDialogFragment(
@@ -85,19 +86,27 @@ class EditCategoryDialogFragment(
         }
 
         val colorSpinnerAdapter = ColorSpinnerAdapter(
-            binding.spnCategoryColor.context,
+            binding.dropdownColor.context,
             colors
         )
-        binding.spnCategoryColor.adapter = colorSpinnerAdapter
+        binding.dropdownColor.setAdapter(colorSpinnerAdapter)
+        binding.dropdownColor.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                val colorItem = colorSpinnerAdapter.getItem(position)
+                setColor(colorItem)
+            }
 
-        if (categoryItem?.category?.color != null) {
+        if (categoryItem?.category != null) {
             val categoryNameUppercase = categoryItem.category
                 .name
                 .uppercase(Locale.ROOT)
 
             binding.edCategoryName.setText(categoryNameUppercase)
-            binding.spnCategoryColor
-                .setSelection(colorValues.indexOf(categoryItem.category.color!!))
+
+            val existingColor = colors.find { it.value == categoryItem.category.color }
+                ?: colors.first()
+
+            setColor(existingColor)
         }
     }
 
@@ -106,7 +115,6 @@ class EditCategoryDialogFragment(
 
         binding.btnSaveCategory.setOnClickListener {
             if (validateCategoryName()) {
-                viewModel.categoryColor = binding.spnCategoryColor.selectedItem as ColorItem
                 lifecycleScope.launch(Dispatchers.Default) {
                     viewModel.saveCategory()
                     dismiss()
@@ -144,6 +152,13 @@ class EditCategoryDialogFragment(
         }
 
         return NameValidationState.VALID
+    }
+
+    private fun setColor(colorItem: ColorItem) {
+        viewModel.categoryColor = colorItem
+        binding.cardCategoryColor.setCardBackgroundColor(colorItem.value)
+        binding.dropdownColor
+            .setText(colorItem.name)
     }
 
     inner class CategoryNameTextWatcher : TextWatcher {

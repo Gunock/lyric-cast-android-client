@@ -50,16 +50,19 @@ class ImportDialogFragment : DialogFragment() {
 
         setupColorSpinner()
         setupListeners()
-        viewModel.importFormat =
-            ImportFormat.getByName(binding.spnImportFormat.selectedItem as String)
     }
 
     private fun setupColorSpinner() {
-        binding.spnImportFormat.adapter = ArrayAdapter.createFromResource(
+        val adapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.import_formats,
             android.R.layout.simple_list_item_1
         )
+
+        binding.dropdownImportFormat.setAdapter(adapter)
+
+        viewModel.importFormat = ImportFormat.getByName(adapter.getItem(0).toString())
+        binding.dropdownImportFormat.setText(viewModel.importFormat.displayName)
     }
 
     private fun setupListeners() {
@@ -77,7 +80,7 @@ class ImportDialogFragment : DialogFragment() {
             viewModel.deleteAll = binding.chkDeleteAll.isChecked
             viewModel.replaceOnConflict = binding.chkReplaceOnConflict.isChecked
             viewModel.importFormat =
-                ImportFormat.getByName(binding.spnImportFormat.selectedItem as String)
+                ImportFormat.getByName(binding.dropdownImportFormat.text.toString())
             isAccepted.value = true
             dismiss()
         }

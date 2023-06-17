@@ -103,7 +103,7 @@ class FilterSongsTest {
         sleep(100)
         onView(
             allOf(
-                withId(R.id.tv_spinner_color_name),
+                withId(R.id.text_color_name),
                 withText(category.name)
             )
         ).perform(click())

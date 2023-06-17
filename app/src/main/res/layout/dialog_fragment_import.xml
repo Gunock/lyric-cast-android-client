@@ -14,7 +14,7 @@
     android:background="@color/window_background_2"
     android:padding="16dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tv_dialog_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,23 +32,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title">
 
-        <Spinner
-            android:id="@+id/spn_import_format"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dropdown_import_format_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_import_format"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@android:layout/simple_spinner_item" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/dropdown_import_format"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                tools:listitem="@android:layout/simple_spinner_item" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spn_import_format">
+            app:layout_constraintTop_toBottomOf="@+id/dropdown_import_format_layout">
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/chk_delete_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,7 +64,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/chk_replace_on_conflict"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,7 +75,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
@@ -78,7 +86,7 @@
         app:layout_constraintEnd_toStartOf="@+id/btn_import"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout5" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_import"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"

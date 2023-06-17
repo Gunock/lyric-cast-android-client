@@ -11,7 +11,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
@@ -222,7 +227,7 @@ class SetlistsFragment : Fragment() {
     }
 
     private fun editSelectedSetlist(): Boolean {
-        val selectedItem = viewModel.setlists.value
+        val selectedItem = viewModel.filteredSetlists
             .first { setlistItem -> setlistItem.isSelected }
 
         Log.v(TAG, "Editing setlist : ${selectedItem.setlist}")

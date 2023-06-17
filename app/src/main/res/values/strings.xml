@@ -29,7 +29,9 @@
 
     <!-- Hints -->
     <string name="hint_song_title">Song title</string>
+    <string name="hint_song_category">Category</string>
     <string name="hint_setlist_name">Setlist name</string>
+    <string name="hint_import_format">Format</string>
 
     <!-- Option/Action Menu -->
     <string name="option_menu_cast">Cast</string>
@@ -73,7 +75,8 @@
     <string name="editor_button_add">Add</string>
 
     <!-- Category Manager -->
-    <string name="category_manager_hint_category_name">Category name</string>
+    <string name="category_manager_hint_category_name">Name</string>
+    <string name="category_manager_hint_category_color">Color</string>
     <string name="category_manager_add_category">Add category</string>
     <string name="category_manager_edit_category">Edit category</string>
     <string name="category_manager_name_already_used">Category name already in use</string>

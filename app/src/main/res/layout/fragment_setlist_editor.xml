@@ -16,7 +16,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/window_background_2"
-        android:elevation="@dimen/elevation_medium"
         android:outlineProvider="background"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +38,7 @@
                 android:hint="@string/hint_setlist_name" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save_setlist"
             style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="wrap_content"
@@ -51,7 +50,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tin_setlist_name" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_pick_setlist_songs"
             style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="wrap_content"

@@ -12,7 +12,11 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.getCastConfigurationJson
@@ -38,13 +42,13 @@ class SongControlsModel @Inject constructor(
 
     var settings: Settings? = null
 
-    val currentSlideText: StateFlow<String> get() = _currentSlideText
+    val currentSlideText: Flow<String> get() = _currentSlideText
     private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentSlideNumber: StateFlow<String> get() = _currentSlideNumber
+    val currentSlideNumber: Flow<String> get() = _currentSlideNumber
     private val _currentSlideNumber: MutableStateFlow<String> = MutableStateFlow("")
 
-    val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
+    val currentBlankTextAndColor: Flow<Pair<Int, Int>> get() = _currentBlankTextAndColor
     private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(blankOffText, blankOffColor))
 

@@ -4,7 +4,7 @@
   ~ Last modified 4/25/21 1:15 PM
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_song"
@@ -18,14 +18,11 @@
     android:clipChildren="false"
     android:clipToPadding="false"
     android:descendantFocusability="afterDescendants"
-    android:elevation="@dimen/card_elevation_small"
     android:focusable="true"
     android:hapticFeedbackEnabled="true"
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
-    app:cardCornerRadius="@dimen/card_radius_small"
-    app:cardElevation="@dimen/card_elevation_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
 
@@ -41,7 +38,7 @@
         android:descendantFocusability="afterDescendants"
         android:longClickable="false">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_item_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,4 +62,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

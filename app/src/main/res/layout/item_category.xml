@@ -4,7 +4,7 @@
   ~ Last modified 4/8/21 10:20 PM
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_category"
@@ -17,13 +17,10 @@
     android:clickable="true"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:elevation="@dimen/card_elevation_small"
     android:focusable="true"
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
-    app:cardCornerRadius="@dimen/card_radius_small"
-    app:cardElevation="@dimen/card_elevation_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
 
@@ -36,7 +33,7 @@
         android:clipToPadding="false"
         android:padding="8dp">
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_item_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,7 +46,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_category_name"
             android:layout_width="0dp"
             android:layout_height="48dp"
@@ -68,23 +65,20 @@
             app:layout_constraintStart_toEndOf="@+id/chk_item_category"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cdv_category_color"
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:background="@color/color_primary_dark"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:elevation="@dimen/card_elevation_small"
             android:outlineProvider="background"
             app:cardBackgroundColor="@color/placeholder_card_color_1"
-            app:cardCornerRadius="@dimen/card_radius_big"
-            app:cardMaxElevation="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

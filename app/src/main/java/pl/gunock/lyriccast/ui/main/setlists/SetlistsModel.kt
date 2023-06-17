@@ -35,10 +35,15 @@ class SetlistsModel @Inject constructor(
         const val TAG = "SetlistsViewModel"
     }
 
-    val setlists: StateFlow<List<SetlistItem>>
+    private val _setlists: MutableSharedFlow<List<SetlistItem>> = MutableSharedFlow(replay = 1)
+
+    val setlists: Flow<List<SetlistItem>>
         get() = _setlists
 
-    private val _setlists: MutableStateFlow<List<SetlistItem>> = MutableStateFlow(listOf())
+
+    private var _filteredSetlists: List<SetlistItem> = listOf()
+    val filteredSetlists: List<SetlistItem>
+        get() = _filteredSetlists
 
     private var allSetlists: List<SetlistItem> = listOf()
 
@@ -145,7 +150,8 @@ class SetlistsModel @Inject constructor(
     private suspend fun emitSetlists() = withContext(Dispatchers.Default) {
         Log.v(TAG, "Setlist filtering invoked")
         val duration = measureTimeMillis {
-            _setlists.value = itemFilter.apply(allSetlists).toList()
+            _filteredSetlists = itemFilter.apply(allSetlists).toList()
+            _setlists.emit(_filteredSetlists)
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
     }

@@ -4,7 +4,7 @@
   ~ Last modified 4/8/21 10:20 PM
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_setlist"
@@ -17,15 +17,12 @@
     android:clickable="true"
     android:clipToPadding="false"
     android:descendantFocusability="blocksDescendants"
-    android:elevation="@dimen/card_elevation_small"
     android:focusable="true"
     android:focusableInTouchMode="false"
     android:hapticFeedbackEnabled="true"
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
-    app:cardCornerRadius="@dimen/card_radius_small"
-    app:cardElevation="@dimen/card_elevation_small"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
 
@@ -35,7 +32,7 @@
         android:layout_margin="8dp"
         android:animateLayoutChanges="true">
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_item_setlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -50,7 +47,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_item_setlist_name" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_item_setlist_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -70,4 +67,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

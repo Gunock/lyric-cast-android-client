@@ -13,7 +13,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.models.Song
@@ -44,13 +48,13 @@ class SongEditorModel @Inject constructor(
 
     private var editedSong: Song? = null
 
-    val categories: StateFlow<List<CategoryItem>> get() = _categories
-    private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
+    private val _categories: MutableSharedFlow<List<CategoryItem>> = MutableSharedFlow(replay = 1)
+    val categories: Flow<List<CategoryItem>> get() = _categories
 
     private var songTitles: Set<String> = setOf()
 
     val categoryNone: CategoryItem = CategoryItem(
-            Category(name = context.getString(R.string.category_none))
+        Category(name = context.getString(R.string.category_none))
     )
 
     val newSectionName: String
@@ -76,7 +80,7 @@ class SongEditorModel @Inject constructor(
         categoriesRepository.getAllCategories()
                 .onEach {
                     val categoryItems = it.map { category -> CategoryItem(category) }.sorted()
-                    _categories.value = categoryItems
+                    _categories.emit(categoryItems)
                 }.flowOn(Dispatchers.Default)
                 .launchIn(viewModelScope)
     }

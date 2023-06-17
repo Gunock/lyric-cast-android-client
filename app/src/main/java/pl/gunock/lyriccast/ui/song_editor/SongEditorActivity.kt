@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
@@ -81,11 +83,15 @@ class SongEditorActivity : AppCompatActivity() {
                 categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
 
                 if (viewModelCategory != null) {
-                    val categoryIndex = categorySpinnerAdapter.items
-                        .map { category -> category.category.name }
-                        .indexOf(viewModelCategory.name)
-
-                    binding.spnSongEditorCategory.setSelection(categoryIndex, false)
+                    withContext(Dispatchers.Main) {
+                        binding.dropdownCategory.setText(viewModelCategory.name)
+                        if (viewModelCategory.color != null) {
+                            binding.cardCategoryColor.setCardBackgroundColor(viewModelCategory.color!!)
+                            binding.cardCategoryColor.visibility = View.VISIBLE
+                        } else {
+                            binding.cardCategoryColor.visibility = View.GONE
+                        }
+                    }
                 }
             }.flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
@@ -110,14 +116,16 @@ class SongEditorActivity : AppCompatActivity() {
                 }
                 return true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun setupCategorySpinner() {
-        categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnSongEditorCategory.context)
-        binding.spnSongEditorCategory.adapter = categorySpinnerAdapter
-        binding.spnSongEditorCategory.onItemSelectedListener = OnCategoryItemSelectedListener()
+        categorySpinnerAdapter = CategorySpinnerAdapter(binding.dropdownCategory.context)
+
+        binding.dropdownCategory.setAdapter(categorySpinnerAdapter)
+        binding.dropdownCategory.onItemClickListener = OnCategoryItemClickListener()
     }
 
     private fun setupListeners() {
@@ -184,6 +192,7 @@ class SongEditorActivity : AppCompatActivity() {
                 newAddTab.text = getString(R.string.editor_button_add)
                 addTab(newAddTab)
             }
+
             else -> {
                 sectionNameTextWatcher.ignoreOnTextChanged = true
                 binding.edSectionName.setText(tabText)
@@ -272,14 +281,14 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
 
-    private inner class OnCategoryItemSelectedListener : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
+    private inner class OnCategoryItemClickListener : OnItemClickListener {
+        override fun onItemClick(
             parent: AdapterView<*>?,
             view: View?,
             position: Int,
             id: Long
         ) {
-            val categoryItem = binding.spnSongEditorCategory.selectedItem as CategoryItem?
+            val categoryItem = parent?.getItemAtPosition(position) as CategoryItem?
             val category = if (categoryItem == viewModel.categoryNone) {
                 null
             } else {
@@ -287,8 +296,13 @@ class SongEditorActivity : AppCompatActivity() {
             }
 
             viewModel.category = category
-        }
 
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+            if (category?.color != null) {
+                binding.cardCategoryColor.setCardBackgroundColor(category.color!!)
+                binding.cardCategoryColor.visibility = View.VISIBLE
+            } else {
+                binding.cardCategoryColor.visibility = View.GONE
+            }
+        }
     }
 }

@@ -117,7 +117,6 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidXCoreVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.cardview:cardview:$cardViewVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.recyclerview:recyclerview-selection:$recyclerViewSelectionVersion"

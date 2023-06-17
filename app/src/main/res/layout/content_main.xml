@@ -109,19 +109,17 @@
             app:layout_constraintBottom_toTopOf="@+id/LinearLayout2"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                app:cardElevation="@dimen/fab_elevation"
-                app:cardMaxElevation="@dimen/fab_elevation">
+                android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
                     android:text="@string/main_activity_button_add_setlist" />
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_setlist"
@@ -131,7 +129,6 @@
                 android:contentDescription="@string/main_activity_button_add_setlist"
                 android:visibility="visible"
                 app:backgroundTint="@color/fab_background_1"
-                app:elevation="@dimen/fab_elevation"
                 app:fabCustomSize="40dp"
                 app:maxImageSize="24dp"
                 app:srcCompat="@drawable/baseline_playlist_add_white_24dp"
@@ -156,19 +153,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                app:cardElevation="@dimen/fab_elevation"
-                app:cardMaxElevation="@dimen/fab_elevation">
+                android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
                     android:text="@string/main_activity_button_add_song" />
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_song"
@@ -180,7 +175,6 @@
                 android:scaleType="center"
                 android:visibility="visible"
                 app:backgroundTint="@color/fab_background_1"
-                app:elevation="@dimen/fab_elevation"
                 app:fabCustomSize="40dp"
                 app:srcCompat="@drawable/baseline_music_note_black_24dp"
                 app:tint="@color/fab_icon"
@@ -201,7 +195,6 @@
         android:focusableInTouchMode="true"
         android:scaleType="center"
         app:backgroundTint="@color/fab_background_2"
-        app:elevation="@dimen/fab_elevation"
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"

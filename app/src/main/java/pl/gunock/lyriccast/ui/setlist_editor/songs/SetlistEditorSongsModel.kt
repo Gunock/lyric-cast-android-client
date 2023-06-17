@@ -11,7 +11,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
@@ -31,14 +37,16 @@ class SetlistEditorSongsModel @Inject constructor(
         const val TAG = "SetlistEditorSongsModel"
     }
 
-    val songs: StateFlow<List<SongItem>> get() = _songs
-    private val _songs: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
+    private val _songs: MutableSharedFlow<List<SongItem>> = MutableSharedFlow(replay = 1)
+    val songs: Flow<List<SongItem>> get() = _songs
+
+    private var filteredSongs: List<SongItem> = listOf()
     private var allSongs: List<SongItem> = listOf()
 
     private var setlistSongIds: List<String> = listOf()
 
-    val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
+    val categories: Flow<List<CategoryItem>> get() = _categories
 
     val searchValues get() = itemFilter.values
 
@@ -111,13 +119,14 @@ class SetlistEditorSongsModel @Inject constructor(
 
     fun selectSong(songItem: SongItem): Int {
         songItem.isSelected = !songItem.isSelected
-        return _songs.value.indexOf(songItem)
+        return filteredSongs.indexOf(songItem)
     }
 
     private suspend fun emitSongs() = withContext(Dispatchers.Default) {
         Log.v(TAG, "Song filtering invoked")
         val duration = measureTimeMillis {
-            _songs.value = itemFilter.apply(allSongs).toList()
+            filteredSongs = itemFilter.apply(allSongs).toList()
+            _songs.emit(filteredSongs)
         }
         Log.v(TAG, "Filtering took : ${duration}ms")
     }

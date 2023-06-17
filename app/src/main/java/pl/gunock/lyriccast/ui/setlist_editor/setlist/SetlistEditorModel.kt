@@ -11,7 +11,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -29,9 +33,9 @@ class SetlistEditorModel @Inject constructor(
         const val TAG = "SetlistEditorModel"
     }
 
-    private var _songs: MutableStateFlow<MutableList<SetlistSongItem>> =
+    private var _songsFlow: MutableStateFlow<MutableList<SetlistSongItem>> =
         MutableStateFlow(mutableListOf())
-    val songs: StateFlow<List<SetlistSongItem>> = _songs
+    val songsFlow: StateFlow<List<SetlistSongItem>> = _songsFlow
 
     private var setlistNames: Set<String> = setOf()
 
@@ -59,11 +63,11 @@ class SetlistEditorModel @Inject constructor(
             SetlistSongItem(songsRepository.getSong(songId)!!, availableId++)
         }
 
-        _songs.value = setlistSongs.toMutableList()
+        _songsFlow.value = setlistSongs.toMutableList()
     }
 
     fun loadAdhocSetlist(presentation: List<String>) {
-        _songs.value = presentation.map { songId ->
+        _songsFlow.value = presentation.map { songId ->
             SetlistSongItem(songsRepository.getSong(songId)!!, availableId++)
         }.toMutableList()
     }
@@ -71,7 +75,7 @@ class SetlistEditorModel @Inject constructor(
     fun loadEditedSetlist(setlistId: String) {
         this.setlistId = setlistId
         editedSetlist = setlistsRepository.getSetlist(setlistId)!!.also { setlist ->
-            _songs.value = setlist.presentation
+            _songsFlow.value = setlist.presentation
                 .map { SetlistSongItem(it, availableId++) }
                 .toMutableList()
             setlistName = setlist.name
@@ -79,7 +83,7 @@ class SetlistEditorModel @Inject constructor(
     }
 
     suspend fun saveSetlist() {
-        val presentation: Array<Song> = _songs.value
+        val presentation: Array<Song> = _songsFlow.value
             .map { it.song }
             .toTypedArray()
 
@@ -89,27 +93,27 @@ class SetlistEditorModel @Inject constructor(
     }
 
     fun hideSelectionCheckboxes() {
-        _songs.value.forEach {
+        _songsFlow.value.forEach {
             it.hasCheckbox = false
             it.isSelected = false
         }
     }
 
     fun showSelectionCheckboxes() {
-        _songs.value.forEach { it.hasCheckbox = true }
+        _songsFlow.value.forEach { it.hasCheckbox = true }
     }
 
     fun moveSong(from: Int, to: Int) {
-        val item = _songs.value.removeAt(from)
-        _songs.value.add(to, item)
+        val item = _songsFlow.value.removeAt(from)
+        _songsFlow.value.add(to, item)
     }
 
     fun removeSelectedSongs() {
-        _songs.value = _songs.value.filter { !it.isSelected }.toMutableList()
+        _songsFlow.value = _songsFlow.value.filter { !it.isSelected }.toMutableList()
     }
 
     fun duplicateSelectedSong() {
-        val songsAfterDuplicate = _songs.value.toMutableList()
+        val songsAfterDuplicate = _songsFlow.value.toMutableList()
 
         val selectedItemIndex = songsAfterDuplicate.indexOfFirst { item -> item.isSelected }
         val selectedItem = songsAfterDuplicate[selectedItemIndex].copy(id = availableId++)
@@ -117,7 +121,7 @@ class SetlistEditorModel @Inject constructor(
         selectedItem.isSelected = false
 
         songsAfterDuplicate.add(selectedItemIndex + 1, selectedItem)
-        _songs.value = songsAfterDuplicate
+        _songsFlow.value = songsAfterDuplicate
     }
 
     fun validateSetlistName(name: String): NameValidationState {
@@ -135,7 +139,7 @@ class SetlistEditorModel @Inject constructor(
     }
 
     fun selectSong(songId: Long, selected: Boolean): Boolean {
-        val item = _songs.value
+        val item = _songsFlow.value
             .firstOrNull { it.id == songId } ?: return false
 
         item.isSelected = selected

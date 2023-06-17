@@ -12,7 +12,11 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.application.Settings
 import pl.gunock.lyriccast.application.getCastConfigurationJson
@@ -43,21 +47,21 @@ class SetlistControlsModel @Inject constructor(
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
 
-    val currentSlideText: StateFlow<String> get() = _currentSlideText
     private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
+    val currentSlideText: Flow<String> get() = _currentSlideText
 
-    val currentSongTitle: StateFlow<String> get() = _currentSongTitle
     private val _currentSongTitle: MutableStateFlow<String> = MutableStateFlow("")
+    val currentSongTitle: Flow<String> get() = _currentSongTitle
 
-    val currentSongPosition: StateFlow<Int> get() = _currentSongPosition
     private val _currentSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val currentSongPosition: Flow<Int> get() = _currentSongPosition
 
-    val changedSongPositions: StateFlow<List<Int>> get() = _changedSongPositions
     private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf(0))
+    val changedSongPositions: Flow<List<Int>> get() = _changedSongPositions
 
-    val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
     private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
         MutableStateFlow(Pair(blankOffText, blankOffColor))
+    val currentBlankTextAndColor: Flow<Pair<Int, Int>> get() = _currentBlankTextAndColor
 
 
     private lateinit var setlistLyrics: List<String>
