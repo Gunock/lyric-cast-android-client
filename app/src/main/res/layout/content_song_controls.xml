@@ -10,14 +10,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
-    android:background="@color/window_background_2"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ConstraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_background_primary"
         android:outlineProvider="background"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,7 +30,6 @@
             android:paddingEnd="8dp"
             android:text="99/99"
             android:textAlignment="textEnd"
-            android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="Test song"
-            android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/tv_song_slide_number"
             app:layout_constraintStart_toEndOf="@+id/tv_song_slide_number"
@@ -80,7 +76,6 @@
         android:id="@+id/song_controls_button_container"
         android:layout_width="match_parent"
         android:layout_height="88dp"
-        android:background="@color/window_background_1"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

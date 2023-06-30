@@ -73,7 +73,6 @@
             android:singleLine="true"
             android:text="@string/placeholder_title"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:textColor="@color/text"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toStartOf="@+id/imv_handle"
             app:layout_constraintStart_toEndOf="@+id/chk_item_song"

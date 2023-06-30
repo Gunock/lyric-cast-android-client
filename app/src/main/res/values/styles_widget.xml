@@ -6,31 +6,32 @@
 
 <resources>
 
+    <!-- Find Material3 equivalent for parent -->
     <style name="Widget.LyricCast.TextView" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/text</item>
+        <!--        <item name="android:textColor">@color/text</item>-->
     </style>
 
-    <style name="Widget.LyricCast.TabLayout" parent="Widget.MaterialComponents.TabLayout">
-        <item name="tabIndicatorColor">@color/tab_indicator</item>
-        <item name="tabTextColor">@color/white</item>
-        <item name="android:background">@color/color_background_primary</item>
+    <style name="Widget.LyricCast.TabLayout" parent="Widget.Material3.TabLayout">
+        <!--        <item name="tabIndicatorColor">@color/tab_indicator</item>-->
+        <!--        <item name="tabTextColor">@color/white</item>-->
+        <item name="android:background">@color/material_dynamic_neutral10</item>
     </style>
 
     <style name="Widget.LyricCast.TabLayout.Bottom" parent="Widget.LyricCast.TabLayout">
-        <item name="android:background">@color/window_background_2</item>
+        <!--        <item name="android:background">@color/window_background_2</item>-->
 
-        <item name="tabTextColor">@color/text</item>
-        <item name="tabIndicatorColor">@color/accent</item>
+        <!--        <item name="tabTextColor">@color/text</item>-->
+        <!--        <item name="tabIndicatorColor">@color/accent</item>-->
     </style>
 
-    <style name="Widget.LyricCast.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+    <style name="Widget.LyricCast.TextInputLayout" parent="Widget.Material3.TextInputLayout.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
 
-        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <!--        <item name="boxStrokeColor">@color/text_input_stroke</item>-->
 
-        <item name="hintTextColor">@color/accent</item>
-        <item name="android:textColorHint">@color/text_hint</item>
+        <!--        <item name="hintTextColor">@color/accent</item>-->
+        <!--        <item name="android:textColorHint">@color/text_hint</item>-->
 
         <item name="android:paddingLeft">4dp</item>
         <item name="android:paddingRight">4dp</item>
@@ -39,60 +40,62 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.LyricCast.EditText</item>
     </style>
 
-    <style name="ThemeOverlay.LyricCast.EditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
+    <style name="ThemeOverlay.LyricCast.EditText" parent="ThemeOverlay.Material3.TextInputEditText.FilledBox">
         <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
     </style>
 
-    <style name="Widget.LyricCast.EditText" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
+    <style name="Widget.LyricCast.EditText" parent="Widget.Material3.TextInputEditText.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
 
         <item name="android:paddingLeft">0dp</item>
         <item name="android:paddingRight">0dp</item>
 
-        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColor">@color/text</item>
-        <item name="colorControlActivated">@color/text_hint</item>
-        <item name="android:colorControlActivated">@color/text_hint</item>
+        <!--        <item name="android:textCursorDrawable">@drawable/text_cursor</item>-->
+        <!--        <item name="android:textColor">@color/text</item>-->
+        <!--        <item name="colorControlActivated">@color/text_hint</item>-->
+        <!--        <item name="android:colorControlActivated">@color/text_hint</item>-->
     </style>
 
-    <style name="Widget.LyricCast.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
-        <item name="buttonTint">@color/checkbox_state_list</item>
+    <style name="Widget.LyricCast.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <!--        <item name="buttonTint">@color/checkbox_state_list</item>-->
     </style>
 
-    <style name="Widget.LyricCast.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Surface">
-        <item name="android:background">@color/color_background_primary</item>
+    <!-- Find Material3 equivalent for parent -->
+    <style name="Widget.LyricCast.AppBarLayout" parent="Widget.Material3.AppBarLayout">
+        <item name="android:background">@color/material_dynamic_neutral10</item>
+        <item name="elevation">0dp</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout.Light" parent="Widget.LyricCast.AppBarLayout">
-        <item name="android:background">@color/color_secondary</item>
+        <item name="android:background">@color/material_dynamic_neutral10</item>
     </style>
 
-    <style name="Widget.LyricCast.Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:backgroundTint">@color/button_background</item>
-        <item name="android:textColor">@color/button_text_1</item>
+    <style name="Widget.LyricCast.Button" parent="Widget.Material3.Button">
+        <!--        <item name="android:backgroundTint">@color/button_background</item>-->
+        <!--        <item name="android:textColor">@color/button_text_1</item>-->
     </style>
 
     <style name="Widget.LyricCast.Button.Light" parent="Widget.LyricCast.Button">
-        <item name="android:textColor">@color/button_text_2</item>
+        <!--        <item name="android:textColor">@color/button_text_2</item>-->
     </style>
 
-    <style name="Widget.LyricCast.Button.Icon.Light" parent="Widget.MaterialComponents.Button.TextButton.Icon">
-        <item name="iconTint">@color/button_text_2</item>
+    <style name="Widget.LyricCast.Button.Icon.Light" parent="Widget.Material3.Button.TextButton.Icon">
+        <!--        <item name="iconTint">@color/button_text_2</item>-->
     </style>
 
     <style name="Widget.LyricCast.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="tint">@color/white</item>
+        <!--        <item name="tint">@color/white</item>-->
     </style>
 
     <style name="Widget.LyricCast.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
-        <item name="tint">@color/white</item>
-        <item name="android:tint">@color/white</item>
+        <!--        <item name="tint">@color/white</item>-->
+        <!--        <item name="android:tint">@color/white</item>-->
     </style>
 
     <style name="Widget.LyricCast.ActionButton" parent="Widget.AppCompat.ActionButton">
-        <item name="tint">@color/white</item>
-        <item name="android:tint">@color/white</item>
+        <!--        <item name="tint">@color/white</item>-->
+        <!--        <item name="android:tint">@color/white</item>-->
 
         <item name="android:minWidth">30dp</item>
         <item name="android:maxWidth">48dp</item>
@@ -102,12 +105,12 @@
         <item name="android:height">38dp</item>
     </style>
 
-    <style name="Widget.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/dialog_button</item>
+    <style name="Widget.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <!--        <item name="android:textColor">@color/dialog_button</item>-->
     </style>
 
-    <style name="Widget.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/dialog_button</item>
+    <style name="Widget.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <!--        <item name="android:textColor">@color/dialog_button</item>-->
     </style>
 
 </resources>

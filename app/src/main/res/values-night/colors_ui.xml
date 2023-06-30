@@ -5,7 +5,7 @@
   -->
 
 <resources>
-    <color name="color_primary">@color/royal_blue_dark</color>
+<!--    <color name="color_primary">@color/royal_blue_dark</color>-->
     <color name="color_background_primary">@color/almost_black</color>
     <color name="color_primary_dark">@color/almost_black</color>
     <color name="color_secondary">@color/very_dark_gray</color>

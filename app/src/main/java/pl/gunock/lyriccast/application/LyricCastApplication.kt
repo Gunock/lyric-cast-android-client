@@ -12,6 +12,7 @@ import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,8 @@ class LyricCastApplication : Application() {
                 task.result.sessionManager.addSessionManagerListener(listener)
             }
 
+
+        DynamicColors.applyToActivitiesIfAvailable(this)
 
         var appTheme = getSettings().appTheme
         appTheme = if (appTheme == 0) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else appTheme

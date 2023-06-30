@@ -10,7 +10,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
-    android:background="@color/window_background_1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.recyclerview.widget.RecyclerView

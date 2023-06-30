@@ -11,7 +11,6 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:animateLayoutChanges="true"
-    android:background="@color/window_background_2"
     android:padding="16dp">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -19,7 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:indeterminateTint="@color/indeterminate_progress_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +39,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@android:string/ok"
-        android:textColor="@color/dialog_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pgb_progress" />
 

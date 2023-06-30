@@ -10,7 +10,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
-    android:background="@color/window_background_3"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <com.google.android.gms.ads.AdView
@@ -28,7 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
-        android:background="@color/window_background_2"
         android:outlineProvider="background"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,9 +58,7 @@
             android:id="@+id/card_category_color"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="@color/color_primary_dark"
             android:outlineProvider="background"
-            app:cardBackgroundColor="@color/placeholder_card_color_1"
             app:layout_constraintBottom_toBottomOf="@+id/dropdown_layout_category"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category" />
@@ -139,7 +135,6 @@
         android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/window_background_2"
         android:paddingTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
