@@ -41,7 +41,7 @@ class ImportDialogFragment : DialogFragment() {
         setupImportTypeDropdown()
         setupListeners()
 
-        return MaterialAlertDialogBuilder(requireActivity())
+        return MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_LyricCast_MaterialAlertDialog)
             .setTitle(R.string.main_activity_import_dialog_title)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.main_activity_menu_import) { _, _ -> onImport() }

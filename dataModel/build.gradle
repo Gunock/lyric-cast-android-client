@@ -11,11 +11,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
-
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
+        compileSdk rootProject.targetSdkVersion
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -52,10 +51,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
     namespace 'pl.gunock.lyriccast.datamodel'
+}
+
+// TODO: Remove this workaround when https://github.com/realm/realm-kotlin/issues/887 is fixed
+project.afterEvaluate {
+    kotlin.target.compilations.all { // use targets if this is a Multiplatform project
+        kotlinOptions.jvmTarget = "17"
+    }
 }
 
 dependencies {

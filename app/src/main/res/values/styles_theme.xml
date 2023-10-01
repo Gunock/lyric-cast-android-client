@@ -16,8 +16,8 @@
         <!--        <item name="colorAccent">@color/accent</item>-->
         <!--        <item name="android:navigationBarColor">@color/color_primary_dark</item>-->
 
-        <item name="alertDialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
-        <item name="dialogTheme">@style/Theme.LyricCast.Dialog.NoTitle</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle</item>
+        <item name="dialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle</item>
 
         <!--        <item name="mediaRouteButtonTint">@color/white</item>-->
         <!--        <item name="android:textColorPrimary">@color/white</item>-->
@@ -39,7 +39,7 @@
             @style/Widget.LyricCast.ActionButton.Overflow
         </item>
         <!-- TODO: Replace with rounded icon -->
-        <item name="actionModeCloseDrawable">@drawable/baseline_close_black_24dp</item>
+        <item name="actionModeCloseDrawable">@drawable/round_close_24_white</item>
         <item name="actionModeCloseButtonStyle">
             @style/Widget.LyricCast.ActionButton
         </item>
@@ -49,31 +49,16 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <!--        <item name="actionModeBackground">@color/color_background_primary</item>-->
     </style>
 
-    <style name="Theme.LyricCast.Dialog" parent="Theme.Material3.DayNight.Dialog">
-        <item name="android:windowMinWidthMajor">85%</item>
-        <item name="android:windowMinWidthMinor">85%</item>
-        <item name="android:windowNoTitle">false</item>
-
-        <!--        <item name="android:textColor">@color/dialog_text</item>-->
-        <!--        <item name="colorPrimary">@color/color_primary</item>-->
-        <!--        <item name="colorPrimaryDark">@color/color_primary_dark</item>-->
-        <!--        <item name="colorAccent">@color/dialog_button</item>-->
-
-        <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
-        <item name="autoCompleteTextViewStyle">@style/ThemeOverlay.Material3.AutoCompleteTextView
-        </item>
-        <item name="buttonBarNegativeButtonStyle">
-            @style/Widget.LyricCast.Dialog.NegativeButtonStyle
-        </item>
-        <item name="buttonBarPositiveButtonStyle">
-            @style/Widget.LyricCast.Dialog.PositiveButtonStyle
-        </item>
+    <!-- TODO: add title when title padding is fixed by google -->
+    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.3</item>
     </style>
 
-    <style name="Theme.LyricCast.Dialog.NoTitle" parent="Theme.LyricCast.Dialog">
+    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle" parent="ThemeOverlay.LyricCast.MaterialAlertDialog">
         <item name="android:windowNoTitle">true</item>
     </style>
 

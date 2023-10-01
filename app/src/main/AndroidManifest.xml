@@ -31,7 +31,7 @@
             android:value="@string/ads_application_id" />
 
         <activity
-            android:name=".ui.launch.LaunchActivity"
+            android:name=".ui.main.MainActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:exported="true"
@@ -42,12 +42,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.main.MainActivity"
-            android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.setlist_editor.SetlistEditorActivity"

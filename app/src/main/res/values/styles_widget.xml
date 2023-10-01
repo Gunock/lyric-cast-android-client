@@ -58,7 +58,8 @@
     </style>
 
     <style name="Widget.LyricCast.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
-        <!--        <item name="buttonTint">@color/checkbox_state_list</item>-->
+        <item name="buttonIconTint">@color/white</item>
+        <item name="buttonTint">@color/checkbox_state_list</item>
     </style>
 
     <!-- Find Material3 equivalent for parent -->
@@ -103,14 +104,6 @@
         <item name="android:minHeight">30dp</item>
         <item name="android:maxHeight">48dp</item>
         <item name="android:height">38dp</item>
-    </style>
-
-    <style name="Widget.LyricCast.Dialog.NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <!--        <item name="android:textColor">@color/dialog_button</item>-->
-    </style>
-
-    <style name="Widget.LyricCast.Dialog.PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <!--        <item name="android:textColor">@color/dialog_button</item>-->
     </style>
 
 </resources>

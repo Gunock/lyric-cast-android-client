@@ -7,32 +7,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Theme.LyricCast.Dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:padding="16dp">
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tv_dialog_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/placeholder_title"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tin_category_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:hint="@string/category_manager_hint_category_name"
         app:counterEnabled="true"
         app:counterMaxLength="@integer/ed_max_length_category_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ed_category_name"
@@ -58,6 +48,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:hint="@string/category_manager_hint_category_color"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/card_category_color"
         app:layout_constraintTop_toBottomOf="@+id/tin_category_name">
@@ -69,26 +60,5 @@
             android:inputType="none"
             tools:listitem="@layout/dropdown_item_color" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_cancel"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@android:string/cancel"
-        app:layout_constraintEnd_toStartOf="@+id/btn_save_category"
-        app:layout_constraintTop_toBottomOf="@+id/dropdown_layout_category" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_save_category"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/editor_button_save"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dropdown_layout_category" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -101,13 +101,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun showAddCategoryDialog(): Boolean {
-        val dialogFragment = EditCategoryDialogFragment()
-        dialogFragment.setStyle(
-            DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog_NoTitle
-        )
-
-        dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
+        EditCategoryDialogFragment().show(supportFragmentManager, EditCategoryDialogFragment.TAG)
         return true
     }
 
@@ -115,9 +109,7 @@ class CategoryManagerActivity : AppCompatActivity() {
         val categoryItem = categoryItemsAdapter.currentList
             .first { tracker.isSelected(it.category.idLong) }
 
-        val dialogFragment = EditCategoryDialogFragment(categoryItem)
-        dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog_NoTitle)
-        dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
+        EditCategoryDialogFragment(categoryItem).show(supportFragmentManager, EditCategoryDialogFragment.TAG)
 
         return true
     }

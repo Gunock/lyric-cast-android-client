@@ -19,8 +19,6 @@
         <action
             android:id="@+id/action_Songs_to_Setlists"
             app:destination="@id/Setlists"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
             app:launchSingleTop="false"
             app:popUpTo="@id/nav_graph_main"
             app:popUpToInclusive="true" />
@@ -34,8 +32,6 @@
         <action
             android:id="@+id/action_Setlists_to_Songs"
             app:destination="@id/Songs"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
             app:launchSingleTop="true"
             app:popUpTo="@id/nav_graph_main"
             app:popUpToInclusive="true" />

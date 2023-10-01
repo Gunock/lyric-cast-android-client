@@ -56,7 +56,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_item_song_title" />
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_item_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_view_headline_black_24dp" />
+            app:srcCompat="@drawable/round_view_headline_24_black" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

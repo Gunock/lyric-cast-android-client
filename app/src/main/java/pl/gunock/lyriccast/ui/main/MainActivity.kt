@@ -7,9 +7,13 @@
 package pl.gunock.lyriccast.ui.main
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -23,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -58,6 +63,8 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "MainActivity"
+
+        var wifiStateChecked = false
     }
 
     private val viewModel: MainModel by viewModels()
@@ -77,9 +84,11 @@ class MainActivity : AppCompatActivity() {
         val rootBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(rootBinding.root)
         setSupportActionBar(rootBinding.toolbarMain)
+
         binding = rootBinding.contentMain
 
         binding.cstlFabContainer.visibility = View.GONE
+        binding.advMain.loadAd()
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navh_main) as NavHostFragment
@@ -89,11 +98,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupListeners()
-    }
 
-    override fun onResume() {
-        binding.advMain.loadAd()
-        super.onResume()
+        if (!wifiStateChecked) {
+            checkWifiEnabled()
+            wifiStateChecked = true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -117,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch(Dispatchers.Default) { showImportDialog() }
                 true
             }
+
             R.id.menu_export_all -> startExport()
             else -> super.onOptionsItemSelected(item)
         }
@@ -226,9 +236,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showImportDialog() {
-        val importDialog = ImportDialogFragment().apply {
-            show(this@MainActivity.supportFragmentManager, ImportDialogFragment.TAG)
-        }
+        val importDialog = ImportDialogFragment()
+        importDialog.show(this@MainActivity.supportFragmentManager, ImportDialogFragment.TAG)
 
         while (!importDialog.isAdded) {
             delay(10)
@@ -340,5 +349,33 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(baseContext, CategoryManagerActivity::class.java)
         startActivity(intent)
         return true
+    }
+
+    private fun checkWifiEnabled() {
+        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (!wifiManager.isWifiEnabled) {
+            turnOnWifi()
+        }
+    }
+
+    private fun turnOnWifi() {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_LyricCast_MaterialAlertDialog_NoTitle)
+            .setMessage(getString(R.string.launch_activity_turn_on_wifi))
+            .setPositiveButton(getString(R.string.launch_activity_go_to_settings)) { _, _ ->
+                openWifiSettings()
+            }
+            .setNegativeButton(getString(R.string.launch_activity_ignore), null)
+            .create()
+            .show()
+    }
+
+    private fun openWifiSettings() {
+        val wifiIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
+        } else {
+            Intent(Settings.ACTION_WIRELESS_SETTINGS)
+        }
+
+        startActivity(wifiIntent)
     }
 }

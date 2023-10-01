@@ -18,7 +18,7 @@
     <string name="placeholder_progress_message" translatable="false">Importing data …</string>
 
     <!-- Titles -->
-    <string name="title_category_manager">Category manager</string>
+    <string name="title_category_manager">Manage categories</string>
     <string name="title_categories">Categories</string>
     <string name="title_settings">Settings</string>
     <string name="title_song_editor">Song editor</string>

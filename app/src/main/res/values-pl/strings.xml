@@ -6,7 +6,7 @@
 
 <resources>
     <!-- Titles -->
-    <string name="title_category_manager">Zarządzanie kategoriami</string>
+    <string name="title_category_manager">Zarządzaj kategoriami</string>
     <string name="title_categories">Kategorie</string>
     <string name="title_settings">Ustawienia</string>
     <string name="title_song_editor">Edytor piosenek</string>

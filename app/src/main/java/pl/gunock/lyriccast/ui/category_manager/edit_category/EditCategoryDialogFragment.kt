@@ -6,6 +6,7 @@
 
 package pl.gunock.lyriccast.ui.category_manager.edit_category
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -17,11 +18,13 @@ import android.widget.AdapterView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
+import pl.gunock.lyriccast.databinding.DialogFragmentImportBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.ColorItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
@@ -43,13 +46,37 @@ class EditCategoryDialogFragment(
 
     private lateinit var binding: DialogFragmentEditCategoryBinding
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        binding = DialogFragmentEditCategoryBinding.inflate(layoutInflater)
+
+        setupListeners()
+
+        val title = if (categoryItem == null) {
+            getString(R.string.category_manager_add_category)
+        } else {
+            getString(R.string.category_manager_edit_category)
+        }
+
+        return MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_LyricCast_MaterialAlertDialog_NoTitle)
+            .setTitle(title)
+            .setPositiveButton(R.string.editor_button_save) { _, _ ->
+                if (validateCategoryName()) {
+                    lifecycleScope.launch(Dispatchers.Default) {
+                        viewModel.saveCategory()
+                        dismiss()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
+            .setView(binding.root)
+            .create()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DialogFragmentEditCategoryBinding.inflate(inflater)
         return binding.root
     }
 
@@ -57,12 +84,6 @@ class EditCategoryDialogFragment(
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.categoryId = categoryItem?.category?.id ?: ""
-
-        binding.tvDialogTitle.text = if (categoryItem == null) {
-            getString(R.string.category_manager_add_category)
-        } else {
-            getString(R.string.category_manager_edit_category)
-        }
 
         binding.edCategoryName.filters = arrayOf(
             InputFilter.AllCaps(),
@@ -112,19 +133,6 @@ class EditCategoryDialogFragment(
 
     private fun setupListeners() {
         binding.edCategoryName.addTextChangedListener(categoryNameTextWatcher)
-
-        binding.btnSaveCategory.setOnClickListener {
-            if (validateCategoryName()) {
-                lifecycleScope.launch(Dispatchers.Default) {
-                    viewModel.saveCategory()
-                    dismiss()
-                }
-            }
-        }
-
-        binding.btnCancel.setOnClickListener {
-            dismiss()
-        }
     }
 
     private fun validateCategoryName(): Boolean {

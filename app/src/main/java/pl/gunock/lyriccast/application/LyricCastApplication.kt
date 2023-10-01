@@ -64,6 +64,7 @@ class LyricCastApplication : Application() {
     private fun setupStrictMode() {
         val threadPolicy = StrictMode.ThreadPolicy.Builder()
             .detectAll()
+            .permitCustomSlowCalls()
             .penaltyLog()
             .penaltyDialog()
             .build()

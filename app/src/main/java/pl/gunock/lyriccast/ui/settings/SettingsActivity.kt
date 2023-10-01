@@ -118,7 +118,7 @@ class SettingsActivity : AppCompatActivity() {
             savedInstanceState: Bundle?
         ): View {
             val contextThemeWrapper: Context =
-                ContextThemeWrapper(activity, R.style.Theme_LyricCast_Dialog)
+                ContextThemeWrapper(activity, R.style.ThemeOverlay_LyricCast_MaterialAlertDialog)
 
             val localInflater = inflater.cloneInContext(contextThemeWrapper)
 

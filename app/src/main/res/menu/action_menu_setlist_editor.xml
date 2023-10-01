@@ -12,13 +12,13 @@
 
     <item
         android:id="@+id/menu_duplicate"
-        android:icon="@drawable/baseline_library_add_white_24dp"
+        android:icon="@drawable/round_library_add_24_white"
         android:title="@string/setlist_editor_action_menu_duplicate"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_menu_delete"
-        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:icon="@drawable/round_delete_outline_24_white"
         android:title="@string/action_menu_button_delete"
         app:showAsAction="always" />
 

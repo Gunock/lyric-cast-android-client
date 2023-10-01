@@ -6,4 +6,4 @@
 
 package pl.gunock.lyriccast.domain.models
 
-class ColorItem(val name: String, val value: Int)
+data class ColorItem(val name: String, val value: Int)

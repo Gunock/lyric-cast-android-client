@@ -12,8 +12,9 @@ import com.google.android.gms.ads.AdView
 
 fun AdView.loadAd() {
     // TODO: Add settings for ads
-    @Suppress("ConstantConditionIf")
-    if (true) {
+    val enableAds = context.getSettings().enableAds
+
+    if (enableAds) {
         this.visibility = View.VISIBLE
         val adRequest = AdRequest.Builder().build()
         this.loadAd(adRequest)

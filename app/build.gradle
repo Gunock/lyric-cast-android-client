@@ -19,25 +19,24 @@ plugins {
 
 android {
     def major = 0
-    def minor = 1
-    def patch = 6
+    def minor = 2
+    def patch = 0
 
 
     signingConfigs {
-        release {
-            storeFile file(var)
-            storePassword 'eAdmin.1@2'
-            keyAlias 'LyricCast-release'
-            keyPassword 'eAdmin.1@2'
-        }
+//        release {
+//            storeFile file(var)
+//            storePassword 'eAdmin.1@2'
+//            keyAlias 'LyricCast-release'
+//            keyPassword 'eAdmin.1@2'
+//        }
     }
-
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
+        compileSdk rootProject.targetSdkVersion
         versionCode major * 100000000 + minor * 10000 + patch
         versionName "$major.$minor.$patch"
 
@@ -81,10 +80,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
     testOptions {

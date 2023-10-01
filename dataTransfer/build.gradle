@@ -10,11 +10,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
-
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
+        compileSdk rootProject.targetSdkVersion
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -50,9 +49,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+
     namespace 'pl.gunock.datatransfer'
 }
 

@@ -12,23 +12,23 @@
 
     <item
         android:id="@+id/action_menu_edit"
-        android:icon="@drawable/baseline_mode_edit_white_24dp"
+        android:icon="@drawable/round_edit_24_white"
         android:title="@string/main_activity_button_edit"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_menu_add_setlist"
-        android:icon="@drawable/baseline_playlist_add_white_24dp"
+        android:icon="@drawable/round_playlist_add_24_white"
         android:title="@string/main_activity_button_add_setlist"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_menu_export_selected"
-        android:icon="@drawable/baseline_upload_file_white_24dp"
+        android:icon="@drawable/round_upload_file_24"
         android:title="@string/main_activity_action_menu_export_selected"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_menu_delete"
-        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:icon="@drawable/round_delete_outline_24_white"
         android:title="@string/action_menu_button_delete"
         app:showAsAction="always" />
 

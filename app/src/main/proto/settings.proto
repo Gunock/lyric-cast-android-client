@@ -11,4 +11,5 @@ message Settings {
     string background_color = 4;
     string font_color = 5;
     int32 max_font_size = 6;
+    bool enable_ads = 7;
 }
