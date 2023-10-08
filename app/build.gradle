@@ -8,7 +8,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
     id 'androidx.navigation.safeargs.kotlin'
     id 'com.google.dagger.hilt.android'
     id 'com.google.protobuf'
@@ -127,7 +127,7 @@ dependencies {
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
-    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
+    ksp "com.google.dagger:hilt-compiler:$hiltVersion"
 
     // Firebase
     implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
@@ -144,14 +144,10 @@ dependencies {
 
     // AndroidX Test - Hilt testing
     androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-    kaptAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
+    kspAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
 
     // LeakCanary
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
-}
-
-kapt {
-    correctErrorTypes true
 }
 
 protobuf {

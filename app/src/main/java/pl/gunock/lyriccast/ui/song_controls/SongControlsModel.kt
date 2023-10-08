@@ -31,11 +31,11 @@ class SongControlsModel @Inject constructor(
     val songsRepository: SongsRepository
 ) : ViewModel() {
     private companion object {
-        private const val blankOnColor: Int = R.color.green
-        private const val blankOffColor: Int = R.color.red
+        private val blankOnColor: Int = R.color.green
+        private val blankOffColor: Int = R.color.red
 
-        private const val blankOffText: Int = R.string.controls_off
-        private const val blankOnText: Int = R.string.controls_on
+        private val blankOffText: Int = R.string.controls_off
+        private val blankOnText: Int = R.string.controls_on
     }
 
     var songTitle: String = ""
