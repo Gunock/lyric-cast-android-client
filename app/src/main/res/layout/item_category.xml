@@ -21,6 +21,7 @@
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
+    app:strokeWidth="0dp"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
 
@@ -76,7 +77,8 @@
             app:cardBackgroundColor="@color/placeholder_card_color_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
 
         </com.google.android.material.card.MaterialCardView>
 

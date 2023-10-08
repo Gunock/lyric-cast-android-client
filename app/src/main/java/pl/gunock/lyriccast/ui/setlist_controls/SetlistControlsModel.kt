@@ -13,6 +13,7 @@ import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -47,16 +48,16 @@ class SetlistControlsModel @Inject constructor(
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
 
-    private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSlideText: MutableSharedFlow<String> = MutableSharedFlow(1)
     val currentSlideText: Flow<String> get() = _currentSlideText
 
-    private val _currentSongTitle: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSongTitle: MutableSharedFlow<String> = MutableSharedFlow(1)
     val currentSongTitle: Flow<String> get() = _currentSongTitle
 
-    private val _currentSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _currentSongPosition: MutableSharedFlow<Int> = MutableSharedFlow(1)
     val currentSongPosition: Flow<Int> get() = _currentSongPosition
 
-    private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf(0))
+    private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf())
     val changedSongPositions: Flow<List<Int>> get() = _changedSongPositions
 
     private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
@@ -193,10 +194,10 @@ class SetlistControlsModel @Inject constructor(
             _changedSongPositions.value = listOf(itemPosition1, itemPosition2)
             previousSongTitle = songTitle
 
-            _currentSongTitle.value = songTitleWithoutNumber
+            _currentSongTitle.tryEmit(songTitleWithoutNumber)
         }
 
-        _currentSlideText.value = setlistLyrics[currentLyricsPosition]
+        _currentSlideText.tryEmit(setlistLyrics[currentLyricsPosition])
     }
 
     private fun highlightSong(
@@ -213,7 +214,7 @@ class SetlistControlsModel @Inject constructor(
 
         _songs[songItemPosition].isHighlighted = isHighlighted
         if (isCurrent) {
-            _currentSongPosition.value = songItemPosition
+            _currentSongPosition.tryEmit(songItemPosition)
         }
 
         return songItemPosition

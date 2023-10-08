@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
@@ -79,20 +78,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         viewModel.categories
             .onEach { categories ->
-                val viewModelCategory = viewModel.category
                 categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
-
-                if (viewModelCategory != null) {
-                    withContext(Dispatchers.Main) {
-                        binding.dropdownCategory.setText(viewModelCategory.name)
-                        if (viewModelCategory.color != null) {
-                            binding.cardCategoryColor.setCardBackgroundColor(viewModelCategory.color!!)
-                            binding.cardCategoryColor.visibility = View.VISIBLE
-                        } else {
-                            binding.cardCategoryColor.visibility = View.GONE
-                        }
-                    }
-                }
             }.flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
     }
@@ -126,6 +112,17 @@ class SongEditorActivity : AppCompatActivity() {
 
         binding.dropdownCategory.setAdapter(categorySpinnerAdapter)
         binding.dropdownCategory.onItemClickListener = OnCategoryItemClickListener()
+
+        val viewModelCategoryName = viewModel.category?.name ?: viewModel.categoryNone.category.name
+        binding.dropdownCategory.setText(viewModelCategoryName)
+
+        val viewModelCategoryColor = viewModel.category?.color
+        if (viewModelCategoryColor != null) {
+            binding.cardCategoryColor.setCardBackgroundColor(viewModelCategoryColor)
+            binding.cardCategoryColor.visibility = View.VISIBLE
+        } else {
+            binding.cardCategoryColor.visibility = View.GONE
+        }
     }
 
     private fun setupListeners() {
@@ -133,14 +130,12 @@ class SongEditorActivity : AppCompatActivity() {
 
         binding.edSectionName.addTextChangedListener(sectionNameTextWatcher)
 
-        binding.edSectionLyrics.addTextChangedListener(
-            InputTextChangedListener { newText ->
-                val sectionName = selectedTab.text.toString().trim()
-                viewModel.setSectionText(sectionName, newText)
-            })
+        binding.edSectionLyrics.addTextChangedListener(InputTextChangedListener { newText ->
+            val sectionName = selectedTab.text.toString().trim()
+            viewModel.setSectionText(sectionName, newText)
+        })
 
-        binding.tblSongSection
-            .addOnTabSelectedListener(ItemSelectedTabListener(this::onTabSelected))
+        binding.tblSongSection.addOnTabSelectedListener(ItemSelectedTabListener(this::onTabSelected))
 
         binding.btnMoveSectionLeft.setOnClickListener {
             binding.tblSongSection.moveTabLeft(selectedTab)

@@ -106,17 +106,12 @@
             app:layout_constraintBottom_toTopOf="@+id/LinearLayout2"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="@string/main_activity_button_add_setlist" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginEnd="8dp"
+                android:text="@string/main_activity_button_add_setlist"
+                android:textColor="@color/white" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_setlist"
@@ -150,17 +145,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="@string/main_activity_button_add_song" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:text="@string/main_activity_button_add_song"
+                android:textColor="@color/white" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_song"

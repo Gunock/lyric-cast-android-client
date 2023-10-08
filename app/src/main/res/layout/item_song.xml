@@ -24,6 +24,7 @@
     android:longClickable="true"
     android:outlineProvider="background"
     android:soundEffectsEnabled="false"
+    app:strokeWidth="0dp"
     tools:layout_editor_absoluteX="2dp"
     tools:layout_editor_absoluteY="2dp">
 
@@ -78,7 +79,8 @@
             app:cardBackgroundColor="@color/placeholder_card_color_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_item_song_title">
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_song_title"
+            app:strokeWidth="0dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_song_category"
@@ -90,7 +92,7 @@
                 android:maxLines="1"
                 android:padding="8dp"
                 android:text="@string/placeholder_category"
-                android:textColor="@color/category_dark_text"
+                android:textColor="@color/category_bright_text"
                 android:textSize="12sp" />
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>

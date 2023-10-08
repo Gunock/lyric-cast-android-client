@@ -42,39 +42,58 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tv_setlist_slide_preview"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_setlist_slide_preview"
         android:layout_width="0dp"
         android:layout_height="196dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:scrollbars="vertical"
-        android:textAlignment="textStart"
-        android:textSize="18sp"
+        app:cardBackgroundColor="@color/window_background_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls" />
+        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls"
+        app:strokeWidth="0dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcv_songs"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_setlist_slide_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:textAlignment="textStart"
+            android:textSize="18sp" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:fadeScrollbars="false"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:outlineProvider="background"
-        android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
-        android:scrollbarStyle="outsideInset"
-        android:scrollbars="vertical"
+        app:cardBackgroundColor="@color/window_background_3"
+        app:cardCornerRadius="16dp"
         app:layout_constraintBottom_toTopOf="@+id/setlist_controls_button_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_setlist_slide_preview"
-        tools:listitem="@layout/item_controls_song">
+        app:layout_constraintTop_toBottomOf="@+id/card_setlist_slide_preview"
+        app:strokeWidth="0dp">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_songs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="false"
+            android:outlineProvider="background"
+            android:scrollbarAlwaysDrawHorizontalTrack="false"
+            android:scrollbarAlwaysDrawVerticalTrack="false"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_controls_song" />
+    </com.google.android.material.card.MaterialCardView>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/setlist_controls_button_container"
@@ -91,6 +110,7 @@
             android:layout_width="96dp"
             android:layout_height="0dp"
             android:layout_marginEnd="32dp"
+            android:backgroundTint="@color/very_dark_gray"
             android:contentDescription="@string/controls_previous"
             android:rotation="180"
             app:icon="@drawable/round_play_arrow_24_black"
@@ -118,6 +138,7 @@
             android:layout_width="96dp"
             android:layout_height="0dp"
             android:layout_marginStart="32dp"
+            android:backgroundTint="@color/very_dark_gray"
             android:contentDescription="@string/controls_next"
             app:icon="@drawable/round_play_arrow_24_black"
             app:iconGravity="textStart"

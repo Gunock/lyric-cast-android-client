@@ -61,15 +61,16 @@
             android:outlineProvider="background"
             app:layout_constraintBottom_toBottomOf="@+id/dropdown_layout_category"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category" />
+            app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category"
+            app:strokeWidth="0dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dropdown_layout_category"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:hint="@string/hint_song_category"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/card_category_color"
@@ -95,6 +96,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dropdown_layout_category">
 
+            <!-- Visually separate song inputs and song section inputs -->
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/ed_section_name"
                 android:layout_width="match_parent"
@@ -107,29 +109,35 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/ed_section_lyrics"
-        style="@style/Widget.LyricCast.EditText"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:gravity="top"
-        android:hint="@string/song_editor_hint_enter_lyrics"
-        android:importantForAutofill="no"
-        android:inputType="textMultiLine"
-        android:paddingStart="0dp"
-        android:paddingTop="0dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="0dp"
-        android:textSize="18sp"
+        app:cardBackgroundColor="@color/window_background_2"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3"
+        app:strokeWidth="0dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ed_section_lyrics"
+            style="@style/Widget.LyricCast.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/song_editor_hint_enter_lyrics"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine"
+            android:padding="8dp"
+            android:textSize="18sp" />
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout4"
@@ -146,6 +154,7 @@
             android:layout_marginEnd="32dp"
             android:contentDescription="@string/song_editor_button_move_left"
             app:icon="@drawable/round_arrow_back_24_black"
+            android:backgroundTint="@color/very_dark_gray"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="32dp"
@@ -167,6 +176,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_move_section_right"
             style="@style/Widget.LyricCast.Button.Icon.Light"
+            android:backgroundTint="@color/very_dark_gray"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -187,6 +197,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:tabIndicatorGravity="top"
             app:tabMode="scrollable">
 
             <com.google.android.material.tabs.TabItem

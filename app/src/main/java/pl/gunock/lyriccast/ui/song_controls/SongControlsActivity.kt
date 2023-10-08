@@ -57,17 +57,17 @@ class SongControlsActivity : AppCompatActivity() {
                 val (blankText: Int, blankColor: Int) = it
                 binding.btnSongBlank.setBackgroundColor(getColor(blankColor))
                 binding.btnSongBlank.text = getString(blankText)
-            }.flowOn(Dispatchers.Default)
+            }.flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
         viewModel.currentSlideText
             .onEach { binding.tvSlidePreview.text = it }
-            .flowOn(Dispatchers.Default)
+            .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
         viewModel.currentSlideNumber
             .onEach { binding.tvSongSlideNumber.text = it }
-            .flowOn(Dispatchers.Default)
+            .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
         setupListeners()

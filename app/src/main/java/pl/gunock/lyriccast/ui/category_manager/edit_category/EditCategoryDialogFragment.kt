@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.DialogFragmentEditCategoryBinding
-import pl.gunock.lyriccast.databinding.DialogFragmentImportBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.ColorItem
 import pl.gunock.lyriccast.shared.enums.NameValidationState
@@ -57,7 +56,10 @@ class EditCategoryDialogFragment(
             getString(R.string.category_manager_edit_category)
         }
 
-        return MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_LyricCast_MaterialAlertDialog_NoTitle)
+        return MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_LyricCast_MaterialAlertDialog_NoTitle
+        )
             .setTitle(title)
             .setPositiveButton(R.string.editor_button_save) { _, _ ->
                 if (validateCategoryName()) {
@@ -67,7 +69,7 @@ class EditCategoryDialogFragment(
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
+            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss() }
             .setView(binding.root)
             .create()
     }
@@ -123,12 +125,12 @@ class EditCategoryDialogFragment(
                 .uppercase(Locale.ROOT)
 
             binding.edCategoryName.setText(categoryNameUppercase)
-
-            val existingColor = colors.find { it.value == categoryItem.category.color }
-                ?: colors.first()
-
-            setColor(existingColor)
         }
+
+        val existingColor = categoryItem?.category?.let {
+            colors.find { it.value == categoryItem.category.color }
+        }
+        setColor(existingColor ?: colors.first())
     }
 
     private fun setupListeners() {
@@ -165,8 +167,7 @@ class EditCategoryDialogFragment(
     private fun setColor(colorItem: ColorItem) {
         viewModel.categoryColor = colorItem
         binding.cardCategoryColor.setCardBackgroundColor(colorItem.value)
-        binding.dropdownColor
-            .setText(colorItem.name)
+        binding.dropdownColor.setText(colorItem.name)
     }
 
     inner class CategoryNameTextWatcher : TextWatcher {
@@ -183,10 +184,12 @@ class EditCategoryDialogFragment(
                 NameValidationState.EMPTY -> {
                     binding.tinCategoryName.error = getString(R.string.category_manager_enter_name)
                 }
+
                 NameValidationState.ALREADY_IN_USE -> {
                     binding.tinCategoryName.error =
                         getString(R.string.category_manager_name_already_used)
                 }
+
                 NameValidationState.VALID -> {
                     binding.tinCategoryName.error = null
                 }

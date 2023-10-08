@@ -38,7 +38,8 @@
         android:outlineProvider="background"
         app:layout_constraintBottom_toBottomOf="@+id/dropdown_layout_category"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category" />
+        app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category"
+        app:strokeWidth="0dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dropdown_layout_category"

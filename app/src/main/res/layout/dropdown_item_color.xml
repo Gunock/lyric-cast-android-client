@@ -19,7 +19,8 @@
         android:outlineProvider="background"
         app:layout_constraintBottom_toBottomOf="@+id/text_color_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/text_color_name">
+        app:layout_constraintTop_toTopOf="@+id/text_color_name"
+        app:strokeWidth="0dp">
 
     </com.google.android.material.card.MaterialCardView>
 
