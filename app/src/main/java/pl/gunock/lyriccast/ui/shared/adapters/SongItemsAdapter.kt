@@ -7,11 +7,11 @@
 package pl.gunock.lyriccast.ui.shared.adapters
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -30,10 +30,9 @@ class SongItemsAdapter(
 
     var onItemClickListener: ((SongItem?) -> Unit)? = null
 
-    private val defaultItemCardColor = context.getColor(R.color.window_background_2)
-    private val withCategoryTextColor = context.getColor(R.color.text_item_with_category)
-    private val noCategoryTextColor = context.getColor(R.color.text_item_no_category)
-    private val checkBoxColors = context.getColorStateList(R.color.checkbox_state_list)
+    private val brightCategoryTextColor = context.getColor(R.color.category_dark_text)
+    private val darkCategoryTextColor = context.getColor(R.color.category_bright_text)
+    private val categoryTextColorMap = createCategoryTextColorMap(context)
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -69,13 +68,27 @@ class SongItemsAdapter(
         return currentList[position].song.idLong
     }
 
+    private fun createCategoryTextColorMap(context: Context): MutableMap<Int, Int> {
+        val categoryColorValues = context.resources.getIntArray(R.array.category_color_values)
+        return categoryColorValues.associateWith(::getCategoryTextColor).toMutableMap()
+    }
+
+    private fun getCategoryTextColor(backgroundColor: Int): Int {
+        val darkTextContrast =
+            ColorUtils.calculateContrast(darkCategoryTextColor, backgroundColor)
+        val brightTextContrast =
+            ColorUtils.calculateContrast(brightCategoryTextColor, backgroundColor)
+
+        return if (brightTextContrast > darkTextContrast) {
+            brightCategoryTextColor
+        } else {
+            darkCategoryTextColor
+        }
+    }
+
     inner class ViewHolder(
         private val binding: ItemSongBinding
     ) : SelectionViewHolder<SongItem>(binding.root) {
-        init {
-            binding.tvSongCategory.setTextColor(withCategoryTextColor)
-        }
-
         override fun bindAction(item: SongItem) {
             if (item.hasCheckbox) {
                 binding.chkItemSong.visibility = View.VISIBLE
@@ -85,25 +98,30 @@ class SongItemsAdapter(
                 binding.chkItemSong.isChecked = false
             }
 
-            if (item.song != this.item?.song) {
-                binding.tvItemSongTitle.text = item.song.title
+            if (item.song == this.item?.song) {
+                return
+            }
 
-                if (item.song.category != null) {
-                    binding.tvSongCategory.text = item.song.category?.name
+            binding.tvItemSongTitle.text = item.song.title
 
-                    binding.chkItemSong.buttonTintList =
-                        ColorStateList.valueOf(this@SongItemsAdapter.withCategoryTextColor)
+            if (item.song.category == null) {
+                binding.tvSongCategory.text = ""
+                binding.cardSongCategory.visibility = View.INVISIBLE
+            } else {
+                if (item.song.category!!.color != null) {
+                    val backgroundColor = item.song.category!!.color!!
+                    var categoryTextColor = categoryTextColorMap[backgroundColor]
+                    if (categoryTextColor == null) {
+                        categoryTextColor = getCategoryTextColor(backgroundColor)
+                        categoryTextColorMap[backgroundColor] = categoryTextColor
+                    }
 
-                    binding.tvItemSongTitle.setTextColor(this@SongItemsAdapter.withCategoryTextColor)
-                    binding.root.setCardBackgroundColor(item.song.category?.color!!)
-                } else {
-                    binding.tvSongCategory.text = ""
-
-                    binding.chkItemSong.buttonTintList = checkBoxColors
-
-                    binding.tvItemSongTitle.setTextColor(noCategoryTextColor)
-                    binding.root.setCardBackgroundColor(this@SongItemsAdapter.defaultItemCardColor)
+                    binding.cardSongCategory.setCardBackgroundColor(backgroundColor)
+                    binding.tvSongCategory.setTextColor(categoryTextColor)
                 }
+
+                binding.tvSongCategory.text = item.song.category!!.name
+                binding.cardSongCategory.visibility = View.VISIBLE
             }
         }
     }

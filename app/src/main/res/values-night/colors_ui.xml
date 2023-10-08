@@ -21,8 +21,8 @@
     <color name="tab_indicator">@color/royal_blue</color>
 
     <color name="placeholder_card_color_1">@color/royal_blue_dark</color>
-    <color name="text_item_with_category">@color/black</color>
-    <color name="text_item_no_category">@color/dim_white</color>
+    <color name="category_dark_text">@color/black</color>
+    <color name="category_bright_text">@color/dim_white</color>
     <color name="item_handle">@color/very_dim_white</color>
 
     <color name="fab_icon">@color/very_dim_white</color>

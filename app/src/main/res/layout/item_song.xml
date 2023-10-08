@@ -68,21 +68,31 @@
             app:layout_constraintStart_toEndOf="@+id/chk_item_song"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_song_category"
-            android:layout_width="0dp"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_song_category"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:gravity="end"
-            android:maxLines="1"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="@string/placeholder_category"
-            android:textSize="12sp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:outlineProvider="background"
+            app:cardBackgroundColor="@color/placeholder_card_color_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_item_song_title" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_song_title">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_song_category"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+
+                android:gravity="end"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:text="@string/placeholder_category"
+                android:textColor="@color/category_dark_text"
+                android:textSize="12sp" />
+        </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

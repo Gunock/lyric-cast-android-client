@@ -21,8 +21,8 @@
     <color name="tab_indicator">@color/white</color>
 
     <color name="placeholder_card_color_1">@color/royal_blue_dark</color>
-    <color name="text_item_with_category">@color/white</color>
-    <color name="text_item_no_category">@android:color/primary_text_light</color>
+    <color name="category_dark_text">@color/almost_black</color>
+    <color name="category_bright_text">@color/white</color>
     <color name="item_handle">@color/royal_blue</color>
 
     <color name="fab_icon">@color/white</color>
