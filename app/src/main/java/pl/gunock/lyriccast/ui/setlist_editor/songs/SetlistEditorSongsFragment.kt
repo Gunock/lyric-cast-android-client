@@ -47,6 +47,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         viewModel.init()
 
         setupMenu()

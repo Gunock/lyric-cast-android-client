@@ -12,31 +12,21 @@
     android:animateLayoutChanges="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_categories"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:outlineProvider="background"
-        app:cardBackgroundColor="@color/window_background_3"
-        app:cardCornerRadius="16dp"
         app:layout_constraintBottom_toTopOf="@+id/adv_category_manager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="0dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv_categories"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/item_category" />
-    </com.google.android.material.card.MaterialCardView>
+        tools:listitem="@layout/item_category" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adv_category_manager"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:adSize="BANNER"
         app:adUnitId="@string/ads_uid_category_manager"
         app:layout_constraintBottom_toBottomOf="parent"

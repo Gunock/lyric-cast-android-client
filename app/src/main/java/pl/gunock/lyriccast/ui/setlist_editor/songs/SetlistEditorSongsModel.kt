@@ -29,8 +29,8 @@ import kotlin.system.measureTimeMillis
 
 @HiltViewModel
 class SetlistEditorSongsModel @Inject constructor(
-    songsRepository: SongsRepository,
-    categoriesRepository: CategoriesRepository
+    private val songsRepository: SongsRepository,
+    private val categoriesRepository: CategoriesRepository
 ) : ViewModel() {
 
     private companion object {
@@ -52,7 +52,14 @@ class SetlistEditorSongsModel @Inject constructor(
 
     private val itemFilter = SongItemFilter()
 
-    init {
+    private var initialized: Boolean = false
+
+    fun init() {
+        if (initialized) {
+            return
+        }
+        initialized = true
+
         songsRepository.getAllSongs()
             .onEach {
                 val songItems = it.map { song ->
@@ -83,10 +90,6 @@ class SetlistEditorSongsModel @Inject constructor(
         searchValues.isSelectedFlow
             .onEach { emitSongs() }
             .launchIn(viewModelScope)
-    }
-
-
-    fun init() {
     }
 
     suspend fun updateSetlistSongIds(newSetlistSongIds: List<String>) {

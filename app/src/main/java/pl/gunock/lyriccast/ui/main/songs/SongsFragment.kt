@@ -72,7 +72,8 @@ class SongsFragment : Fragment() {
     private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSongsBinding.inflate(inflater)

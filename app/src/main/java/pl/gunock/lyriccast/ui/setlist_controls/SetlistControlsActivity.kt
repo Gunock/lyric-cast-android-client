@@ -43,6 +43,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val rootBinding = ActivitySetlistControlsBinding.inflate(layoutInflater)
         binding = rootBinding.contentSetlistControls
         setContentView(rootBinding.root)

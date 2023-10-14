@@ -6,15 +6,8 @@
 
 <resources>
 
-    <!-- Find Material3 equivalent for parent -->
-    <style name="Widget.LyricCast.TextView" parent="Widget.MaterialComponents.TextView">
-        <!--        <item name="android:textColor">@color/text</item>-->
-    </style>
-
-    <style name="Widget.LyricCast.TabLayout" parent="Widget.Material3.TabLayout">
-        <!--        <item name="tabIndicatorColor">@color/tab_indicator</item>-->
-        <!--        <item name="tabTextColor">@color/white</item>-->
-        <item name="android:background">@color/material_dynamic_neutral10</item>
+    <style name="Widget.LyricCast.TabLayout" parent="@style/Widget.Material3.TabLayout">
+        <item name="android:background">@color/window_background_3</item>
     </style>
 
     <style name="Widget.LyricCast.TabLayout.Bottom" parent="Widget.LyricCast.TabLayout">
@@ -24,7 +17,7 @@
         <!--        <item name="tabIndicatorColor">@color/accent</item>-->
     </style>
 
-    <style name="Widget.LyricCast.TextInputLayout" parent="Widget.Material3.TextInputLayout.FilledBox">
+    <style name="Widget.LyricCast.TextInputLayout" parent="@style/Widget.Material3.TextInputLayout.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
 
@@ -44,7 +37,7 @@
         <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
     </style>
 
-    <style name="Widget.LyricCast.EditText" parent="Widget.Material3.TextInputEditText.FilledBox">
+    <style name="Widget.LyricCast.EditText" parent="@style/Widget.Material3.TextInputEditText.FilledBox">
         <item name="background">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
 
@@ -57,22 +50,27 @@
         <!--        <item name="android:colorControlActivated">@color/text_hint</item>-->
     </style>
 
-    <style name="Widget.LyricCast.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+    <style name="Widget.LyricCast.CheckBox" parent="@style/Widget.Material3.CompoundButton.CheckBox">
         <item name="buttonIconTint">@color/white</item>
         <item name="buttonTint">@color/checkbox_state_list</item>
     </style>
 
-    <!-- Find Material3 equivalent for parent -->
-    <style name="Widget.LyricCast.AppBarLayout" parent="Widget.Material3.AppBarLayout">
-        <item name="android:background">@color/material_dynamic_neutral10</item>
-        <item name="elevation">0dp</item>
+    <style name="Widget.LyricCast.AppBarLayout" parent="@style/Widget.Material3.AppBarLayout">
+        <item name="android:background">@color/window_background_2</item>
+        <item name="liftOnScrollColor">@color/window_background_1</item>
     </style>
 
-    <style name="Widget.LyricCast.AppBarLayout.Light" parent="Widget.LyricCast.AppBarLayout">
-        <item name="android:background">@color/material_dynamic_neutral10</item>
+    <style name="Widget.LyricCast.AppBarLayout.Static" parent="Widget.LyricCast.AppBarLayout">
+        <item name="android:background">@color/window_background_1</item>
+        <item name="liftOnScrollColor">@color/window_background_1</item>
+        <item name="liftOnScroll">false</item>
     </style>
 
-    <style name="Widget.LyricCast.Button" parent="Widget.Material3.Button">
+    <style name="Widget.LyricCast.Toolbar.Static" parent="">
+        <item name="android:background">@color/window_background_1</item>
+    </style>
+
+    <style name="Widget.LyricCast.Button" parent="@style/Widget.Material3.Button">
         <!--        <item name="android:backgroundTint">@color/button_background</item>-->
         <item name="android:textColor">@color/button_text_1</item>
     </style>
@@ -81,12 +79,16 @@
         <item name="android:textColor">@color/button_text_2</item>
     </style>
 
-    <style name="Widget.LyricCast.Button.Icon.Light" parent="Widget.Material3.Button.TextButton.Icon">
+    <style name="Widget.LyricCast.Button.Icon.Light" parent="@style/Widget.Material3.Button.TextButton.Icon">
         <item name="iconTint">@color/button_text_2</item>
     </style>
 
+    <style name="Widget.LyricCast.ActionMode" parent="@style/Widget.Material3.ActionMode">
+        <item name="background">@color/window_background_1</item>
+    </style>
+
     <style name="Widget.LyricCast.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">
-        <!--        <item name="tint">@color/white</item>-->
+        <item name="tint">@color/icon_primary</item>
     </style>
 
     <style name="Widget.LyricCast.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
@@ -95,8 +97,7 @@
     </style>
 
     <style name="Widget.LyricCast.ActionButton" parent="Widget.AppCompat.ActionButton">
-        <!--        <item name="tint">@color/white</item>-->
-        <!--        <item name="android:tint">@color/white</item>-->
+        <item name="tint">@color/icon_primary</item>
 
         <item name="android:minWidth">30dp</item>
         <item name="android:maxWidth">48dp</item>

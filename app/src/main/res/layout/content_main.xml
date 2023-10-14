@@ -22,7 +22,6 @@
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="@id/adv_main"
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,6 +33,7 @@
         android:id="@+id/adv_main"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:adSize="BANNER"
         app:adUnitId="@string/ads_uid_main"
         app:layout_constraintBottom_toTopOf="@+id/tbl_main_fragments"
@@ -47,28 +47,25 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:tabIndicatorGravity="top">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
             android:longClickable="false"
             android:text="@string/title_songs" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
             android:text="@string/title_setlists" />
 
     </com.google.android.material.tabs.TabLayout>
 
 
     <ImageView
-        android:id="@+id/imv_main_dimm"
+        android:id="@+id/imv_main_dim"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"
@@ -120,11 +117,12 @@
                 android:clickable="false"
                 android:contentDescription="@string/main_activity_button_add_setlist"
                 android:visibility="visible"
-                app:backgroundTint="@color/fab_background_1"
+                app:backgroundTint="@color/fab_background_secondary"
+                app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
                 app:maxImageSize="24dp"
                 app:srcCompat="@drawable/round_playlist_add_24_white"
-                app:tint="@color/fab_icon" />
+                app:tint="@color/icon_secondary" />
 
         </LinearLayout>
 
@@ -162,10 +160,11 @@
                 android:cropToPadding="false"
                 android:scaleType="center"
                 android:visibility="visible"
-                app:backgroundTint="@color/fab_background_1"
+                app:backgroundTint="@color/fab_background_secondary"
+                app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
                 app:srcCompat="@drawable/round_music_note_24_black"
-                app:tint="@color/fab_icon"
+                app:tint="@color/icon_secondary"
                 app:useCompatPadding="false" />
         </LinearLayout>
 
@@ -182,12 +181,13 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:scaleType="center"
-        app:backgroundTint="@color/fab_background_2"
+        app:backgroundTint="@color/fab_background_primary"
+        app:elevation="@dimen/cardview_default_elevation"
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"
         app:srcCompat="@drawable/round_add_24_black"
-        app:tint="@color/fab_icon" />
+        app:tint="@color/icon_secondary" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

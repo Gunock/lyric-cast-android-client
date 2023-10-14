@@ -14,8 +14,4 @@
         <item name="tint">@color/item_handle</item>
     </style>
 
-    <style name="LyricCast.Spinner.Item" parent="">
-        <item name="backgroundColor">@color/window_background_2</item>
-    </style>
-
 </resources>

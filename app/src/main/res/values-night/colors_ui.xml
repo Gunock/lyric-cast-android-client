@@ -5,7 +5,7 @@
   -->
 
 <resources>
-<!--    <color name="color_primary">@color/royal_blue_dark</color>-->
+    <!--    <color name="color_primary">@color/royal_blue_dark</color>-->
     <color name="color_background_primary">@color/almost_black</color>
     <color name="color_primary_dark">@color/almost_black</color>
     <color name="color_secondary">@color/very_dark_gray</color>
@@ -14,20 +14,21 @@
     <color name="text">@color/dim_white</color>
     <color name="text_hint">@color/very_dim_white</color>
 
-    <color name="window_background_1">@color/almost_black</color>
-    <color name="window_background_2">@color/very_dark_gray</color>
-    <color name="window_background_3">@color/almost_black</color>
+    <color name="window_background_1">@color/material_dynamic_neutral10</color>
+    <color name="window_background_2">@color/material_dynamic_neutral30</color>
+    <color name="window_background_3">@color/material_dynamic_neutral20</color>
+
+    <color name="icon_primary">@color/material_dynamic_neutral95</color>
+    <color name="icon_secondary">@color/material_dynamic_neutral95</color>
 
     <color name="tab_indicator">@color/royal_blue</color>
 
-    <color name="placeholder_card_color_1">@color/royal_blue_dark</color>
     <color name="category_dark_text">@color/black</color>
     <color name="category_bright_text">@color/dim_white</color>
     <color name="item_handle">@color/very_dim_white</color>
 
-    <color name="fab_icon">@color/very_dim_white</color>
-    <color name="fab_background_1">@color/very_dark_gray</color>
-    <color name="fab_background_2">@color/royal_blue_dark</color>
+    <color name="fab_background_primary">@color/material_dynamic_primary30</color>
+    <color name="fab_background_secondary">@color/material_dynamic_secondary30</color>
 
     <color name="dialog_text">@color/very_dim_white</color>
     <color name="dialog_button">@color/royal_blue</color>

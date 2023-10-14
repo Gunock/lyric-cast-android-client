@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 10/14/23, 7:05 PM
+  ~ Copyright (c) 2023 . All rights reserved.
+  ~ Last modified 10/14/23, 7:05 PM
+  -->
+
+<resources>
+    <style name="Theme.LyricCast.DarkActionBar" parent="Base.Theme.LyricCast.DarkActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Widget.LyricCast.Toolbar.Static" parent="">
+    </style>
+</resources>

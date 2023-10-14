@@ -55,6 +55,7 @@
         android:id="@+id/adv_song_controls"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:adSize="BANNER"
         app:adUnitId="@string/ads_uid_song_controls"
         app:layout_constraintEnd_toEndOf="parent"

@@ -38,6 +38,7 @@ class SongControlsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val rootBinding = ActivitySongControlsBinding.inflate(layoutInflater)
         setContentView(rootBinding.root)
         setSupportActionBar(rootBinding.toolbarControls)

@@ -16,6 +16,7 @@ import pl.gunock.lyriccast.shared.extensions.loadAd
 class SetlistEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val binding = ActivitySetlistEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

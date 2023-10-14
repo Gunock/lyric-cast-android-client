@@ -38,8 +38,6 @@ class MainModel @Inject constructor(
         const val TAG = "MainViewModel"
     }
 
-    fun init() {}
-
     suspend fun exportAll(
         cacheDir: String,
         outputStream: OutputStream,

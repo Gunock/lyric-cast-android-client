@@ -7,7 +7,7 @@
 <resources>
 
     <color name="black">#000000</color>
-    <color name="transparent_black">#66000000</color>
+    <color name="transparent_black">#99000000</color>
     <color name="almost_black">#191919</color>
     <color name="very_dark_gray">#303030</color>
     <color name="dark_gray">#606060</color>

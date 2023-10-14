@@ -6,8 +6,7 @@
 
 <resources>
 
-    <style name="Theme.LyricCast.DarkActionBar" parent="Theme.Material3.DynamicColors.DayNight">
-        <item name="android:windowLightStatusBar">false</item>
+    <style name="Base.Theme.LyricCast.DarkActionBar" parent="@style/Theme.Material3.DynamicColors.DayNight">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
@@ -16,13 +15,13 @@
         <!--        <item name="colorAccent">@color/accent</item>-->
         <!--        <item name="android:navigationBarColor">@color/color_primary_dark</item>-->
 
-        <item name="alertDialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle
+        </item>
         <item name="dialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle</item>
 
         <!--        <item name="mediaRouteButtonTint">@color/white</item>-->
         <!--        <item name="android:textColorPrimary">@color/white</item>-->
 
-        <item name="android:textViewStyle">@style/Widget.LyricCast.TextView</item>
         <item name="materialButtonStyle">@style/Widget.LyricCast.Button</item>
         <item name="buttonStyle">@style/Widget.LyricCast.Button</item>
         <item name="autoCompleteTextViewStyle">@style/ThemeOverlay.Material3.AutoCompleteTextView
@@ -35,30 +34,34 @@
         <item name="toolbarNavigationButtonStyle">
             @style/Widget.LyricCast.Toolbar.Button.Navigation
         </item>
+        <item name="actionModeStyle">@style/Widget.LyricCast.ActionMode</item>
         <item name="android:actionOverflowButtonStyle">
             @style/Widget.LyricCast.ActionButton.Overflow
         </item>
-        <!-- TODO: Replace with rounded icon -->
         <item name="actionModeCloseDrawable">@drawable/round_close_24_white</item>
         <item name="actionModeCloseButtonStyle">
             @style/Widget.LyricCast.ActionButton
         </item>
     </style>
 
+    <style name="Theme.LyricCast.DarkActionBar" parent="Base.Theme.LyricCast.DarkActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
     <style name="Theme.LyricCast.NoActionBar" parent="Theme.LyricCast.DarkActionBar">
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">true</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <!-- TODO: add title when title padding is fixed by google -->
-    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog">
+        <!-- TODO: set to false when title padding issue is fixed by google -->
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.3</item>
     </style>
 
-    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle" parent="ThemeOverlay.LyricCast.MaterialAlertDialog">
+    <style name="ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle" parent="@style/ThemeOverlay.LyricCast.MaterialAlertDialog">
         <item name="android:windowNoTitle">true</item>
     </style>
 

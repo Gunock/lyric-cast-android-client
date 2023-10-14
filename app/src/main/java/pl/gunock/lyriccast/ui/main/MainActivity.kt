@@ -79,7 +79,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.init()
+
+        window.navigationBarColor = getColor(R.color.window_background_3)
+        // Workaround for status bar color changing when entering/exiting action mode
+        window.statusBarColor = getColor(R.color.window_background_1)
 
         val rootBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(rootBinding.root)
@@ -161,10 +164,10 @@ class MainActivity : AppCompatActivity() {
         binding.fabAdd.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 fabContainer.visibility = View.VISIBLE
-                binding.imvMainDimm.visibility = View.VISIBLE
+                binding.imvMainDim.visibility = View.VISIBLE
             } else {
                 fabContainer.visibility = View.GONE
-                binding.imvMainDimm.visibility = View.GONE
+                binding.imvMainDim.visibility = View.GONE
             }
         }
 
