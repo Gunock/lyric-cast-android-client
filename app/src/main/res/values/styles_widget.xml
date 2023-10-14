@@ -74,15 +74,15 @@
 
     <style name="Widget.LyricCast.Button" parent="Widget.Material3.Button">
         <!--        <item name="android:backgroundTint">@color/button_background</item>-->
-        <!--        <item name="android:textColor">@color/button_text_1</item>-->
+        <item name="android:textColor">@color/button_text_1</item>
     </style>
 
     <style name="Widget.LyricCast.Button.Light" parent="Widget.LyricCast.Button">
-        <!--        <item name="android:textColor">@color/button_text_2</item>-->
+        <item name="android:textColor">@color/button_text_2</item>
     </style>
 
     <style name="Widget.LyricCast.Button.Icon.Light" parent="Widget.Material3.Button.TextButton.Icon">
-        <!--        <item name="iconTint">@color/button_text_2</item>-->
+        <item name="iconTint">@color/button_text_2</item>
     </style>
 
     <style name="Widget.LyricCast.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">

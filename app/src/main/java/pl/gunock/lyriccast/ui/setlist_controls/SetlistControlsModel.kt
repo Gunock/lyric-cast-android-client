@@ -138,7 +138,8 @@ class SetlistControlsModel @Inject constructor(
         val itemPosition = highlightSong(previousSongTitle, isHighlighted = true, isCurrent = true)
         _changedSongPositions.value = listOf(itemPosition)
 
-        postSlide()
+        changeTitle()
+        _currentSlideText.tryEmit(setlistLyrics[currentLyricsPosition])
     }
 
     fun previousSlide() {
@@ -177,27 +178,28 @@ class SetlistControlsModel @Inject constructor(
 
     fun sendSlide() {
         CastMessageHelper.sendContentMessage(setlistLyrics[currentLyricsPosition])
-        postSlide()
-    }
 
-    private fun postSlide() {
         val isNewSongTitle = songTitles.containsKey(currentLyricsPosition)
                 && songTitles[currentLyricsPosition]!! != previousSongTitle
 
         if (isNewSongTitle) {
-            val songTitle = songTitles[currentLyricsPosition]!!
-            val songTitleWithoutNumber = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
-
-            val itemPosition1 = highlightSong(previousSongTitle, isHighlighted = false)
-            val itemPosition2 = highlightSong(songTitle, isHighlighted = true, isCurrent = true)
-
-            _changedSongPositions.value = listOf(itemPosition1, itemPosition2)
-            previousSongTitle = songTitle
-
-            _currentSongTitle.tryEmit(songTitleWithoutNumber)
+            changeTitle()
         }
 
         _currentSlideText.tryEmit(setlistLyrics[currentLyricsPosition])
+    }
+
+    private fun changeTitle() {
+        val songTitle = songTitles[currentLyricsPosition]!!
+        val songTitleWithoutNumber = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
+
+        val itemPosition1 = highlightSong(previousSongTitle, isHighlighted = false)
+        val itemPosition2 = highlightSong(songTitle, isHighlighted = true, isCurrent = true)
+
+        _changedSongPositions.value = listOf(itemPosition1, itemPosition2)
+        previousSongTitle = songTitle
+
+        _currentSongTitle.tryEmit(songTitleWithoutNumber)
     }
 
     private fun highlightSong(

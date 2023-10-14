@@ -8,7 +8,7 @@
 buildscript {
     ext {
         kotlinVersion = '1.9.0'
-        navVersion = '2.7.3'
+        navVersion = '2.7.4'
         hiltVersion = '2.48.1'
         protobufVersion = '0.9.1'
         realmVersion = '1.11.1'
@@ -60,7 +60,7 @@ ext {
     coroutinesVersion = '1.7.3'
     datastoreVersion = '1.0.0'
     protobufJavaLiteVersion = '3.21.12'
-    materialVersion = '1.9.0'
+    materialVersion = '1.10.0'
     androidXCoreVersion = '1.12.0'
     appCompatVersion = '1.6.1'
     constraintLayoutVersion = '2.1.4'
@@ -71,7 +71,7 @@ ext {
     firebaseVersion = '32.3.1'
     castFrameworkVersion = '21.3.0'
     mediaRouterVersion = '1.6.0'
-    apacheCommonsLangVersion = '3.12.0'
+    apacheCommonsLangVersion = '3.13.0'
     zip4jVersion = '2.11.5'
 
     // Test dependencies
@@ -80,7 +80,7 @@ ext {
     espressoVersion = '3.5.1'
     // TODO: Check if this can be migrated to jupyter api
     junitVersion = '4.13.2'
-    truthVersion = '1.1.4'
+    truthVersion = '1.1.5'
 
     // LeakCanary
     leakCanaryVersion = '2.10'
