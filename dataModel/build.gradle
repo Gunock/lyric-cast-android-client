@@ -56,7 +56,7 @@ android {
 
 // TODO: Remove this workaround when https://github.com/realm/realm-kotlin/issues/887 is fixed
 project.afterEvaluate {
-    kotlin.target.compilations.all { // use targets if this is a Multiplatform project
+    kotlin.target.compilations.configureEach { // use targets if this is a Multiplatform project
         kotlinOptions.jvmTarget = "17"
     }
 }

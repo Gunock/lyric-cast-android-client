@@ -121,7 +121,7 @@
                 app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
                 app:maxImageSize="24dp"
-                app:srcCompat="@drawable/round_playlist_add_24_white"
+                app:srcCompat="@drawable/round_playlist_add_24"
                 app:tint="@color/icon_secondary" />
 
         </LinearLayout>
@@ -163,7 +163,7 @@
                 app:backgroundTint="@color/fab_background_secondary"
                 app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
-                app:srcCompat="@drawable/round_music_note_24_black"
+                app:srcCompat="@drawable/round_music_note_24"
                 app:tint="@color/icon_secondary"
                 app:useCompatPadding="false" />
         </LinearLayout>
@@ -186,7 +186,7 @@
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"
-        app:srcCompat="@drawable/round_add_24_black"
+        app:srcCompat="@drawable/round_add_24"
         app:tint="@color/icon_secondary" />
 
 

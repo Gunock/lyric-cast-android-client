@@ -29,15 +29,12 @@ class ProgressDialogFragment(
 
     private lateinit var binding: DialogFragmentProgressBinding
 
-    private var defaultTextColor: Int = Int.MIN_VALUE
-    private var defaultProgressColor: Int = Int.MIN_VALUE
+    private lateinit var defaultTextColor: ColorStateList
     private var errorProgressColor: Int = Int.MIN_VALUE
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogFragmentProgressBinding.inflate(layoutInflater)
 
-        defaultTextColor = requireContext().getColor(R.color.dialog_button)
-        defaultProgressColor = requireContext().getColor(R.color.indeterminate_progress_bar)
         errorProgressColor = requireContext().getColor(R.color.error_Indeterminate_progress_bar)
 
         binding.btnProgressOk.visibility = View.GONE
@@ -52,8 +49,11 @@ class ProgressDialogFragment(
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
+        defaultTextColor = binding.btnProgressOk.textColors
         return binding.root
     }
 
@@ -75,8 +75,7 @@ class ProgressDialogFragment(
             binding.pgbProgress.indeterminateTintList = ColorStateList.valueOf(errorProgressColor)
             binding.btnProgressOk.setTextColor(errorProgressColor)
         } else {
-            binding.pgbProgress.indeterminateTintList =
-                ColorStateList.valueOf(defaultProgressColor)
+            binding.pgbProgress.indeterminateTintList = null
             binding.btnProgressOk.setTextColor(defaultTextColor)
         }
     }

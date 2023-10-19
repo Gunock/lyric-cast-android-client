@@ -30,8 +30,8 @@ class SongItemsAdapter(
 
     var onItemClickListener: ((SongItem?) -> Unit)? = null
 
-    private val brightCategoryTextColor = context.getColor(com.google.android.material.R.color.material_dynamic_neutral95)
-    private val darkCategoryTextColor = context.getColor(com.google.android.material.R.color.material_dynamic_neutral10)
+    private val brightCategoryTextColor = context.getColor(R.color.bright_text)
+    private val darkCategoryTextColor = context.getColor(R.color.dark_text)
     private val categoryTextColorMap = createCategoryTextColorMap(context)
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
@@ -76,8 +76,10 @@ class SongItemsAdapter(
     private fun getCategoryTextColor(backgroundColor: Int): Int {
         val brightTextContrast =
             ColorUtils.calculateContrast(brightCategoryTextColor, backgroundColor)
+        val darkTextContrast =
+            ColorUtils.calculateContrast(darkCategoryTextColor, backgroundColor)
 
-        return if (brightTextContrast > 3) {
+        return if (brightTextContrast > darkTextContrast) {
             brightCategoryTextColor
         } else {
             darkCategoryTextColor

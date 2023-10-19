@@ -50,11 +50,6 @@
         <!--        <item name="android:colorControlActivated">@color/text_hint</item>-->
     </style>
 
-    <style name="Widget.LyricCast.CheckBox" parent="@style/Widget.Material3.CompoundButton.CheckBox">
-        <item name="buttonIconTint">@color/white</item>
-        <item name="buttonTint">@color/checkbox_state_list</item>
-    </style>
-
     <style name="Widget.LyricCast.AppBarLayout" parent="@style/Widget.Material3.AppBarLayout">
         <item name="android:background">@color/window_background_2</item>
         <item name="liftOnScrollColor">@color/window_background_1</item>

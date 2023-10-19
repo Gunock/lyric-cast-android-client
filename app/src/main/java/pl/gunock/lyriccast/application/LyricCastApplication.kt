@@ -39,16 +39,20 @@ class LyricCastApplication : Application() {
                     onEnded = { CastMessageHelper.onSessionEnded() }
                 )
 
-                task.result.sessionManager.addSessionManagerListener(listener)
+                CoroutineScope(Dispatchers.Main).launch {
+                    task.result.sessionManager.addSessionManagerListener(listener)
+                }
             }
 
 
         DynamicColors.applyToActivitiesIfAvailable(this)
 
-        var appTheme = getSettings().appTheme
-        appTheme = if (appTheme == 0) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else appTheme
+        var appTheme: Int? = getSettings().appTheme
+        appTheme = if (appTheme == 0) null else appTheme
 
-        AppCompatDelegate.setDefaultNightMode(appTheme)
+        if (appTheme != null) {
+            AppCompatDelegate.setDefaultNightMode(appTheme)
+        }
 
         if (BuildConfig.DEBUG) {
             setupStrictMode()

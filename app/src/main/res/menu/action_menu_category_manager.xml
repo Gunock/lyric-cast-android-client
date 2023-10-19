@@ -12,13 +12,15 @@
 
     <item
         android:id="@+id/action_menu_edit"
-        android:icon="@drawable/round_edit_24_white"
+        android:icon="@drawable/round_edit_24"
+        android:iconTint="@color/icon_primary"
         android:title="@string/main_activity_button_edit"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_menu_delete"
-        android:icon="@drawable/round_delete_outline_24_white"
+        android:icon="@drawable/round_delete_outline_24"
+        android:iconTint="@color/icon_primary"
         android:title="@string/action_menu_button_delete"
         app:showAsAction="always" />
 

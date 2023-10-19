@@ -53,7 +53,7 @@ ext {
     var = 'C:/Users/aszcz/OneDrive/Dokumenty/AndroidKeystores/android-release.keystore'
 
     // Sdk and tools
-    minSdkVersion = 23
+    minSdkVersion = 26
     targetSdkVersion = 34
 
     // App dependencies

@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/3/21 5:37 PM
-  ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/3/21 5:37 PM
-  -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_lyriccast_background" />
-    <foreground android:drawable="@mipmap/ic_lyriccast_foreground" />
+    <background android:drawable="@color/ic_lyriccast_background"/>
+    <foreground android:drawable="@drawable/ic_lyriccast_foreground"/>
+    <monochrome android:drawable="@drawable/ic_lyriccast_monochrome"/>
 </adaptive-icon>

@@ -28,7 +28,6 @@
         </item>
         <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
         <item name="tabStyle">@style/Widget.LyricCast.TabLayout</item>
-        <item name="checkboxStyle">@style/Widget.LyricCast.CheckBox</item>
         <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout</item>
 
         <item name="toolbarNavigationButtonStyle">
@@ -38,7 +37,7 @@
         <item name="android:actionOverflowButtonStyle">
             @style/Widget.LyricCast.ActionButton.Overflow
         </item>
-        <item name="actionModeCloseDrawable">@drawable/round_close_24_white</item>
+        <item name="actionModeCloseDrawable">@drawable/round_close_24</item>
         <item name="actionModeCloseButtonStyle">
             @style/Widget.LyricCast.ActionButton
         </item>

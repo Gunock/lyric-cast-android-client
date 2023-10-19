@@ -7,7 +7,7 @@
 <resources>
 
     <style name="LyricCast.RecyclerView.Item1" parent="">
-        <item name="cardBackgroundColor">@color/window_background_2</item>
+        <item name="cardBackgroundColor">@color/list_item_background</item>
     </style>
 
     <style name="LyricCast.RecyclerView.Item.Handle" parent="">

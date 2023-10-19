@@ -129,8 +129,8 @@ class SetlistEditorFragment : Fragment() {
     private fun setupListeners() {
         binding.edSetlistName.addTextChangedListener(setlistNameTextWatcher)
 
-        binding.edSetlistName.setOnFocusChangeListener { view_, hasFocus ->
-            if (!hasFocus) view_.hideKeyboard()
+        binding.edSetlistName.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) view.hideKeyboard()
         }
 
         binding.btnPickSetlistSongs.setOnClickListener {
