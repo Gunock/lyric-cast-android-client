@@ -81,9 +81,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            window.navigationBarColor = getColor(R.color.window_background_3)
+            window.navigationBarColor = getColor(R.color.background_3)
             // Workaround for status bar color changing when entering/exiting action mode
-            window.statusBarColor = getColor(R.color.window_background_1)
+            window.statusBarColor = getColor(R.color.background_1)
         }
 
         val rootBinding = ActivityMainBinding.inflate(layoutInflater)

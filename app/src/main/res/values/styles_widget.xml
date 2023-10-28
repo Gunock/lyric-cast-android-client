@@ -7,7 +7,7 @@
 <resources>
 
     <style name="Widget.LyricCast.TabLayout" parent="@style/Widget.Material3.TabLayout">
-        <item name="android:background">@color/window_background_3</item>
+        <item name="android:background">@color/background_3</item>
     </style>
 
     <style name="Widget.LyricCast.TabLayout.Bottom" parent="Widget.LyricCast.TabLayout">
@@ -51,18 +51,18 @@
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout" parent="@style/Widget.Material3.AppBarLayout">
-        <item name="android:background">@color/window_background_2</item>
-        <item name="liftOnScrollColor">@color/window_background_1</item>
+        <item name="android:background">@color/background_2</item>
+        <item name="liftOnScrollColor">@color/background_1</item>
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout.Static" parent="Widget.LyricCast.AppBarLayout">
-        <item name="android:background">@color/window_background_1</item>
-        <item name="liftOnScrollColor">@color/window_background_1</item>
+        <item name="android:background">@color/background_1</item>
+        <item name="liftOnScrollColor">@color/background_1</item>
         <item name="liftOnScroll">false</item>
     </style>
 
     <style name="Widget.LyricCast.Toolbar.Static" parent="">
-        <item name="android:background">@color/window_background_1</item>
+        <item name="android:background">@color/background_1</item>
     </style>
 
     <style name="Widget.LyricCast.Button" parent="@style/Widget.Material3.Button">
@@ -79,7 +79,7 @@
     </style>
 
     <style name="Widget.LyricCast.ActionMode" parent="@style/Widget.Material3.ActionMode">
-        <item name="background">@color/window_background_1</item>
+        <item name="background">@color/background_1</item>
     </style>
 
     <style name="Widget.LyricCast.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">

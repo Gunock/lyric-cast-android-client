@@ -22,8 +22,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.getCastConfigurationJson
 import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
+import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
@@ -47,18 +49,25 @@ class SongControlsActivity : AppCompatActivity() {
         binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
         binding.advSongControls.loadAd()
 
-        viewModel.settings = getSettings()
+        val sessionsManager = CastContext.getSharedInstance()!!.sessionManager
+        viewModel.initialize(sessionsManager)
+        viewModel.castConfiguration = getSettings().getCastConfigurationJson()
 
         val songId: String = intent.getStringExtra("songId")!!
         viewModel.loadSong(songId)
         binding.tvControlsSongTitle.text = viewModel.songTitle
 
-        viewModel.currentBlankTextAndColor
-            .onEach {
-                val (blankText: Int, blankColor: Int) = it
-                binding.btnSongBlank.setBackgroundColor(getColor(blankColor))
-                binding.btnSongBlank.text = getString(blankText)
-            }.flowOn(Dispatchers.Main)
+        CastMessageHelper.isBlanked
+            .onEach { blanked ->
+                if (blanked) {
+                    binding.btnSongBlank.setBackgroundColor(getColor(R.color.red))
+                    binding.btnSongBlank.setText(R.string.controls_off)
+                } else {
+                    binding.btnSongBlank.setBackgroundColor(getColor(R.color.green))
+                    binding.btnSongBlank.setText(R.string.controls_on)
+                }
+            }
+            .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
 
         viewModel.currentSlideText
@@ -78,7 +87,7 @@ class SongControlsActivity : AppCompatActivity() {
         super.onResume()
 
         val settings = getSettings()
-        viewModel.settings = settings
+        viewModel.castConfiguration = settings.getCastConfigurationJson()
 
         if (settings.controlButtonsHeight > 0.0) {
             val params = binding.songControlsButtonContainer.layoutParams
@@ -121,7 +130,6 @@ class SongControlsActivity : AppCompatActivity() {
     private fun goToSettings(): Boolean {
         val intent = Intent(baseContext, SettingsActivity::class.java)
         startActivity(intent)
-        viewModel.sendConfiguration()
         return true
     }
 

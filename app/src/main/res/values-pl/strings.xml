@@ -50,7 +50,6 @@
 
 
     <!-- Song/Setlist Controls -->
-    <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Poprzedni</string>
     <string name="controls_next">Następny</string>
 

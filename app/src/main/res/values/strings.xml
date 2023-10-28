@@ -61,7 +61,6 @@
     <string name="main_activity_setlist_is_empty">Setlist is empty!</string>
 
     <!-- Song/Setlist Controls -->
-    <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Previous</string>
     <string name="controls_next">Next</string>
     <string name="controls_on" translatable="false">ON</string>

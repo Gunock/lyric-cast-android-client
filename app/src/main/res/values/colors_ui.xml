@@ -8,23 +8,23 @@
     <!--    <color name="color_primary">@color/royal_blue</color>-->
     <color name="color_primary_dark">@color/royal_blue_dark</color>
     <color name="color_secondary">@color/royal_blue</color>
-    <color name="accent">@color/cyan</color>
+    <color name="accent">@color/material_dynamic_primary70</color>
 
     <color name="text">@color/dark_text</color>
     <color name="dark_text">@color/material_dynamic_neutral10</color>
     <color name="bright_text">@color/material_dynamic_neutral95</color>
     <color name="text_hint">@color/material_dynamic_neutral40</color>
 
-    <color name="window_background_1">@color/material_dynamic_secondary99</color>
-    <color name="window_background_2">@color/material_dynamic_secondary100</color>
-    <color name="window_background_3">@color/material_dynamic_primary95</color>
+    <color name="background_1">@color/material_dynamic_secondary99</color>
+    <color name="background_2">@color/material_dynamic_secondary100</color>
+    <color name="background_3">@color/material_dynamic_primary95</color>
+    <color name="background_4">@color/material_dynamic_secondary90</color>
 
-    <color name="list_item_background">@color/material_dynamic_secondary90</color>
 
     <color name="icon_primary">@color/material_dynamic_neutral10</color>
     <color name="icon_secondary">@color/material_dynamic_neutral40</color>
 
-    <color name="placeholder_card_color_1">@color/material_dynamic_primary50</color>
+    <color name="placeholder_card_color_1">@color/maroon</color>
     <color name="category_dark_text">@color/almost_black</color>
     <color name="category_bright_text">@color/white</color>
     <color name="item_handle">@color/material_dynamic_secondary70</color>
@@ -37,6 +37,7 @@
 
     <color name="button_text_1">@color/white</color>
     <color name="button_text_2">@color/white</color>
+    <color name="button_background">@color/material_dynamic_secondary80</color>
 
     <color name="error_Indeterminate_progress_bar">@color/red</color>
 </resources>

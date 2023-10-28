@@ -7,20 +7,13 @@
 package pl.gunock.lyriccast.ui.setlist_controls
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.Settings
-import pl.gunock.lyriccast.application.getCastConfigurationJson
+import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -33,17 +26,8 @@ import javax.inject.Inject
 class SetlistControlsModel @Inject constructor(
     private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
-    private companion object {
-        private val blankOnColor: Int = R.color.green
-        private val blankOffColor: Int = R.color.red
 
-
-        private val blankOffText: Int = R.string.controls_off
-        private val blankOnText: Int = R.string.controls_on
-    }
-
-    // TODO: Try to remove this field
-    var settings: Settings? = null
+    var castConfiguration: JSONObject? = null
 
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
@@ -60,10 +44,6 @@ class SetlistControlsModel @Inject constructor(
     private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf())
     val changedSongPositions: Flow<List<Int>> get() = _changedSongPositions
 
-    private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(blankOffText, blankOffColor))
-    val currentBlankTextAndColor: Flow<Pair<Int, Int>> get() = _currentBlankTextAndColor
-
 
     private lateinit var setlistLyrics: List<String>
 
@@ -76,31 +56,12 @@ class SetlistControlsModel @Inject constructor(
     private var previousSongTitle: String = ""
 
     private val castSessionListener: CastSessionListener = CastSessionListener(onStarted = {
-        if (settings != null) sendConfiguration()
+        if (castConfiguration != null) sendConfiguration()
         sendSlide()
     })
 
-    init {
-        val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(castSessionListener)
-
-        CastMessageHelper.isBlanked
-            .onEach {
-                val currentBlankText: Int = if (it) {
-                    blankOffText
-                } else {
-                    blankOnText
-                }
-
-                val currentBlankColor: Int = if (it) {
-                    blankOffColor
-                } else {
-                    blankOnColor
-                }
-
-                _currentBlankTextAndColor.value = Pair(currentBlankText, currentBlankColor)
-            }.flowOn(Dispatchers.Default)
-            .launchIn(viewModelScope)
+    fun initialize(sessionManager: SessionManager) {
+        sessionManager.addSessionManagerListener(castSessionListener)
     }
 
     override fun onCleared() {
@@ -165,7 +126,7 @@ class SetlistControlsModel @Inject constructor(
     }
 
     fun sendConfiguration() {
-        CastMessageHelper.sendConfiguration(settings!!.getCastConfigurationJson())
+        CastMessageHelper.sendConfiguration(castConfiguration!!)
     }
 
     fun selectSong(position: Int) {
