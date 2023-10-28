@@ -37,7 +37,7 @@
 
     <color name="button_text_1">@color/white</color>
     <color name="button_text_2">@color/white</color>
-    <color name="button_background">@color/material_dynamic_secondary80</color>
+    <color name="button_background">@color/background_4</color>
 
     <color name="error_Indeterminate_progress_bar">@color/red</color>
 </resources>
