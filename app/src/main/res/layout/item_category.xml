@@ -70,7 +70,7 @@
             android:id="@+id/cdv_category_color"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:background="@color/color_primary_dark"
+            android:background="@color/placeholder_card_color_1"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:outlineProvider="background"

@@ -53,6 +53,8 @@ class CategoryManagerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        window.statusBarColor = getColor(R.color.background_1)
+
         val rootBinding = ActivityCategoryManagerBinding.inflate(layoutInflater)
         binding = rootBinding.contentCategoryManager
         setContentView(rootBinding.root)

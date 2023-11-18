@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
-  ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:56 PM
+  ~ Created by Tomasz Kiljanczyk on 10/28/23, 2:10 PM
+  ~ Copyright (c) 2023 . All rights reserved.
+  ~ Last modified 10/28/23, 2:10 PM
   -->
 
 <resources>
-    <!--    <color name="color_primary">@color/royal_blue_dark</color>-->
-    <color name="color_primary_dark">@color/almost_black</color>
-    <color name="color_secondary">@color/very_dark_gray</color>
-    <color name="accent">@color/material_dynamic_primary30</color>
-
     <color name="text">@color/bright_text</color>
-    <color name="dark_text">@color/material_dynamic_neutral10</color>
-    <color name="bright_text">@color/material_dynamic_neutral90</color>
-    <color name="text_hint">@color/material_dynamic_neutral80</color>
-
-    <color name="background_1">@color/material_dynamic_neutral10</color>
-    <color name="background_2">@color/material_dynamic_neutral30</color>
-    <color name="background_3">@color/material_dynamic_neutral20</color>
-    <color name="background_4">@color/material_dynamic_neutral_variant30</color>
-
-    <color name="icon_primary">@color/material_dynamic_neutral95</color>
-    <color name="icon_secondary">@color/material_dynamic_neutral95</color>
-
-    <color name="category_dark_text">@color/black</color>
-    <color name="category_bright_text">@color/dim_white</color>
-    <color name="item_handle">@color/material_dynamic_neutral80</color>
-
-    <color name="fab_background_primary">@color/material_dynamic_primary30</color>
-    <color name="fab_background_secondary">@color/material_dynamic_neutral30</color>
-
-    <color name="dialog_text">@color/bright_text</color>
-    <color name="dialog_button">@color/royal_blue</color>
 
     <color name="button_text_1">@color/dark_text</color>
     <color name="button_text_2">@color/bright_text</color>

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.HarmonizedColorsOptions.*
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,8 @@ class LyricCastApplication : Application() {
 
 
         DynamicColors.applyToActivitiesIfAvailable(this)
+
+        // TODO: Add color harmonization
 
         var appTheme: Int? = getSettings().appTheme
         appTheme = if (appTheme == 0) null else appTheme

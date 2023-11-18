@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 10/28/23, 1:24 PM
+  ~ Copyright (c) 2023 . All rights reserved.
+  ~ Last modified 10/28/23, 1:24 PM
+  -->
+
+<resources>
+    <color name="primary">#00668B</color>
+    <color name="secondary">#4E616C</color>
+    <color name="accent">#657985</color>
+
+    <color name="dark_text">#191C1E</color>
+    <color name="bright_text">#F0F0F3</color>
+
+    <color name="background_1">#F9FCFF</color>
+    <color name="background_2">#FFFFFF</color>
+    <color name="background_3">#E0F3FF</color>
+    <color name="background_4">#DCE3E9</color>
+
+    <color name="icon_primary">#191C1E</color>
+    <color name="icon_secondary">#5C5F61</color>
+
+    <color name="item_handle">#9AAEBB</color>
+
+    <color name="fab_background_primary">#E0F3FF</color>
+    <color name="fab_background_secondary">#E0F3FF</color>
+</resources>

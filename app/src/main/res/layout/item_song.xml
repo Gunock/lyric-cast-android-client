@@ -92,7 +92,7 @@
                 android:maxLines="1"
                 android:padding="8dp"
                 android:text="@string/placeholder_category"
-                android:textColor="@color/category_bright_text"
+                android:textColor="@color/bright_text"
                 android:textSize="12sp" />
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>

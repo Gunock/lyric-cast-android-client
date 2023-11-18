@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:56 PM
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 4/9/21 11:56 PM
+  -->
+
+<resources>
+    <color name="primary">@color/material_dynamic_primary40</color>
+    <color name="secondary">@color/material_dynamic_secondary40</color>
+    <color name="accent">@color/material_dynamic_secondary50</color>
+
+    <color name="dark_text">@color/material_dynamic_neutral10</color>
+    <color name="bright_text">@color/material_dynamic_neutral95</color>
+    <color name="text_hint">@color/material_dynamic_secondary70</color>
+
+    <color name="background_1">@color/material_dynamic_secondary99</color>
+    <color name="background_2">@color/material_dynamic_secondary100</color>
+    <color name="background_3">@color/material_dynamic_primary95</color>
+    <color name="background_4">@color/material_dynamic_neutral_variant90</color>
+
+    <color name="icon_primary">@color/material_dynamic_neutral10</color>
+    <color name="icon_secondary">@color/material_dynamic_neutral40</color>
+
+    <color name="item_handle">@color/material_dynamic_secondary70</color>
+
+    <color name="fab_background_primary">@color/material_dynamic_primary95</color>
+    <color name="fab_background_secondary">@color/material_dynamic_secondary95</color>
+</resources>

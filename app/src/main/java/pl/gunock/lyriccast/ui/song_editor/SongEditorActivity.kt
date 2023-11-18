@@ -6,7 +6,6 @@
 
 package pl.gunock.lyriccast.ui.song_editor
 
-import android.os.Build
 import android.os.Bundle
 import android.text.InputFilter
 import android.view.Menu
@@ -57,9 +56,7 @@ class SongEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            window.navigationBarColor = getColor(R.color.background_3)
-        }
+        window.navigationBarColor = getColor(R.color.background_3)
 
         val rootBinding = ActivitySongEditorBinding.inflate(layoutInflater)
         binding = rootBinding.contentSongEditor

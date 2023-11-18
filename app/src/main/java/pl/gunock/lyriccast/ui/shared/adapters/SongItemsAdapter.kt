@@ -104,7 +104,7 @@ class SongItemsAdapter(
 
             binding.tvItemSongTitle.text = item.song.title
 
-            if (item.song.category == null) {
+            if (item.song.category == null || item.song.category!!.color == 0) {
                 binding.tvSongCategory.text = ""
                 binding.cardSongCategory.visibility = View.INVISIBLE
             } else {

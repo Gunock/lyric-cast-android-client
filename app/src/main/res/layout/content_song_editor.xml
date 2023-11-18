@@ -67,7 +67,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dropdown_layout_category"
-            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            style="@style/Widget.LyricCast.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -193,7 +193,6 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tbl_song_section"
-            style="@style/Widget.LyricCast.TabLayout.Bottom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

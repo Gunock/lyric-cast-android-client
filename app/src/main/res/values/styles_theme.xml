@@ -10,10 +10,11 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
-        <!--        <item name="colorPrimary">@color/color_primary</item>-->
-        <!--        <item name="colorPrimaryDark">@color/color_primary_dark</item>-->
-        <!--        <item name="colorAccent">@color/accent</item>-->
-        <!--        <item name="android:navigationBarColor">@color/color_primary_dark</item>-->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSecondaryVariant">@color/secondary</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/background_1</item>
+        <item name="android:colorBackground">@color/background_1</item>
 
         <item name="alertDialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle
         </item>
@@ -28,7 +29,7 @@
         </item>
         <item name="textInputStyle">@style/Widget.LyricCast.TextInputLayout</item>
         <item name="tabStyle">@style/Widget.LyricCast.TabLayout</item>
-        <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout</item>
+        <item name="appBarLayoutStyle">@style/Widget.LyricCast.AppBarLayout.Static</item>
 
         <item name="toolbarNavigationButtonStyle">
             @style/Widget.LyricCast.Toolbar.Button.Navigation
@@ -45,6 +46,7 @@
 
     <style name="Theme.LyricCast.DarkActionBar" parent="Base.Theme.LyricCast.DarkActionBar">
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <style name="Theme.LyricCast.NoActionBar" parent="Theme.LyricCast.DarkActionBar">
@@ -52,6 +54,7 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
+
 
     <style name="ThemeOverlay.LyricCast.MaterialAlertDialog" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog">
         <!-- TODO: set to false when title padding issue is fixed by google -->
