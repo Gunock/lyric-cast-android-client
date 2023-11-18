@@ -50,8 +50,6 @@ allprojects {
 
 
 ext {
-    var = 'C:/Users/aszcz/OneDrive/Dokumenty/AndroidKeystores/android-release.keystore'
-
     // Sdk and tools
     minSdkVersion = 27
     targetSdkVersion = 34

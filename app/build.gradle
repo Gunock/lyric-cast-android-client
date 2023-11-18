@@ -22,16 +22,6 @@ android {
     def minor = 2
     def patch = 0
 
-
-    signingConfigs {
-//        release {
-//            storeFile file(var)
-//            storePassword 'eAdmin.1@2'
-//            keyAlias 'LyricCast-release'
-//            keyPassword 'eAdmin.1@2'
-//        }
-    }
-
     defaultConfig {
         applicationId "pl.gunock.lyriccast"
         minSdkVersion rootProject.minSdkVersion
