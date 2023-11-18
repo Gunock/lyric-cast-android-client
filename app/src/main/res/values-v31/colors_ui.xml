@@ -21,7 +21,7 @@
     <color name="icon_primary">@color/material_dynamic_neutral10</color>
     <color name="icon_secondary">@color/material_dynamic_neutral40</color>
 
-    <color name="item_handle">@color/material_dynamic_secondary70</color>
+    <color name="item_handle">@color/material_dynamic_neutral70</color>
 
     <color name="fab_background_primary">@color/material_dynamic_primary95</color>
     <color name="fab_background_secondary">@color/material_dynamic_secondary95</color>

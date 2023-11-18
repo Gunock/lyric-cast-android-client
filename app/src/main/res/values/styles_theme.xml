@@ -20,9 +20,6 @@
         </item>
         <item name="dialogTheme">@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle</item>
 
-        <!--        <item name="mediaRouteButtonTint">@color/white</item>-->
-        <!--        <item name="android:textColorPrimary">@color/white</item>-->
-
         <item name="materialButtonStyle">@style/Widget.LyricCast.Button</item>
         <item name="buttonStyle">@style/Widget.LyricCast.Button</item>
         <item name="autoCompleteTextViewStyle">@style/ThemeOverlay.Material3.AutoCompleteTextView
