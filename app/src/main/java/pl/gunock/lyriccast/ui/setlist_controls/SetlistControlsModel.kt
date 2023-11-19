@@ -7,15 +7,13 @@
 package pl.gunock.lyriccast.ui.setlist_controls
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.Settings
-import pl.gunock.lyriccast.application.getCastConfigurationJson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.json.JSONObject
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -28,74 +26,40 @@ import javax.inject.Inject
 class SetlistControlsModel @Inject constructor(
     private val setlistsRepository: SetlistsRepository
 ) : ViewModel() {
-    private companion object {
-        private const val blankOnColor: Int = R.color.green
-        private const val blankOffColor: Int = R.color.red
 
-
-        private const val blankOffText: Int = R.string.controls_off
-        private const val blankOnText: Int = R.string.controls_on
-    }
-
-    // TODO: Try to remove this field
-    var settings: Settings? = null
+    var castConfiguration: JSONObject? = null
 
     val songs: List<SongItem> get() = _songs
     private val _songs: MutableList<SongItem> = mutableListOf()
 
-    val currentSlideText: StateFlow<String> get() = _currentSlideText
-    private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSlideText = MutableSharedFlow<String>(1)
+    val currentSlideText: Flow<String> get() = _currentSlideText
 
-    val currentSongTitle: StateFlow<String> get() = _currentSongTitle
-    private val _currentSongTitle: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSlideNumber = MutableStateFlow("")
+    val currentSlideNumber: Flow<String> get() = _currentSlideNumber
 
-    val currentSongPosition: StateFlow<Int> get() = _currentSongPosition
-    private val _currentSongPosition: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _currentSongTitle = MutableSharedFlow<String>(1)
+    val currentSongTitle: Flow<String> get() = _currentSongTitle
 
-    val changedSongPositions: StateFlow<List<Int>> get() = _changedSongPositions
-    private val _changedSongPositions: MutableStateFlow<List<Int>> = MutableStateFlow(listOf(0))
+    private val _currentSongPosition = MutableStateFlow(0)
+    val currentSongPosition: Flow<Int> get() = _currentSongPosition
 
-    val currentBlankTextAndColor: StateFlow<Pair<Int, Int>> get() = _currentBlankTextAndColor
-    private val _currentBlankTextAndColor: MutableStateFlow<Pair<Int, Int>> =
-        MutableStateFlow(Pair(blankOffText, blankOffColor))
+    private val _changedSongItems: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
+    val changedSongPositions: Flow<List<SongItem>> get() = _changedSongItems
 
-
-    private lateinit var setlistLyrics: List<String>
-
-    private var songTitles: MutableMap<Int, String> = mutableMapOf()
-
-    private var songStartPoints: MutableMap<String, Int> = mutableMapOf()
 
     private var currentLyricsPosition: Int = 0
-
-    private var previousSongTitle: String = ""
+    private lateinit var currentSongItem: SongItem
+    private lateinit var previousSongItem: SongItem
+    private val currentSong: Song get() = currentSongItem.song
 
     private val castSessionListener: CastSessionListener = CastSessionListener(onStarted = {
-        if (settings != null) sendConfiguration()
+        if (castConfiguration != null) sendConfiguration()
         sendSlide()
     })
 
-    init {
-        val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
-        sessionsManager.addSessionManagerListener(castSessionListener)
-
-        CastMessageHelper.isBlanked
-            .onEach {
-                val currentBlankText: Int = if (it) {
-                    blankOffText
-                } else {
-                    blankOnText
-                }
-
-                val currentBlankColor: Int = if (it) {
-                    blankOffColor
-                } else {
-                    blankOnColor
-                }
-
-                _currentBlankTextAndColor.value = Pair(currentBlankText, currentBlankColor)
-            }.flowOn(Dispatchers.Default)
-            .launchIn(viewModelScope)
+    fun initialize(sessionManager: SessionManager) {
+        sessionManager.addSessionManagerListener(castSessionListener)
     }
 
     override fun onCleared() {
@@ -108,50 +72,34 @@ class SetlistControlsModel @Inject constructor(
     fun loadSetlist(setlistId: String) {
         val setlist: Setlist = setlistsRepository.getSetlist(setlistId)!!
 
-        var setlistLyricsIndex = 0
-        setlistLyrics = setlist.presentation
-            .flatMapIndexed { index: Int, song: Song ->
-                val lyrics = song.lyricsList
-
-                val indexedTitle = "[$index] ${song.title}"
-                songTitles[setlistLyricsIndex] = indexedTitle
-                songTitles[setlistLyricsIndex + lyrics.size - 1] = indexedTitle
-                songStartPoints[indexedTitle] = setlistLyricsIndex
-
-                setlistLyricsIndex += lyrics.size
-
-                return@flatMapIndexed lyrics
-            }
-
         _songs.clear()
 
         val songItems = setlist.presentation.map { SongItem(it) }
         _songs.addAll(songItems)
 
-        currentLyricsPosition = 0
-        previousSongTitle = songTitles[currentLyricsPosition]!!
-        val itemPosition = highlightSong(previousSongTitle, isHighlighted = true, isCurrent = true)
-        _changedSongPositions.value = listOf(itemPosition)
-
-        postSlide()
+        currentSongItem = songItems.first()
+        currentSongItem.isHighlighted = true
+        selectSong(0)
     }
 
     fun previousSlide() {
-        if (currentLyricsPosition <= 0) {
-            return
+        val isFirstLyricsPage = currentLyricsPosition <= 0
+        if (isFirstLyricsPage && _currentSongPosition.value > 0) {
+            selectSong(_currentSongPosition.value - 1)
+        } else if (!isFirstLyricsPage) {
+            currentLyricsPosition--
+            sendSlide()
         }
-        currentLyricsPosition--
-
-        sendSlide()
     }
 
     fun nextSlide() {
-        if (currentLyricsPosition >= setlistLyrics.size - 1) {
-            return
+        val isLastLyricsPage = currentLyricsPosition >= currentSong.lyricsList.size - 1
+        if (isLastLyricsPage && _currentSongPosition.value < songs.size - 1) {
+            selectSong(_currentSongPosition.value + 1)
+        } else if (!isLastLyricsPage) {
+            currentLyricsPosition++
+            sendSlide()
         }
-        currentLyricsPosition++
-
-        sendSlide()
     }
 
     fun sendBlank() {
@@ -159,60 +107,34 @@ class SetlistControlsModel @Inject constructor(
     }
 
     fun sendConfiguration() {
-        CastMessageHelper.sendConfiguration(settings!!.getCastConfigurationJson())
+        CastMessageHelper.sendConfiguration(castConfiguration!!)
     }
 
     fun selectSong(position: Int) {
-        val title = _songs[position].song.title
-        val indexedTitle = "[$position] $title"
-        currentLyricsPosition = songStartPoints[indexedTitle]!!
+        previousSongItem = currentSongItem
+        currentSongItem = _songs[position]
+        currentLyricsPosition =
+            if (position >= _songs.indexOf(previousSongItem)) 0
+            else currentSongItem.song.lyricsList.size - 1
+        _currentSongPosition.tryEmit(position)
 
         sendSlide()
     }
 
     fun sendSlide() {
-        CastMessageHelper.sendContentMessage(setlistLyrics[currentLyricsPosition])
-        postSlide()
-    }
+        val lyricsText = currentSong.lyricsList[currentLyricsPosition]
+        CastMessageHelper.sendContentMessage(lyricsText)
+        _currentSlideText.tryEmit(lyricsText)
+        _currentSlideNumber.tryEmit("${currentLyricsPosition + 1}/${currentSong.lyricsList.size}")
 
-    private fun postSlide() {
-        val isNewSongTitle = songTitles.containsKey(currentLyricsPosition)
-                && songTitles[currentLyricsPosition]!! != previousSongTitle
-
+        val isNewSongTitle = previousSongItem != currentSongItem
         if (isNewSongTitle) {
-            val songTitle = songTitles[currentLyricsPosition]!!
-            val songTitleWithoutNumber = songTitle.replace("^\\[[0-9]+] ".toRegex(), "")
+            previousSongItem.isHighlighted = false
+            currentSongItem.isHighlighted = true
 
-            val itemPosition1 = highlightSong(previousSongTitle, isHighlighted = false)
-            val itemPosition2 = highlightSong(songTitle, isHighlighted = true, isCurrent = true)
-
-            _changedSongPositions.value = listOf(itemPosition1, itemPosition2)
-            previousSongTitle = songTitle
-
-            _currentSongTitle.value = songTitleWithoutNumber
+            _changedSongItems.value = listOf(previousSongItem.copy(), currentSongItem.copy())
+            _currentSongTitle.tryEmit(currentSong.title)
         }
-
-        _currentSlideText.value = setlistLyrics[currentLyricsPosition]
-    }
-
-    private fun highlightSong(
-        title: String,
-        isHighlighted: Boolean,
-        isCurrent: Boolean = false
-    ): Int {
-        if (title.isBlank()) {
-            throw IllegalArgumentException("Song title cannot be blank")
-        }
-
-        val songItemPosition: Int = songStartPoints.keys
-            .indexOfFirst { songTitle -> songTitle == title }
-
-        _songs[songItemPosition].isHighlighted = isHighlighted
-        if (isCurrent) {
-            _currentSongPosition.value = songItemPosition
-        }
-
-        return songItemPosition
     }
 
 }

@@ -7,15 +7,11 @@
 <resources>
 
     <style name="LyricCast.RecyclerView.Item1" parent="">
-        <item name="cardBackgroundColor">@color/window_background_2</item>
+        <item name="cardBackgroundColor">@color/background_4</item>
     </style>
 
     <style name="LyricCast.RecyclerView.Item.Handle" parent="">
         <item name="tint">@color/item_handle</item>
-    </style>
-
-    <style name="LyricCast.Spinner.Item" parent="">
-        <item name="backgroundColor">@color/window_background_2</item>
     </style>
 
 </resources>

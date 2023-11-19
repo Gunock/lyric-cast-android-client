@@ -6,27 +6,19 @@
 
 package pl.gunock.lyriccast.shared.utils
 
-import androidx.fragment.app.DialogFragment
+import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentManager
-import kotlinx.coroutines.delay
-import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.ui.shared.fragments.ProgressDialogFragment
 
 object DialogFragmentUtils {
 
-    suspend fun createProgressDialogFragment(
+    fun createProgressDialogFragment(
         fragmentManager: FragmentManager,
-        messageResourceId: Int
+        @StringRes messageResourceId: Int
     ): ProgressDialogFragment {
-        val dialogFragment = ProgressDialogFragment().apply {
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog)
+        val dialogFragment = ProgressDialogFragment(messageResourceId).apply {
             show(fragmentManager, ProgressDialogFragment.TAG)
         }
-
-        while (!dialogFragment.hasBinding()) {
-            delay(10)
-        }
-        dialogFragment.setMessage(messageResourceId)
 
         return dialogFragment
     }

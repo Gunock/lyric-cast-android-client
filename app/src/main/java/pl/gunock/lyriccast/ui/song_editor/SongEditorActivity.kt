@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -55,6 +56,8 @@ class SongEditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        window.navigationBarColor = getColor(R.color.background_3)
+
         val rootBinding = ActivitySongEditorBinding.inflate(layoutInflater)
         binding = rootBinding.contentSongEditor
         setContentView(rootBinding.root)
@@ -77,16 +80,7 @@ class SongEditorActivity : AppCompatActivity() {
 
         viewModel.categories
             .onEach { categories ->
-                val viewModelCategory = viewModel.category
                 categorySpinnerAdapter.submitCollection(categories, viewModel.categoryNone)
-
-                if (viewModelCategory != null) {
-                    val categoryIndex = categorySpinnerAdapter.items
-                        .map { category -> category.category.name }
-                        .indexOf(viewModelCategory.name)
-
-                    binding.spnSongEditorCategory.setSelection(categoryIndex, false)
-                }
             }.flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
     }
@@ -110,14 +104,27 @@ class SongEditorActivity : AppCompatActivity() {
                 }
                 return true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun setupCategorySpinner() {
-        categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnSongEditorCategory.context)
-        binding.spnSongEditorCategory.adapter = categorySpinnerAdapter
-        binding.spnSongEditorCategory.onItemSelectedListener = OnCategoryItemSelectedListener()
+        categorySpinnerAdapter = CategorySpinnerAdapter(binding.dropdownCategory.context)
+
+        binding.dropdownCategory.setAdapter(categorySpinnerAdapter)
+        binding.dropdownCategory.onItemClickListener = OnCategoryItemClickListener()
+
+        val viewModelCategoryName = viewModel.category?.name ?: viewModel.categoryNone.category.name
+        binding.dropdownCategory.setText(viewModelCategoryName)
+
+        val viewModelCategoryColor = viewModel.category?.color
+        if (viewModelCategoryColor != null) {
+            binding.cardCategoryColor.setCardBackgroundColor(viewModelCategoryColor)
+            binding.cardCategoryColor.visibility = View.VISIBLE
+        } else {
+            binding.cardCategoryColor.visibility = View.GONE
+        }
     }
 
     private fun setupListeners() {
@@ -125,14 +132,12 @@ class SongEditorActivity : AppCompatActivity() {
 
         binding.edSectionName.addTextChangedListener(sectionNameTextWatcher)
 
-        binding.edSectionLyrics.addTextChangedListener(
-            InputTextChangedListener { newText ->
-                val sectionName = selectedTab.text.toString().trim()
-                viewModel.setSectionText(sectionName, newText)
-            })
+        binding.edSectionLyrics.addTextChangedListener(InputTextChangedListener { newText ->
+            val sectionName = selectedTab.text.toString().trim()
+            viewModel.setSectionText(sectionName, newText)
+        })
 
-        binding.tblSongSection
-            .addOnTabSelectedListener(ItemSelectedTabListener(this::onTabSelected))
+        binding.tblSongSection.addOnTabSelectedListener(ItemSelectedTabListener(this::onTabSelected))
 
         binding.btnMoveSectionLeft.setOnClickListener {
             binding.tblSongSection.moveTabLeft(selectedTab)
@@ -184,6 +189,7 @@ class SongEditorActivity : AppCompatActivity() {
                 newAddTab.text = getString(R.string.editor_button_add)
                 addTab(newAddTab)
             }
+
             else -> {
                 sectionNameTextWatcher.ignoreOnTextChanged = true
                 binding.edSectionName.setText(tabText)
@@ -272,14 +278,14 @@ class SongEditorActivity : AppCompatActivity() {
     }
 
 
-    private inner class OnCategoryItemSelectedListener : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
+    private inner class OnCategoryItemClickListener : OnItemClickListener {
+        override fun onItemClick(
             parent: AdapterView<*>?,
             view: View?,
             position: Int,
             id: Long
         ) {
-            val categoryItem = binding.spnSongEditorCategory.selectedItem as CategoryItem?
+            val categoryItem = parent?.getItemAtPosition(position) as CategoryItem?
             val category = if (categoryItem == viewModel.categoryNone) {
                 null
             } else {
@@ -287,8 +293,13 @@ class SongEditorActivity : AppCompatActivity() {
             }
 
             viewModel.category = category
-        }
 
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+            if (category?.color != null) {
+                binding.cardCategoryColor.setCardBackgroundColor(category.color!!)
+                binding.cardCategoryColor.visibility = View.VISIBLE
+            } else {
+                binding.cardCategoryColor.visibility = View.GONE
+            }
+        }
     }
 }

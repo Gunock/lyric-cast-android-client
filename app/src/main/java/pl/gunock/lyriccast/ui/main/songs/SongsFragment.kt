@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
@@ -35,7 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
-import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.domain.models.SongItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.shared.extensions.registerForActivityResult
@@ -44,7 +44,6 @@ import pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
-import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
 import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
 import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
 import pl.gunock.lyriccast.ui.song_controls.SongControlsActivity
@@ -73,7 +72,8 @@ class SongsFragment : Fragment() {
     private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSongsBinding.inflate(inflater)
@@ -114,23 +114,29 @@ class SongsFragment : Fragment() {
                 view.hideKeyboard()
             }
         }
-
-        binding.spnCategory.onItemSelectedListener =
-            ItemSelectedSpinnerListener { _, _ ->
-                val selectedItem = binding.spnCategory.selectedItem as CategoryItem?
-                val categoryId: String? = selectedItem?.category?.id
-                viewModel.searchValues.categoryId = categoryId
-            }
     }
 
     @SuppressLint("CutPasteId")
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnCategory.context)
+        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.dropdownCategory.context)
 
-        binding.spnCategory.adapter = categorySpinnerAdapter
+        binding.dropdownCategory.setAdapter(categorySpinnerAdapter)
+        binding.dropdownCategory.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                val categoryItem = categorySpinnerAdapter.getItem(position)
+                val categoryId: String = categoryItem.category.id
+                viewModel.searchValues.categoryId = categoryId
+            }
 
         viewModel.categories
-            .onEach { categorySpinnerAdapter.submitCollection(it) }
+            .onEach {
+                categorySpinnerAdapter.submitCollection(it)
+
+                val firstCategoryName = categorySpinnerAdapter.getItem(0).category.name
+                withContext(Dispatchers.Main) {
+                    binding.dropdownCategory.setText(firstCategoryName)
+                }
+            }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
     }
@@ -177,6 +183,7 @@ class SongsFragment : Fragment() {
             0 -> {
                 actionMode?.finish()
             }
+
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
@@ -187,6 +194,7 @@ class SongsFragment : Fragment() {
 
                 showMenuActions()
             }
+
             2 -> showMenuActions(showEdit = false)
         }
     }
@@ -303,6 +311,7 @@ class SongsFragment : Fragment() {
                         viewModel.deleteSelectedSongs()
                         true
                     }
+
                     R.id.action_menu_export_selected -> startExport()
                     R.id.action_menu_edit -> editSelectedSong()
                     R.id.action_menu_add_setlist -> createAdhocSetlist()

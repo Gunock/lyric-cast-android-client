@@ -18,12 +18,17 @@ import androidx.core.view.MenuItemCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.getCastConfigurationJson
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
+import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
 import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
@@ -43,6 +48,7 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val rootBinding = ActivitySetlistControlsBinding.inflate(layoutInflater)
         binding = rootBinding.contentSetlistControls
         setContentView(rootBinding.root)
@@ -51,24 +57,36 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         binding.advSetlistControls.loadAd()
 
-        viewModel.settings = getSettings()
+        val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
+        viewModel.initialize(sessionsManager)
+        viewModel.castConfiguration = getSettings().getCastConfigurationJson()
 
         val setlistId: String = intent.getStringExtra("setlistId")!!
         viewModel.loadSetlist(setlistId)
 
-        viewModel.currentBlankTextAndColor
-            .onEach {
-                val (blankText: Int, blankColor: Int) = it
-                binding.btnSetlistBlank.setBackgroundColor(getColor(blankColor))
-                binding.btnSetlistBlank.text = getString(blankText)
-            }.launchIn(lifecycleScope)
+        CastMessageHelper.isBlanked
+            .onEach { blanked ->
+                if (blanked) {
+                    binding.btnSetlistBlank.setBackgroundColor(getColor(R.color.red))
+                    binding.btnSetlistBlank.setText(R.string.controls_off)
+                } else {
+                    binding.btnSetlistBlank.setBackgroundColor(getColor(R.color.green))
+                    binding.btnSetlistBlank.setText(R.string.controls_on)
+                }
+            }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
 
         viewModel.currentSlideText
             .onEach { binding.tvSetlistSlidePreview.text = it }
             .launchIn(lifecycleScope)
 
         viewModel.currentSongTitle
-            .onEach { binding.tvCurrentSongTitle.text = it }
+            .onEach { binding.tvControlsSongTitle.text = it }
+            .launchIn(lifecycleScope)
+
+        viewModel.currentSlideNumber
+            .onEach { binding.tvSongSlideNumber.text = it }
             .launchIn(lifecycleScope)
 
         viewModel.currentSongPosition
@@ -85,7 +103,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         super.onResume()
 
         val settings = getSettings()
-        viewModel.settings = settings
+        viewModel.castConfiguration = settings.getCastConfigurationJson()
 
         if (settings.controlButtonsHeight > 0.0) {
             val params = binding.setlistControlsButtonContainer.layoutParams
@@ -145,7 +163,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.changedSongPositions
-            .onEach { itemPositions ->
+            .onEach { songItems ->
+                val itemPositions = songItems.map { viewModel.songs.indexOf(it) }
                 itemPositions.forEach { songItemsAdapter.notifyItemChanged(it) }
             }.launchIn(lifecycleScope)
     }
@@ -159,7 +178,6 @@ class SetlistControlsActivity : AppCompatActivity() {
     private fun goToSettings(): Boolean {
         val intent = Intent(baseContext, SettingsActivity::class.java)
         startActivity(intent)
-        viewModel.sendConfiguration()
         return true
     }
 }

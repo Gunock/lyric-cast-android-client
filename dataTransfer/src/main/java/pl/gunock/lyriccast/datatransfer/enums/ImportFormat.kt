@@ -6,14 +6,14 @@
 
 package pl.gunock.lyriccast.datatransfer.enums
 
-enum class ImportFormat(private val textName: String) {
+enum class ImportFormat(val displayName: String) {
     NONE("NONE"),
     OPEN_SONG("OpenSong"),
     LYRIC_CAST("LyricCast");
 
     companion object {
         fun getByName(name: String): ImportFormat {
-            return values().first { it.textName == name }
+            return values().first { it.displayName == name }
         }
     }
 }

@@ -10,22 +10,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
+import android.widget.ArrayAdapter
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
+import pl.gunock.lyriccast.databinding.DropdownItemColorBinding
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.domain.models.CategoryItem
 
 class CategorySpinnerAdapter(
     context: Context
-) : BaseAdapter() {
+) : ArrayAdapter<CategoryItem>(context, R.layout.dropdown_item_color) {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     private val categoryAll: CategoryItem =
         CategoryItem(Category(name = context.getString(R.string.category_all), id = ""))
-
-    val items: List<CategoryItem> get() = _items
 
     private var _items: List<CategoryItem> = listOf()
 
@@ -37,7 +35,7 @@ class CategorySpinnerAdapter(
         notifyDataSetChanged()
     }
 
-    override fun getItem(position: Int): Any {
+    override fun getItem(position: Int): CategoryItem {
         return _items[position]
     }
 
@@ -53,9 +51,9 @@ class CategorySpinnerAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val binding = if (convertView != null) {
-            SpinnerItemColorBinding.bind(convertView)
+            DropdownItemColorBinding.bind(convertView)
         } else {
-            SpinnerItemColorBinding.inflate(inflater)
+            DropdownItemColorBinding.inflate(inflater)
         }
 
         val viewHolder = ViewHolder(binding)
@@ -65,14 +63,14 @@ class CategorySpinnerAdapter(
         return binding.root
     }
 
-    private inner class ViewHolder(private val binding: SpinnerItemColorBinding) {
+    private inner class ViewHolder(private val binding: DropdownItemColorBinding) {
         fun bind(category: Category) {
-            binding.tvSpinnerColorName.text = category.name
+            binding.textColorName.text = category.name
             if (category.color != null) {
-                binding.cdvSpinnerCategoryColor.visibility = View.VISIBLE
-                binding.cdvSpinnerCategoryColor.setCardBackgroundColor(category.color!!)
+                binding.cardCategoryColor.visibility = View.VISIBLE
+                binding.cardCategoryColor.setCardBackgroundColor(category.color!!)
             } else {
-                binding.cdvSpinnerCategoryColor.visibility = View.GONE
+                binding.cardCategoryColor.visibility = View.GONE
             }
         }
     }

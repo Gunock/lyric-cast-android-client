@@ -8,6 +8,8 @@ package pl.gunock.lyriccast.datamodel
 
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.datamodel.models.mongo.CategoryDocument
 import pl.gunock.lyriccast.datamodel.models.mongo.SetlistDocument
 import pl.gunock.lyriccast.datamodel.models.mongo.SongDocument
@@ -22,6 +24,12 @@ import pl.gunock.lyriccast.datamodel.repositiories.impl.mongo.SetlistsRepository
 import pl.gunock.lyriccast.datamodel.repositiories.impl.mongo.SongsRepositoryMongoImpl
 
 object RepositoryFactory {
+    private val schema = setOf(
+        LyricsSectionDocument::class,
+        CategoryDocument::class,
+        SongDocument::class,
+        SetlistDocument::class,
+    )
 
     fun createSongsRepository(provider: RepositoryProvider): SongsRepository {
         return when (provider) {
@@ -62,14 +70,10 @@ object RepositoryFactory {
     }
 
     private fun openRealm(): Realm {
-        val schema = setOf(
-            LyricsSectionDocument::class,
-            CategoryDocument::class,
-            SongDocument::class,
-            SetlistDocument::class,
-        )
-
-        return Realm.open(RealmConfiguration.Builder(schema).build())
+        return runBlocking(Dispatchers.IO) {
+            val realmConfiguration = RealmConfiguration.Builder(schema).build()
+            Realm.open(realmConfiguration)
+        }
     }
 
     enum class RepositoryProvider {

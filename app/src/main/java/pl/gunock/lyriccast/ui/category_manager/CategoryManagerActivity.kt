@@ -14,7 +14,6 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
@@ -53,6 +52,9 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.statusBarColor = getColor(R.color.background_1)
+
         val rootBinding = ActivityCategoryManagerBinding.inflate(layoutInflater)
         binding = rootBinding.contentCategoryManager
         setContentView(rootBinding.root)
@@ -101,13 +103,7 @@ class CategoryManagerActivity : AppCompatActivity() {
     }
 
     private fun showAddCategoryDialog(): Boolean {
-        val dialogFragment = EditCategoryDialogFragment()
-        dialogFragment.setStyle(
-            DialogFragment.STYLE_NORMAL,
-            R.style.Theme_LyricCast_Dialog_NoTitle
-        )
-
-        dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
+        EditCategoryDialogFragment().show(supportFragmentManager, EditCategoryDialogFragment.TAG)
         return true
     }
 
@@ -115,9 +111,8 @@ class CategoryManagerActivity : AppCompatActivity() {
         val categoryItem = categoryItemsAdapter.currentList
             .first { tracker.isSelected(it.category.idLong) }
 
-        val dialogFragment = EditCategoryDialogFragment(categoryItem)
-        dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_LyricCast_Dialog_NoTitle)
-        dialogFragment.show(supportFragmentManager, EditCategoryDialogFragment.TAG)
+        EditCategoryDialogFragment(categoryItem)
+            .show(supportFragmentManager, EditCategoryDialogFragment.TAG)
 
         return true
     }
@@ -127,6 +122,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             0 -> {
                 actionMode?.finish()
             }
+
             1 -> {
                 if (actionMode == null) {
                     actionMode = startSupportActionMode(actionModeCallback)
@@ -136,6 +132,7 @@ class CategoryManagerActivity : AppCompatActivity() {
 
                 showMenuActions()
             }
+
             2 -> showMenuActions(showEdit = false)
         }
     }
@@ -188,6 +185,7 @@ class CategoryManagerActivity : AppCompatActivity() {
                         viewModel.deleteSelectedCategories()
                         true
                     }
+
                     R.id.action_menu_edit -> editSelectedCategory()
                     else -> false
                 }

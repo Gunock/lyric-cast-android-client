@@ -14,48 +14,17 @@
     android:focusableInTouchMode="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tbl_main_fragments"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:elevation="10dp"
-        android:outlineProvider="bounds"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tabGravity="fill"
-        app:tabIndicatorFullWidth="true"
-        app:tabMaxWidth="0dp">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
-            android:longClickable="false"
-            android:text="@string/title_songs" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
-            android:text="@string/title_setlists" />
-
-    </com.google.android.material.tabs.TabLayout>
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/navh_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
+        app:layout_constraintBottom_toBottomOf="@id/adv_main"
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tbl_main_fragments"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph_main">
 
     </androidx.fragment.app.FragmentContainerView>
@@ -64,14 +33,39 @@
         android:id="@+id/adv_main"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:adSize="BANNER"
         app:adUnitId="@string/ads_uid_main"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tbl_main_fragments"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- TODO: Make the tab layout work similar to YouTube's one -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tbl_main_fragments"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabIndicatorGravity="top">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:longClickable="false"
+            android:text="@string/title_songs" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_setlists" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+
     <ImageView
-        android:id="@+id/imv_main_dimm"
+        android:id="@+id/imv_main_dim"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"
@@ -109,19 +103,12 @@
             app:layout_constraintBottom_toTopOf="@+id/LinearLayout2"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                app:cardElevation="@dimen/fab_elevation"
-                app:cardMaxElevation="@dimen/fab_elevation">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/main_activity_button_add_setlist" />
-            </androidx.cardview.widget.CardView>
+                android:text="@string/main_activity_button_add_setlist"
+                android:textColor="@color/white" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_setlist"
@@ -130,12 +117,12 @@
                 android:clickable="false"
                 android:contentDescription="@string/main_activity_button_add_setlist"
                 android:visibility="visible"
-                app:backgroundTint="@color/fab_background_1"
-                app:elevation="@dimen/fab_elevation"
+                app:backgroundTint="@color/fab_background_secondary"
+                app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
                 app:maxImageSize="24dp"
-                app:srcCompat="@drawable/baseline_playlist_add_white_24dp"
-                app:tint="@color/fab_icon" />
+                app:srcCompat="@drawable/round_playlist_add_24"
+                app:tint="@color/icon_secondary" />
 
         </LinearLayout>
 
@@ -156,19 +143,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                app:cardElevation="@dimen/fab_elevation"
-                app:cardMaxElevation="@dimen/fab_elevation">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/main_activity_button_add_song" />
-            </androidx.cardview.widget.CardView>
+                android:padding="8dp"
+                android:text="@string/main_activity_button_add_song"
+                android:textColor="@color/white" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_add_song"
@@ -179,11 +160,11 @@
                 android:cropToPadding="false"
                 android:scaleType="center"
                 android:visibility="visible"
-                app:backgroundTint="@color/fab_background_1"
-                app:elevation="@dimen/fab_elevation"
+                app:backgroundTint="@color/fab_background_secondary"
+                app:elevation="@dimen/cardview_default_elevation"
                 app:fabCustomSize="40dp"
-                app:srcCompat="@drawable/baseline_music_note_black_24dp"
-                app:tint="@color/fab_icon"
+                app:srcCompat="@drawable/round_music_note_24"
+                app:tint="@color/icon_secondary"
                 app:useCompatPadding="false" />
         </LinearLayout>
 
@@ -200,13 +181,13 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:scaleType="center"
-        app:backgroundTint="@color/fab_background_2"
-        app:elevation="@dimen/fab_elevation"
+        app:backgroundTint="@color/fab_background_primary"
+        app:elevation="@dimen/cardview_default_elevation"
         app:layout_constraintBottom_toTopOf="@+id/adv_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="48dp"
-        app:srcCompat="@drawable/baseline_add_black_24dp"
-        app:tint="@color/fab_icon" />
+        app:srcCompat="@drawable/round_add_24"
+        app:tint="@color/icon_secondary" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

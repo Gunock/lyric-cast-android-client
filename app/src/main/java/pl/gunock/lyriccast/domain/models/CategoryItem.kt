@@ -13,9 +13,11 @@ data class CategoryItem(
     var hasCheckbox: Boolean = false,
     var isSelected: Boolean = false
 ) : Comparable<CategoryItem> {
-
-
     override fun compareTo(other: CategoryItem): Int {
         return category.name.compareTo(other.category.name)
+    }
+
+    override fun toString(): String {
+        return category.name
     }
 }

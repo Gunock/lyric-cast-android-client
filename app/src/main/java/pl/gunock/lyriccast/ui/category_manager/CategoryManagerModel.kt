@@ -10,7 +10,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import javax.inject.Inject
@@ -20,8 +24,8 @@ class CategoryManagerModel @Inject constructor(
     private val categoriesRepository: CategoriesRepository
 ) : ViewModel() {
 
-    val categories: StateFlow<List<CategoryItem>> get() = _categories
     private val _categories: MutableStateFlow<List<CategoryItem>> = MutableStateFlow(listOf())
+    val categories: StateFlow<List<CategoryItem>> get() = _categories
 
     init {
         categoriesRepository.getAllCategories()
@@ -33,7 +37,7 @@ class CategoryManagerModel @Inject constructor(
     }
 
     suspend fun deleteSelectedCategories() {
-        val selectedCategories = categories.value.filter { it.isSelected }
+        val selectedCategories = _categories.value.filter { it.isSelected }
             .map { item -> item.category.id }
 
         categoriesRepository.deleteCategories(selectedCategories)

@@ -15,12 +15,14 @@ import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
     @Provides
+    @Singleton
     fun provideDataTransferRepository(): DataTransferRepository {
         return RepositoryFactory.createDataTransferRepository(
             RepositoryFactory.RepositoryProvider.MONGO
@@ -28,6 +30,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideSongsRepository(): SongsRepository {
         return RepositoryFactory.createSongsRepository(
             RepositoryFactory.RepositoryProvider.MONGO
@@ -35,6 +38,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideSetlistsRepository(): SetlistsRepository {
         return RepositoryFactory.createSetlistsRepository(
             RepositoryFactory.RepositoryProvider.MONGO
@@ -42,6 +46,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideCategoriesRepository(): CategoriesRepository {
         return RepositoryFactory.createCategoriesRepository(
             RepositoryFactory.RepositoryProvider.MONGO

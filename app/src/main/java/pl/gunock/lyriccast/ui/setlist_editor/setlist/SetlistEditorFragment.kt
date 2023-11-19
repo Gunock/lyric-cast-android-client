@@ -129,14 +129,14 @@ class SetlistEditorFragment : Fragment() {
     private fun setupListeners() {
         binding.edSetlistName.addTextChangedListener(setlistNameTextWatcher)
 
-        binding.edSetlistName.setOnFocusChangeListener { view_, hasFocus ->
-            if (!hasFocus) view_.hideKeyboard()
+        binding.edSetlistName.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) view.hideKeyboard()
         }
 
         binding.btnPickSetlistSongs.setOnClickListener {
             actionMode?.finish()
 
-            val presentation: Array<String> = viewModel.songs.value
+            val presentation: Array<String> = viewModel.songsFlow.value
                 .map { it.song.id }
                 .toTypedArray()
 
@@ -189,7 +189,7 @@ class SetlistEditorFragment : Fragment() {
 
         itemTouchHelper.attachToRecyclerView(binding.rcvSongs)
 
-        viewModel.songs
+        viewModel.songsFlow
             .onEach { setlistSongItemsAdapter.submitList(it) }
             .launchIn(lifecycleScope)
     }
@@ -208,7 +208,7 @@ class SetlistEditorFragment : Fragment() {
             return
         }
 
-        if (viewModel.songs.value.isNotEmpty()) {
+        if (setlistSongItemsAdapter.itemCount > 0) {
             lifecycleScope.launch(Dispatchers.Default) { viewModel.saveSetlist() }
             requireActivity().finish()
         } else {

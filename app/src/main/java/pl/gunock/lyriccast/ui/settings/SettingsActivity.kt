@@ -38,12 +38,15 @@ class SettingsActivity : AppCompatActivity() {
                     exceptionMessage.contains("java.lang.Integer") -> {
                         sharedPreferences.getInt(key, 0).toString()
                     }
+
                     exceptionMessage.contains("java.lang.Float") -> {
                         sharedPreferences.getFloat(key, 0.0f).toString()
                     }
+
                     exceptionMessage.contains("java.lang.Boolean") -> {
                         sharedPreferences.getBoolean(key, false).toString()
                     }
+
                     else -> throw e
                 }
             }
@@ -61,18 +64,23 @@ class SettingsActivity : AppCompatActivity() {
                             settingsBuilder.appTheme = appThemeValue
                             AppCompatDelegate.setDefaultNightMode(appThemeValue)
                         }
+
                         "controlsButtonHeight" -> {
                             settingsBuilder.controlButtonsHeight = preferenceValue.toFloat()
                         }
+
                         "blankedOnStart" -> {
                             settingsBuilder.blankOnStart = preferenceValue.toBooleanStrict()
                         }
+
                         "backgroundColor" -> {
                             settingsBuilder.backgroundColor = preferenceValue
                         }
+
                         "fontColor" -> {
                             settingsBuilder.fontColor = preferenceValue
                         }
+
                         "fontMaxSize" -> {
                             settingsBuilder.maxFontSize = preferenceValue.toInt()
                         }
@@ -84,6 +92,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -118,7 +127,7 @@ class SettingsActivity : AppCompatActivity() {
             savedInstanceState: Bundle?
         ): View {
             val contextThemeWrapper: Context =
-                ContextThemeWrapper(activity, R.style.Theme_LyricCast_Dialog)
+                ContextThemeWrapper(activity, R.style.ThemeOverlay_LyricCast_MaterialAlertDialog)
 
             val localInflater = inflater.cloneInContext(contextThemeWrapper)
 

@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.ui.setlist_controls
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.databinding.ItemControlsSongBinding
@@ -25,9 +26,10 @@ class ControlsSongItemsAdapter(
 ) : RecyclerView.Adapter<ControlsSongItemsAdapter.ViewHolder>() {
 
     private val highlightCardColor = context.getColor(R.color.accent)
-    private val defaultCardColor = context.getColor(R.color.window_background_2)
-    private val defaultTextColor = context.getColor(R.color.text)
-    private val highlightTextColor = context.getColor(R.color.button_text_2)
+    private val defaultCardColor = context.getColor(R.color.background_4)
+    private val darkTextColor = context.getColor(R.color.dark_text)
+    private val brightTextColor = context.getColor(R.color.bright_text)
+    private val songItemTextColorMap = createCategoryTextColorMap()
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -42,6 +44,24 @@ class ControlsSongItemsAdapter(
 
     override fun getItemCount() = songItems.size
 
+    private fun createCategoryTextColorMap(): MutableMap<Int, Int> {
+        val cardBackgroundColors = listOf(defaultCardColor, highlightCardColor)
+        return cardBackgroundColors.associateWith(::getSongItemTextColor).toMutableMap()
+    }
+
+    private fun getSongItemTextColor(backgroundColor: Int): Int {
+        val brightTextContrast =
+            ColorUtils.calculateContrast(brightTextColor, backgroundColor)
+        val darkTextContrast =
+            ColorUtils.calculateContrast(darkTextColor, backgroundColor)
+
+        return if (brightTextContrast > darkTextContrast) {
+            brightTextColor
+        } else {
+            darkTextColor
+        }
+    }
+
     inner class ViewHolder(
         private val binding: ItemControlsSongBinding
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -55,10 +75,10 @@ class ControlsSongItemsAdapter(
             binding.tvItemSongTitle.text = titleText
 
             if (item.isHighlighted) {
-                binding.tvItemSongTitle.setTextColor(highlightTextColor)
+                binding.tvItemSongTitle.setTextColor(songItemTextColorMap[highlightCardColor]!!)
                 binding.root.setCardBackgroundColor(highlightCardColor)
             } else {
-                binding.tvItemSongTitle.setTextColor(defaultTextColor)
+                binding.tvItemSongTitle.setTextColor(songItemTextColorMap[defaultCardColor]!!)
                 binding.root.setCardBackgroundColor(defaultCardColor)
             }
 

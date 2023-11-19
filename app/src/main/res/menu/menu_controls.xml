@@ -15,7 +15,7 @@
         android:title="@string/option_menu_cast"
         app:actionProviderClass="pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider"
         app:showAsAction="always"
-        tools:icon="@drawable/mr_button_dark" />
+        tools:icon="@drawable/round_cast_24" />
 
     <item
         android:id="@+id/menu_settings"

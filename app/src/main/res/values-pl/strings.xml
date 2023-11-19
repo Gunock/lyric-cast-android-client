@@ -6,7 +6,7 @@
 
 <resources>
     <!-- Titles -->
-    <string name="title_category_manager">Zarządzanie kategoriami</string>
+    <string name="title_category_manager">Zarządzaj kategoriami</string>
     <string name="title_categories">Kategorie</string>
     <string name="title_settings">Ustawienia</string>
     <string name="title_song_editor">Edytor piosenek</string>
@@ -17,7 +17,9 @@
 
     <!-- Hints -->
     <string name="hint_song_title">Tytuł piosenki</string>
+    <string name="hint_song_category">Kategoria</string>
     <string name="hint_setlist_name">Nazwa listy</string>
+    <string name="hint_import_format">Format</string>
 
     <!-- Option/Action Menu -->
     <string name="option_menu_cast">Rzutuj</string>
@@ -48,7 +50,6 @@
 
 
     <!-- Song/Setlist Controls -->
-    <string name="controls_button_blank_placeholder">Blank</string>
     <string name="controls_previous">Poprzedni</string>
     <string name="controls_next">Następny</string>
 
@@ -57,7 +58,8 @@
     <string name="editor_button_add">Dodaj</string>
 
     <!-- Category Manager -->
-    <string name="category_manager_hint_category_name">Nazwa kategorii</string>
+    <string name="category_manager_hint_category_name">Nazwa</string>
+    <string name="category_manager_hint_category_color">Kolor</string>
     <string name="category_manager_add_category">Dodawanie kategorii</string>
     <string name="category_manager_edit_category">Edycja kategorii</string>
     <string name="category_manager_name_already_used">Nazwa kategorii już zajęta</string>

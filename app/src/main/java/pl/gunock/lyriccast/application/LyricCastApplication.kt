@@ -12,6 +12,8 @@ import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.HarmonizedColorsOptions.*
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,8 @@ import java.util.concurrent.Executors
 class LyricCastApplication : Application() {
     @SuppressLint("WrongConstant")
     override fun onCreate() {
+        super.onCreate()
+
         initializeFromThread()
 
         // Initializes CastContext
@@ -36,16 +40,22 @@ class LyricCastApplication : Application() {
                     onEnded = { CastMessageHelper.onSessionEnded() }
                 )
 
-                task.result.sessionManager.addSessionManagerListener(listener)
+                CoroutineScope(Dispatchers.Main).launch {
+                    task.result.sessionManager.addSessionManagerListener(listener)
+                }
             }
 
 
-        var appTheme = getSettings().appTheme
-        appTheme = if (appTheme == 0) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else appTheme
+        DynamicColors.applyToActivitiesIfAvailable(this)
 
-        AppCompatDelegate.setDefaultNightMode(appTheme)
+        // TODO: Add color harmonization
 
-        super.onCreate()
+        var appTheme: Int? = getSettings().appTheme
+        appTheme = if (appTheme == 0) null else appTheme
+
+        if (appTheme != null) {
+            AppCompatDelegate.setDefaultNightMode(appTheme)
+        }
 
         if (BuildConfig.DEBUG) {
             setupStrictMode()
@@ -61,6 +71,7 @@ class LyricCastApplication : Application() {
     private fun setupStrictMode() {
         val threadPolicy = StrictMode.ThreadPolicy.Builder()
             .detectAll()
+            .permitCustomSlowCalls()
             .penaltyLog()
             .penaltyDialog()
             .build()

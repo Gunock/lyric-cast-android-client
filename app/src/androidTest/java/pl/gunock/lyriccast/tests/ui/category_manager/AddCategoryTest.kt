@@ -20,8 +20,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
-import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.CustomEspresso.waitForView
+import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 
 
@@ -55,13 +55,13 @@ class AddCategoryTest {
         onView(withId(R.id.ed_category_name))
             .perform(replaceText(newCategoryName))
 
-        onView(withId(R.id.spn_category_color))
+        onView(withId(R.id.dropdown_color))
             .perform(click())
 
-        onView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)))
+        onView(allOf(withId(R.id.text_color_name), withText(colorName)))
             .perform()
 
-        waitForView(allOf(withId(R.id.tv_spinner_color_name), withText(colorName)), 100)
+        waitForView(allOf(withId(R.id.text_color_name), withText(colorName)), 100)
             .inRoot(isPlatformPopup())
             .perform(click())
 

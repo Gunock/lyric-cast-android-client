@@ -38,8 +38,6 @@ class MainModel @Inject constructor(
         const val TAG = "MainViewModel"
     }
 
-    fun init() {}
-
     suspend fun exportAll(
         cacheDir: String,
         outputStream: OutputStream,
@@ -73,16 +71,9 @@ class MainModel @Inject constructor(
         inputStream: InputStream,
         importOptions: ImportOptions
     ): Flow<Int>? {
-        val transferData: DatabaseTransferData? = getImportData(cacheDir, inputStream)
+        val transferData: DatabaseTransferData = getImportData(cacheDir, inputStream) ?: return null
 
-        return if (transferData != null) {
-            dataTransferRepository.importData(
-                transferData,
-                importOptions
-            )
-        } else {
-            null
-        }
+        return dataTransferRepository.importData(transferData, importOptions)
     }
 
     suspend fun importOpenSong(
@@ -94,21 +85,14 @@ class MainModel @Inject constructor(
         val importSongXmlParser =
             ImportSongXmlParserFactory.create(importDir, SongXmlParserType.OPEN_SONG)
 
-        val importedSongs: Set<SongDto>? = try {
+        val importedSongs: Set<SongDto> = try {
             importSongXmlParser.parseZip(inputStream)
         } catch (exception: Exception) {
-            Log.e(TAG, exception.stackTraceToString())
+            Log.w(TAG, exception)
             null
-        }
+        } ?: return null
 
-        return if (importedSongs != null) {
-            dataTransferRepository.importSongs(
-                importedSongs,
-                importOptions
-            )
-        } else {
-            null
-        }
+        return dataTransferRepository.importSongs(importedSongs, importOptions)
     }
 
     private fun getImportData(

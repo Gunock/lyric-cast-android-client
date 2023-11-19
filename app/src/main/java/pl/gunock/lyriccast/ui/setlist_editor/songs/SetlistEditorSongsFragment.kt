@@ -7,7 +7,13 @@
 package pl.gunock.lyriccast.ui.setlist_editor.songs
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -22,13 +28,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.databinding.FragmentSongsBinding
 import pl.gunock.lyriccast.domain.models.CategoryItem
 import pl.gunock.lyriccast.shared.extensions.hideKeyboard
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.adapters.SongItemsAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
-import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedSpinnerListener
 
 @AndroidEntryPoint
 class SetlistEditorSongsFragment : Fragment() {
@@ -41,6 +47,7 @@ class SetlistEditorSongsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         viewModel.init()
 
         setupMenu()
@@ -90,22 +97,31 @@ class SetlistEditorSongsFragment : Fragment() {
             }
         }
 
-        binding.spnCategory.onItemSelectedListener = ItemSelectedSpinnerListener { _, _ ->
-            val categoryItem = binding.spnCategory.selectedItem as CategoryItem?
-            viewModel.searchValues.categoryId = categoryItem?.category?.id
-        }
-
         binding.swtSelectedSongs.setOnCheckedChangeListener { _, isChecked ->
             viewModel.searchValues.isSelected = if (isChecked) true else null
         }
     }
 
     private fun setupCategorySpinner() {
-        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.spnCategory.context)
-        binding.spnCategory.adapter = categorySpinnerAdapter
+        val categorySpinnerAdapter = CategorySpinnerAdapter(binding.dropdownCategory.context)
+
+        binding.dropdownCategory.setAdapter(categorySpinnerAdapter)
+        binding.dropdownCategory.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                val categoryItem = categorySpinnerAdapter.getItem(position) as CategoryItem?
+                val categoryId: String? = categoryItem?.category?.id
+                viewModel.searchValues.categoryId = categoryId
+            }
 
         viewModel.categories
-            .onEach { categorySpinnerAdapter.submitCollection(it) }
+            .onEach {
+                categorySpinnerAdapter.submitCollection(it)
+
+                val firstCategoryName = categorySpinnerAdapter.getItem(0).category.name
+                withContext(Dispatchers.Main) {
+                    binding.dropdownCategory.setText(firstCategoryName)
+                }
+            }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
     }
@@ -152,6 +168,7 @@ class SetlistEditorSongsFragment : Fragment() {
                     goToSetlistFragment()
                     return true
                 }
+
                 else -> false
             }
         }

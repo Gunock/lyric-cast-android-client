@@ -10,19 +10,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import pl.gunock.lyriccast.databinding.SpinnerItemColorBinding
+import android.widget.ArrayAdapter
+import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.databinding.DropdownItemColorBinding
 import pl.gunock.lyriccast.domain.models.ColorItem
 
 
 class ColorSpinnerAdapter(
     context: Context,
     private val colors: Array<ColorItem>
-) : BaseAdapter() {
+) : ArrayAdapter<ColorItem>(context, R.layout.dropdown_item_color) {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    override fun getItem(position: Int): Any {
+    override fun getItem(position: Int): ColorItem {
         return colors[position]
     }
 
@@ -36,9 +37,9 @@ class ColorSpinnerAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val binding = if (convertView != null) {
-            SpinnerItemColorBinding.bind(convertView)
+            DropdownItemColorBinding.bind(convertView)
         } else {
-            SpinnerItemColorBinding.inflate(inflater)
+            DropdownItemColorBinding.inflate(inflater)
         }
 
         val item = colors[position]
@@ -48,10 +49,10 @@ class ColorSpinnerAdapter(
         return binding.root
     }
 
-    private inner class ViewHolder(private val binding: SpinnerItemColorBinding) {
+    private inner class ViewHolder(private val binding: DropdownItemColorBinding) {
         fun bind(item: ColorItem) {
-            binding.tvSpinnerColorName.text = item.name
-            binding.cdvSpinnerCategoryColor.setCardBackgroundColor(item.value)
+            binding.textColorName.text = item.name
+            binding.cardCategoryColor.setCardBackgroundColor(item.value)
         }
     }
 
