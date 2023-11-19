@@ -28,10 +28,10 @@ class SongControlsModel @Inject constructor(
     var castConfiguration: JSONObject? = null
 
     val currentSlideText: Flow<String> get() = _currentSlideText
-    private val _currentSlideText: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSlideText = MutableStateFlow("")
 
     val currentSlideNumber: Flow<String> get() = _currentSlideNumber
-    private val _currentSlideNumber: MutableStateFlow<String> = MutableStateFlow("")
+    private val _currentSlideNumber = MutableStateFlow("")
 
     private var currentSlide = 0
     private lateinit var lyrics: List<String>
@@ -92,7 +92,7 @@ class SongControlsModel @Inject constructor(
     }
 
     private fun postSlide() {
-        _currentSlideNumber.value = "${currentSlide + 1}/${lyrics.size}"
-        _currentSlideText.value = lyrics[currentSlide]
+        _currentSlideNumber.tryEmit("${currentSlide + 1}/${lyrics.size}")
+        _currentSlideText.tryEmit(lyrics[currentSlide])
     }
 }

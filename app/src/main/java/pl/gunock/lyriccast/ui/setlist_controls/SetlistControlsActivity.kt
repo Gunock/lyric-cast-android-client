@@ -82,7 +82,11 @@ class SetlistControlsActivity : AppCompatActivity() {
             .launchIn(lifecycleScope)
 
         viewModel.currentSongTitle
-            .onEach { binding.tvCurrentSongTitle.text = it }
+            .onEach { binding.tvControlsSongTitle.text = it }
+            .launchIn(lifecycleScope)
+
+        viewModel.currentSlideNumber
+            .onEach { binding.tvSongSlideNumber.text = it }
             .launchIn(lifecycleScope)
 
         viewModel.currentSongPosition
@@ -159,7 +163,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.changedSongPositions
-            .onEach { itemPositions ->
+            .onEach { songItems ->
+                val itemPositions = songItems.map { viewModel.songs.indexOf(it) }
                 itemPositions.forEach { songItemsAdapter.notifyItemChanged(it) }
             }.launchIn(lifecycleScope)
     }
