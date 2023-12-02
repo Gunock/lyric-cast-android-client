@@ -9,9 +9,9 @@ buildscript {
     ext {
         kotlinVersion = '1.9.0'
         navVersion = '2.7.5'
-        hiltVersion = '2.48.1'
+        hiltVersion = '2.49'
         protobufVersion = '0.9.1'
-        realmVersion = '1.12.0'
+        realmVersion = '1.13.0'
         googleServicesVersion = '4.3.15'
         crashlyticsVersion = '2.9.4'
     }
@@ -20,7 +20,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.android.tools.build:gradle:8.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
         classpath "com.google.gms:google-services:$googleServicesVersion"
@@ -57,7 +57,7 @@ ext {
     // App dependencies
     coroutinesVersion = '1.7.3'
     datastoreVersion = '1.0.0'
-    protobufJavaLiteVersion = '3.21.12'
+    protobufJavaLiteVersion = '3.25.1'
     materialVersion = '1.10.0'
     androidXCoreVersion = '1.12.0'
     appCompatVersion = '1.6.1'
@@ -69,7 +69,7 @@ ext {
     firebaseVersion = '32.6.0'
     castFrameworkVersion = '21.3.0'
     mediaRouterVersion = '1.6.0'
-    apacheCommonsLangVersion = '3.13.0'
+    apacheCommonsLangVersion = '3.14.0'
     zip4jVersion = '2.11.5'
 
     // Test dependencies

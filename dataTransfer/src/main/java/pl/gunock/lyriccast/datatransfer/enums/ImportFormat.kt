@@ -13,7 +13,7 @@ enum class ImportFormat(val displayName: String) {
 
     companion object {
         fun getByName(name: String): ImportFormat {
-            return values().first { it.displayName == name }
+            return entries.first { it.displayName == name }
         }
     }
 }
