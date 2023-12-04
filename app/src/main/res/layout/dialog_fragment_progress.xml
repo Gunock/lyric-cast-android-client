@@ -6,24 +6,22 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Theme.LyricCast.Dialog.NoTitle"
+    style="@style/ThemeOverlay.LyricCast.MaterialAlertDialog.NoTitle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:animateLayoutChanges="true"
-    android:background="@color/window_background_2"
     android:padding="16dp">
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/pgb_progress"
-        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/indeterminate_progress_bar"
+        android:indeterminate="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tv_progress_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -35,13 +33,12 @@
         app:layout_constraintStart_toEndOf="@+id/pgb_progress"
         app:layout_constraintTop_toTopOf="@+id/pgb_progress" />
 
-    <Button
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/btn_progress_ok"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@android:string/ok"
-        android:textColor="@color/dialog_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pgb_progress" />
 

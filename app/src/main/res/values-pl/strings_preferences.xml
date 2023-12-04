@@ -7,6 +7,7 @@
 <resources>
     <!-- Titles -->
     <string name="preference_theme_title">Motyw</string>
+    <string name="preference_controls_button_height_title">Wysokość przycisków sterujących</string>
     <string name="preference_cast_background_title">Kolor tła</string>
     <string name="preference_cast_font_color_title">Kolor czcionki</string>
     <string name="preference_cast_max_font_size_title">Maksymalny rozmiar czcionki</string>
@@ -20,6 +21,11 @@
     <string name="preference_theme_light">Jasny</string>
     <string name="preference_theme_dark">Ciemny</string>
     <string name="preference_theme_system">Systemowy</string>
+
+    <!-- Theme entries -->
+    <string name="preference_controls_buttons_height_small">Mały</string>
+    <string name="preference_controls_buttons_height_medium">Średni</string>
+    <string name="preference_controls_buttons_height_large">Duży</string>
 
     <!-- Color entries -->
     <string name="preference_color_black">Czarny</string>

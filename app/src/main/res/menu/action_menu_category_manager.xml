@@ -1,24 +1,26 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 17/07/2021, 11:25
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:context="pl.gunock.lyriccast.ui.main.MainActivity"
     tools:ignore="AlwaysShowAction">
 
     <item
         android:id="@+id/action_menu_edit"
-        android:icon="@drawable/baseline_mode_edit_white_24dp"
+        android:icon="@drawable/round_edit_24"
+        android:iconTint="@color/icon_primary"
         android:title="@string/main_activity_button_edit"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_menu_delete"
-        android:icon="@drawable/baseline_delete_outline_white_24dp"
+        android:icon="@drawable/round_delete_outline_24"
+        android:iconTint="@color/icon_primary"
         android:title="@string/action_menu_button_delete"
         app:showAsAction="always" />
 

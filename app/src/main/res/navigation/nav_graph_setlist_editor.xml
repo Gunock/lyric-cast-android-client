@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/20/21 1:10 AM
+  ~ Created by Tomasz Kiljanczyk on 05/10/2021, 18:43
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/20/21 1:09 AM
+  ~ Last modified 05/10/2021, 18:43
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,7 +12,7 @@
 
     <fragment
         android:id="@+id/SetlistEditorSongs"
-        android:name="pl.gunock.lyriccast.fragments.SetlistEditorSongsFragment"
+        android:name="pl.gunock.lyriccast.ui.setlist_editor.songs.SetlistEditorSongsFragment"
         android:label="@string/title_songs"
         tools:layout="@layout/fragment_songs">
 
@@ -24,7 +24,7 @@
             app:popUpToInclusive="false" />
         <argument
             android:name="setlistId"
-            app:argType="org.bson.types.ObjectId" />
+            app:argType="string" />
         <argument
             android:name="presentation"
             app:argType="string[]" />
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/SetlistEditor"
-        android:name="pl.gunock.lyriccast.fragments.SetlistEditorFragment"
+        android:name="pl.gunock.lyriccast.ui.setlist_editor.setlist.SetlistEditorFragment"
         android:label="@string/title_songs"
         tools:layout="@layout/fragment_setlist_editor">
 
@@ -45,9 +45,9 @@
             app:popUpToInclusive="false" />
         <argument
             android:name="setlistId"
-            android:defaultValue="@null"
-            app:argType="org.bson.types.ObjectId"
-            app:nullable="true" />
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <argument
             android:name="presentation"
             android:defaultValue="@null"

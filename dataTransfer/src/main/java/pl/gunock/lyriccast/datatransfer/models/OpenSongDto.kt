@@ -1,12 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/5/21 1:02 AM
+ * Created by Tomasz Kiljanczyk on 18/07/2021, 23:43
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/5/21 12:33 AM
+ * Last modified 18/07/2021, 23:28
  */
 
 package pl.gunock.lyriccast.datatransfer.models
-
-import java.util.*
 
 internal data class OpenSongDto(
     val title: String,
@@ -33,7 +31,7 @@ internal data class OpenSongDto(
             presentationFixed = FIX_PRESENTATION_REGEX_2.replace(presentationFixed) { match ->
                 "${match.groupValues[1]} ${match.groupValues[2]}"
             }
-            presentationFixed.toUpperCase(Locale.getDefault())
+            presentationFixed.uppercase()
                 .split(SPLIT_SPACE_REGEX)
                 .filter { lyricsMap.containsKey(it) }
         } else {
@@ -53,7 +51,7 @@ internal data class OpenSongDto(
                 .trim()
                 .replace("\n +".toRegex(), "\n")
 
-            result[sectionName.toUpperCase(Locale.getDefault())] = sectionText
+            result[sectionName.uppercase()] = sectionText
         }
 
         return result

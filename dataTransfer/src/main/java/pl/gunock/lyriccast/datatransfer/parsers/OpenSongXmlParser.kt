@@ -1,13 +1,11 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 02/05/2021, 16:23
+ * Created by Tomasz Kiljanczyk on 12/11/2022, 19:57
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 22/09/2022, 20:49
  */
 
 package pl.gunock.lyriccast.datatransfer.parsers
 
-import android.content.ContentResolver
-import android.net.Uri
 import android.util.Log
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
@@ -17,7 +15,6 @@ import pl.gunock.lyriccast.datatransfer.models.OpenSongDto
 import pl.gunock.lyriccast.datatransfer.models.SongDto
 import java.io.File
 import java.io.InputStream
-import java.util.*
 
 internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir) {
 
@@ -25,12 +22,12 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
         const val TAG = "OpenSongXmlParser"
     }
 
-    override fun parseZip(resolver: ContentResolver, targetUri: Uri): Set<SongDto> {
-        mImportDirectory.deleteRecursively()
-        mImportDirectory.mkdirs()
-        FileHelper.unzip(resolver.openInputStream(targetUri)!!, mImportDirectory.canonicalPath)
+    override fun parseZip(inputStream: InputStream): Set<SongDto> {
+        importDirectory.deleteRecursively()
+        importDirectory.mkdirs()
+        FileHelper.unzip(inputStream, importDirectory.canonicalPath)
 
-        val fileList1 = mImportDirectory.listFiles() ?: arrayOf()
+        val fileList1 = importDirectory.listFiles() ?: arrayOf()
         val result: MutableSet<SongDto> = mutableSetOf()
         for (file1 in fileList1) {
             if (!file1.isDirectory) {
@@ -51,7 +48,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
             }
         }
 
-        mImportDirectory.deleteRecursively()
+        importDirectory.deleteRecursively()
         return result
     }
 
@@ -68,9 +65,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
 
         val song = readSong(parser)
 
-        val presentationList: List<String> = if (song.presentationList.isNotEmpty()) {
-            song.presentationList
-        } else {
+        val presentationList: List<String> = song.presentationList.ifEmpty {
             song.lyricsMap.keys.toList()
         }
 
@@ -78,7 +73,7 @@ internal class OpenSongXmlParser(filesDir: File) : ImportSongXmlParser(filesDir)
             title = song.title,
             presentation = presentationList,
             lyrics = song.lyricsMap,
-            category = category.trim().toUpperCase(Locale.getDefault())
+            category = category.trim().uppercase()
         )
     }
 

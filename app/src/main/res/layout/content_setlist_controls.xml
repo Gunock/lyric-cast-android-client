@@ -10,29 +10,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
-    android:background="@color/window_background_2"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_background_primary"
-        android:elevation="@dimen/elevation_medium"
         android:outlineProvider="background"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_current_song_title"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_controls_song_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:singleLine="true"
+            android:text="Test song"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_song_slide_number"
+            app:layout_constraintEnd_toStartOf="@+id/tv_song_slide_number"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_song_slide_number"
+            tools:ignore="HardcodedText" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_song_slide_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_title"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginEnd="16dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="8dp"
+            android:text="99/99"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -40,94 +57,108 @@
         android:id="@+id/adv_setlist_controls"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:adSize="BANNER"
         app:adUnitId="@string/ads_uid_setlist_controls"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
-    <TextView
-        android:id="@+id/tv_setlist_slide_preview"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_setlist_slide_preview"
         android:layout_width="0dp"
-        android:layout_height="256dp"
+        android:layout_height="196dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:scrollbars="vertical"
-        android:textAlignment="textStart"
-        android:textSize="18sp"
+        app:cardBackgroundColor="@color/background_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls" />
+        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls"
+        app:strokeWidth="0dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_setlist_slide_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:textAlignment="textStart"
+            android:textSize="18sp" />
+    </com.google.android.material.card.MaterialCardView>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_songs"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:background="@color/window_background_3"
-        android:elevation="@dimen/elevation_medium"
         android:fadeScrollbars="false"
         android:outlineProvider="background"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
         android:scrollbarAlwaysDrawVerticalTrack="false"
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout7"
+        app:layout_constraintBottom_toTopOf="@+id/setlist_controls_button_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_setlist_slide_preview"
-        tools:listitem="@layout/item_controls_song">
+        app:layout_constraintTop_toBottomOf="@+id/card_setlist_slide_preview"
+        tools:listitem="@layout/item_controls_song" />
 
-    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout7"
+        android:id="@+id/setlist_controls_button_container"
         android:layout_width="match_parent"
         android:layout_height="88dp"
-        android:background="@color/window_background_1"
-        android:elevation="@dimen/elevation_medium"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_setlist_prev"
-            style="@style/Widget.LyricCast.ImageButton.Light"
-            android:layout_width="112dp"
+            style="@style/Widget.LyricCast.Button.Icon.Light"
+            android:layout_width="96dp"
             android:layout_height="0dp"
             android:layout_marginEnd="32dp"
+            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/controls_previous"
             android:rotation="180"
+            app:icon="@drawable/round_play_arrow_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_setlist_blank"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_play_arrow_black_24dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_setlist_blank"
             style="@style/Widget.LyricCast.Button.Light"
             android:layout_width="88dp"
             android:layout_height="0dp"
-            android:text="@string/controls_button_blank_placeholder"
+            android:backgroundTint="@color/red"
+            android:text="@string/controls_off"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_setlist_next"
-            style="@style/Widget.LyricCast.ImageButton.Light"
-            android:layout_width="112dp"
+            style="@style/Widget.LyricCast.Button.Icon.Light"
+            android:layout_width="96dp"
             android:layout_height="0dp"
             android:layout_marginStart="32dp"
+            android:backgroundTint="@color/button_background"
             android:contentDescription="@string/controls_next"
+            app:icon="@drawable/round_play_arrow_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_setlist_blank"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_play_arrow_black_24dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

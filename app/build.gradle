@@ -1,40 +1,65 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 14:57
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 06/05/2021, 14:56
+ * Created by Tomasz Kiljanczyk on 03/01/2022, 23:17
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 03/01/2022, 23:13
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: "androidx.navigation.safeargs.kotlin"
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.google.devtools.ksp'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'com.google.dagger.hilt.android'
+    id 'com.google.protobuf'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+}
+
 
 android {
-    signingConfigs {
-        release {
-        storeFile file(var)
-            storePassword 'eAdmin.1@2'
-            keyAlias 'LyricCast-release'
-            keyPassword 'eAdmin.1@2'
-        }
-    }
-
-    compileSdkVersion 30
-    buildToolsVersion '30.0.3'
+    def major = 0
+    def minor = 2
+    def patch = 0
 
     defaultConfig {
         applicationId "pl.gunock.lyriccast"
-        minSdkVersion 23
-        targetSdkVersion 30
-        versionCode 2
-        versionName "0.1.0-a2"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        compileSdk rootProject.targetSdkVersion
+        versionCode major * 100000000 + minor * 10000 + patch
+        versionName "$major.$minor.$patch"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "pl.gunock.lyriccast.HiltTestRunner"
+        resourceConfigurations += ['en', 'pl']
     }
 
     buildTypes {
+        debugMini {
+            initWith buildTypes.debug
+
+            minifyEnabled true
+            shrinkResources false
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
@@ -43,50 +68,93 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     testOptions {
+        animationsDisabled = true
+
         unitTests {
             returnDefaultValues = true
             includeAndroidResources = true
         }
     }
-
+    namespace 'pl.gunock.lyriccast'
 }
 
 dependencies {
+    // Submodules
     implementation project(':common')
     implementation project(':dataTransfer')
     implementation project(':dataModel')
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3"
+    // App dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'com.google.android.gms:play-services-cast-framework:20.0.0'
-    implementation 'com.google.android.gms:play-services-ads:20.1.0'
 
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.mediarouter:mediarouter:1.2.2'
-    implementation 'androidx.preference:preference-ktx:1.1.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    // Architecture Components
+    implementation "androidx.datastore:datastore:$datastoreVersion"
+    implementation "com.google.protobuf:protobuf-javalite:$protobufJavaLiteVersion"
 
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    // AndroidX
+    implementation "com.google.android.material:material:$materialVersion"
+    implementation "androidx.core:core-ktx:$androidXCoreVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.recyclerview:recyclerview-selection:$recyclerViewSelectionVersion"
+    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    // AdMob
+    implementation "com.google.android.gms:play-services-ads:$googleAdsVersion"
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation "androidx.test:runner:1.3.0"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+    // Chromecast
+    implementation "com.google.android.gms:play-services-cast-framework:$castFrameworkVersion"
+    implementation "androidx.mediarouter:mediarouter:$mediaRouterVersion"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    ksp "com.google.dagger:hilt-compiler:$hiltVersion"
+
+    // Firebase
+    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    // AndroidX Test - Instrumented testing
+    androidTestImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+
+
+    // AndroidX Test - Hilt testing
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    kspAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
+
+    // LeakCanary
+//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protobufJavaLiteVersion"
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
 }

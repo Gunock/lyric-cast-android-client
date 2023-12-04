@@ -1,7 +1,7 @@
 /*
- * Created by Tomasz Kiljanczyk on 06/05/2021, 13:42
+ * Created by Tomasz Kiljanczyk on 29/12/2021, 14:52
  * Copyright (c) 2021 . All rights reserved.
- * Last modified 02/05/2021, 16:32
+ * Last modified 29/12/2021, 14:49
  */
 
 package pl.gunock.lyriccast.common.helpers
@@ -9,6 +9,7 @@ package pl.gunock.lyriccast.common.helpers
 import android.util.Log
 import net.lingala.zip4j.io.inputstream.ZipInputStream
 import net.lingala.zip4j.io.outputstream.ZipOutputStream
+import net.lingala.zip4j.model.LocalFileHeader
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.CompressionMethod
@@ -20,25 +21,23 @@ import java.io.OutputStream
 object FileHelper {
     private const val TAG = "FileHelper"
 
-    fun unzip(inputStream: InputStream, targetLocation: String): Boolean {
+    fun unzip(inputStream: InputStream, targetLocation: String) {
         Log.d(TAG, "Unzipping stream to '$targetLocation'")
 
         createDirectory(targetLocation)
-        val zipInputStream = ZipInputStream(inputStream)
+        ZipInputStream(inputStream).use { zipInputStream ->
+            while (true) {
+                val entry: LocalFileHeader = zipInputStream.nextEntry ?: break
+                val filePath = "${targetLocation}/${entry.fileName}"
 
-        while (true) {
-            val entry = zipInputStream.nextEntry ?: break
-            val filePath = "${targetLocation}/${entry.fileName}"
-
-            if (entry.isDirectory) {
-                createDirectory(filePath)
-            } else {
-                File(filePath).outputStream().use { it.write(zipInputStream.readBytes()) }
-                Log.v(TAG, "Unzipped file at $filePath")
+                if (entry.isDirectory) {
+                    createDirectory(filePath)
+                } else {
+                    File(filePath).outputStream().use { it.write(zipInputStream.readBytes()) }
+                    Log.v(TAG, "Unzipped file at $filePath")
+                }
             }
         }
-        zipInputStream.close()
-        return true
     }
 
     fun zip(outputStream: OutputStream, sourceLocation: String): Boolean {

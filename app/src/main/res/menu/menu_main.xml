@@ -1,21 +1,21 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 4/8/21 1:47 PM
+  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/8/21 1:41 PM
+  ~ Last modified 17/07/2021, 12:26
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pl.gunock.lyriccast.activities.MainActivity"
+    tools:context="pl.gunock.lyriccast.ui.main.MainActivity"
     tools:ignore="AlwaysShowAction">
 
     <item
         android:id="@+id/menu_cast"
         android:title="@string/option_menu_cast"
-        app:actionProviderClass="pl.gunock.lyriccast.cast.CustomMediaRouteActionProvider"
+        app:actionProviderClass="pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider"
         app:showAsAction="always"
-        tools:icon="@drawable/mr_button_dark" />
+        tools:icon="@drawable/round_cast_24" />
 
     <item
         android:id="@+id/menu_settings"

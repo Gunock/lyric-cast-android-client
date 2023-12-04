@@ -1,79 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Created by Tomasz Kiljanczyk on 4/9/21 11:51 PM
+  ~ Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
   ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 4/9/21 11:45 PM
+  ~ Last modified 15/05/2021, 21:34
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Theme.LyricCast.Dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:background="@color/window_background_2"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/tv_dialog_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/placeholder_title"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tv_category_name"
+        android:id="@+id/tin_category_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:hint="@string/category_manager_hint_category_name"
         app:counterEnabled="true"
-        app:counterMaxLength="30"
+        app:counterMaxLength="@integer/ed_max_length_category_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tin_category_name"
+            android:id="@+id/ed_category_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/category_manager_hint_category_name"
             android:maxLength="21" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Spinner
-        android:id="@+id/spn_category_color"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
-        app:layout_constraintEnd_toEndOf="parent"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_category_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:outlineProvider="background"
+        app:layout_constraintBottom_toBottomOf="@+id/dropdown_layout_category"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_category_name"
-        tools:listitem="@layout/spinner_item_color" />
+        app:layout_constraintTop_toTopOf="@+id/dropdown_layout_category"
+        app:strokeWidth="0dp" />
 
-    <Button
-        android:id="@+id/btn_cancel"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dropdown_layout_category"
+        style="@style/Widget.LyricCast.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@android:string/cancel"
-        android:textColor="@color/accent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_save_category"
-        app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
-
-    <Button
-        android:id="@+id/btn_save_category"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/editor_button_save"
-        android:textColor="@color/accent"
+        android:hint="@string/category_manager_hint_category_color"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spn_category_color" />
+        app:layout_constraintStart_toEndOf="@+id/card_category_color"
+        app:layout_constraintTop_toBottomOf="@+id/tin_category_name">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/dropdown_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            tools:listitem="@layout/dropdown_item_color" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

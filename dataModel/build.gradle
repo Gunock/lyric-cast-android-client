@@ -1,57 +1,71 @@
 /*
- * Created by Tomasz Kiljanczyk on 4/20/21 3:32 PM
- * Copyright (c) 2021 . All rights reserved.
- * Last modified 4/20/21 3:31 PM
+ * Created by Tomasz Kiljanczyk on 03/01/2022, 23:17
+ * Copyright (c) 2022 . All rights reserved.
+ * Last modified 03/01/2022, 23:13
  */
 
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'realm-android'
+    id 'io.realm.kotlin'
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        compileSdk rootProject.targetSdkVersion
 
         consumerProguardFiles "consumer-rules.pro"
-
-        realm {
-            syncEnabled = false
-        }
-    }
-
-    buildFeatures {
-        dataBinding true
     }
 
     buildTypes {
+        debugMini {
+            initWith buildTypes.debug
+
+            minifyEnabled true
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
+    namespace 'pl.gunock.lyriccast.datamodel'
+}
+
+// TODO: Remove this workaround when https://github.com/realm/realm-kotlin/issues/887 is fixed
+project.afterEvaluate {
+    kotlin.target.compilations.configureEach { // use targets if this is a Multiplatform project
+        kotlinOptions.jvmTarget = "17"
     }
 }
 
 dependencies {
+    // Submodules
     implementation project(':dataTransfer')
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    // Library dependencies
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+    implementation "io.realm.kotlin:library-base:$realmVersion"
 }

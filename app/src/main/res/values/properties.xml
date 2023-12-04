@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Created by Tomasz Kiljanczyk on 16/05/2021, 17:06
+  ~ Copyright (c) 2021 . All rights reserved.
+  ~ Last modified 15/05/2021, 21:34
+  -->
+
+<resources>
+    <integer name="ed_max_length_category_name">30</integer>
+    <integer name="ed_max_length_song_title">30</integer>
+    <integer name="ed_max_length_section_name">30</integer>
+    <integer name="ed_max_length_setlist_name">30</integer>
+</resources>
