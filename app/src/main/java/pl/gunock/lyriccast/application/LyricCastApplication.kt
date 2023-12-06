@@ -8,6 +8,7 @@ package pl.gunock.lyriccast.application
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.MobileAds
@@ -18,7 +19,6 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pl.gunock.lyriccast.BuildConfig
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CastSessionListener
 import pl.gunock.lyriccast.shared.extensions.getSettings
@@ -57,7 +57,8 @@ class LyricCastApplication : Application() {
             AppCompatDelegate.setDefaultNightMode(appTheme)
         }
 
-        if (BuildConfig.DEBUG) {
+        val isDebuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+        if (isDebuggable) {
             setupStrictMode()
         }
     }

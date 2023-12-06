@@ -34,7 +34,7 @@ buildscript {
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
-    id "com.google.devtools.ksp" version "1.9.0-1.0.12"
+    id "com.google.devtools.ksp" version "1.9.21-1.0.15"
     id 'com.google.dagger.hilt.android' version "$hiltVersion" apply false
     id 'io.realm.kotlin' version "$realmVersion" apply false
     id 'com.google.protobuf' version "$protobufVersion" apply false
