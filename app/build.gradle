@@ -20,7 +20,7 @@ plugins {
 android {
     def major = 0
     def minor = 2
-    def patch = 0
+    def patch = 1
 
     defaultConfig {
         applicationId "pl.gunock.lyriccast"
