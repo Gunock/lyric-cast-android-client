@@ -143,14 +143,14 @@ class SetlistControlsActivity : AppCompatActivity() {
         val onLongClickListener =
             LongClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
                 binding.rcvSongs.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                viewModel.selectSong(position)
+                viewModel.selectSong(position, true)
                 return@LongClickAdapterItemListener true
             }
 
         val onClickListener =
             ClickAdapterItemListener { _: ControlsSongItemsAdapter.ViewHolder, position, _ ->
                 binding.rcvSongs.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                viewModel.selectSong(position)
+                viewModel.selectSong(position, true)
             }
 
         songItemsAdapter = ControlsSongItemsAdapter(

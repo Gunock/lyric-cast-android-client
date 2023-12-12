@@ -110,11 +110,12 @@ class SetlistControlsModel @Inject constructor(
         CastMessageHelper.sendConfiguration(castConfiguration!!)
     }
 
-    fun selectSong(position: Int) {
+    fun selectSong(position: Int, fromStart: Boolean = false) {
         previousSongItem = currentSongItem
         currentSongItem = _songs[position]
         currentLyricsPosition =
-            if (position >= _songs.indexOf(previousSongItem)) 0
+            if (fromStart) 0
+            else if (position >= _songs.indexOf(previousSongItem)) 0
             else currentSongItem.song.lyricsList.size - 1
         _currentSongPosition.tryEmit(position)
 
