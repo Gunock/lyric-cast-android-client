@@ -8,10 +8,17 @@
 
 package pl.gunock.lyriccast.modules
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.dataStoreFile
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import pl.gunock.lyriccast.application.AppSettings
+import pl.gunock.lyriccast.application.AppSettingsSerializer
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
 import pl.gunock.lyriccast.datamodel.repositiories.DataTransferRepository
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
@@ -21,6 +28,8 @@ import pl.gunock.lyriccast.repositories.CategoriesRepositoryFakeImpl
 import pl.gunock.lyriccast.repositories.DataTransferRepositoryFakeImpl
 import pl.gunock.lyriccast.repositories.SetlistsRepositoryFakeImpl
 import pl.gunock.lyriccast.repositories.SongsRepositoryFakeImpl
+import java.io.File
+import java.util.UUID
 import javax.inject.Singleton
 
 @Module
@@ -30,6 +39,44 @@ import javax.inject.Singleton
 )
 class FakeAppModule {
 
+    companion object {
+        private const val TEST_DATASTORE_FILENAME = "settings"
+
+        var dataStore: DataStore<AppSettings>? = null
+        var dataStoreFile: File? = null
+
+        fun initializeDataStore(appContext: Context) {
+            if (dataStoreFile == null) {
+                cleanupDataStore()
+            }
+
+            val newDataStoreFile =
+                appContext.dataStoreFile("$TEST_DATASTORE_FILENAME-${UUID.randomUUID()}")
+            dataStoreFile = newDataStoreFile
+
+            dataStore = DataStoreFactory.create(
+                produceFile = { newDataStoreFile },
+                serializer = AppSettingsSerializer
+            )
+        }
+
+        fun cleanupDataStore() {
+            dataStoreFile?.delete()
+            dataStoreFile = null
+            dataStore = null
+        }
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext appContext: Context): DataStore<AppSettings> {
+        if (dataStore == null) {
+            initializeDataStore(appContext)
+        }
+
+        return dataStore!!
+    }
 
     @Provides
     @Singleton

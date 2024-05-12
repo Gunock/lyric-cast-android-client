@@ -11,7 +11,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class pl.gunock.lyriccast.application.Settings { *; }
+-keep class pl.gunock.lyriccast.application.AppSettings { *; }
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.

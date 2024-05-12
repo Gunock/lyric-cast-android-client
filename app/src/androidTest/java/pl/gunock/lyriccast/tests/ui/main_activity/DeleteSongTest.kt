@@ -8,12 +8,12 @@ package pl.gunock.lyriccast.tests.ui.main_activity
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
@@ -24,13 +24,16 @@ import org.junit.Test
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Song
 import pl.gunock.lyriccast.datamodel.repositiories.SongsRepository
+import pl.gunock.lyriccast.shared.BaseHiltTest
+import pl.gunock.lyriccast.shared.CustomEspresso.touchscreenClick
+import pl.gunock.lyriccast.shared.CustomEspresso.touchscreenLongClick
+import pl.gunock.lyriccast.shared.retryWithTimeout
 import pl.gunock.lyriccast.ui.main.MainActivity
-import java.lang.Thread.sleep
 import javax.inject.Inject
 
 @HiltAndroidTest
 @LargeTest
-class DeleteSongTest {
+class DeleteSongTest : BaseHiltTest() {
 
     private companion object {
         const val songTitle = "FilterSongsTest 1"
@@ -39,9 +42,6 @@ class DeleteSongTest {
         val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
 
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
-
     @get:Rule(order = 1)
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
@@ -49,56 +49,61 @@ class DeleteSongTest {
     lateinit var songsRepository: SongsRepository
 
     @Before
-    fun setup() {
-        hiltRule.inject()
+    override fun setup() {
+        super.setup()
 
         runBlocking {
             songsRepository.upsertSong(song1)
             songsRepository.upsertSong(song2)
             songsRepository.upsertSong(song3)
         }
-        sleep(100)
     }
 
     @Test
     fun songIsDeleted() {
-        onView(withId(R.id.rcv_songs))
-            .check(matches(hasDescendant(withText(song1.title))))
-            .check(matches(hasDescendant(withText(song2.title))))
-            .check(matches(hasDescendant(withText(song3.title))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_songs))
+                .check(matches(hasDescendant(withText(song1.title))))
+                .check(matches(hasDescendant(withText(song2.title))))
+                .check(matches(hasDescendant(withText(song3.title))))
+        }
 
         onView(
             allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
-        ).perform(longClick())
+        ).perform(touchscreenLongClick())
         onView(withId(R.id.action_menu_delete)).perform(click())
-        sleep(100)
 
-        onView(withId(R.id.rcv_songs))
-            .check(matches(hasDescendant(withText(song1.title))))
-            .check(matches(not(hasDescendant(withText(song2.title)))))
-            .check(matches(hasDescendant(withText(song3.title))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_songs))
+                .check(matches(hasDescendant(withText(song1.title))))
+                .check(matches(not(hasDescendant(withText(song2.title)))))
+                .check(matches(hasDescendant(withText(song3.title))))
+        }
     }
 
     @Test
     fun multipleSongsAreDeleted() {
-        onView(withId(R.id.rcv_songs))
-            .check(matches(hasDescendant(withText(song1.title))))
-            .check(matches(hasDescendant(withText(song2.title))))
-            .check(matches(hasDescendant(withText(song3.title))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_songs))
+                .check(matches(hasDescendant(withText(song1.title))))
+                .check(matches(hasDescendant(withText(song2.title))))
+                .check(matches(hasDescendant(withText(song3.title))))
+        }
 
         onView(
             allOf(withId(R.id.item_song), hasDescendant(withText(song1.title)))
-        ).perform(longClick())
+        ).perform(touchscreenLongClick())
         onView(
             allOf(withId(R.id.item_song), hasDescendant(withText(song2.title)))
-        ).perform(click())
+        ).perform(touchscreenClick())
         onView(withId(R.id.action_menu_delete)).perform(click())
-        sleep(100)
 
-        onView(withId(R.id.rcv_songs))
-            .check(matches(not(hasDescendant(withText(song1.title)))))
-            .check(matches(not(hasDescendant(withText(song2.title)))))
-            .check(matches(hasDescendant(withText(song3.title))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_songs))
+                .check(matches(not(hasDescendant(withText(song1.title)))))
+                .check(matches(not(hasDescendant(withText(song2.title)))))
+                .check(matches(hasDescendant(withText(song3.title))))
+        }
     }
 
 }

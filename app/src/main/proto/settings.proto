@@ -3,7 +3,7 @@ syntax = "proto3";
 option java_package = "pl.gunock.lyriccast.application";
 option java_multiple_files = true;
 
-message Settings {
+message AppSettings {
     int32 app_theme = 1;
     float control_buttons_height = 2;
 
