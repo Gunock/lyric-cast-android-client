@@ -1,10 +1,10 @@
 /*
- * Created by Tomasz Kiljanczyk on 10/01/2023, 22:19
- * Copyright (c) 2023 . All rights reserved.
- * Last modified 10/01/2023, 22:19
+ * Created by Tomasz Kiljanczyk on 5/12/24, 11:12 PM
+ * Copyright (c) 2024 . All rights reserved.
+ * Last modified 12/5/23, 12:24 AM
  */
 
-package pl.gunock.lyriccast
+package pl.gunock.lyriccast.extensions
 
 import android.content.ComponentName
 import android.content.Intent
@@ -14,6 +14,8 @@ import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import pl.gunock.lyriccast.HiltTestActivity
+import pl.gunock.lyriccast.R
 
 
 inline fun <reified T : Fragment> launchFragmentInHiltContainer(

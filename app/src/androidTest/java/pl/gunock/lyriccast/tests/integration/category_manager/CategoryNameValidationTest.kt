@@ -16,31 +16,30 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Category
 import pl.gunock.lyriccast.datamodel.repositiories.CategoriesRepository
+import pl.gunock.lyriccast.modules.FakeAppModule
+import pl.gunock.lyriccast.shared.BaseHiltTest
+import pl.gunock.lyriccast.shared.retryWithTimeout
 import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
-import java.lang.Thread.sleep
 import javax.inject.Inject
 
 @HiltAndroidTest
 @SmallTest
-class CategoryNameValidationTest {
+class CategoryNameValidationTest : BaseHiltTest() {
 
     private companion object {
         const val newCategoryName = "NameValidationTest 2"
         const val newCategoryLongName = "NAME_VALIDATION_TEST 2 VERY LONG NAME VERY SO LONG"
         val category1 = Category("NAME_VALIDATION_TEST 1", Color.RED)
     }
-
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
     var activityRule = ActivityScenarioRule(CategoryManagerActivity::class.java)
@@ -49,23 +48,29 @@ class CategoryNameValidationTest {
     lateinit var categoriesRepository: CategoriesRepository
 
     @Before
-    fun setup() {
-        hiltRule.inject()
+    override fun setup() {
+        super.setup()
 
         runBlocking {
             categoriesRepository.upsertCategory(category1)
         }
-        sleep(100)
+    }
+
+    @After
+    fun cleanup() {
+        FakeAppModule.cleanupDataStore()
     }
 
     @Test
     fun categoryNameAlreadyInUse() {
-        onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(ViewMatchers.withText(category1.name))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_categories))
+                .check(matches(hasDescendant(ViewMatchers.withText(category1.name))))
+        }
 
         onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        onView(withId(R.id.tv_dialog_title))
+        onView(withId(com.google.android.material.R.id.alertTitle))
             .check(matches(ViewMatchers.withText("Add category")))
 
         onView(withId(R.id.ed_category_name))
@@ -79,7 +84,7 @@ class CategoryNameValidationTest {
     fun categoryNameIsUpperCase() {
         onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        onView(withId(R.id.tv_dialog_title))
+        onView(withId(com.google.android.material.R.id.alertTitle))
             .check(matches(ViewMatchers.withText("Add category")))
 
         onView(withId(R.id.ed_category_name))
@@ -98,7 +103,7 @@ class CategoryNameValidationTest {
 
         onView(withId(R.id.menu_add_category)).perform(ViewActions.click())
 
-        onView(withId(R.id.tv_dialog_title))
+        onView(ViewMatchers.withText("Add category"))
             .check(matches(ViewMatchers.withText("Add category")))
 
         onView(withId(R.id.ed_category_name))

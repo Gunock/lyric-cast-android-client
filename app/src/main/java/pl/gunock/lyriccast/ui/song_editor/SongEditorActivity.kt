@@ -15,15 +15,18 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.common.extensions.moveTabLeft
 import pl.gunock.lyriccast.common.extensions.moveTabRight
 import pl.gunock.lyriccast.databinding.ActivitySongEditorBinding
@@ -34,10 +37,14 @@ import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.shared.adapters.CategorySpinnerAdapter
 import pl.gunock.lyriccast.ui.shared.listeners.InputTextChangedListener
 import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SongEditorActivity : AppCompatActivity() {
     private val viewModel: SongEditorModel by viewModels()
+
+    @Inject
+    lateinit var dataStore: DataStore<AppSettings>
 
     private lateinit var binding: ContentSongEditorBinding
 
@@ -64,7 +71,7 @@ class SongEditorActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarMain)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        binding.advSongEditor.loadAd()
+        CoroutineScope(Dispatchers.Main).launch { binding.advSongEditor.loadAd(dataStore) }
 
         binding.edSongTitle.filters = arrayOf(
             InputFilter.LengthFilter(resources.getInteger(R.integer.ed_max_length_song_title))

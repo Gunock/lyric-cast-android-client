@@ -23,12 +23,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
+import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.databinding.ActivityMainBinding
 import pl.gunock.lyriccast.databinding.ContentMainBinding
 import pl.gunock.lyriccast.datamodel.models.ImportOptions
@@ -58,6 +61,7 @@ import pl.gunock.lyriccast.ui.shared.listeners.ItemSelectedTabListener
 import pl.gunock.lyriccast.ui.song_editor.SongEditorActivity
 import java.io.Closeable
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -66,6 +70,9 @@ class MainActivity : AppCompatActivity() {
 
         var wifiStateChecked = false
     }
+
+    @Inject
+    lateinit var dataStore: DataStore<AppSettings>
 
     private val viewModel: MainModel by viewModels()
     private val importDialogModel: ImportDialogModel by viewModels()
@@ -90,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         binding = rootBinding.contentMain
 
         binding.cstlFabContainer.visibility = View.GONE
-        binding.advMain.loadAd()
+        CoroutineScope(Dispatchers.Main).launch { binding.advMain.loadAd(dataStore) }
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navh_main) as NavHostFragment

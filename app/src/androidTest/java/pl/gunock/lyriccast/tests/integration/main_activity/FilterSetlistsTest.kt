@@ -10,26 +10,27 @@ import androidx.core.os.bundleOf
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.filters.SmallTest
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot.not
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import pl.gunock.lyriccast.R
 import pl.gunock.lyriccast.datamodel.models.Setlist
 import pl.gunock.lyriccast.datamodel.repositiories.SetlistsRepository
-import pl.gunock.lyriccast.launchFragmentInHiltContainer
+import pl.gunock.lyriccast.extensions.launchFragmentInHiltContainer
+import pl.gunock.lyriccast.shared.BaseHiltTest
+import pl.gunock.lyriccast.shared.retryWithTimeout
 import pl.gunock.lyriccast.ui.main.setlists.SetlistsFragment
-import java.lang.Thread.sleep
 import javax.inject.Inject
 
 @HiltAndroidTest
 @SmallTest
-class FilterSetlistsTest {
+class FilterSetlistsTest : BaseHiltTest() {
 
     private companion object {
         const val setlistName = "FilterSetlistsTest 1"
@@ -38,22 +39,18 @@ class FilterSetlistsTest {
         val setlist3 = Setlist("3", "FilterSetlistsTest 2", listOf())
     }
 
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
-
     @Inject
     lateinit var setlistsRepository: SetlistsRepository
 
     @Before
-    fun setup() {
-        hiltRule.inject()
+    override fun setup() {
+        super.setup()
 
         runBlocking {
             setlistsRepository.upsertSetlist(setlist1)
             setlistsRepository.upsertSetlist(setlist2)
             setlistsRepository.upsertSetlist(setlist3)
         }
-        sleep(100)
 
         launchFragmentInHiltContainer<SetlistsFragment>(
             bundleOf(),
@@ -63,21 +60,22 @@ class FilterSetlistsTest {
 
     @Test
     fun setlistsAreFilteredByName() {
-        onView(withId(R.id.rcv_setlists))
-            .check(matches(hasDescendant(withText(setlist1.name))))
-            .check(matches(hasDescendant(withText(setlist2.name))))
-            .check(matches(hasDescendant(withText(setlist3.name))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_setlists))
+                .check(matches(hasDescendant(withText(setlist1.name))))
+                .check(matches(hasDescendant(withText(setlist2.name))))
+                .check(matches(hasDescendant(withText(setlist3.name))))
+        }
 
         onView(withId(R.id.ed_setlist_name_filter))
             .perform(replaceText(setlistName))
 
-        // Test needs to accommodate for debounce
-        sleep(700)
-
-        onView(withId(R.id.rcv_setlists))
-            .check(matches(hasDescendant(withText(setlist1.name))))
-            .check(matches(hasDescendant(withText(setlist2.name))))
-            .check(matches(not(hasDescendant(withText(setlist3.name)))))
+        retryWithTimeout {
+            onView(withId(R.id.rcv_setlists))
+                .check(matches(hasDescendant(withText(setlist1.name))))
+                .check(matches(hasDescendant(withText(setlist2.name))))
+                .check(matches(not(hasDescendant(withText(setlist3.name)))))
+        }
     }
 
 

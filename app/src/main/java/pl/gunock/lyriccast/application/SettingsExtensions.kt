@@ -8,7 +8,7 @@ package pl.gunock.lyriccast.application
 
 import org.json.JSONObject
 
-fun Settings.getCastConfigurationJson(): JSONObject {
+fun AppSettings.getCastConfigurationJson(): JSONObject {
     val configuration = JSONObject()
     configuration.put("backgroundColor", this.backgroundColor)
     configuration.put("fontColor", this.fontColor)

@@ -15,32 +15,38 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.getCastConfigurationJson
+import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
-import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.listeners.LongClickAdapterItemListener
+import javax.inject.Inject
 
-// TODO: Check if AndroidX SelectionTracker can be used
 @AndroidEntryPoint
 class SetlistControlsActivity : AppCompatActivity() {
 
     private val viewModel: SetlistControlsModel by viewModels()
+
+    @Inject
+    lateinit var dataStore: DataStore<AppSettings>
 
     private lateinit var binding: ContentSetlistControlsBinding
 
@@ -55,11 +61,10 @@ class SetlistControlsActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        binding.advSetlistControls.loadAd()
+        CoroutineScope(Dispatchers.Main).launch { binding.advSetlistControls.loadAd(dataStore) }
 
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
         viewModel.initialize(sessionsManager)
-        viewModel.castConfiguration = getSettings().getCastConfigurationJson()
 
         val setlistId: String = intent.getStringExtra("setlistId")!!
         viewModel.loadSetlist(setlistId)
@@ -102,20 +107,21 @@ class SetlistControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val settings = getSettings()
-        viewModel.castConfiguration = settings.getCastConfigurationJson()
+        CoroutineScope(Dispatchers.Main).launch {
+            val settings = dataStore.data.first()
 
-        if (settings.controlButtonsHeight > 0.0) {
-            val params = binding.setlistControlsButtonContainer.layoutParams
-            params.height = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                settings.controlButtonsHeight,
-                resources.displayMetrics
-            ).toInt()
-            binding.setlistControlsButtonContainer.layoutParams = params
+            if (settings.controlButtonsHeight > 0.0) {
+                val params = binding.setlistControlsButtonContainer.layoutParams
+                params.height = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    settings.controlButtonsHeight,
+                    resources.displayMetrics
+                ).toInt()
+
+                binding.setlistControlsButtonContainer.layoutParams = params
+            }
         }
 
-        viewModel.sendConfiguration()
         viewModel.sendSlide()
     }
 

@@ -14,27 +14,34 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.getCastConfigurationJson
+import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
-import pl.gunock.lyriccast.shared.extensions.getSettings
 import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SongControlsActivity : AppCompatActivity() {
 
     private val viewModel: SongControlsModel by viewModels()
+
+    @Inject
+    lateinit var dataStore: DataStore<AppSettings>
 
     private lateinit var binding: ContentSongControlsBinding
 
@@ -47,11 +54,10 @@ class SongControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
-        binding.advSongControls.loadAd()
+        CoroutineScope(Dispatchers.Main).launch { binding.advSongControls.loadAd(dataStore) }
 
         val sessionsManager = CastContext.getSharedInstance()!!.sessionManager
         viewModel.initialize(sessionsManager)
-        viewModel.castConfiguration = getSettings().getCastConfigurationJson()
 
         val songId: String = intent.getStringExtra("songId")!!
         viewModel.loadSong(songId)
@@ -86,20 +92,19 @@ class SongControlsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val settings = getSettings()
-        viewModel.castConfiguration = settings.getCastConfigurationJson()
+        CoroutineScope(Dispatchers.Main).launch {
+            val settings = dataStore.data.first()
+            if (settings.controlButtonsHeight > 0.0) {
+                val params = binding.songControlsButtonContainer.layoutParams
+                params.height = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    settings.controlButtonsHeight,
+                    resources.displayMetrics
+                ).toInt()
 
-        if (settings.controlButtonsHeight > 0.0) {
-            val params = binding.songControlsButtonContainer.layoutParams
-            params.height = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                settings.controlButtonsHeight,
-                resources.displayMetrics
-            ).toInt()
-            binding.songControlsButtonContainer.layoutParams = params
+                binding.songControlsButtonContainer.layoutParams = params
+            }
         }
-
-        viewModel.sendConfiguration()
         viewModel.sendSlide()
     }
 

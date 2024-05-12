@@ -11,21 +11,28 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.datastore.core.DataStore
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.HarmonizedColorsOptions.*
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CastSessionListener
-import pl.gunock.lyriccast.shared.extensions.getSettings
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 @HiltAndroidApp
 class LyricCastApplication : Application() {
+
+    @Inject
+    lateinit var dataStore: DataStore<AppSettings>
+
     @SuppressLint("WrongConstant")
     override fun onCreate() {
         super.onCreate()
@@ -36,7 +43,12 @@ class LyricCastApplication : Application() {
         CastContext.getSharedInstance(applicationContext, Executors.newSingleThreadExecutor())
             .addOnCompleteListener { task ->
                 val listener = CastSessionListener(
-                    onStarted = { CastMessageHelper.sendBlank(getSettings().blankOnStart) },
+                    onStarted = {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            val blankOnStart = dataStore.data.first().blankOnStart
+                            CastMessageHelper.sendBlank(blankOnStart)
+                        }
+                    },
                     onEnded = { CastMessageHelper.onSessionEnded() }
                 )
 
@@ -50,12 +62,15 @@ class LyricCastApplication : Application() {
 
         // TODO: Add color harmonization
 
-        var appTheme: Int? = getSettings().appTheme
-        appTheme = if (appTheme == 0) null else appTheme
+        dataStore.data
+            .onEach {
+                var appTheme: Int? = it.appTheme
+                appTheme = if (appTheme == 0) null else appTheme
+                if (appTheme != null) {
+                    AppCompatDelegate.setDefaultNightMode(appTheme)
+                }
+            }.launchIn(CoroutineScope(Dispatchers.Main))
 
-        if (appTheme != null) {
-            AppCompatDelegate.setDefaultNightMode(appTheme)
-        }
 
         val isDebuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         if (isDebuggable) {
