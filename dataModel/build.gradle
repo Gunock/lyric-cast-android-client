@@ -41,16 +41,9 @@ android {
     namespace "pl.gunock.lyriccast.datamodel"
 }
 
-// TODO: Remove this workaround when https://github.com/realm/realm-kotlin/issues/887 is fixed
-project.afterEvaluate {
-    kotlin.target.compilations.configureEach { // use targets if this is a Multiplatform project
-        kotlinOptions.jvmTarget = "21"
-    }
-}
-
 dependencies {
     // Submodules
-    implementation project(":dataTransfer")
+    implementation(project(":dataTransfer"))
 
     // Library dependencies
     implementation(libs.kotlinx.coroutines)
