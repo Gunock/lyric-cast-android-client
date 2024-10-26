@@ -6,25 +6,16 @@
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext {
-        kotlinVersion = '1.9.24'
-        navVersion = '2.7.7'
-        hiltVersion = '2.51.1'
-        protobufVersion = '0.9.4'
-        realmVersion = '1.16.0'
-        googleServicesVersion = '4.3.15'
-        crashlyticsVersion = '2.9.4'
-    }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
-        classpath "com.google.gms:google-services:$googleServicesVersion"
-        classpath "com.google.firebase:firebase-crashlytics-gradle:$crashlyticsVersion"
+        classpath(libs.gradle)
+        classpath(libs.kotlin.gradlePlugin)
+        classpath(libs.androidx.navSafeArgs)
+        classpath(libs.google.googleServices)
+        classpath(libs.firebase.crashlyticsGradle)
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -33,11 +24,11 @@ buildscript {
 
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
-    id "com.google.devtools.ksp" version "1.9.24-1.0.20"
-    id 'com.google.dagger.hilt.android' version "$hiltVersion" apply false
-    id 'io.realm.kotlin' version "$realmVersion" apply false
-    id 'com.google.protobuf' version "$protobufVersion" apply false
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.mongoDbRealm) apply false
+    alias(libs.plugins.protobuf) apply false
 }
 
 
@@ -53,33 +44,4 @@ ext {
     // Sdk and tools
     minSdkVersion = 27
     targetSdkVersion = 34
-
-    // App dependencies
-    coroutinesVersion = '1.8.1'
-    datastoreVersion = '1.1.1'
-    protobufJavaLiteVersion = '4.26.1'
-    materialVersion = '1.12.0'
-    androidXCoreVersion = '1.13.1'
-    appCompatVersion = '1.6.1'
-    constraintLayoutVersion = '2.1.4'
-    preferenceVersion = '1.2.1'
-    recyclerViewVersion = '1.3.2'
-    recyclerViewSelectionVersion = '1.1.0'
-    googleAdsVersion = '23.1.0'
-    firebaseVersion = '33.0.0'
-    castFrameworkVersion = '21.4.0'
-    mediaRouterVersion = '1.7.0'
-    apacheCommonsLangVersion = '3.14.0'
-    zip4jVersion = '2.11.5'
-
-    // Test dependencies
-    androidXTestCoreVersion = '1.5.0'
-    androidXTestExtKotlinRunnerVersion = '1.1.5'
-    espressoVersion = '3.5.1'
-    // TODO: Check if this can be migrated to jupyter api
-    junitVersion = '4.13.2'
-    truthVersion = '1.4.2'
-
-    // LeakCanary
-    leakCanaryVersion = '2.10'
 }

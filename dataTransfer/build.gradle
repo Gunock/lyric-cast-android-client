@@ -5,8 +5,8 @@
  */
 
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -22,12 +22,12 @@ android {
         release {
             minifyEnabled true
             proguardFiles(
-                    getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
             )
 
             ndk {
-                debugSymbolLevel 'FULL'
+                debugSymbolLevel "FULL"
             }
         }
     }
@@ -36,10 +36,10 @@ android {
         targetCompatibility JavaVersion.VERSION_21
     }
 
-    namespace 'pl.gunock.datatransfer'
+    namespace "pl.gunock.datatransfer"
 }
 
 dependencies {
     // Submodules
-    implementation project(':common')
+    implementation project(":common")
 }

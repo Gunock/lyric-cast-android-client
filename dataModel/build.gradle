@@ -5,9 +5,9 @@
  */
 
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'io.realm.kotlin'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.mongoDbRealm)
 }
 
 android {
@@ -23,36 +23,37 @@ android {
         release {
             minifyEnabled true
             proguardFiles(
-                    getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
             )
 
             ndk {
-                debugSymbolLevel 'FULL'
+                debugSymbolLevel "FULL"
             }
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    namespace 'pl.gunock.lyriccast.datamodel'
+    namespace "pl.gunock.lyriccast.datamodel"
 }
 
 // TODO: Remove this workaround when https://github.com/realm/realm-kotlin/issues/887 is fixed
 project.afterEvaluate {
     kotlin.target.compilations.configureEach { // use targets if this is a Multiplatform project
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
 }
 
 dependencies {
     // Submodules
-    implementation project(':dataTransfer')
+    implementation project(":dataTransfer")
 
     // Library dependencies
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
-    implementation "io.realm.kotlin:library-base:$realmVersion"
+    implementation(libs.kotlinx.coroutines)
+
+    implementation(libs.mongoDbRealm.libraryBase)
 }

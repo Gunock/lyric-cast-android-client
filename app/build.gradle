@@ -6,14 +6,14 @@
 
 
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'com.google.devtools.ksp'
-    id 'androidx.navigation.safeargs.kotlin'
-    id 'com.google.dagger.hilt.android'
-    id 'com.google.protobuf'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.navigationSafeArgs)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.google.googleServices)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -22,39 +22,39 @@ android {
     def patch = 2
 
     defaultConfig {
-        applicationId "pl.gunock.lyriccast"
+        applicationId = "pl.gunock.lyriccast"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        compileSdk rootProject.targetSdkVersion
-        versionCode major * 100000000 + minor * 10000 + patch
-        versionName "$major.$minor.$patch"
+        compileSdk = rootProject.targetSdkVersion
+        versionCode = major * 100000000 + minor * 10000 + patch
+        versionName = "$major.$minor.$patch"
 
-        testInstrumentationRunner "pl.gunock.lyriccast.HiltTestRunner"
-        resourceConfigurations += ['en', 'pl']
+        testInstrumentationRunner = "pl.gunock.lyriccast.HiltTestRunner"
+        resourceConfigurations += ["en", "pl"]
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles(
-                    getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
             )
 
             ndk {
-                debugSymbolLevel 'FULL'
+                debugSymbolLevel = "FULL"
             }
         }
     }
 
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     testOptions {
@@ -65,73 +65,72 @@ android {
             includeAndroidResources = true
         }
     }
-    namespace 'pl.gunock.lyriccast'
+    namespace = "pl.gunock.lyriccast"
 }
 
 dependencies {
     // Submodules
-    implementation project(':common')
-    implementation project(':dataTransfer')
-    implementation project(':dataModel')
+    implementation(project(":common"))
+    implementation(project(":dataTransfer"))
+    implementation(project(":dataModel"))
 
     // App dependencies
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
-
+    implementation(libs.kotlinx.coroutines)
 
     // Architecture Components
-    implementation "androidx.datastore:datastore:$datastoreVersion"
-    implementation "com.google.protobuf:protobuf-javalite:$protobufJavaLiteVersion"
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javaLite)
 
     // AndroidX
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.core:core-ktx:$androidXCoreVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.preference:preference-ktx:$preferenceVersion"
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "androidx.recyclerview:recyclerview-selection:$recyclerViewSelectionVersion"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
+    implementation(libs.android.material)
+    implementation(libs.androidx.coreKtx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintLayout)
+    implementation(libs.androidx.preferenceKtx)
+    implementation(libs.androidx.recyclerView)
+    implementation(libs.androidx.recyclerViewSelection)
+    implementation(libs.androidx.navigationFragmentKtx)
+    implementation(libs.androidx.navigationUiKtx)
 
     // AdMob
-    implementation "com.google.android.gms:play-services-ads:$googleAdsVersion"
+    implementation(libs.google.ads)
 
     // Chromecast
-    implementation "com.google.android.gms:play-services-cast-framework:$castFrameworkVersion"
-    implementation "androidx.mediarouter:mediarouter:$mediaRouterVersion"
+    implementation(libs.google.castFramework)
+    implementation(libs.androidx.mediaRouter)
 
     // Hilt
-    implementation "com.google.dagger:hilt-android:$hiltVersion"
-    ksp "com.google.dagger:hilt-compiler:$hiltVersion"
+    implementation(libs.hilt)
+    ksp(libs.hiltCompiler)
 
     // Firebase
-    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
-    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlyticsKtx)
+    implementation(libs.firebase.analyticsKtx)
 
     // AndroidX Test - Instrumented testing
-    androidTestImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
-    androidTestImplementation "androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation(libs.androidx.test.coreKtx)
+    androidTestImplementation(libs.androidx.test.extJunit)
+    androidTestImplementation(libs.androidx.test.extJunitKtx)
+    androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.androidx.test.espressoContrib) {
         // TODO: Workaround for protobuf-lite test issues
         // Source: https://stackoverflow.com/questions/66154727/java-lang-nosuchmethoderror-no-static-method-registerdefaultinstance-with-fireb
-        exclude module: "protobuf-lite"
+        exclude(module: "protobuf-lite")
     }
 
 
     // AndroidX Test - Hilt testing
-    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-    kspAndroidTest "com.google.dagger:hilt-compiler:$hiltVersion"
+    androidTestImplementation(libs.hiltTesting)
+    kspAndroidTest(libs.hiltCompiler)
 
     // LeakCanary
-//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+//    debugImplementation(libs.squareup.leakCanary)
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:$protobufJavaLiteVersion"
+        artifact = libs.protobuf.protoc.get()
     }
 
     // Generates the java Protobuf-lite code for the Protobufs in this project. See
@@ -141,7 +140,7 @@ protobuf {
         all().each { task ->
             task.builtins {
                 java {
-                    option 'lite'
+                    option "lite"
                 }
             }
         }
