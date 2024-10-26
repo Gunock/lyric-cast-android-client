@@ -11,35 +11,34 @@ plugins {
 
 android {
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-        compileSdk rootProject.targetSdkVersion
+        minSdk = 27
+        compileSdk = 34
 
-        consumerProguardFiles "consumer-rules.pro"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            isMinifyEnabled = true
             proguardFiles(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro"
             )
 
             ndk {
-                debugSymbolLevel "FULL"
+                debugSymbolLevel = "FULL"
             }
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    namespace "pl.gunock.datatransfer"
+    namespace = "pl.gunock.datatransfer"
 }
 
 dependencies {
     // Submodules
-    implementation project(":common")
+    implementation(project(":common"))
 }

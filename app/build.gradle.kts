@@ -4,6 +4,7 @@
  * Last modified 03/01/2022, 23:13
  */
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.application)
@@ -17,29 +18,28 @@ plugins {
 }
 
 android {
-    def major = 0
-    def minor = 2
-    def patch = 2
+    val major = 0
+    val minor = 2
+    val patch = 2
 
     defaultConfig {
         applicationId = "pl.gunock.lyriccast"
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-        compileSdk = rootProject.targetSdkVersion
+        minSdk = 27
+        compileSdk = 34
         versionCode = major * 100000000 + minor * 10000 + patch
         versionName = "$major.$minor.$patch"
 
         testInstrumentationRunner = "pl.gunock.lyriccast.HiltTestRunner"
-        resourceConfigurations += ["en", "pl"]
+        resourceConfigurations += listOf("en", "pl")
     }
 
     buildTypes {
         release {
-            minifyEnabled = true
-            shrinkResources = true
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
 
             ndk {
@@ -61,8 +61,8 @@ android {
         animationsDisabled = true
 
         unitTests {
-            returnDefaultValues = true
-            includeAndroidResources = true
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
         }
     }
     namespace = "pl.gunock.lyriccast"
@@ -116,7 +116,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espressoContrib) {
         // TODO: Workaround for protobuf-lite test issues
         // Source: https://stackoverflow.com/questions/66154727/java-lang-nosuchmethoderror-no-static-method-registerdefaultinstance-with-fireb
-        exclude(module: "protobuf-lite")
+        exclude(module = "protobuf-lite")
     }
 
 
@@ -130,17 +130,17 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = libs.protobuf.protoc.get()
+        artifact = libs.protobuf.protoc.get().toString()
     }
 
     // Generates the java Protobuf-lite code for the Protobufs in this project. See
     // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
     // for more information.
     generateProtoTasks {
-        all().each { task ->
+        all().forEach { task ->
             task.builtins {
-                java {
-                    option "lite"
+                create("java") {
+                    option("lite")
                 }
             }
         }
@@ -150,12 +150,12 @@ protobuf {
 // A fix for protobuf ksp issues
 // Source: https://github.com/google/ksp/issues/1590
 androidComponents {
-    onVariants(selector().all(), { variant ->
+    onVariants(selector().all()) { variant ->
         afterEvaluate {
-            def capName = variant.name.capitalize()
-            tasks.getByName("ksp${capName}Kotlin") {
+            val capName = variant.name.replaceFirstChar { it.uppercase() }
+            tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
                 setSource(tasks.getByName("generate${capName}Proto").outputs)
             }
         }
-    })
+    }
 }

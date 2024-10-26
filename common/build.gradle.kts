@@ -11,19 +11,17 @@ plugins {
 
 android {
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-        compileSdk = rootProject.targetSdkVersion
-
-        consumerProguardFiles "consumer-rules.pro"
+        minSdk = 27
+        compileSdk = 34
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            isMinifyEnabled = true
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
 
             ndk {
@@ -39,10 +37,10 @@ android {
 
     testOptions {
         unitTests {
-            includeAndroidResources = true
+            isIncludeAndroidResources = true
         }
     }
-    namespace "pl.gunock.lyriccast.common"
+    namespace = "pl.gunock.lyriccast.common"
 }
 
 dependencies {

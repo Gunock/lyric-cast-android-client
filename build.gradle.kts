@@ -6,10 +6,6 @@
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
     dependencies {
         classpath(libs.gradle)
         classpath(libs.kotlin.gradlePlugin)
@@ -29,19 +25,4 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.mongoDbRealm) apply false
     alias(libs.plugins.protobuf) apply false
-}
-
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-
-ext {
-    // Sdk and tools
-    minSdkVersion = 27
-    targetSdkVersion = 34
 }
