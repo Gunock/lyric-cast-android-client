@@ -12,7 +12,6 @@ import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.DataStore
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
@@ -36,8 +35,6 @@ class LyricCastApplication : Application() {
     @SuppressLint("WrongConstant")
     override fun onCreate() {
         super.onCreate()
-
-        initializeFromThread()
 
         // Initializes CastContext
         CastContext.getSharedInstance(applicationContext, Executors.newSingleThreadExecutor())
@@ -75,12 +72,6 @@ class LyricCastApplication : Application() {
         val isDebuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         if (isDebuggable) {
             setupStrictMode()
-        }
-    }
-
-    private fun initializeFromThread() {
-        CoroutineScope(Dispatchers.Default).launch {
-            MobileAds.initialize(applicationContext)
         }
     }
 

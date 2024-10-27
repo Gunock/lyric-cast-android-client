@@ -34,7 +34,6 @@ import pl.gunock.lyriccast.databinding.ActivitySetlistControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSetlistControlsBinding
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
-import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import pl.gunock.lyriccast.ui.shared.listeners.ClickAdapterItemListener
 import pl.gunock.lyriccast.ui.shared.listeners.LongClickAdapterItemListener
@@ -60,8 +59,6 @@ class SetlistControlsActivity : AppCompatActivity() {
         setContentView(rootBinding.root)
         setSupportActionBar(rootBinding.toolbarControls)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        CoroutineScope(Dispatchers.Main).launch { binding.advSetlistControls.loadAd(dataStore) }
 
         val sessionsManager: SessionManager = CastContext.getSharedInstance()!!.sessionManager
         viewModel.initialize(sessionsManager)

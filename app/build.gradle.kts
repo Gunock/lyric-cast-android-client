@@ -92,9 +92,6 @@ dependencies {
     implementation(libs.androidx.navigationFragmentKtx)
     implementation(libs.androidx.navigationUiKtx)
 
-    // AdMob
-    implementation(libs.google.ads)
-
     // Chromecast
     implementation(libs.google.castFramework)
     implementation(libs.androidx.mediaRouter)

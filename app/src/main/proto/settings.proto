@@ -4,12 +4,11 @@ option java_package = "pl.gunock.lyriccast.application";
 option java_multiple_files = true;
 
 message AppSettings {
-    int32 app_theme = 1;
-    float control_buttons_height = 2;
+  int32 app_theme = 1;
+  float control_buttons_height = 2;
 
-    bool blank_on_start = 3;
-    string background_color = 4;
-    string font_color = 5;
-    int32 max_font_size = 6;
-    bool enable_ads = 7;
+  bool blank_on_start = 3;
+  string background_color = 4;
+  string font_color = 5;
+  int32 max_font_size = 6;
 }
