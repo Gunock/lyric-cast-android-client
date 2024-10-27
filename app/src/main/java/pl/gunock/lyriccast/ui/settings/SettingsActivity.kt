@@ -14,25 +14,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.datastore.core.DataStore
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.application.settingsDataStore
 import pl.gunock.lyriccast.databinding.ActivitySettingsBinding
-import pl.gunock.lyriccast.shared.extensions.loadAd
-import javax.inject.Inject
 
 
 class SettingsActivity : AppCompatActivity() {
-
-    @Inject
-    lateinit var dataStore: DataStore<AppSettings>
 
     private var preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -105,17 +95,6 @@ class SettingsActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbarSettings)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            binding.contentSettings.advSettings1.loadAd(
-                dataStore
-            )
-        }
-        CoroutineScope(Dispatchers.Main).launch {
-            binding.contentSettings.advSettings2.loadAd(
-                dataStore
-            )
-        }
 
         if (savedInstanceState == null) {
             val transaction = supportFragmentManager.beginTransaction()

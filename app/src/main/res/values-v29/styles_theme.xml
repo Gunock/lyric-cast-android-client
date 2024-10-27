@@ -9,6 +9,5 @@
     <style name="Theme.LyricCast.DarkActionBar" parent="Base.Theme.LyricCast.DarkActionBar">
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
     </style>
 </resources>

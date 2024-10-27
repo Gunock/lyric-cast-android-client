@@ -31,7 +31,6 @@ import pl.gunock.lyriccast.databinding.ActivitySongControlsBinding
 import pl.gunock.lyriccast.databinding.ContentSongControlsBinding
 import pl.gunock.lyriccast.shared.cast.CastMessageHelper
 import pl.gunock.lyriccast.shared.cast.CustomMediaRouteActionProvider
-import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.settings.SettingsActivity
 import javax.inject.Inject
 
@@ -54,7 +53,6 @@ class SongControlsActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         binding = ContentSongControlsBinding.bind(rootBinding.contentSongControls.root)
-        CoroutineScope(Dispatchers.Main).launch { binding.advSongControls.loadAd(dataStore) }
 
         val sessionsManager = CastContext.getSharedInstance()!!.sessionManager
         viewModel.initialize(sessionsManager)

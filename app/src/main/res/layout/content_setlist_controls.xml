@@ -53,17 +53,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adv_setlist_controls"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:adSize="BANNER"
-        app:adUnitId="@string/ads_uid_setlist_controls"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_setlist_slide_preview"
         android:layout_width="0dp"
@@ -74,7 +63,7 @@
         app:cardBackgroundColor="@color/background_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adv_setlist_controls"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:strokeWidth="0dp">
 
         <com.google.android.material.textview.MaterialTextView

@@ -11,39 +11,32 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.gunock.lyriccast.R
-import pl.gunock.lyriccast.application.AppSettings
 import pl.gunock.lyriccast.databinding.ActivityCategoryManagerBinding
 import pl.gunock.lyriccast.databinding.ContentCategoryManagerBinding
-import pl.gunock.lyriccast.shared.extensions.loadAd
 import pl.gunock.lyriccast.ui.category_manager.edit_category.EditCategoryDialogFragment
 import pl.gunock.lyriccast.ui.shared.selection.MappedItemKeyProvider
 import pl.gunock.lyriccast.ui.shared.selection.SimpleItemDetailsLookup
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CategoryManagerActivity : AppCompatActivity() {
 
     private val viewModel: CategoryManagerModel by viewModels()
-
-    @Inject
-    lateinit var dataStore: DataStore<AppSettings>
 
     private lateinit var binding: ContentCategoryManagerBinding
 
@@ -58,9 +51,8 @@ class CategoryManagerActivity : AppCompatActivity() {
     private lateinit var tracker: SelectionTracker<Long>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        window.statusBarColor = getColor(R.color.background_1)
 
         val rootBinding = ActivityCategoryManagerBinding.inflate(layoutInflater)
         binding = rootBinding.contentCategoryManager
@@ -68,9 +60,6 @@ class CategoryManagerActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbarCategoryManager)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            binding.advCategoryManager.loadAd(dataStore)
-        }
         binding.rcvCategories.setHasFixedSize(true)
         binding.rcvCategories.layoutManager = LinearLayoutManager(baseContext)
 
