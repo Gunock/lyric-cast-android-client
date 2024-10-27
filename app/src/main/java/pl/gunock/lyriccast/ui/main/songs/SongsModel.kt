@@ -112,7 +112,7 @@ class SongsModel @Inject constructor(
         allSongs.forEach { it.hasCheckbox = true }
     }
 
-    suspend fun exportSongs(
+    fun exportSongs(
         cacheDir: String,
         outputStream: OutputStream
     ): Flow<Int> = flow {

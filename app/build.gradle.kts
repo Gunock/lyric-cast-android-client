@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId = "pl.gunock.lyriccast"
         minSdk = 27
-        compileSdk = 34
+        compileSdk = 35
         versionCode = major * 100000000 + minor * 10000 + patch
         versionName = "$major.$minor.$patch"
 

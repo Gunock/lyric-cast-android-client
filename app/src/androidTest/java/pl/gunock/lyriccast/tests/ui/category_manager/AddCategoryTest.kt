@@ -32,7 +32,7 @@ import pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity
 class AddCategoryTest: BaseHiltTest() {
 
     private companion object {
-        const val newCategoryName = "AddCategoryTest 2"
+        const val NEW_CATEGORY_NAME = "AddCategoryTest 2"
     }
 
     @get:Rule(order = 1)
@@ -52,7 +52,7 @@ class AddCategoryTest: BaseHiltTest() {
             .check(matches(withText("Add category")))
 
         onView(withId(R.id.ed_category_name))
-            .perform(replaceText(newCategoryName))
+            .perform(replaceText(NEW_CATEGORY_NAME))
 
         onView(withId(R.id.dropdown_color))
             .perform(click())
@@ -67,6 +67,6 @@ class AddCategoryTest: BaseHiltTest() {
         onView(withId(android.R.id.button1)).perform(click())
 
         onView(withId(R.id.rcv_categories))
-            .check(matches(hasDescendant(withText(newCategoryName.uppercase()))))
+            .check(matches(hasDescendant(withText(NEW_CATEGORY_NAME.uppercase()))))
     }
 }

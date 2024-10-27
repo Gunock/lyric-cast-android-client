@@ -116,10 +116,12 @@ class SetlistEditorFragment : Fragment() {
                 )
                 binding.edSetlistName.setText(viewModel.setlistName)
             }
+
             intentSetlistId != null -> {
                 viewModel.loadEditedSetlist(intentSetlistId)
                 binding.edSetlistName.setText(viewModel.setlistName)
             }
+
             intentSetlistPresentation != null -> {
                 viewModel.loadAdhocSetlist(intentSetlistPresentation.toList())
             }
@@ -227,6 +229,7 @@ class SetlistEditorFragment : Fragment() {
             0 -> {
                 actionMode?.finish()
             }
+
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
@@ -237,6 +240,7 @@ class SetlistEditorFragment : Fragment() {
 
                 showMenuActions()
             }
+
             2 -> showMenuActions(showDuplicate = false)
         }
     }
@@ -248,16 +252,12 @@ class SetlistEditorFragment : Fragment() {
         }
     }
 
-    private fun removeSelectedSongs(): Boolean {
+    private fun removeSelectedSongs() {
         viewModel.removeSelectedSongs()
-
-        return true
     }
 
-    private fun duplicateSong(): Boolean {
+    private fun duplicateSong() {
         viewModel.duplicateSelectedSong()
-
-        return true
     }
 
     private fun resetSelection() {
@@ -294,8 +294,16 @@ class SetlistEditorFragment : Fragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             val result = when (item.itemId) {
-                R.id.action_menu_delete -> removeSelectedSongs()
-                R.id.menu_duplicate -> duplicateSong()
+                R.id.action_menu_delete -> {
+                    removeSelectedSongs()
+                    true
+                }
+
+                R.id.menu_duplicate -> {
+                    duplicateSong()
+                    true
+                }
+
                 else -> false
             }
 

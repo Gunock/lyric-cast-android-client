@@ -104,14 +104,12 @@ class SetlistsFragment : Fragment() {
         super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment)
     }
 
-    private fun startExport(): Boolean {
+    private fun startExport() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
         exportChooserResultLauncher.launch(chooserIntent)
-
-        return true
     }
 
     private fun exportSelectedSetlists(result: ActivityResult) {
@@ -212,6 +210,7 @@ class SetlistsFragment : Fragment() {
             0 -> {
                 actionMode?.finish()
             }
+
             1 -> {
                 if (actionMode == null) {
                     actionMode = (requireActivity() as AppCompatActivity)
@@ -222,11 +221,12 @@ class SetlistsFragment : Fragment() {
 
                 showMenuActions()
             }
+
             2 -> showMenuActions(showEdit = false)
         }
     }
 
-    private fun editSelectedSetlist(): Boolean {
+    private fun editSelectedSetlist() {
         val selectedItem = viewModel.filteredSetlists
             .first { setlistItem -> setlistItem.isSelected }
 
@@ -234,8 +234,6 @@ class SetlistsFragment : Fragment() {
         val intent = Intent(context, SetlistEditorActivity::class.java)
         intent.putExtra("setlistId", selectedItem.setlist.id)
         startActivity(intent)
-
-        return true
     }
 
     private fun showMenuActions(
@@ -289,8 +287,17 @@ class SetlistsFragment : Fragment() {
                         viewModel.deleteSelectedSetlists()
                         true
                     }
-                    R.id.action_menu_export_selected -> startExport()
-                    R.id.action_menu_edit -> editSelectedSetlist()
+
+                    R.id.action_menu_export_selected -> {
+                        startExport()
+                        true
+                    }
+
+                    R.id.action_menu_edit -> {
+                        editSelectedSetlist()
+                        true
+                    }
+
                     else -> false
                 }
 

@@ -37,7 +37,7 @@ import javax.inject.Inject
 class EditCategoryTest : BaseHiltTest() {
 
     private companion object {
-        const val editedCategoryName = "EDIT_CATEGORY_TEST 2 EDITED"
+        const val EDITED_CATEGORY_NAME = "EDIT_CATEGORY_TEST 2 EDITED"
         val category1 = Category("EDIT_CATEGORY_TEST 1", Color.RED, "1")
         val category2 = Category("EDIT_CATEGORY_TEST 2", Color.RED, "2")
         val category3 = Category("EDIT_CATEGORY_TEST 3", Color.RED, "3")
@@ -78,7 +78,7 @@ class EditCategoryTest : BaseHiltTest() {
         onView(withId(com.google.android.material.R.id.alertTitle))
             .check(matches(withText("Edit category")))
 
-        onView(withId(R.id.ed_category_name)).perform(replaceText(editedCategoryName))
+        onView(withId(R.id.ed_category_name)).perform(replaceText(EDITED_CATEGORY_NAME))
         onView(withId(android.R.id.button1)).perform(click())
 
         retryWithTimeout {
@@ -86,7 +86,7 @@ class EditCategoryTest : BaseHiltTest() {
                 .check(matches(hasDescendant(withText(category1.name))))
                 .check(matches(not(hasDescendant(withText(category2.name)))))
                 .check(matches(hasDescendant(withText(category3.name))))
-                .check(matches(hasDescendant(withText(editedCategoryName))))
+                .check(matches(hasDescendant(withText(EDITED_CATEGORY_NAME))))
         }
     }
 

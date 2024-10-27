@@ -6,7 +6,7 @@ Version numbers are generated using this formula:
 * major - bumped with every significant version
 * minor - bumped with every new feature(s).
 * patch - fix updates.
-* alpha/beta number - no commenct.
+* alpha/beta number - no comment.
 
 Examples:
 * 1.0.0

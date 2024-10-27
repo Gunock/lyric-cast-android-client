@@ -74,7 +74,7 @@ abstract class DataTransferRepositoryBaseImpl : DataTransferRepository {
 
     protected abstract suspend fun upsertCategories(categories: Iterable<Category>)
 
-    private suspend fun executeDataImport(
+    private fun executeDataImport(
         data: DatabaseTransferData,
         options: ImportOptions
     ): Flow<Int> = flow {
