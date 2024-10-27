@@ -137,7 +137,11 @@ class SetlistControlsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_settings -> goToSettings()
+            R.id.menu_settings -> {
+                goToSettings()
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -181,9 +185,8 @@ class SetlistControlsActivity : AppCompatActivity() {
         binding.btnSetlistNext.setOnClickListener { viewModel.nextSlide() }
     }
 
-    private fun goToSettings(): Boolean {
+    private fun goToSettings() {
         val intent = Intent(baseContext, SettingsActivity::class.java)
         startActivity(intent)
-        return true
     }
 }

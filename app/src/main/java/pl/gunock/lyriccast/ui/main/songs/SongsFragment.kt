@@ -199,25 +199,21 @@ class SongsFragment : Fragment() {
         }
     }
 
-    private fun editSelectedSong(): Boolean {
+    private fun editSelectedSong() {
         val selectedItem = viewModel.getSelectedSong()
 
         Log.v(TAG, "Editing song : ${selectedItem.song}")
         val intent = Intent(requireContext(), SongEditorActivity::class.java)
         intent.putExtra("songId", selectedItem.song.id)
         startActivity(intent)
-
-        return true
     }
 
-    private fun startExport(): Boolean {
+    private fun startExport() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
         exportChooserResultLauncher.launch(chooserIntent)
-
-        return true
     }
 
     private fun exportSelectedSongs(result: ActivityResult) {
@@ -251,13 +247,11 @@ class SongsFragment : Fragment() {
         }
     }
 
-    private fun createAdhocSetlist(): Boolean {
+    private fun createAdhocSetlist() {
         val setlistSongs = viewModel.getSelectedSongIds().toTypedArray()
         val intent = Intent(context, SetlistEditorActivity::class.java)
         intent.putExtra("setlistSongs", setlistSongs)
         startActivity(intent)
-
-        return true
     }
 
     private fun showMenuActions(
@@ -312,9 +306,21 @@ class SongsFragment : Fragment() {
                         true
                     }
 
-                    R.id.action_menu_export_selected -> startExport()
-                    R.id.action_menu_edit -> editSelectedSong()
-                    R.id.action_menu_add_setlist -> createAdhocSetlist()
+                    R.id.action_menu_export_selected -> {
+                        startExport()
+                        true
+                    }
+
+                    R.id.action_menu_edit -> {
+                        editSelectedSong()
+                        true
+                    }
+
+                    R.id.action_menu_add_setlist -> {
+                        createAdhocSetlist()
+                        true
+                    }
+
                     else -> false
                 }
 

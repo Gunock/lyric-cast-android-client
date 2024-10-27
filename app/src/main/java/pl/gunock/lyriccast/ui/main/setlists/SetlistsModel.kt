@@ -85,7 +85,7 @@ class SetlistsModel @Inject constructor(
         allSetlists.forEach { it.hasCheckbox = true }
     }
 
-    suspend fun exportSelectedSetlists(
+    fun exportSelectedSetlists(
         cacheDir: String,
         outputStream: OutputStream
     ): Flow<Int> = flow {

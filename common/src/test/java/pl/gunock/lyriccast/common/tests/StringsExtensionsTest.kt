@@ -8,14 +8,14 @@ package pl.gunock.lyriccast.common.tests
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import pl.gunock.lyriccast.common.extensions.normalize
 
-// TODO: Fix the tests
-class StringsExtensionsTest {
+@RunWith(Parameterized::class)
+class StringsExtensionsTest(private val text: String, private val normalizedText: String) {
 
     companion object {
-        @Suppress("SpellCheckingInspection")
         @JvmStatic
         @Parameterized.Parameters
         fun data(): Iterable<Array<String>> {
@@ -28,7 +28,7 @@ class StringsExtensionsTest {
     }
 
     @Test
-    fun stringIsNormalized(text: String, normalizedText: String) {
+    fun stringIsNormalized() {
         assertThat(text.normalize()).isEqualTo(normalizedText)
     }
 

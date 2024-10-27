@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- TODO: Make the tab layout work similar to YouTube's one -->
+    <!-- TODO: Make the tab layout works similar to YouTube's one -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tbl_main_fragments"
         android:layout_width="0dp"

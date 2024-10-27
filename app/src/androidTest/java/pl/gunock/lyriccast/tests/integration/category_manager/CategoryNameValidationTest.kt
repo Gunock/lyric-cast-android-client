@@ -36,8 +36,8 @@ import javax.inject.Inject
 class CategoryNameValidationTest : BaseHiltTest() {
 
     private companion object {
-        const val newCategoryName = "NameValidationTest 2"
-        const val newCategoryLongName = "NAME_VALIDATION_TEST 2 VERY LONG NAME VERY SO LONG"
+        const val NEW_CATEGORY_NAME = "NameValidationTest 2"
+        const val NEW_CATEGORY_LONG_NAME = "NAME_VALIDATION_TEST 2 VERY LONG NAME VERY SO LONG"
         val category1 = Category("NAME_VALIDATION_TEST 1", Color.RED)
     }
 
@@ -88,9 +88,9 @@ class CategoryNameValidationTest : BaseHiltTest() {
             .check(matches(ViewMatchers.withText("Add category")))
 
         onView(withId(R.id.ed_category_name))
-            .perform(ViewActions.replaceText(newCategoryName))
+            .perform(ViewActions.replaceText(NEW_CATEGORY_NAME))
 
-        val newCategoryNameUppercase = newCategoryName.uppercase()
+        val newCategoryNameUppercase = NEW_CATEGORY_NAME.uppercase()
         onView(withId(R.id.ed_category_name))
             .check(matches(ViewMatchers.withText(newCategoryNameUppercase)))
     }
@@ -107,9 +107,9 @@ class CategoryNameValidationTest : BaseHiltTest() {
             .check(matches(ViewMatchers.withText("Add category")))
 
         onView(withId(R.id.ed_category_name))
-            .perform(ViewActions.replaceText(newCategoryLongName))
+            .perform(ViewActions.replaceText(NEW_CATEGORY_LONG_NAME))
 
-        val limitedCategoryName = newCategoryLongName.substring(0, maxNameLength)
+        val limitedCategoryName = NEW_CATEGORY_LONG_NAME.substring(0, maxNameLength)
         onView(withId(R.id.ed_category_name))
             .check(matches(ViewMatchers.withText(limitedCategoryName)))
     }

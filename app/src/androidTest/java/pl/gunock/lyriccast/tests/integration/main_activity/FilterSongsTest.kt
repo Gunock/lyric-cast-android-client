@@ -41,9 +41,9 @@ class FilterSongsTest : BaseHiltTest() {
     private companion object {
         val category = Category("TEST CATEGORY", Color.RED)
 
-        const val songTitle = "FilterSongsTest 1"
-        val song1 = Song("1", "$songTitle 1", listOf(), listOf(), category = category)
-        val song2 = Song("2", "$songTitle 2", listOf(), listOf())
+        const val SONG_TITLE = "FilterSongsTest 1"
+        val song1 = Song("1", "$SONG_TITLE 1", listOf(), listOf(), category = category)
+        val song2 = Song("2", "$SONG_TITLE 2", listOf(), listOf())
         val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
 
@@ -81,7 +81,7 @@ class FilterSongsTest : BaseHiltTest() {
         }
 
         onView(withId(R.id.ed_song_title_filter))
-            .perform(replaceText(songTitle))
+            .perform(replaceText(SONG_TITLE))
 
         retryWithTimeout {
             onView(withId(R.id.rcv_songs))

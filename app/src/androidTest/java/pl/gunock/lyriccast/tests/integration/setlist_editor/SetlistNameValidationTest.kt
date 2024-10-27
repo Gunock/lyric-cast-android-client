@@ -32,7 +32,7 @@ import javax.inject.Inject
 class SetlistNameValidationTest : BaseHiltTest() {
 
     private companion object {
-        const val longSetlistName = "SetlistNameValidationTest 2 very long name omg"
+        const val LONG_SETLIST_NAME = "SetlistNameValidationTest 2 very long name omg"
         val setlist = Setlist("1", "SetlistNameValidationTest 1", listOf())
     }
 
@@ -69,9 +69,9 @@ class SetlistNameValidationTest : BaseHiltTest() {
             .getInteger(R.integer.ed_max_length_setlist_name)
 
         onView(withId(R.id.ed_setlist_name))
-            .perform(replaceText(longSetlistName))
+            .perform(replaceText(LONG_SETLIST_NAME))
 
-        val limitedSetlistName = longSetlistName.substring(0, maxNameLength)
+        val limitedSetlistName = LONG_SETLIST_NAME.substring(0, maxNameLength)
         onView(withId(R.id.ed_setlist_name))
             .check(matches(withText(limitedSetlistName)))
     }

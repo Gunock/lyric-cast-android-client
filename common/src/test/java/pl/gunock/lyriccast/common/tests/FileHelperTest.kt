@@ -19,7 +19,7 @@ import java.io.File
 class FileHelperTest {
 
     private companion object {
-        const val testFileContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        const val TEST_FILE_CONTENT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
     }
 
     private lateinit var testDir: File
@@ -36,7 +36,7 @@ class FileHelperTest {
         testZipFile = File("${testDir.path}/FileHelperTest.zip")
 
         testFile.createNewFile()
-        testFile.writeText(testFileContent)
+        testFile.writeText(TEST_FILE_CONTENT)
     }
 
     @After
@@ -65,7 +65,7 @@ class FileHelperTest {
         }
 
         assertThat(testFile.exists()).isTrue()
-        assertThat(testFile.readText()).isEqualTo(testFileContent)
+        assertThat(testFile.readText()).isEqualTo(TEST_FILE_CONTENT)
     }
 
 }

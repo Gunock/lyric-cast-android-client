@@ -6,8 +6,6 @@
 
 package pl.gunock.lyriccast.ui.main
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.net.wifi.WifiManager
@@ -129,14 +127,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_add_category -> goToCategoryManager()
-            R.id.menu_settings -> goToSettings()
+            R.id.menu_add_category -> {
+                goToCategoryManager()
+                true
+            }
+
+            R.id.menu_settings -> {
+                goToSettings()
+                true
+            }
+
             R.id.menu_import_songs -> {
                 lifecycleScope.launch(Dispatchers.Default) { showImportDialog() }
                 true
             }
 
-            R.id.menu_export_all -> startExport()
+            R.id.menu_export_all -> {
+                startExport()
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -190,18 +200,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startExport(): Boolean {
+    private fun startExport() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a directory")
         exportChooserResultLauncher.launch(chooserIntent)
-
-        return true
     }
 
     private fun import(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) {
+        if (result.resultCode != RESULT_OK) {
             return
         }
 
@@ -218,7 +226,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportAll(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) {
+        if (result.resultCode != RESULT_OK) {
             return
         }
 
@@ -338,30 +346,27 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun startImport(): Boolean {
+    private fun startImport() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "application/zip"
 
         val chooserIntent = Intent.createChooser(intent, "Choose a file")
         importChooserResultLauncher.launch(chooserIntent)
-        return true
     }
 
-    private fun goToSettings(): Boolean {
+    private fun goToSettings() {
         val intent = Intent(baseContext, SettingsActivity::class.java)
         startActivity(intent)
-        return true
     }
 
-    private fun goToCategoryManager(): Boolean {
+    private fun goToCategoryManager() {
         val intent = Intent(baseContext, CategoryManagerActivity::class.java)
         startActivity(intent)
-        return true
     }
 
     private fun checkWifiEnabled() {
-        val wifiManager = baseContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager = baseContext.getSystemService(WIFI_SERVICE) as WifiManager
         if (!wifiManager.isWifiEnabled) {
             turnOnWifi()
         }

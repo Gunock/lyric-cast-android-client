@@ -38,7 +38,7 @@ class MainModel @Inject constructor(
         const val TAG = "MainViewModel"
     }
 
-    suspend fun exportAll(
+    fun exportAll(
         cacheDir: String,
         outputStream: OutputStream,
     ): Flow<Int> = flow {

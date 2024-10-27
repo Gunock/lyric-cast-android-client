@@ -4,8 +4,6 @@
  * Last modified 10/01/2023, 21:31
  */
 
-@file:Suppress("unused")
-
 package pl.gunock.lyriccast.modules
 
 import android.content.Context

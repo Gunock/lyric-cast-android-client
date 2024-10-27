@@ -36,9 +36,9 @@ import javax.inject.Inject
 class DeleteSongTest : BaseHiltTest() {
 
     private companion object {
-        const val songTitle = "FilterSongsTest 1"
-        val song1 = Song("1", "$songTitle 1", listOf(), listOf())
-        val song2 = Song("2", "$songTitle 2", listOf(), listOf())
+        const val SONG_TITLE = "FilterSongsTest 1"
+        val song1 = Song("1", "$SONG_TITLE 1", listOf(), listOf())
+        val song2 = Song("2", "$SONG_TITLE 2", listOf(), listOf())
         val song3 = Song("3", "FilterSongsTest 2", listOf(), listOf())
     }
 

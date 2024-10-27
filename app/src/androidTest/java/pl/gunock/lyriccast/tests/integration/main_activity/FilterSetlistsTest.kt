@@ -33,9 +33,9 @@ import javax.inject.Inject
 class FilterSetlistsTest : BaseHiltTest() {
 
     private companion object {
-        const val setlistName = "FilterSetlistsTest 1"
-        val setlist1 = Setlist("1", "$setlistName 1", listOf())
-        val setlist2 = Setlist("2", "$setlistName 2", listOf())
+        const val SETLIST_NAME = "FilterSetlistsTest 1"
+        val setlist1 = Setlist("1", "$SETLIST_NAME 1", listOf())
+        val setlist2 = Setlist("2", "$SETLIST_NAME 2", listOf())
         val setlist3 = Setlist("3", "FilterSetlistsTest 2", listOf())
     }
 
@@ -68,7 +68,7 @@ class FilterSetlistsTest : BaseHiltTest() {
         }
 
         onView(withId(R.id.ed_setlist_name_filter))
-            .perform(replaceText(setlistName))
+            .perform(replaceText(SETLIST_NAME))
 
         retryWithTimeout {
             onView(withId(R.id.rcv_setlists))

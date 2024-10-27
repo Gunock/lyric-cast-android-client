@@ -85,7 +85,11 @@ class CategoryManagerActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_add_category -> showAddCategoryDialog()
+            R.id.menu_add_category -> {
+                showAddCategoryDialog()
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -111,19 +115,16 @@ class CategoryManagerActivity : AppCompatActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun showAddCategoryDialog(): Boolean {
+    private fun showAddCategoryDialog() {
         EditCategoryDialogFragment().show(supportFragmentManager, EditCategoryDialogFragment.TAG)
-        return true
     }
 
-    private fun editSelectedCategory(): Boolean {
+    private fun editSelectedCategory() {
         val categoryItem = categoryItemsAdapter.currentList
             .first { tracker.isSelected(it.category.idLong) }
 
         EditCategoryDialogFragment(categoryItem)
             .show(supportFragmentManager, EditCategoryDialogFragment.TAG)
-
-        return true
     }
 
     private fun onSelectCategory() {
@@ -195,7 +196,11 @@ class CategoryManagerActivity : AppCompatActivity() {
                         true
                     }
 
-                    R.id.action_menu_edit -> editSelectedCategory()
+                    R.id.action_menu_edit -> {
+                        editSelectedCategory()
+                        true
+                    }
+
                     else -> false
                 }
 
