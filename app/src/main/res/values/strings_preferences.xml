@@ -7,7 +7,6 @@
 <resources>
     <!-- Keys -->
     <string name="preference_theme_key" translatable="false">appTheme</string>
-    <string name="preference_enable_ads_key" translatable="false">preferenceAdsEnable</string>
     <string name="preference_controls_button_height_key" translatable="false">controlsButtonHeight</string>
     <string name="preference_cast_background_key" translatable="false">backgroundColor</string>
     <string name="preference_cast_font_color_key" translatable="false">fontColor</string>
