@@ -8,10 +8,12 @@ protobuf = "0.9.4"
 nav = "2.8.3"
 googleServices = "4.4.2"
 firebaseCrashlytics = "3.0.2"
+firebaseCrashlyticsKtx = "19.2.1"
+firebaseAnalyticsKtx = "22.1.2"
 
 coroutines = "1.9.0"
 datastore = "1.1.1"
-protobuf-javaLite = "4.26.1"
+protobuf-javaLite = "4.28.3"
 material = "1.12.0"
 androidXCore = "1.13.1"
 appCompat = "1.7.0"
@@ -23,7 +25,7 @@ googleAds = "23.4.0"
 firebase = "33.5.1"
 castFramework = "21.5.0"
 mediaRouter = "1.7.0"
-apacheCommonsLang = "3.14.0"
+apacheCommonsLang = "3.17.0"
 zip4j = "2.11.5"
 
 androidXTestCore = "1.6.1"
@@ -31,7 +33,7 @@ androidXTestExtKotlinRunner = "1.2.1"
 espresso = "3.6.1"
 # TODO: Check if this can be migrated to jupyter api
 junit = "4.13.2"
-truth = "1.4.2"
+truth = "1.4.4"
 
 leakCanary = "2.10"
 
@@ -60,8 +62,8 @@ androidx-recyclerViewSelection = { module = "androidx.recyclerview:recyclerview-
 google-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "googleAds" }
 google-castFramework = { module = "com.google.android.gms:play-services-cast-framework", version.ref = "castFramework" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
-firebase-crashlyticsKtx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-firebase-analyticsKtx = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-crashlyticsKtx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtx" }
+firebase-analyticsKtx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebaseAnalyticsKtx" }
 androidx-mediaRouter = { module = "androidx.mediarouter:mediarouter", version.ref = "mediaRouter" }
 apache-commonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang" }
 zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
