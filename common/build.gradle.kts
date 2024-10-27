@@ -38,6 +38,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
     }
     namespace = "pl.gunock.lyriccast.common"
