@@ -8,8 +8,10 @@ package pl.gunock.lyriccast.shared.cast
 
 import android.util.Log
 import com.google.android.gms.cast.framework.CastContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import pl.gunock.lyriccast.shared.enums.ControlAction
 
@@ -64,8 +66,11 @@ object CastMessageHelper {
     }
 
     private fun isNotInSession(): Boolean {
-        val context: CastContext = CastContext.getSharedInstance()!!
-        val castSession = context.sessionManager.currentCastSession
+        val castSession = runBlocking(Dispatchers.Main) {
+            val context = CastContext.getSharedInstance()
+            context?.sessionManager?.currentCastSession
+        }
+
         return castSession == null
     }
 
