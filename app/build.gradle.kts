@@ -18,9 +18,9 @@ plugins {
 }
 
 android {
-    val major = 0
-    val minor = 2
-    val patch = 2
+    val major = 1
+    val minor = 0
+    val patch = 0
 
     defaultConfig {
         applicationId = "dev.thomas_kiljanczyk.lyriccast"
