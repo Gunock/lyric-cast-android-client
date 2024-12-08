@@ -57,7 +57,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var songItemsAdapter: ControlsSongItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge();
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val rootBinding = ActivitySetlistControlsBinding.inflate(layoutInflater)
@@ -190,8 +190,7 @@ class SetlistControlsActivity : AppCompatActivity() {
         binding.rcvSongs.adapter = songItemsAdapter
 
         viewModel.changedSongPositions
-            .onEach { songItems ->
-                val itemPositions = songItems.map { viewModel.songs.indexOf(it) }
+            .onEach { itemPositions ->
                 itemPositions.forEach { songItemsAdapter.notifyItemChanged(it) }
             }.launchIn(lifecycleScope)
     }

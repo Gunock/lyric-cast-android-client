@@ -53,8 +53,8 @@ class SetlistControlsModel @Inject constructor(
     private val _currentSongPosition = MutableStateFlow(0)
     val currentSongPosition: Flow<Int> get() = _currentSongPosition
 
-    private val _changedSongItems: MutableStateFlow<List<SongItem>> = MutableStateFlow(listOf())
-    val changedSongPositions: Flow<List<SongItem>> get() = _changedSongItems
+    private val _changedSongItems: MutableStateFlow<List<Int>> = MutableStateFlow(listOf())
+    val changedSongPositions: Flow<List<Int>> get() = _changedSongItems
 
 
     private var currentLyricsPosition: Int = 0
@@ -146,12 +146,17 @@ class SetlistControlsModel @Inject constructor(
         _currentSlideText.tryEmit(lyricsText)
         _currentSlideNumber.tryEmit("${currentLyricsPosition + 1}/${currentSong.lyricsList.size}")
 
-        val isNewSongTitle = previousSongItem != currentSongItem
-        if (isNewSongTitle) {
+        // Uses reference equality to make it work for songs with same title
+        val isNewSong = previousSongItem !== currentSongItem
+        if (isNewSong) {
             previousSongItem.isHighlighted = false
             currentSongItem.isHighlighted = true
 
-            _changedSongItems.value = listOf(previousSongItem.copy(), currentSongItem.copy())
+            // Uses reference equality to make it work for songs with same title
+            val previousSongPosition = _songs.indexOfFirst { it === previousSongItem }
+            val currentSongPosition = _songs.indexOfFirst { it === currentSongItem }
+
+            _changedSongItems.value = listOf(previousSongPosition, currentSongPosition)
             _currentSongTitle.tryEmit(currentSong.title)
         }
     }
