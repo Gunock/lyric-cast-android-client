@@ -30,7 +30,7 @@
             android:exported="true"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +43,8 @@
             android:label="@string/title_setlist_editor"
             android:parentActivityName="pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar" />
+            android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.song_editor.SongEditorActivity"
@@ -51,35 +52,39 @@
             android:parentActivityName="pl.gunock.lyriccast.ui.song_editor.SongEditorActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.song_controls.SongControlsActivity"
             android:label="@string/title_controls"
             android:parentActivityName="pl.gunock.lyriccast.ui.song_controls.SongControlsActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar" />
+            android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.setlist_controls.SetlistControlsActivity"
             android:label="@string/title_controls"
             android:parentActivityName="pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar" />
+            android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_settings"
             android:parentActivityName="pl.gunock.lyriccast.ui.settings.SettingsActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar" />
+            android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.category_manager.CategoryManagerActivity"
             android:label="@string/title_categories"
             android:parentActivityName="pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/Theme.LyricCast.NoActionBar" />
+            android:theme="@style/Theme.LyricCast.NoActionBar"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
     </application>
 
 </manifest>

@@ -4,7 +4,14 @@
   ~ Last modified 10/28/23, 2:06 PM
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- fix status bar color in action mode -->
+    <color name="abc_decor_view_status_guard" tools:override="true">@android:color/transparent
+    </color>
+    <color name="abc_decor_view_status_guard_light" tools:override="true">
+        @android:color/transparent
+    </color>
+
     <color name="placeholder_card_color_1">@color/maroon</color>
     <color name="error_Indeterminate_progress_bar">@color/red</color>
 

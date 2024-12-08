@@ -69,19 +69,14 @@ class CategoryManagerActivity : AppCompatActivity() {
 
         setupRecyclerView()
 
-        setOnApplyWindowInsetsListener(rootBinding.toolbarCategoryManager) { v, windowInsets ->
+        setOnApplyWindowInsetsListener(rootBinding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            rootBinding.toolbarCategoryManager.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
                 bottomMargin = 0
             }
 
-            WindowInsetsCompat.CONSUMED
-        }
-
-        setOnApplyWindowInsetsListener(binding.rcvCategories) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            binding.rcvCategories.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = insets.bottom
             }
 

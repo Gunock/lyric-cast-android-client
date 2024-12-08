@@ -85,19 +85,19 @@ class SongEditorActivity : AppCompatActivity() {
             }.flowOn(Dispatchers.Default)
             .launchIn(lifecycleScope)
 
-        setOnApplyWindowInsetsListener(rootBinding.toolbarMain) { v, windowInsets ->
+        setOnApplyWindowInsetsListener(rootBinding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            rootBinding.toolbarMain.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
                 bottomMargin = 0
             }
 
-            WindowInsetsCompat.CONSUMED
-        }
-
-        setOnApplyWindowInsetsListener(binding.tblSongSection) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, insets.bottom)
+            binding.tblSongSection.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                insets.bottom
+            )
 
             WindowInsetsCompat.CONSUMED
         }

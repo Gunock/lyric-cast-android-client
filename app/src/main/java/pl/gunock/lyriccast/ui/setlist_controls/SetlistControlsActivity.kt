@@ -106,10 +106,14 @@ class SetlistControlsActivity : AppCompatActivity() {
         setupRecyclerView()
         setupListeners()
 
-        setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+        setOnApplyWindowInsetsListener(rootBinding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            rootBinding.toolbarControls.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+                bottomMargin = 0
+            }
 
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            binding.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = insets.bottom
             }
 

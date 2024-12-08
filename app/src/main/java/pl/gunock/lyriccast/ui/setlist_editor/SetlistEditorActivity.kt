@@ -28,23 +28,6 @@ class SetlistEditorActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbarSetlistEditor)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        setOnApplyWindowInsetsListener(binding.toolbarSetlistEditor) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                insets.top,
-                v.paddingRight,
-                v.paddingBottom
-            )
-
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = 0
-                bottomMargin = 0
-            }
-
-            WindowInsetsCompat.CONSUMED
-        }
-
         setOnApplyWindowInsetsListener(binding.contentSetlistEditor.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 

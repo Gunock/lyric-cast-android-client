@@ -105,32 +105,20 @@ class MainActivity : AppCompatActivity() {
             wifiStateChecked = true
         }
 
-        setOnApplyWindowInsetsListener(rootBinding.toolbarMain) { v, windowInsets ->
+        setOnApplyWindowInsetsListener(rootBinding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                insets.top,
-                v.paddingRight,
-                v.paddingBottom
-            )
-
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = 0
+            rootBinding.toolbarMain.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
                 bottomMargin = 0
             }
 
-            WindowInsetsCompat.CONSUMED
-        }
-
-        setOnApplyWindowInsetsListener(binding.tblMainFragments) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
+            binding.tblMainFragments.setPadding(
                 v.paddingLeft,
                 v.paddingTop,
                 v.paddingRight,
                 insets.bottom
             )
+
             WindowInsetsCompat.CONSUMED
         }
     }

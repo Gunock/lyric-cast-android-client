@@ -29,10 +29,6 @@
         <item name="hintTextColor">@color/accent</item>
     </style>
 
-    <style name="temp">
-        <item name="colorSurface">@android:color/black</item>
-    </style>
-
     <style name="ThemeOverlay.LyricCast.EditText" parent="ThemeOverlay.Material3.TextInputEditText.FilledBox">
         <item name="editTextStyle">@style/Widget.LyricCast.EditText</item>
     </style>
@@ -46,6 +42,7 @@
     </style>
 
     <style name="Widget.LyricCast.AppBarLayout" parent="@style/Widget.Material3.AppBarLayout">
+        <item name="elevation">0dp</item>
         <item name="android:background">@color/background_2</item>
         <item name="liftOnScrollColor">@color/background_1</item>
     </style>
