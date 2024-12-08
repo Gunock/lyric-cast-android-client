@@ -16,12 +16,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -99,6 +103,35 @@ class MainActivity : AppCompatActivity() {
         if (!wifiStateChecked) {
             checkWifiEnabled()
             wifiStateChecked = true
+        }
+
+        setOnApplyWindowInsetsListener(rootBinding.toolbarMain) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                insets.top,
+                v.paddingRight,
+                v.paddingBottom
+            )
+
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = 0
+                bottomMargin = 0
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
+
+        setOnApplyWindowInsetsListener(binding.tblMainFragments) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                insets.bottom
+            )
+            WindowInsetsCompat.CONSUMED
         }
     }
 

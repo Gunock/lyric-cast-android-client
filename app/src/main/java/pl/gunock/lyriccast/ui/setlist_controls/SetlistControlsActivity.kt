@@ -12,9 +12,14 @@ import android.util.TypedValue
 import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,6 +57,7 @@ class SetlistControlsActivity : AppCompatActivity() {
     private lateinit var songItemsAdapter: ControlsSongItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge();
         super.onCreate(savedInstanceState)
 
         val rootBinding = ActivitySetlistControlsBinding.inflate(layoutInflater)
@@ -99,6 +105,16 @@ class SetlistControlsActivity : AppCompatActivity() {
 
         setupRecyclerView()
         setupListeners()
+
+        setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = insets.bottom
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     override fun onResume() {

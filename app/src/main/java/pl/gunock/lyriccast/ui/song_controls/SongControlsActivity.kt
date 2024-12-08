@@ -11,9 +11,14 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.cast.framework.CastContext
@@ -45,6 +50,7 @@ class SongControlsActivity : AppCompatActivity() {
     private lateinit var binding: ContentSongControlsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val rootBinding = ActivitySongControlsBinding.inflate(layoutInflater)
@@ -85,6 +91,16 @@ class SongControlsActivity : AppCompatActivity() {
             .launchIn(lifecycleScope)
 
         setupListeners()
+
+        setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = insets.bottom
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     override fun onResume() {

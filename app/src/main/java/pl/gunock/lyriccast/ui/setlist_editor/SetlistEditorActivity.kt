@@ -7,8 +7,12 @@
 package pl.gunock.lyriccast.ui.setlist_editor
 
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import dagger.hilt.android.AndroidEntryPoint
 import pl.gunock.lyriccast.databinding.ActivitySetlistEditorBinding
 
@@ -23,6 +27,33 @@ class SetlistEditorActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbarSetlistEditor)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        setOnApplyWindowInsetsListener(binding.toolbarSetlistEditor) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                insets.top,
+                v.paddingRight,
+                v.paddingBottom
+            )
+
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = 0
+                bottomMargin = 0
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
+
+        setOnApplyWindowInsetsListener(binding.contentSetlistEditor.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = insets.bottom
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
 }
