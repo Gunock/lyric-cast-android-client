@@ -23,7 +23,7 @@ android {
     val patch = 2
 
     defaultConfig {
-        applicationId = "pl.gunock.lyriccast"
+        applicationId = "dev.thomas_kiljanczyk.lyriccast"
         minSdk = 27
         compileSdk = 35
         targetSdk = 35
@@ -31,7 +31,7 @@ android {
         versionCode = major * 100000000 + minor * 10000 + patch
         versionName = "$major.$minor.$patch"
 
-        testInstrumentationRunner = "pl.gunock.lyriccast.HiltTestRunner"
+        testInstrumentationRunner = "dev.thomas_kiljanczyk.lyriccast.HiltTestRunner"
         resourceConfigurations += listOf("en", "pl")
     }
 
@@ -67,7 +67,7 @@ android {
             isIncludeAndroidResources = true
         }
     }
-    namespace = "pl.gunock.lyriccast"
+    namespace = "dev.thomas_kiljanczyk.lyriccast"
 }
 
 dependencies {

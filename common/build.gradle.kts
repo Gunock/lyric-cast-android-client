@@ -41,7 +41,7 @@ android {
             isReturnDefaultValues = true
         }
     }
-    namespace = "pl.gunock.lyriccast.common"
+    namespace = "dev.thomas_kiljanczyk.lyriccast.common"
 }
 
 dependencies {

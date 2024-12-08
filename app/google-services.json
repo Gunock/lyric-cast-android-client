@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1032205717305:android:e7454a285c26a5a4b0e2e8",
         "android_client_info": {
-          "package_name": "pl.gunock.lyriccast"
+          "package_name": "dev.thomas_kiljanczyk.lyriccast"
         }
       },
       "oauth_client": [

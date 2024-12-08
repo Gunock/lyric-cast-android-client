@@ -34,7 +34,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    namespace = "pl.gunock.datatransfer"
+    namespace = "dev.thomas_kiljanczyk.datatransfer"
 }
 
 dependencies {

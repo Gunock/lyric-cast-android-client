@@ -1,13 +1,13 @@
 <!--
-  ~ Created by Tomasz Kiljanczyk on 18/07/2021, 12:21
-  ~ Copyright (c) 2021 . All rights reserved.
-  ~ Last modified 17/07/2021, 11:25
+  ~ Created by Tomasz Kiljanczyk on 08/12/2024, 21:35
+  ~ Copyright (c) 2024 . All rights reserved.
+  ~ Last modified 08/12/2024, 21:06
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pl.gunock.lyriccast.ui.main.MainActivity"
+    tools:context="dev.thomas_kiljanczyk.lyriccast.ui.main.MainActivity"
     tools:ignore="AlwaysShowAction">
 
     <item

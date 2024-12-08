@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="pl.gunock.lyriccast.shared.cast.CastOptionsProvider" />
+            android:value="dev.thomas_kiljanczyk.lyriccast.shared.cast.CastOptionsProvider" />
 
         <activity
             android:name=".ui.main.MainActivity"
@@ -41,7 +41,7 @@
         <activity
             android:name=".ui.setlist_editor.SetlistEditorActivity"
             android:label="@string/title_setlist_editor"
-            android:parentActivityName="pl.gunock.lyriccast.ui.setlist_editor.SetlistEditorActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.setlist_editor.SetlistEditorActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />
@@ -49,7 +49,7 @@
         <activity
             android:name=".ui.song_editor.SongEditorActivity"
             android:label="@string/title_song_editor"
-            android:parentActivityName="pl.gunock.lyriccast.ui.song_editor.SongEditorActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.song_editor.SongEditorActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />
@@ -57,7 +57,7 @@
         <activity
             android:name=".ui.song_controls.SongControlsActivity"
             android:label="@string/title_controls"
-            android:parentActivityName="pl.gunock.lyriccast.ui.song_controls.SongControlsActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.song_controls.SongControlsActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />
@@ -65,7 +65,7 @@
         <activity
             android:name=".ui.setlist_controls.SetlistControlsActivity"
             android:label="@string/title_controls"
-            android:parentActivityName="pl.gunock.lyriccast.ui.setlist_controls.SetlistControlsActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.setlist_controls.SetlistControlsActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />
@@ -73,7 +73,7 @@
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_settings"
-            android:parentActivityName="pl.gunock.lyriccast.ui.settings.SettingsActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.settings.SettingsActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />
@@ -81,7 +81,7 @@
         <activity
             android:name=".ui.category_manager.CategoryManagerActivity"
             android:label="@string/title_categories"
-            android:parentActivityName="pl.gunock.lyriccast.ui.category_manager.CategoryManagerActivity"
+            android:parentActivityName="dev.thomas_kiljanczyk.lyriccast.ui.category_manager.CategoryManagerActivity"
             android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.LyricCast.NoActionBar"
             android:windowSoftInputMode="adjustPan|adjustResize" />

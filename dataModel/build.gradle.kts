@@ -36,7 +36,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    namespace = "pl.gunock.lyriccast.datamodel"
+    namespace = "dev.thomas_kiljanczyk.lyriccast.datamodel"
 }
 
 dependencies {
