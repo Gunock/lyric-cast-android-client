@@ -21,6 +21,8 @@ android {
     val major = 1
     val minor = 0
     val patch = 0
+    // used for alpha, beta, etc. versions
+    val revision = 0
 
     defaultConfig {
         applicationId = "dev.thomas_kiljanczyk.lyriccast"
@@ -28,8 +30,15 @@ android {
         compileSdk = 35
         targetSdk = 35
 
-        versionCode = major * 100000000 + minor * 10000 + patch
-        versionName = "$major.$minor.$patch"
+        // Versioning
+        // Max version code is 2,100,000,000
+        // Version code is calculated as follows:
+        // revision - up to 99
+        // patch - up to 999
+        // minor - up to 999
+        // major - up to 21
+        versionCode = major * 100_000_000 + minor * 100_000 + patch * 100 + revision
+        versionName = "$major.$minor.$patch ${if (revision > 0) ".$revision" else ""}"
 
         testInstrumentationRunner = "dev.thomas_kiljanczyk.lyriccast.HiltTestRunner"
         resourceConfigurations += listOf("en", "pl")

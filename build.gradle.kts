@@ -25,4 +25,5 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.mongoDbRealm) apply false
     alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.google.googleServices) apply false
 }

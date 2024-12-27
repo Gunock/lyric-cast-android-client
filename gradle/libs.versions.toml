@@ -84,6 +84,6 @@ mongoDbRealm = { id = "io.realm.kotlin", version.ref = "mongoDbRealm" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 android-application = { id = "com.android.application" }
 androidx-navigationSafeArgs = { id = "androidx.navigation.safeargs.kotlin" }
-google-googleServices = { id = "com.google.gms.google-services" }
+google-googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics" }
 android-library = { id = "com.android.library" }
